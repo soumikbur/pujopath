@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PandalService } from '@/lib/services/PandalService';
+import { PANDALS_DATA } from '@/data/pandals';
+
+export function generateStaticParams() {
+  return PANDALS_DATA.map((pandal) => ({
+    slug: pandal.slug,
+  }));
+}
 
 export async function GET(
   request: NextRequest,
