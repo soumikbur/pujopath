@@ -479,6 +479,7 @@ assert.strictEqual(headerSource.includes('z-[1100]'), true, 'Header must have z-
 assert.strictEqual(headerSource.includes('z-[1200]'), true, 'More dropdown must have z-[1200] for guaranteed elevation');
 assert.strictEqual(headerSource.includes('top-full mt-2'), true, 'More dropdown must anchor to top-full with mt-2 offset');
 assert.strictEqual(headerSource.includes('max-h-[calc(100vh-5rem)]'), true, 'More dropdown must constrain height and allow scrolling within viewport');
+assert.strictEqual(headerSource.includes('bg-white dark:bg-[#1a1613]'), true, 'More dropdown must have 100% solid opaque background to prevent see-through collisions');
 
 // 3. ARIA attributes for accessibility
 assert.strictEqual(headerSource.includes('aria-haspopup="menu"'), true, 'More trigger button must have aria-haspopup="menu"');

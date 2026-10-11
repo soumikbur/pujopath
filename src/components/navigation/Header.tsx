@@ -139,7 +139,7 @@ export function Header() {
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="desktop-more-menu-button"
-                className="absolute right-0 top-full mt-2 w-52 sm:w-56 rounded-2xl border border-[#e8e1d9] dark:border-[#2f2720] bg-white/98 dark:bg-[#1a1613]/98 backdrop-blur-xl p-1.5 shadow-2xl shadow-black/15 dark:shadow-black/60 z-[1200] max-h-[calc(100vh-5rem)] overflow-y-auto animate-in fade-in zoom-in-95 duration-150"
+                className="absolute right-0 top-full mt-2 w-52 sm:w-56 rounded-2xl border border-[#ded4c8] dark:border-[#382e25] bg-white dark:bg-[#1a1613] p-1.5 shadow-2xl shadow-black/20 dark:shadow-black/70 z-[1200] max-h-[calc(100vh-5rem)] overflow-y-auto"
               >
                 {secondaryLinks.map((link) => {
                   const Icon = link.icon;
