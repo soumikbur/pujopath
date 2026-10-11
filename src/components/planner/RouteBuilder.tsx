@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   Trash2,
@@ -11,11 +11,30 @@ import {
   Search,
   ArrowUp,
   ArrowDown,
+  MapPin,
+  Compass,
+  ExternalLink,
+  AlertTriangle,
+  Train,
+  Layers,
+  Smartphone,
+  Info,
 } from 'lucide-react';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { PANDALS_DATA } from '@/data/pandals';
+import { METRO_STATIONS_DATA } from '@/data/metro';
 import { calculateHaversineDistance, estimateWalkingMinutes, formatDistance, toBengaliDigits } from '@/lib/geo';
+import {
+  NavigationProvider,
+  OriginMode,
+  NavigationOrigin,
+  buildGoogleMapsUrl,
+  buildAppleMapsUrl,
+  detectDefaultNavigationProvider,
+  requestCurrentGeolocation,
+  isValidCoordinate,
+} from '@/lib/maps/navigationUrl';
 import { cn } from '@/lib/utils/cn';
 
 export function RouteBuilder() {
@@ -32,8 +51,31 @@ export function RouteBuilder() {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
 
+  // Navigation settings & states
+  const [provider, setProvider] = useState<NavigationProvider>('google');
+  const [originMode, setOriginMode] = useState<OriginMode>('app_default');
+  const [selectedStationId, setSelectedStationId] = useState<string>(
+    METRO_STATIONS_DATA[0]?.id || 'shobhabazar-sutanuti'
+  );
+
+  // GPS Location state
+  const [isLocating, setIsLocating] = useState<boolean>(false);
+  const [gpsLocation, setGpsLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [gpsError, setGpsError] = useState<string | null>(null);
+
+  // Feedback states
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [optimizedSuccess, setOptimizedSuccess] = useState(false);
+
+  // Initialize recommended provider on client mount
+  useEffect(() => {
+    try {
+      const detected = detectDefaultNavigationProvider();
+      setProvider(detected);
+    } catch {
+      // Fallback to google
+    }
+  }, []);
 
   const handleSave = () => {
     saveCurrentRoute();
@@ -46,6 +88,83 @@ export function RouteBuilder() {
     setOptimizedSuccess(true);
     setTimeout(() => setOptimizedSuccess(false), 2000);
   };
+
+  // Request device GPS location on-demand
+  const handleAcquireLocation = async () => {
+    setIsLocating(true);
+    setGpsError(null);
+    try {
+      const coords = await requestCurrentGeolocation(10000);
+      setGpsLocation({ lat: coords.lat, lng: coords.lng });
+      setOriginMode('current_location');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Location request failed';
+      setGpsError(msg);
+    } finally {
+      setIsLocating(false);
+    }
+  };
+
+  // Resolve current active NavigationOrigin
+  const activeOrigin: NavigationOrigin = useMemo(() => {
+    if (originMode === 'current_location' && gpsLocation) {
+      return {
+        mode: 'current_location',
+        lat: gpsLocation.lat,
+        lng: gpsLocation.lng,
+        label: `My GPS Location (${gpsLocation.lat.toFixed(4)}, ${gpsLocation.lng.toFixed(4)})`,
+        labelBn: `আমার জিপিএস অবস্থান (${gpsLocation.lat.toFixed(4)}, ${gpsLocation.lng.toFixed(4)})`,
+      };
+    }
+
+    if (originMode === 'custom_station') {
+      const station = METRO_STATIONS_DATA.find((s) => s.id === selectedStationId);
+      if (station) {
+        return {
+          mode: 'custom_station',
+          lat: station.latitude,
+          lng: station.longitude,
+          label: `${station.name} Metro`,
+          labelBn: `${station.nameBn} মেট্রো`,
+        };
+      }
+    }
+
+    if (originMode === 'first_pandal' && currentRouteStops.length > 0) {
+      const firstStop = currentRouteStops[0];
+      return {
+        mode: 'first_pandal',
+        lat: firstStop.pandal.latitude,
+        lng: firstStop.pandal.longitude,
+        label: firstStop.pandal.name,
+        labelBn: firstStop.pandal.nameBn,
+      };
+    }
+
+    return {
+      mode: 'app_default',
+      label: 'Mapping App Device Location',
+      labelBn: 'ম্যাপিং অ্যাপের স্বয়ংক্রিয় অবস্থান',
+    };
+  }, [originMode, gpsLocation, selectedStationId, currentRouteStops]);
+
+  // Check for invalid coordinates
+  const invalidStops = useMemo(() => {
+    return currentRouteStops.filter(
+      (s) => !isValidCoordinate(s.pandal.latitude, s.pandal.longitude)
+    );
+  }, [currentRouteStops]);
+
+  // Generate NavigationPlan based on selected provider and stops
+  const navigationPlan = useMemo(() => {
+    if (currentRouteStops.length === 0 || invalidStops.length > 0) {
+      return null;
+    }
+    if (provider === 'apple') {
+      return buildAppleMapsUrl(currentRouteStops, activeOrigin);
+    }
+    return buildGoogleMapsUrl(currentRouteStops, activeOrigin);
+  }, [currentRouteStops, activeOrigin, provider, invalidStops]);
 
   // Accurate great-circle distance between sequential stops
   const totalDistance = currentRouteStops.reduce((acc, stop, idx) => {
@@ -66,34 +185,24 @@ export function RouteBuilder() {
     ? Math.round(estimateWalkingMinutes(totalDistance) + currentRouteStops.length * 20)
     : 0;
 
-  const generateGoogleMapsUrl = () => {
-    if (currentRouteStops.length === 0) return '#';
-    const origin = `${currentRouteStops[0].pandal.latitude},${currentRouteStops[0].pandal.longitude}`;
-    const destination = `${currentRouteStops[currentRouteStops.length - 1].pandal.latitude},${currentRouteStops[currentRouteStops.length - 1].pandal.longitude}`;
-    const waypoints = currentRouteStops
-      .slice(1, -1)
-      .map((s) => `${s.pandal.latitude},${s.pandal.longitude}`)
-      .join('|');
-
-    return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints ? `&waypoints=${waypoints}` : ''}&travelmode=walking`;
-  };
-
   return (
     <div className="space-y-6">
-      {/* Stats Header Bar */}
+      {/* =========================================================================
+          STAGE B / STATS HEADER: Distance, Time, Optimization
+         ========================================================================= */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-5 sm:p-6 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] shadow-xs">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95]">
             {isBn ? 'মোট প্যান্ডেল' : 'Total Stops'}
           </span>
-          <div className="text-xl sm:text-2xl font-black text-[#242424] dark:text-[#ede5dc] mt-1">
+          <div className="text-xl sm:text-2xl font-black text-[#242424] dark:text-[#ede5dc] mt-1 font-sans">
             {isBn ? `${toBengaliDigits(currentRouteStops.length)}টি মণ্ডপ` : `${currentRouteStops.length} Pandals`}
           </div>
         </div>
 
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95]">
-            {isBn ? 'প্রকৃত দূরত্ব' : 'True Distance'}
+            {isBn ? 'হাঁটার দূরত্ব' : 'Walking Distance'}
           </span>
           <div className="text-xl sm:text-2xl font-black text-[#b42323] mt-1 font-sans">
             {formatDistance(totalDistance, locale)}
@@ -102,7 +211,7 @@ export function RouteBuilder() {
 
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95]">
-            {isBn ? 'আনুমানিক সময়' : 'Est. Time'}
+            {isBn ? 'আনুমানিক সময়' : 'Est. Duration'}
           </span>
           <div className="text-xl sm:text-2xl font-black text-[#242424] dark:text-[#ede5dc] mt-1 font-sans">
             ~{isBn ? toBengaliDigits(totalWalkingMins) : totalWalkingMins} {isBn ? 'মিনিট' : 'mins'}
@@ -119,6 +228,7 @@ export function RouteBuilder() {
                 ? 'bg-emerald-600 hover:bg-emerald-700'
                 : 'bg-[#b42323] hover:bg-[#971c1c] disabled:opacity-40 disabled:cursor-not-allowed'
             )}
+            title={isBn ? 'স্মার্ট নিকটতম দূরত্ব অ্যালগরিদম দিয়ে সাজান' : 'Optimize stop sequence for shortest walking distance'}
           >
             {optimizedSuccess ? <Check className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
             <span>{optimizedSuccess ? (isBn ? 'সাজানো হয়েছে!' : 'Optimized!') : (isBn ? 'স্মার্ট সাজান' : 'Optimize Trail')}</span>
@@ -126,7 +236,7 @@ export function RouteBuilder() {
         </div>
       </div>
 
-      {/* Action Bar */}
+      {/* Save & Clear Controls */}
       {currentRouteStops.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
@@ -137,28 +247,320 @@ export function RouteBuilder() {
               {savedSuccess ? <Check className="w-4 h-4 text-emerald-600" /> : <Save className="w-4 h-4 text-[#b42323]" />}
               <span>{savedSuccess ? (isBn ? 'সংরক্ষিত হয়েছে!' : 'Saved to Itineraries!') : (isBn ? 'রুট সংরক্ষণ করুন' : 'Save Itinerary')}</span>
             </button>
-
-            <a
-              href={generateGoogleMapsUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2.5 rounded-xl bg-[#b42323] text-white hover:bg-[#971c1c] text-xs sm:text-sm font-bold flex items-center gap-2 transition-all active:scale-95 shadow-sm"
-            >
-              <Navigation className="w-4 h-4" />
-              <span>{isBn ? 'গুগল ম্যাপে ন্যাভিগেশন' : 'Start Google Navigation'}</span>
-            </a>
           </div>
 
           <button
             onClick={clearCurrentRoute}
             className="text-xs sm:text-sm text-rose-600 dark:text-rose-400 hover:underline font-bold"
           >
-            {isBn ? 'রুট পরিষ্কার করুন' : 'Clear Route'}
+            {isBn ? 'সম্পূর্ণ রুট পরিষ্কার করুন' : 'Clear Route'}
           </button>
         </div>
       )}
 
-      {/* Stops List */}
+      {/* =========================================================================
+          STAGE C: NAVIGATION LAUNCH HUB (Starting Point & Provider Selection)
+         ========================================================================= */}
+      {currentRouteStops.length > 0 && (
+        <div className="p-5 sm:p-6 rounded-2xl border-2 border-[#b42323]/20 dark:border-[#b42323]/30 bg-gradient-to-br from-white via-[#fdfbf9] to-[#faf5f0] dark:from-[#1a1613] dark:via-[#1f1915] dark:to-[#171310] shadow-md space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#eee8e1] dark:border-[#2f2720] pb-3">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#b42323]">
+                <Compass className="w-4 h-4" />
+                <span>{isBn ? 'পরিক্রমা ন্যাভিগেশন কন্ট্রোল' : 'Trail Navigation Hub'}</span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-black text-[#242424] dark:text-[#ede5dc] mt-0.5">
+                {isBn ? 'ম্যাপিং অ্যাপে পরিক্রমা শুরু করুন' : 'Launch Route in Maps'}
+              </h3>
+            </div>
+            <span className="text-xs text-[#776d65] dark:text-[#a89e95] bg-[#f2ece4] dark:bg-[#251e18] px-2.5 py-1 rounded-full self-start sm:self-auto font-medium">
+              {isBn ? 'বহিঃস্থ ন্যাভিগেশন কেবল ক্লিকেই খুলবে' : 'External app opens only on click'}
+            </span>
+          </div>
+
+          {/* 1. Origin / Starting Point Selection */}
+          <div className="space-y-2.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95] flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-[#b42323]" />
+              <span>{isBn ? 'যাত্রা শুরুর স্থান (Origin)' : 'Starting Location (Origin)'}</span>
+            </label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              {/* Option: App Default (GPS via map app) */}
+              <button
+                type="button"
+                onClick={() => setOriginMode('app_default')}
+                className={cn(
+                  'p-3 rounded-xl border text-left transition-all text-xs font-bold flex flex-col justify-between gap-1',
+                  originMode === 'app_default'
+                    ? 'border-[#b42323] bg-[#b42323]/5 dark:bg-[#b42323]/15 text-[#b42323]'
+                    : 'border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-[#625b55] dark:text-[#a89e95] hover:border-[#b42323]/40'
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <span>{isBn ? 'ম্যাপের বর্তমান অবস্থান' : "App's Live GPS"}</span>
+                  {originMode === 'app_default' && <Check className="w-3.5 h-3.5" />}
+                </div>
+                <span className="text-[11px] font-normal text-[#776d65] dark:text-[#8d837a]">
+                  {isBn ? 'ম্যাপ অ্যাপ নিজে বর্তমান অবস্থান নির্ণয় করবে' : 'Navigation app detects your location'}
+                </span>
+              </button>
+
+              {/* Option: Browser GPS On-Demand */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (gpsLocation) {
+                    setOriginMode('current_location');
+                  } else {
+                    handleAcquireLocation();
+                  }
+                }}
+                disabled={isLocating}
+                className={cn(
+                  'p-3 rounded-xl border text-left transition-all text-xs font-bold flex flex-col justify-between gap-1',
+                  originMode === 'current_location'
+                    ? 'border-[#b42323] bg-[#b42323]/5 dark:bg-[#b42323]/15 text-[#b42323]'
+                    : 'border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-[#625b55] dark:text-[#a89e95] hover:border-[#b42323]/40'
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <span>{isLocating ? (isBn ? 'অবস্থান খোঁজা হচ্ছে...' : 'Locating GPS...') : (isBn ? 'আমার বর্তমান জিপিএস' : 'My Current GPS')}</span>
+                  {originMode === 'current_location' && gpsLocation && <Check className="w-3.5 h-3.5" />}
+                </div>
+                <span className="text-[11px] font-normal text-[#776d65] dark:text-[#8d837a]">
+                  {gpsLocation
+                    ? `${gpsLocation.lat.toFixed(3)}, ${gpsLocation.lng.toFixed(3)}`
+                    : (isBn ? 'ক্লিক করে সঠিক জিপিএস অনুমতি দিন' : 'Click to acquire precise GPS')}
+                </span>
+              </button>
+
+              {/* Option: Metro Station */}
+              <button
+                type="button"
+                onClick={() => setOriginMode('custom_station')}
+                className={cn(
+                  'p-3 rounded-xl border text-left transition-all text-xs font-bold flex flex-col justify-between gap-1',
+                  originMode === 'custom_station'
+                    ? 'border-[#b42323] bg-[#b42323]/5 dark:bg-[#b42323]/15 text-[#b42323]'
+                    : 'border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-[#625b55] dark:text-[#a89e95] hover:border-[#b42323]/40'
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <Train className="w-3 h-3 text-[#b42323]" />
+                    <span>{isBn ? 'কলকাতা মেট্রো স্টেশন' : 'Metro Station'}</span>
+                  </span>
+                  {originMode === 'custom_station' && <Check className="w-3.5 h-3.5" />}
+                </div>
+                <span className="text-[11px] font-normal text-[#776d65] dark:text-[#8d837a]">
+                  {isBn ? 'মেট্রো থেকে হাঁটা শুরু করুন' : 'Start walking from a transit stop'}
+                </span>
+              </button>
+
+              {/* Option: First Pandal */}
+              <button
+                type="button"
+                onClick={() => setOriginMode('first_pandal')}
+                className={cn(
+                  'p-3 rounded-xl border text-left transition-all text-xs font-bold flex flex-col justify-between gap-1',
+                  originMode === 'first_pandal'
+                    ? 'border-[#b42323] bg-[#b42323]/5 dark:bg-[#b42323]/15 text-[#b42323]'
+                    : 'border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-[#625b55] dark:text-[#a89e95] hover:border-[#b42323]/40'
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <span>{isBn ? 'প্রথম প্যান্ডেল থেকে' : 'First Pandal (#1)'}</span>
+                  {originMode === 'first_pandal' && <Check className="w-3.5 h-3.5" />}
+                </div>
+                <span className="text-[11px] font-normal text-[#776d65] dark:text-[#8d837a] truncate">
+                  {currentRouteStops[0] ? (isBn ? currentRouteStops[0].pandal.nameBn : currentRouteStops[0].pandal.name) : 'Stop 1'}
+                </span>
+              </button>
+            </div>
+
+            {/* GPS Error feedback if denied or timed out */}
+            {gpsError && (
+              <div className="text-xs p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 flex items-center justify-between">
+                <span>{gpsError}</span>
+                <button
+                  onClick={() => setGpsError(null)}
+                  className="font-bold underline ml-2 cursor-pointer"
+                >
+                  {isBn ? 'বাতিল' : 'Dismiss'}
+                </button>
+              </div>
+            )}
+
+            {/* Metro Station Selector dropdown if custom_station is active */}
+            {originMode === 'custom_station' && (
+              <div className="pt-1">
+                <label className="text-[11px] font-bold text-[#776d65] dark:text-[#a89e95] block mb-1">
+                  {isBn ? 'মেট্রো স্টেশন নির্বাচন করুন:' : 'Select Kolkata Metro Station:'}
+                </label>
+                <select
+                  value={selectedStationId}
+                  onChange={(e) => setSelectedStationId(e.target.value)}
+                  className="w-full sm:w-80 p-2.5 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-[#242424] dark:text-[#ede5dc] text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#b42323]"
+                >
+                  {METRO_STATIONS_DATA.map((station) => (
+                    <option key={station.id} value={station.id}>
+                      {station.name} ({station.line.split(' ')[0]})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* 2. Provider Selection (Google Maps vs Apple Maps) */}
+          <div className="space-y-2.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95] flex items-center gap-1.5">
+              <Smartphone className="w-3.5 h-3.5 text-[#b42323]" />
+              <span>{isBn ? 'ন্যাভিগেশন প্রোভাইডার নির্বাচন' : 'Navigation Provider'}</span>
+            </label>
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setProvider('google')}
+                className={cn(
+                  'px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-bold flex items-center gap-2 transition-all active:scale-95',
+                  provider === 'google'
+                    ? 'border-[#b42323] bg-[#b42323] text-white shadow-xs'
+                    : 'border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-[#242424] dark:text-[#ede5dc] hover:border-[#b42323]/40'
+                )}
+              >
+                <span>Google Maps</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/20 uppercase tracking-wider">
+                  {isBn ? 'Android / Web' : 'Android & Web'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setProvider('apple')}
+                className={cn(
+                  'px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-bold flex items-center gap-2 transition-all active:scale-95',
+                  provider === 'apple'
+                    ? 'border-[#b42323] bg-[#b42323] text-white shadow-xs'
+                    : 'border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-[#242424] dark:text-[#ede5dc] hover:border-[#b42323]/40'
+                )}
+              >
+                <span>Apple Maps</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/20 uppercase tracking-wider">
+                  {isBn ? 'iOS / Mac' : 'iOS & Mac'}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Validation Warning if invalid coordinates */}
+          {invalidStops.length > 0 && (
+            <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold">
+                  {isBn ? 'নিচের মণ্ডপগুলোর স্থানাঙ্ক অনুপস্থিত বা ত্রুটিপূর্ণ:' : 'The following pandals have invalid coordinates:'}
+                </p>
+                <ul className="list-disc list-inside mt-1">
+                  {invalidStops.map((s) => (
+                    <li key={s.pandalId}>{isBn ? s.pandal.nameBn : s.pandal.name}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {/* Provider Informational Notes */}
+          {navigationPlan?.notes && (
+            <div className="p-3.5 rounded-xl bg-[#f5efe8] dark:bg-[#251e18] border border-[#e8ded3] dark:border-[#382d24] text-xs text-[#776d65] dark:text-[#a89e95] flex items-start gap-2.5">
+              <Info className="w-4 h-4 text-[#b42323] shrink-0 mt-0.5" />
+              <span>{isBn ? navigationPlan.notesBn : navigationPlan.notes}</span>
+            </div>
+          )}
+
+          {/* 3. Primary Navigation Action */}
+          <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <a
+              href={navigationPlan?.primaryUrl || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-disabled={!navigationPlan || invalidStops.length > 0}
+              onClick={(e) => {
+                if (!navigationPlan || invalidStops.length > 0) {
+                  e.preventDefault();
+                }
+              }}
+              className={cn(
+                'px-6 py-3.5 rounded-xl bg-[#b42323] text-white hover:bg-[#971c1c] text-sm sm:text-base font-extrabold flex items-center justify-center gap-2.5 transition-all shadow-md active:scale-95',
+                (!navigationPlan || invalidStops.length > 0) &&
+                  'opacity-50 pointer-events-none cursor-not-allowed shadow-none'
+              )}
+            >
+              <Navigation className="w-5 h-5 fill-current" />
+              <span>
+                {navigationPlan?.requiresMultiSegment
+                  ? (isBn ? 'প্রথম লেগ শুরু করুন (Start Leg 1)' : 'Start Pandal Hopping (Leg 1)')
+                  : (isBn ? 'পুজো পরিক্রমা শুরু করুন' : 'Start Pandal Hopping')}
+              </span>
+              <ExternalLink className="w-4 h-4 opacity-80" />
+            </a>
+
+            <div className="text-xs text-[#776d65] dark:text-[#a89e95] flex flex-col justify-center">
+              <span className="font-semibold text-[#242424] dark:text-[#ede5dc]">
+                {provider === 'google' ? 'Google Maps Walking Trail' : 'Apple Maps Walking Trail'}
+              </span>
+              <span>
+                {isBn
+                  ? `শুরুর স্থান: ${activeOrigin.labelBn || activeOrigin.label}`
+                  : `Starting from: ${activeOrigin.label}`}
+              </span>
+            </div>
+          </div>
+
+          {/* 4. Sequential Leg Cards (For multi-segment routes or Apple Maps leg-by-leg) */}
+          {navigationPlan && navigationPlan.requiresMultiSegment && navigationPlan.segments.length > 1 && (
+            <div className="pt-3 border-t border-[#eee8e1] dark:border-[#2f2720] space-y-2.5">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95]">
+                <Layers className="w-3.5 h-3.5 text-[#b42323]" />
+                <span>{isBn ? 'ধাপ অনুযায়ী সম্পূর্ণ পরিক্রমা লেগসমূহ' : 'Sequential Trail Legs'}</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {navigationPlan.segments.map((seg) => (
+                  <div
+                    key={seg.segmentIndex}
+                    className="p-3.5 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] flex items-center justify-between gap-3 shadow-xs"
+                  >
+                    <div className="min-w-0">
+                      <div className="font-bold text-xs text-[#242424] dark:text-[#ede5dc]">
+                        {isBn ? seg.titleBn : seg.title}
+                      </div>
+                      <div className="text-[11px] text-[#776d65] dark:text-[#a89e95] truncate">
+                        {seg.startName} → {seg.endName}
+                      </div>
+                    </div>
+                    <a
+                      href={seg.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-lg bg-[#b42323]/10 dark:bg-[#b42323]/25 text-[#b42323] hover:bg-[#b42323] hover:text-white font-bold text-xs shrink-0 transition-all active:scale-95 flex items-center gap-1"
+                    >
+                      <span>{isBn ? 'খুলুন' : 'Open'}</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* =========================================================================
+          STAGE A: PLAN YOUR TRAIL (Stops list with reordering, remove, empty state)
+         ========================================================================= */}
       {currentRouteStops.length === 0 ? (
         <div className="p-10 sm:p-12 text-center rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] shadow-xs space-y-3">
           <Navigation className="w-10 h-10 text-[#b42323] mx-auto opacity-80" />
@@ -168,7 +570,7 @@ export function RouteBuilder() {
           <p className="text-sm text-[#776d65] dark:text-[#a89e95] max-w-md mx-auto">
             {isBn
               ? 'প্যান্ডেল তালিকায় গিয়ে যেকোনো মণ্ডপে "রুট যোগ করুন" বাটনে ক্লিক করে নিজের পছন্দমতো পরিক্রমা তৈরি করুন।'
-              : 'Browse pandals in the directory and click "Add Route" to build your personalized walking or metro hopping route.'}
+              : 'Browse pandals in the directory and click "Add to Route" to build your personalized walking or metro hopping route.'}
           </p>
           <Link
             href="/explore"
@@ -180,6 +582,15 @@ export function RouteBuilder() {
         </div>
       ) : (
         <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95]">
+              {isBn ? 'পরিক্রমা গন্তব্য তালিকা (ক্রমানুসারে)' : 'Planned Stops (In Order)'}
+            </span>
+            <span className="text-xs text-[#776d65] dark:text-[#a89e95]">
+              {isBn ? 'তীর চিহ্নে ক্লিক করে ক্রম পরিবর্তন করুন' : 'Use arrows to reorder stops'}
+            </span>
+          </div>
+
           {currentRouteStops.map((stop, idx) => (
             <div
               key={stop.pandalId}
