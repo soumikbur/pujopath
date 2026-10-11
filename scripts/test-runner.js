@@ -171,6 +171,23 @@ assert.strictEqual(testGetAssetPath('/images/pandals/bagbazar.webp', '/pujopath'
 assert.strictEqual(testGetAssetPath('/pujopath/images/pandals/bagbazar.webp', '/pujopath'), '/pujopath/images/pandals/bagbazar.webp');
 console.log('✓ Authentic pandal photographs (23/23) & asset path resolution verified');
 
-console.log('\nAll 9 automated unit test suites passed successfully with zero errors!');
+// Test 10: Subtle, Elegant Creator Watermark Signature
+const footerPath = path.join(__dirname, '..', 'src', 'components', 'navigation', 'Footer.tsx');
+assert.strictEqual(fs.existsSync(footerPath), true, 'Footer.tsx must exist');
+const footerContent = fs.readFileSync(footerPath, 'utf-8');
+assert.strictEqual(
+  footerContent.includes('Made by ') &&
+  footerContent.includes('Soumik & Moumita') &&
+  footerContent.includes('with') &&
+  footerContent.includes('❤️'),
+  true,
+  "Footer.tsx must contain 'Made by Soumik & Moumita with ❤️'"
+);
+
+const updatedAppShell = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'navigation', 'AppShell.tsx'), 'utf-8');
+assert.strictEqual(updatedAppShell.includes('<Footer />'), true, 'AppShell.tsx must render <Footer />');
+console.log('✓ Subtle creator watermark signature verified in shared layout');
+
+console.log('\nAll 10 automated unit test suites passed successfully with zero errors!');
 
 
