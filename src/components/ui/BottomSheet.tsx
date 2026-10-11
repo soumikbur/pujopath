@@ -43,21 +43,22 @@ export function BottomSheet({
 
       <div
         className={cn(
-          'relative w-full bg-white dark:bg-slate-900 rounded-t-3xl shadow-2xl border-t border-stone-200 dark:border-slate-800 z-10 flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-300',
+          'relative w-full bg-white dark:bg-[#1a1613] rounded-t-3xl shadow-2xl border-t border-[#eee8e1] dark:border-[#2f2720] z-10 flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-300',
           maxHeight,
           className
         )}
       >
         <div className="flex items-center justify-center pt-3 pb-1">
-          <div className="w-12 h-1.5 rounded-full bg-stone-300 dark:bg-slate-700" />
+          <div className="w-12 h-1.5 rounded-full bg-[#d9d0c7] dark:bg-[#3b332b]" />
         </div>
 
         {title && (
-          <div className="flex items-center justify-between px-5 py-3 border-b border-stone-100 dark:border-slate-800/80">
-            <div className="font-semibold text-slate-900 dark:text-white">{title}</div>
+          <div className="flex items-center justify-between px-5 py-3 border-b border-[#eee8e1] dark:border-[#2f2720]">
+            <div className="font-bold text-[#242424] dark:text-[#ede5dc]">{title}</div>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              aria-label="Close bottom sheet"
+              className="p-1.5 rounded-lg text-[#776d65] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white"
             >
               <X className="w-5 h-5" />
             </button>

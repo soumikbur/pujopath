@@ -15,11 +15,28 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('light');
 
+  const applyTheme = (t: Theme) => {
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+    root.style.colorScheme = t;
+    if (t === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+
+    // Synchronize browser theme-color for mobile chrome (iOS Safari & Android Chrome)
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', t === 'dark' ? '#14110E' : '#FCFAF7');
+    }
+  };
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem('pujopath_theme') as Theme | null;
-      // Light mode is the strict default across the entire application.
-      // Dark mode is only activated if the user explicitly previously toggled it.
+      // Light mode is the strict default across the entire application for first-time visitors.
+      // Dark mode is only activated if the user explicitly previously chose it.
       if (saved === 'dark') {
         setThemeState('dark');
         applyTheme('dark');
@@ -31,15 +48,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       applyTheme('light');
     }
   }, []);
-
-  const applyTheme = (t: Theme) => {
-    const root = document.documentElement;
-    if (t === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  };
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);

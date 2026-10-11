@@ -44,7 +44,10 @@ export function MobileBottomNav() {
 
   return (
     <>
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-pujo-border px-3 py-2 pb-safe shadow-elevated">
+      <nav
+        aria-label="Mobile Bottom Navigation"
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] px-3 py-2 pb-safe shadow-elevated transition-colors duration-200"
+      >
         <div className="flex items-center justify-around max-w-sm mx-auto">
           {mainItems.map((item) => {
             const Icon = item.icon;
@@ -58,7 +61,7 @@ export function MobileBottomNav() {
                   'flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-xl transition-all duration-150 relative select-none',
                   isActive
                     ? 'text-pujo-red font-bold scale-105'
-                    : 'text-pujo-text-muted hover:text-pujo-text-secondary'
+                    : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-[#ede5dc]'
                 )}
               >
                 <Icon className={cn('w-5 h-5', isActive ? 'stroke-[2.4]' : 'stroke-[1.8]')} />
@@ -73,9 +76,13 @@ export function MobileBottomNav() {
           {/* More trigger */}
           <button
             onClick={() => setMoreOpen(true)}
+            aria-label="More navigation options"
+            aria-expanded={moreOpen}
             className={cn(
               'flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-xl transition-all select-none',
-              moreOpen ? 'text-pujo-red' : 'text-pujo-text-muted hover:text-pujo-text-secondary'
+              moreOpen
+                ? 'text-pujo-red font-bold'
+                : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-[#ede5dc]'
             )}
           >
             <MoreHorizontal className="w-5 h-5 stroke-[1.8]" />
@@ -86,15 +93,16 @@ export function MobileBottomNav() {
 
       {/* More Drawer */}
       {moreOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end md:hidden bg-black/40 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-white border-t border-pujo-border rounded-t-3xl p-6 space-y-4 shadow-elevated max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-pujo-border pb-3">
-              <h3 className="font-bold text-base text-pujo-text-primary">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end md:hidden bg-black/50 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] rounded-t-3xl p-6 space-y-4 shadow-elevated max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#eee8e1] dark:border-[#2a241f] pb-3">
+              <h3 className="font-bold text-base text-[#242424] dark:text-[#ede5dc]">
                 {isBn ? 'অন্যান্য সুবিধাসমূহ' : 'More Features'}
               </h3>
               <button
                 onClick={() => setMoreOpen(false)}
-                className="p-1.5 rounded-lg text-pujo-text-muted hover:text-pujo-text-primary"
+                aria-label="Close features drawer"
+                className="p-1.5 rounded-lg text-[#776d65] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -112,11 +120,11 @@ export function MobileBottomNav() {
                     className={cn(
                       'p-3.5 rounded-2xl flex items-center gap-3 border transition-colors',
                       isActive
-                        ? 'bg-pujo-red-soft border-pujo-red-border text-pujo-red'
-                        : 'bg-pujo-bg-surface border-pujo-border text-pujo-text-secondary hover:text-pujo-text-primary'
+                        ? 'bg-[#fdeeee] dark:bg-[#341b18] border-[#f6ceca] dark:border-[#4a2420] text-[#d52f2f] dark:text-[#e05656]'
+                        : 'bg-[#fcfaf7] dark:bg-[#201c18] border-[#eee8e1] dark:border-[#2a241f] text-[#4a423d] dark:text-[#c4b9ae] hover:text-[#242424] dark:hover:text-white'
                     )}
                   >
-                    <Icon className="w-4 h-4 text-pujo-red shrink-0" />
+                    <Icon className="w-4 h-4 text-[#b42323] dark:text-[#e05656] shrink-0" />
                     <span className="text-xs sm:text-sm font-bold">{item.label}</span>
                   </Link>
                 );

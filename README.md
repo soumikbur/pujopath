@@ -3,11 +3,13 @@
 > **Discover. Plan. Experience Pujo.**  
 > A high-performance, responsive Progressive Web Application (PWA) and digital guide for Kolkata Durga Puja.
 
+Live Production URL: **[https://soumikbur.github.io/pujopath/](https://soumikbur.github.io/pujopath/)**
+
 ---
 
 ## 🌟 Overview
 
-**PujoPath** is designed for pandal hoppers across Bengal and the global diaspora. It offers curated pandal discovery, real-time sacred countdowns, transit guidance, intelligent walking route optimization, and authentic festive music in an elegant light-first interface.
+**PujoPath** is designed for pandal hoppers across Bengal and the global diaspora. It offers curated pandal discovery, real-time sacred countdowns, transit guidance, intelligent walking route optimization, and authentic festive music in an elegant light-first interface with a synchronized charcoal dark mode.
 
 ---
 
@@ -17,6 +19,7 @@
   - Directory of 23 iconic Kolkata community and heritage Rajbari pandals.
   - Multi-faceted filters: **Zone** (North, South, Central, Salt Lake, Behala, Dum Dum, Howrah), **Heritage Sabeki**, **Near Metro**, **Wheelchair Accessible**, and **Featured**.
   - Instant debounced search by pandal name, locality, theme, or nearest metro station.
+  - Authentic, high-resolution photographs with Creative Commons licensing attribution.
 
 - **Intelligent Geodesic Route Planner (`/planner`):**
   - Sequential great-circle distance calculation using the **Haversine formula**.
@@ -41,138 +44,108 @@
 - **Dual-Language Support (English / বাংলা):**
   - Seamless toggle across all UI strings, headings, descriptions, and Bengali numerals (`০-৯`).
 
-- **Light-First Design & Minimalist Cultural Aesthetics:**
-  - Strict **Light Mode default** using warm off-white (`#FCFAF7`), deep charcoal (`#242424`), and Sindoor red accents (`#B42323`).
-  - Lightweight vector SVG background layer featuring symmetrical Bengali *Alpana* mandalas, lotus petal curves, and autumn *Kash* flower motifs at 3–5% opacity.
-  - Zero heavy background images, zero rendering lag.
+- **Centralized Design Token Theme System:**
+  - Strict **Light Mode default** for all first-time visitors (`#FCFAF7` background, `#242424` text, `#B42323` accents).
+  - Unified **Dark Mode** (`#14110E` background, `#1A1613` surfaces, `#EDE5DC` text, `#2F2720` borders) across mobile navigation, drawers, modals, cards, audio player, and map popups.
+  - Persistent theme switching via `localStorage` with zero flash of wrong theme (anti-FOUC script) and mobile address bar chrome synchronization (`<meta name="theme-color">`).
+  - Lightweight vector SVG background layer featuring symmetrical Bengali *Alpana* mandalas, lotus petal curves, and autumn *Kash* flower motifs at 3–5% opacity with responsive day/night illumination.
 
 - **Universal Responsiveness:**
-  - Fully tested across small mobile (320px), standard mobile (375px), tablet (768px/1024px), laptop (1366px), and wide desktop (1920px).
+  - Fully tested across small mobile (320px), standard mobile (375px/390px/430px), tablet (768px/1024px), laptop (1366px), and wide desktop (1920px).
+
+- **Creator Watermark Signature:**
+  - Subtly integrated in the global footer: *"Made by Soumik & Moumita with ❤️"*.
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Framework:** [Next.js 14](https://nextjs.org/) (App Router)
+- **Framework:** [Next.js 14](https://nextjs.org/) (App Router, Static HTML Export)
 - **Language:** TypeScript 5
-- **UI & Styling:** [Tailwind CSS](https://tailwindcss.com/) + PostCSS
+- **UI & Styling:** [Tailwind CSS 3](https://tailwindcss.com/) + CSS Design Tokens
 - **Icons:** [Lucide React](https://lucide.dev/)
-- **Mapping:** [Leaflet](https://leafletjs.com/) & [React Leaflet](https://react-leaflet.js.org/)
-- **Image Optimization:** [Sharp](https://sharp.pixelplumbing.com/) (automated downsampling pipeline)
+- **Mapping:** [Leaflet](https://leafletjs.com/) with adaptive dark-mode tile rendering
+- **Image Pipeline:** [Sharp](https://sharp.pixelplumbing.com/) (WebP 1200×675 entropy-optimized)
 - **State Management:** React Context API with persistent `localStorage` synchronization
 
 ---
 
-## 🔍 Root-Cause Analysis: 404 Resolution
-
-### Problem
-Previously, requesting `http://localhost:3000/index.html` or reloading paths resulted in `404: This page could not be found`.
-
-### Causes Identified
-1. **Route Mapping in Next.js App Router:** Next.js maps the root page to `src/app/page.tsx` (`/`). Accessing `/index.html` directly in `next dev` triggered the dynamic 404 handler because no `/index.html` route existed in the app graph.
-2. **Port Conflict:** Two concurrent processes (IPv6 `[::]:3000` from a background `next dev` process and IPv4 `0.0.0.0:3000` from static servers) were conflicting on Windows, causing requests to route into stale dev server memory.
-3. **Static Export Trailing Slashes:** When `output: 'export'` generates static directories (`out/explore/index.html`), static servers require clean trailing slash resolution or rewrite fallbacks.
-
-### Solutions Implemented
-- In [`next.config.js`](next.config.js): Configured conditional dev rewrites mapping `/index.html` to `/` in development, while keeping `output: 'export'` and `trailingSlash: true` active for production builds.
-- In [`scripts/serve-out.js`](scripts/serve-out.js): Dual-stack host binding supporting both IPv4 and IPv6 `localhost`, serving `out/index.html` for root and `/index.html`, resolving directory index files, and falling back to `out/200.html` / `out/404.html`.
-- Terminated conflicting legacy processes and verified clean execution.
-
----
-
-## 🚀 Getting Started
+## 🚀 Getting Started & Local Development
 
 ### Prerequisites
-- Node.js `18.17+` or `20+`
-- npm `9+`
+- **Node.js:** `18.17+` or `20+`
+- **npm:** `9+`
 
-### Installation
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/soumikbur/pujopath.git
 cd pujopath
+```
+
+### 2. Install Dependencies
+```bash
 npm install
 ```
 
-### Local Development
+### 3. Configure Local Environment
+Copy the environment template and configure your local settings:
+```bash
+cp .env.example .env.local
+```
+Key configuration parameters:
+- `NEXT_PUBLIC_APP_URL`: Local URL (`http://localhost:3000`)
+- `NEXT_PUBLIC_BASE_PATH`: Leave empty for root domain, or `/pujopath` for GitHub Pages preview
+- `NEXT_PUBLIC_MAP_PROVIDER`: Map tile source (`openstreetmap`)
+
+### 4. Run Development Server
 ```bash
 npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Automated Testing
+---
+
+## 🧪 Automated Testing
+
+Run the automated test suite verifying geometry, algorithms, removal of legacy watch UI, theme tokens, and routing integrity:
 ```bash
 npm test
 ```
-Executes the test suite verifying:
-- Haversine geodesic distance calculation
-- Distance formatting in English and Bengali
-- TSP Nearest-Neighbor route optimization
-- Cumulative multi-stop trail calculation
-- Switch toggle state integrity
-- Verification of complete Watch UI removal
-- Light mode default enforcement
-- Route graph and 404 page integrity
+The test runner validates:
+1. Haversine great-circle distance calculation
+2. Distance formatting in English and Bengali
+3. Traveling Salesperson (TSP) route heuristic optimizer
+4. Cumulative multi-stop itinerary calculation
+5. Filter switch toggle state integrity
+6. Complete Watch UI eradication across components and styles
+7. Strict Light Mode default initialization (no unwanted OS theme override)
+8. Core route graph and 404 handler presence
+9. Authentic pandal photograph presence (23/23) & `getAssetPath` resolution
+10. Creator watermark signature in global shared layout
+11. Centralized CSS design tokens and mobile dark mode classes
+12. Environment configuration validation & LICENSE presence
 
-### Production Build & Static Export
+---
+
+## 🏗 Production Build & Static Deployment
+
+PujoPath is configured for automated static HTML export:
 ```bash
 npm run build
 ```
-Generates 64 pre-rendered static HTML routes in the `out/` directory.
+Generates 64 pre-rendered static HTML routes and assets in the `out/` directory.
 
-### Serving the Production Build Locally
-```bash
-node scripts/serve-out.js
-```
-Serves the exported static bundle on `http://localhost:3000`.
+### Continuous Deployment
+The project deploys automatically to **GitHub Pages** via the GitHub Actions workflow in `.github/workflows/deploy.yml` upon push to `main`. The live site is served with basePath `/pujopath`.
 
 ---
 
-## 📁 Project Structure
+## 📄 License & Intellectual Property
 
-```text
-pujopath/
-├── out/                    # Pre-rendered production static export
-├── public/                 # Static assets, PWA manifest, and optimized images
-│   ├── icons/              # PWA app icons (192x192, 512x512)
-│   ├── images/             # Downsampled hero and pandal photography
-│   └── sw.js               # Service Worker for offline caching
-├── scripts/
-│   ├── optimize-images.js  # Sharp image compression pipeline
-│   ├── serve-out.js        # Production dual-stack static server
-│   └── test-runner.js      # Automated unit test suite
-├── src/
-│   ├── app/                # Next.js App Router pages
-│   │   ├── calendar/       # Sacred Puja calendar
-│   │   ├── explore/        # Pandal discovery and filter directory
-│   │   ├── map/            # Interactive Kolkata pandal map
-│   │   ├── metro/          # Transit hopping guide
-│   │   ├── music/          # Festive audio library
-│   │   ├── mahalaya/       # Mahalaya special broadcast
-│   │   ├── pandals/[slug]/ # Individual pandal detail pages
-│   │   ├── planner/        # Trail builder & route optimizer
-│   │   ├── saved/          # Saved collections & itineraries
-│   │   ├── globals.css     # Design tokens, themes & accessibility rules
-│   │   ├── layout.tsx      # Root HTML layout and metadata
-│   │   ├── not-found.tsx   # Cultural 404 error page
-│   │   └── page.tsx        # Homepage
-│   ├── components/         # Modular React components
-│   │   ├── home/           # Hero, QuickAccess, PujaHighlights, FeatureFooter
-│   │   ├── map/            # Leaflet map container & markers
-│   │   ├── music/          # Translucent glassmorphism bottom player
-│   │   ├── navigation/     # Header, AppShell, MobileBottomNav
-│   │   ├── pandals/        # PandalCard, PandalFilters, PandalDetailClient
-│   │   ├── planner/        # RouteBuilder
-│   │   └── ui/             # PujoBackground (SVG Alpana motifs)
-│   ├── data/               # Static dataset for pandals, metro, calendar, and music
-│   ├── lib/                # Context providers (Theme, I18n, Audio, Favorites) & Geo utilities
-│   └── types/              # TypeScript interfaces and domain models
-├── next.config.js          # Next.js configuration (export & rewrites)
-├── tailwind.config.ts      # Custom Bengali Sindoor red & warm ivory palette
-└── tsconfig.json           # TypeScript configuration
-```
+Copyright © 2024–2026 Soumik & Moumita. All rights reserved.
 
----
+The PujoPath application, including its source code, visual user interface, branding, custom graphics, editorial content, and curated data architecture, is the proprietary work of the authors.
 
-## 📄 License
-
-This project is open-source and available under the [MIT License](LICENSE).
+- **Source Code & Brand:** Subject to the [PujoPath Proprietary & Limited Evaluation License](LICENSE). Personal, non-commercial evaluation and study is permitted. Public cloning, unauthorized commercial hosting, and trademark redistribution are strictly prohibited.
+- **Third-Party Libraries:** Next.js, React, Tailwind CSS, Leaflet, and Lucide React remain governed by their respective open-source licenses (MIT / ISC / Apache 2.0).
+- **Photographic Assets:** Authentic pandal photographs from Wikimedia Commons are credited with source URLs and Creative Commons licenses (CC BY-SA / CC BY / Public Domain) in [PANDAL_IMAGE_ATTRIBUTION.md](PANDAL_IMAGE_ATTRIBUTION.md).

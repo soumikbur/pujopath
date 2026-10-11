@@ -14,18 +14,27 @@ export function PujoBackground() {
       aria-hidden="true"
       className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none transition-colors duration-500"
     >
-      {/* 1. Base Ambient Radial Warmth */}
+      {/* 1. Base Ambient Radial Warmth (Light Mode) */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 dark:opacity-0 transition-opacity duration-500"
         style={{
           background:
             'radial-gradient(ellipse 90% 60% at 50% 0%, rgba(254, 245, 235, 0.85) 0%, rgba(250, 242, 232, 0.5) 55%, rgba(244, 233, 220, 0.4) 100%)',
         }}
       />
 
+      {/* Base Ambient Radial Warmth (Dark Mode) */}
+      <div
+        className="absolute inset-0 opacity-0 dark:opacity-100 transition-opacity duration-500"
+        style={{
+          background:
+            'radial-gradient(ellipse 90% 60% at 50% 0%, rgba(45, 30, 22, 0.45) 0%, rgba(25, 20, 16, 0.25) 55%, rgba(20, 17, 14, 0.05) 100%)',
+        }}
+      />
+
       {/* 2. Top-Left Traditional Alpana Motif (Subtle sacred concentric petals & rays) */}
       <svg
-        className="absolute -top-16 -left-16 w-80 h-80 sm:w-96 sm:h-96 text-[#B42323] opacity-[0.038] dark:opacity-[0.06] transition-opacity duration-300"
+        className="absolute -top-16 -left-16 w-80 h-80 sm:w-96 sm:h-96 text-[#B42323] opacity-[0.038] dark:opacity-[0.05] transition-opacity duration-300"
         viewBox="0 0 200 200"
         fill="none"
         stroke="currentColor"
@@ -60,7 +69,7 @@ export function PujoBackground() {
 
       {/* 3. Top-Right Traditional Alpana Motif (Mirrored mandala accent) */}
       <svg
-        className="absolute -top-20 -right-20 w-88 h-88 sm:w-[420px] sm:h-[420px] text-[#B42323] opacity-[0.035] dark:opacity-[0.06] transition-opacity duration-300"
+        className="absolute -top-20 -right-20 w-88 h-88 sm:w-[420px] sm:h-[420px] text-[#B42323] opacity-[0.035] dark:opacity-[0.05] transition-opacity duration-300"
         viewBox="0 0 200 200"
         fill="none"
         stroke="currentColor"
@@ -96,7 +105,7 @@ export function PujoBackground() {
 
       {/* 5. Bottom Delicate Geometric Border Accent */}
       <svg
-        className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-[700px] h-36 text-[#B42323] opacity-[0.03] dark:opacity-[0.05]"
+        className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-[700px] h-36 text-[#B42323] opacity-[0.03] dark:opacity-[0.04]"
         viewBox="0 0 600 80"
         fill="none"
         stroke="currentColor"

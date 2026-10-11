@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Sparkles,
   Zap,
@@ -15,6 +16,7 @@ import { useTheme } from '@/lib/context/ThemeContext';
 import { cn } from '@/lib/utils/cn';
 
 export function FeatureFooter() {
+  const router = useRouter();
   const { locale, setLocale } = useI18n();
   const { theme, toggleTheme } = useTheme();
   const isBn = locale === 'bn';
@@ -56,9 +58,7 @@ export function FeatureFooter() {
       icon: Heart,
       title: isBn ? 'প্রিয় প্যান্ডেল' : 'Saved Trails',
       desc: isBn ? 'পছন্দের তালিকা' : 'Saved favorites',
-      onClick: () => {
-        window.location.href = '/saved';
-      },
+      onClick: () => router.push('/saved'),
       isAction: true,
     },
   ];

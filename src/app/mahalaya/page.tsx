@@ -19,14 +19,14 @@ export default function MahalayaPage() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
       <div>
-        <div className="flex items-center gap-2 text-pujo-red text-xs sm:text-sm font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-2 text-[#b42323] text-xs sm:text-sm font-bold uppercase tracking-wider">
           <Sparkles className="w-4 h-4" />
           <span>{isBn ? 'দেবীপক্ষের পুণ্য প্রভাত' : 'Dawn Broadcast Heritage'}</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-black text-pujo-text-primary mt-1 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-black text-[#242424] dark:text-[#ede5dc] mt-1 tracking-tight">
           {isBn ? 'মহালয়া ও অমর মহিষাসুরমর্দিনী' : 'Mahalaya & Mahishasura Mardini'}
         </h1>
-        <p className="text-sm sm:text-base text-pujo-text-muted mt-1">
+        <p className="text-sm sm:text-base text-[#665a54] dark:text-[#a89e95] mt-1">
           {isBn
             ? '১৯৩১ সাল থেকে আকাশবাণী কলকাতা থেকে প্রচারিত বীরেন্দ্রকৃষ্ণ ভদ্রের উদাত্ত কণ্ঠের চণ্ডীপাঠ ও বাণী কুমার রচিত মহিষাসুরমর্দিনী।'
             : 'The timeless dawn recitation by Birendra Krishna Bhadra broadcast across Bengal since 1931 on All India Radio.'}
@@ -34,8 +34,8 @@ export default function MahalayaPage() {
       </div>
 
       {/* Hero Showcase */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-pujo-bg-hero border border-pujo-border shadow-card flex flex-col md:flex-row items-center gap-6">
-        <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-3xl overflow-hidden shadow-card border border-pujo-border shrink-0 bg-white">
+      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#1a1613] border border-[#eee8e1] dark:border-[#2f2720] shadow-card flex flex-col md:flex-row items-center gap-6">
+        <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-3xl overflow-hidden shadow-card border border-[#eee8e1] dark:border-[#2f2720] shrink-0 bg-white dark:bg-[#14110e]">
           <Image
             src={getAssetPath('/images/mahalaya-thumb.jpg')}
             alt="মহালয়া চণ্ডীপাঠ"
@@ -47,15 +47,15 @@ export default function MahalayaPage() {
         </div>
 
         <div className="space-y-3.5 text-center md:text-left">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-pujo-red-soft text-pujo-red border border-pujo-red-border shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-[#fdeeee] dark:bg-[#341b18] text-[#d52f2f] dark:text-[#e05656] border border-[#f6ceca] dark:border-[#4a2420] shadow-sm">
             <Radio className="w-3.5 h-3.5 animate-pulse" />
             <span>{isBn ? 'আকাশবাণী কলকাতা মহাফেজখানা' : 'AIR Akashvani Archive'}</span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-black text-pujo-text-primary">
+          <h2 className="text-2xl sm:text-3xl font-black text-[#242424] dark:text-[#ede5dc]">
             {isBn ? 'মহিষাসুরমর্দিনী (বীরেন্দ্রকৃষ্ণ ভদ্র)' : 'Mahishasura Mardini (Chandi Path)'}
           </h2>
-          <p className="text-sm sm:text-base text-pujo-text-secondary leading-relaxed max-w-lg font-medium">
+          <p className="text-sm sm:text-base text-[#4a423d] dark:text-[#c4b9ae] leading-relaxed max-w-lg font-medium">
             {isBn
               ? 'বীরেন্দ্রকৃষ্ণ ভদ্রের গম্ভীর কণ্ঠের চণ্ডীপাঠ, পঙ্কজ কুমার মল্লিকের সুরে গান ও দ্বিজেন মুখোপাধ্যায়, শ্যামল মিত্রের কালজয়ী গীতিধারা।'
               : 'Narrated by Birendra Krishna Bhadra with sacred shlokas, invocations of Goddess Durga, and celestial songs composed by Pankaj Kumar Mullick.'}
@@ -69,7 +69,7 @@ export default function MahalayaPage() {
                 playTrack(mahalayaTrack);
               }
             }}
-            className="inline-flex items-center gap-2.5 px-7 py-3 rounded-2xl bg-pujo-red hover:bg-pujo-red-hover text-white font-bold text-sm shadow-subtle transition-all active:scale-95 mt-2"
+            className="inline-flex items-center gap-2.5 px-7 py-3 rounded-2xl bg-[#b42323] hover:bg-[#971c1c] text-white font-bold text-sm shadow-sm transition-all active:scale-95 mt-2"
           >
             {isCurrentPlaying ? <Volume2 className="w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />}
             <span>{isCurrentPlaying ? (isBn ? 'প্রচার থামান' : 'Pause Broadcast') : (isBn ? 'ভোরের চণ্ডীপাঠ শুনুন' : 'Listen to Dawn Chandi Path')}</span>
@@ -78,8 +78,8 @@ export default function MahalayaPage() {
       </div>
 
       {/* Historical Context */}
-      <div className="p-6 sm:p-7 rounded-3xl bg-pujo-bg-surface border border-pujo-border space-y-3 text-sm text-pujo-text-secondary leading-relaxed font-medium">
-        <h3 className="text-base sm:text-lg font-bold text-pujo-text-primary">
+      <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#1a1613] border border-[#eee8e1] dark:border-[#2f2720] space-y-3 text-sm text-[#4a423d] dark:text-[#c4b9ae] leading-relaxed font-medium">
+        <h3 className="text-base sm:text-lg font-bold text-[#242424] dark:text-[#ede5dc]">
           {isBn ? '১৯৩১ সালের ঐতিহাসিক বেতার সম্প্রচার' : 'About the 1931 Sacred Broadcast'}
         </h3>
         <p>

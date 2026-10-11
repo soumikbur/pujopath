@@ -22,7 +22,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#D52F2F',
+  themeColor: '#FCFAF7',
 };
 
 export default function RootLayout({
@@ -31,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -39,8 +39,25 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
+        {/* Anti-FOUC theme initialization script: defaults to light mode for first-time visitors */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var t = localStorage.getItem('pujopath_theme');
+                if (t === 'dark') {
+                  document.documentElement.classList.add('dark');
+                  document.documentElement.style.colorScheme = 'dark';
+                } else {
+                  document.documentElement.classList.remove('dark');
+                  document.documentElement.style.colorScheme = 'light';
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
       </head>
-      <body className="bg-pujo-bg-main min-h-screen text-pujo-text-primary antialiased selection:bg-pujo-red selection:text-white">
+      <body className="min-h-screen bg-[#FCFAF7] dark:bg-[#14110E] text-[#242424] dark:text-[#EDE5DC] antialiased selection:bg-pujo-red selection:text-white transition-colors duration-200">
         <ThemeProvider>
           <I18nProvider>
             <AudioProvider>

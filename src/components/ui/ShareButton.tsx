@@ -58,7 +58,7 @@ export function ShareButton({
       <button
         onClick={handleShare}
         className={cn(
-          'inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 active:scale-95 border bg-white dark:bg-slate-800 hover:bg-stone-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border-stone-200 dark:border-slate-700',
+          'inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 active:scale-95 border bg-white dark:bg-[#1a1613] hover:bg-[#f7f3ee] dark:hover:bg-[#251e18] text-[#4a423d] dark:text-[#c4b9ae] border-[#eee8e1] dark:border-[#2f2720]',
           className
         )}
       >
@@ -74,7 +74,7 @@ export function ShareButton({
       title={copied ? t('copiedToClipboard') : t('sharePandal')}
       aria-label={copied ? t('copiedToClipboard') : t('sharePandal')}
       className={cn(
-        'p-2.5 rounded-xl backdrop-blur-md transition-all duration-200 active:scale-90 border bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border-stone-200/80 dark:border-slate-700/80 shadow-sm',
+        'p-2.5 rounded-xl backdrop-blur-md transition-all duration-200 active:scale-90 border bg-white/90 dark:bg-[#1a1613]/90 hover:bg-white dark:hover:bg-[#251e18] text-[#4a423d] dark:text-[#c4b9ae] border-[#eee8e1] dark:border-[#2f2720] shadow-sm',
         className
       )}
     >

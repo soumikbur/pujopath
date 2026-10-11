@@ -1,4 +1,6 @@
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 
 // 1. Geo Utilities Tests
 function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
@@ -114,8 +116,6 @@ assert.strictEqual(filterState.heritageOnly, false, 'heritageOnly should toggle 
 console.log('✓ Switch toggle state integrity test passed');
 
 // Test 6: Watch UI Complete Removal Verification
-const fs = require('fs');
-const path = require('path');
 const watchDir = path.join(__dirname, '..', 'src', 'components', 'watch');
 assert.strictEqual(fs.existsSync(watchDir), false, 'src/components/watch directory must be completely removed');
 
@@ -188,6 +188,38 @@ const updatedAppShell = fs.readFileSync(path.join(__dirname, '..', 'src', 'compo
 assert.strictEqual(updatedAppShell.includes('<Footer />'), true, 'AppShell.tsx must render <Footer />');
 console.log('✓ Subtle creator watermark signature verified in shared layout');
 
-console.log('\nAll 10 automated unit test suites passed successfully with zero errors!');
+// Test 11: Centralized Design Tokens & Mobile Dark Mode Consistency
+const globalsCss = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'globals.css'), 'utf-8');
+assert.strictEqual(globalsCss.includes('--bg-main: #FCFAF7;'), true, 'globals.css must define light --bg-main token');
+assert.strictEqual(globalsCss.includes('--bg-main: #14110E;'), true, 'globals.css must define dark --bg-main token');
+assert.strictEqual(globalsCss.includes('.dark .leaflet-tile-pane'), true, 'globals.css must define Leaflet dark tile filter');
 
+const mobileNavContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components/navigation/MobileBottomNav.tsx'), 'utf-8');
+assert.strictEqual(mobileNavContent.includes('dark:bg-[#181411]'), true, 'MobileBottomNav must include dark:bg-[#181411]');
+assert.strictEqual(mobileNavContent.includes('dark:border-[#2a241f]'), true, 'MobileBottomNav must include dark:border-[#2a241f]');
 
+const backgroundContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components/ui/PujoBackground.tsx'), 'utf-8');
+assert.strictEqual(backgroundContent.includes('dark:opacity-0'), true, 'PujoBackground must fade light warmth in dark mode');
+assert.strictEqual(backgroundContent.includes('dark:opacity-100'), true, 'PujoBackground must illuminate dark ambient warmth in dark mode');
+console.log('✓ Centralized design tokens and mobile dark mode consistency verified');
+
+// Test 12: Controlled Project Reusability, LICENSE, and .env.example
+const licensePath = path.join(__dirname, '..', 'LICENSE');
+assert.strictEqual(fs.existsSync(licensePath), true, 'LICENSE file must exist');
+const licenseContent = fs.readFileSync(licensePath, 'utf-8');
+assert.strictEqual(
+  licenseContent.includes('Copyright (c) 2024-2026 Soumik & Moumita. All rights reserved.'),
+  true,
+  'LICENSE must contain author copyright reservation'
+);
+
+const envExamplePath = path.join(__dirname, '..', '.env.example');
+assert.strictEqual(fs.existsSync(envExamplePath), true, '.env.example file must exist');
+
+const configPath = path.join(__dirname, '..', 'src', 'lib', 'config.ts');
+assert.strictEqual(fs.existsSync(configPath), true, 'src/lib/config.ts must exist');
+const configContent = fs.readFileSync(configPath, 'utf-8');
+assert.strictEqual(configContent.includes('validateEnvironment'), true, 'src/lib/config.ts must export validateEnvironment');
+console.log('✓ Controlled reusability, LICENSE, and environment validator verified');
+
+console.log('\nAll 12 automated unit test suites passed successfully with zero errors!');

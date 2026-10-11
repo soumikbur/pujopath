@@ -4,9 +4,61 @@
 
 @layer base {
   :root {
+    color-scheme: light;
+
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-display: 'Inter', sans-serif;
     --font-bengali: 'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif;
+
+    /* Theme Design Tokens - Light Mode Default */
+    --bg-main: #FCFAF7;
+    --surface: #FFFFFF;
+    --surface-secondary: #F5F1EB;
+    --surface-hover: #F2EDE6;
+    --surface-hero: rgba(255, 248, 241, 0.88);
+    --surface-card: #FFFFFF;
+
+    --text-primary: #242424;
+    --text-secondary: #5C524A;
+    --text-muted: #7E7268;
+
+    --border: #E8E1D9;
+    --border-subtle: #F0EAE2;
+    --border-strong: #D5C9BD;
+
+    --accent-red: #D52F2F;
+    --accent-red-hover: #BD2424;
+    --accent-red-soft: #FDEEEB;
+    --accent-red-border: #F6CECA;
+    --accent-gold: #D5A247;
+    --focus-ring: #D52F2F;
+  }
+
+  .dark {
+    color-scheme: dark;
+
+    /* Theme Design Tokens - Consistent Charcoal Dark Mode */
+    --bg-main: #14110E;
+    --surface: #1A1613;
+    --surface-secondary: #241F1A;
+    --surface-hover: #29231D;
+    --surface-hero: rgba(26, 22, 19, 0.85);
+    --surface-card: #1A1613;
+
+    --text-primary: #EDE5DC;
+    --text-secondary: #C7BCB1;
+    --text-muted: #9C9186;
+
+    --border: #2F2720;
+    --border-subtle: #241E18;
+    --border-strong: #3D332A;
+
+    --accent-red: #E05656;
+    --accent-red-hover: #F06A6A;
+    --accent-red-soft: #341B18;
+    --accent-red-border: #4A2420;
+    --accent-gold: #E5B45E;
+    --focus-ring: #FF7777;
   }
 
   *,
@@ -21,30 +73,26 @@
     padding: 0;
     width: 100%;
     min-height: 100%;
-    background-color: #FCFAF7;
-    color: #242424;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
-  }
-
-  html.dark,
-  html.dark body {
-    background-color: #14110E;
-    color: #EDE5DC;
+    transition: background-color 200ms ease, color 200ms ease;
   }
 
   /* Accessible focus indicators */
   :focus-visible {
-    outline: 2px solid #D52F2F;
+    outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
   }
 
   button:focus-visible,
   a:focus-visible,
-  input:focus-visible {
-    outline: 2px solid #D52F2F;
+  input:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
   }
 }
@@ -74,6 +122,27 @@
 
 .dark ::-webkit-scrollbar-thumb {
   background: #3B332B;
+}
+
+/* Leaflet Map Dark Mode Styling */
+.dark .leaflet-tile-pane {
+  filter: brightness(0.85) invert(1) contrast(2.2) hue-rotate(185deg) saturate(0.3) brightness(0.72);
+}
+
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip {
+  background-color: #1A1613 !important;
+  color: #EDE5DC !important;
+  border: 1px solid #2F2720 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dark .leaflet-popup-content {
+  color: #EDE5DC !important;
+}
+
+.dark .leaflet-container {
+  background-color: #14110E !important;
 }
 
 /* Safe area padding for mobile bottom nav */

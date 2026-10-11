@@ -44,8 +44,8 @@ export function FavoriteButton({
         className={cn(
           'p-2 rounded-full backdrop-blur-md transition-all duration-200 active:scale-90',
           saved
-            ? 'bg-sindoor-600 text-white shadow-md shadow-sindoor-600/30'
-            : 'bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-stone-200 dark:border-slate-700',
+            ? 'bg-[#b42323] text-white shadow-md'
+            : 'bg-white/80 dark:bg-[#1a1613]/80 hover:bg-white dark:hover:bg-[#251e18] text-[#4a423d] dark:text-[#c4b9ae] border border-[#eee8e1] dark:border-[#2f2720]',
           className
         )}
       >
@@ -67,12 +67,12 @@ export function FavoriteButton({
         className={cn(
           'inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 active:scale-95 border',
           saved
-            ? 'bg-sindoor-50 dark:bg-sindoor-950/60 text-sindoor-600 dark:text-sindoor-300 border-sindoor-300 dark:border-sindoor-800'
-            : 'bg-white dark:bg-slate-800 hover:bg-stone-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border-stone-200 dark:border-slate-700',
+            ? 'bg-[#fdeeee] dark:bg-[#341b18] text-[#d52f2f] dark:text-[#e05656] border-[#f6ceca] dark:border-[#4a2420]'
+            : 'bg-white dark:bg-[#1a1613] hover:bg-[#f7f3ee] dark:hover:bg-[#251e18] text-[#4a423d] dark:text-[#c4b9ae] border-[#eee8e1] dark:border-[#2f2720]',
           className
         )}
       >
-        <Bookmark className={cn(iconSizes[size], saved && 'fill-current text-sindoor-600')} />
+        <Bookmark className={cn(iconSizes[size], saved && 'fill-current text-[#d52f2f]')} />
         <span>{saved ? t('savedPandal') : t('savePandal')}</span>
       </button>
     );
@@ -86,8 +86,8 @@ export function FavoriteButton({
       className={cn(
         'p-2.5 rounded-xl backdrop-blur-md transition-all duration-200 active:scale-90 border',
         saved
-          ? 'bg-sindoor-600 text-white border-sindoor-600 shadow-md shadow-sindoor-600/30'
-          : 'bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border-stone-200/80 dark:border-slate-700/80 shadow-sm',
+          ? 'bg-[#b42323] text-white border-[#b42323] shadow-md'
+          : 'bg-white/90 dark:bg-[#1a1613]/90 hover:bg-white dark:hover:bg-[#251e18] text-[#4a423d] dark:text-[#c4b9ae] border-[#eee8e1] dark:border-[#2f2720] shadow-sm',
         className
       )}
     >

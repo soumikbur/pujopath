@@ -13,10 +13,10 @@ interface PandalGridProps {
 export function PandalGrid({ pandals, variant = 'grid' }: PandalGridProps) {
   if (pandals.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center bg-white rounded-3xl border border-pujo-border shadow-card">
-        <Sparkles className="w-8 h-8 text-pujo-red mb-2" />
-        <h3 className="font-bold text-base text-pujo-text-primary">No Pandals Found</h3>
-        <p className="text-xs text-pujo-text-muted mt-1 max-w-xs">
+      <div className="flex flex-col items-center justify-center p-12 text-center bg-white dark:bg-[#1a1613] rounded-3xl border border-[#eee8e1] dark:border-[#2f2720] shadow-card">
+        <Sparkles className="w-8 h-8 text-[#b42323] mb-2" />
+        <h3 className="font-bold text-base text-[#242424] dark:text-[#ede5dc]">No Pandals Found</h3>
+        <p className="text-xs text-[#776d65] dark:text-[#a89e95] mt-1 max-w-xs">
           Try clearing your filters or search query to explore more pandals.
         </p>
       </div>

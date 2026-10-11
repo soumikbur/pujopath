@@ -53,17 +53,18 @@ export function Modal({
 
       <div
         className={cn(
-          'relative w-full bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-slate-800 z-10 overflow-hidden transform transition-all',
+          'relative w-full bg-white dark:bg-[#1a1613] rounded-2xl shadow-2xl border border-[#eee8e1] dark:border-[#2f2720] z-10 overflow-hidden transform transition-all',
           maxWidths[maxWidth],
           className
         )}
       >
         {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-slate-800">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h3>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[#eee8e1] dark:border-[#2f2720]">
+            <h3 className="text-lg font-bold text-[#242424] dark:text-[#ede5dc]">{title}</h3>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-stone-100 dark:hover:bg-slate-800 transition-colors"
+              aria-label="Close modal"
+              className="p-1.5 rounded-lg text-[#776d65] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-[#ede5dc] hover:bg-[#f5f1ec] dark:hover:bg-[#221c17] transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
