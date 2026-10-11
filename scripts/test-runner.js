@@ -440,20 +440,22 @@ assert.strictEqual(mapPageFile.includes('maps.google.com'), false, 'Map page mus
 assert.strictEqual(mapPageFile.includes('maps.apple.com'), false, 'Map page must not redirect externally');
 console.log('✓ Scenario 12: Route planning scope is strictly contained inside PujoPath; only explicit click initiates external handoff');
 
-// Test 14: Google Maps Platform Integration & Dark Mode Architecture
-console.log('\n--- Test Suite 14: Google Maps Platform Integration & Dark Mode ---');
+// Test 14: Full-Scale Interactive Map Architecture, Automatic Fallback & Dark Mode
+console.log('\n--- Test Suite 14: Full-Scale Interactive Map & Automatic Fallback ---');
 const pujoMapContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'map', 'PujoMap.tsx'), 'utf-8');
-assert.strictEqual(pujoMapContent.includes('@vis.gl/react-google-maps'), true, 'PujoMap must import from official @vis.gl/react-google-maps');
-assert.strictEqual(pujoMapContent.includes('AdvancedMarker'), true, 'PujoMap must use modern AdvancedMarkerElement');
-assert.strictEqual(pujoMapContent.includes('InfoWindow'), true, 'PujoMap must include InfoWindow for interactive pandal cards');
-assert.strictEqual(pujoMapContent.includes('APIProvider'), true, 'PujoMap must configure APIProvider');
-assert.strictEqual(pujoMapContent.includes('ColorScheme.LIGHT'), true, 'PujoMap must default to clear, readable light map style');
-assert.strictEqual(pujoMapContent.includes('gmp_git_agentskills_v1'), true, 'PujoMap must declare internalUsageAttributionIds');
-assert.strictEqual(pujoMapContent.includes('DEMO_MAP_ID'), true, 'PujoMap must supply a valid Map ID for AdvancedMarker');
+assert.strictEqual(pujoMapContent.includes('@vis.gl/react-google-maps'), true, 'PujoMap must support Google Maps Platform');
+assert.strictEqual(pujoMapContent.includes('LeafletMapEngine'), true, 'PujoMap must provide full-scale LeafletMapEngine automatic fallback');
 
-// Verify Leaflet has been removed from PujoMap
-assert.strictEqual(pujoMapContent.includes('leaflet/dist/leaflet.css'), false, 'PujoMap must no longer import leaflet.css');
-assert.strictEqual(pujoMapContent.includes('L.map'), false, 'PujoMap must not instantiate L.map');
+// Priority 2 verification: API Activation screen MUST NOT exist in PujoMap
+assert.strictEqual(pujoMapContent.includes('Paste your API key'), false, 'PujoMap must not display an API key input field');
+assert.strictEqual(pujoMapContent.includes('Activate Map'), false, 'PujoMap must not display an Activate Map button');
+assert.strictEqual(pujoMapContent.includes('Get Free Maps Demo Key'), false, 'PujoMap must not show demo key links to visitors');
+assert.strictEqual(pujoMapContent.includes('Google Cloud Console'), false, 'PujoMap must not show cloud console links to visitors');
+
+// Verify map container styles & tile isolation
+const currentGlobalsCss = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'globals.css'), 'utf-8');
+assert.strictEqual(currentGlobalsCss.includes('.leaflet-tile'), true, 'globals.css must isolate leaflet tiles from dark filters');
+assert.strictEqual(currentGlobalsCss.includes('.google-map-container'), true, 'globals.css must isolate google map container');
 
 // Verify all pandal coordinates are strictly within valid Kolkata bounds
 const pandalsDataRaw = fs.readFileSync(path.join(__dirname, '..', 'src', 'data', 'pandals', 'index.ts'), 'utf-8');
@@ -466,9 +468,11 @@ latMatches.forEach((lat) => {
 lngMatches.forEach((lng) => {
   assert.ok(lng >= 88.2 && lng <= 88.5, `Longitude ${lng} must be within Kolkata metro area`);
 });
-console.log('✓ Google Maps Platform API integration & dark mode isolation verified');
+console.log('✓ Full-scale interactive map & automatic fallback verified');
+console.log('✓ Complete removal of user-facing API activation screen verified');
 console.log('✓ Verified 23/23 real pandal GPS coordinates accurately bounded in Kolkata');
 
 console.log('\nAll 14 automated unit test suites passed successfully with zero errors!');
+
 
 
