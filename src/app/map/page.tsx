@@ -14,8 +14,9 @@ const PujoMap = dynamic(() => import('@/components/map/PujoMap'), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full min-h-[450px] flex items-center justify-center bg-white dark:bg-[#1a1613] rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] shadow-xs">
-      <div className="text-sm font-bold text-[#776d65] dark:text-[#a89e95]">
-        Loading Map & Pandals...
+      <div className="text-sm font-bold text-[#776d65] dark:text-[#a89e95] flex items-center gap-2">
+        <span className="w-2 h-2 rounded-full bg-[#b42323] animate-ping" />
+        <span>Loading Google Maps & Pandals...</span>
       </div>
     </div>
   ),

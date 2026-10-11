@@ -8,7 +8,9 @@
 export interface AppConfig {
   appUrl: string;
   basePath: string;
-  mapProvider: 'openstreetmap' | 'cartodb' | 'custom';
+  mapProvider: 'google' | 'openstreetmap' | 'cartodb' | 'custom';
+  googleMapsApiKey: string;
+  googleMapsMapId: string;
   defaultLocale: 'en' | 'bn';
   defaultTheme: 'light' | 'dark';
   analyticsEnabled: boolean;
@@ -17,7 +19,9 @@ export interface AppConfig {
 export const config: AppConfig = {
   appUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://soumikbur.github.io/pujopath',
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
-  mapProvider: (process.env.NEXT_PUBLIC_MAP_PROVIDER as AppConfig['mapProvider']) || 'openstreetmap',
+  mapProvider: (process.env.NEXT_PUBLIC_MAP_PROVIDER as AppConfig['mapProvider']) || 'google',
+  googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+  googleMapsMapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || 'DEMO_MAP_ID',
   defaultLocale: (process.env.NEXT_PUBLIC_DEFAULT_LOCALE as 'en' | 'bn') || 'en',
   defaultTheme: 'light', // Strict requirement: First-time visitors always default to light mode
   analyticsEnabled: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === 'true',

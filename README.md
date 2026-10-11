@@ -64,9 +64,43 @@ Live Production URL: **[https://soumikbur.github.io/pujopath/](https://soumikbur
 - **Language:** TypeScript 5
 - **UI & Styling:** [Tailwind CSS 3](https://tailwindcss.com/) + CSS Design Tokens
 - **Icons:** [Lucide React](https://lucide.dev/)
-- **Mapping:** [Leaflet](https://leafletjs.com/) with adaptive dark-mode tile rendering
+- **Mapping:** [Google Maps Platform JavaScript API](https://developers.google.com/maps/documentation/javascript?utm_campaign=gmp_git_agentskills_v1) via [`@vis.gl/react-google-maps`](https://visgl.github.io/react-google-maps/) with Advanced Markers and dark-mode isolation
 - **Image Pipeline:** [Sharp](https://sharp.pixelplumbing.com/) (WebP 1200×675 entropy-optimized)
 - **State Management:** React Context API with persistent `localStorage` synchronization
+
+---
+
+## 🗺️ Google Maps Platform Configuration
+
+PujoPath uses the official **Google Maps Platform JavaScript API** to provide an authentic, high-quality interactive map experience of Kolkata Durga Puja pandals with custom `AdvancedMarkerElement` pins and crowd-level indicators.
+
+### 1. API Key Provisioning & Enablement
+1. Open the [Google Cloud Console](https://console.cloud.google.com/google/maps-apis/credentials?utm_campaign=gmp_git_agentskills_v1).
+2. Create or select your Google Cloud Project with billing enabled.
+3. Enable the **Maps JavaScript API**.
+4. Create an **API Key** and configure the recommended restrictions:
+   - **Application restrictions:** Set to **HTTP referrers (websites)** and add your authorized origins (e.g. `http://localhost:3000/*` and `https://soumikbur.github.io/pujopath/*`).
+   - **API restrictions:** Restrict the key to only authorize the **Maps JavaScript API**.
+   - See [Google Cloud API Key Restrictions Documentation](https://docs.cloud.google.com/api-keys/docs/add-restrictions-api-keys) for security best practices.
+
+### 2. Prototyping with the Maps Demo Key
+For zero-cost local prototyping without configuring a Google Cloud billing account:
+1. Visit the [Maps Demo Key Portal](https://mapsplatform.google.com/maps-demo-key?utm_campaign=gmp_git_agentskills_v1).
+2. Sign in with any Google account (no billing card required).
+3. Generate your prototyping key and copy it into `.env.local` or paste it directly into the in-app key tester in the Map section.
+
+### 3. Environment Variables
+Add the following variables to `.env.local`:
+```bash
+# Required to render the interactive embedded Google Map
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
+
+# Optional Map ID for AdvancedMarker styling (defaults to DEMO_MAP_ID)
+NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=DEMO_MAP_ID
+```
+
+### 4. Dark Mode Architecture
+The embedded Google Map is visually isolated from the website's dark mode theme. In both light and dark website themes, Google Maps renders with its clear, familiar native light appearance by default, ensuring road labels, transit lines, and pandal pins remain readable without distortion or artificial CSS brightness inversion filters. An optional in-map style switch allows users to explicitly toggle Night View if desired.
 
 ---
 
@@ -95,7 +129,9 @@ cp .env.example .env.local
 Key configuration parameters:
 - `NEXT_PUBLIC_APP_URL`: Local URL (`http://localhost:3000`)
 - `NEXT_PUBLIC_BASE_PATH`: Leave empty for root domain, or `/pujopath` for GitHub Pages preview
-- `NEXT_PUBLIC_MAP_PROVIDER`: Map tile source (`openstreetmap`)
+- `NEXT_PUBLIC_MAP_PROVIDER`: Map provider (`google`)
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`: Your Google Maps JavaScript API key
+
 
 ### 4. Run Development Server
 ```bash

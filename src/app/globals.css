@@ -124,26 +124,14 @@
   background: #3B332B;
 }
 
-/* Leaflet Map Dark Mode Styling */
-.dark .leaflet-tile-pane {
-  filter: brightness(0.85) invert(1) contrast(2.2) hue-rotate(185deg) saturate(0.3) brightness(0.72);
+/* Google Maps Isolation: Ensure the embedded Google Map is never distorted or dimmed by website dark mode filters */
+.google-map-container,
+.gm-style,
+.gm-style-iw-c,
+.gm-style-iw-d {
+  filter: none !important;
 }
 
-.dark .leaflet-popup-content-wrapper,
-.dark .leaflet-popup-tip {
-  background-color: #1A1613 !important;
-  color: #EDE5DC !important;
-  border: 1px solid #2F2720 !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6) !important;
-}
-
-.dark .leaflet-popup-content {
-  color: #EDE5DC !important;
-}
-
-.dark .leaflet-container {
-  background-color: #14110E !important;
-}
 
 /* Safe area padding for mobile bottom nav */
 .pb-safe {

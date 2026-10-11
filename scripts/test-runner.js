@@ -192,7 +192,9 @@ console.log('✓ Subtle creator watermark signature verified in shared layout');
 const globalsCss = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'globals.css'), 'utf-8');
 assert.strictEqual(globalsCss.includes('--bg-main: #FCFAF7;'), true, 'globals.css must define light --bg-main token');
 assert.strictEqual(globalsCss.includes('--bg-main: #14110E;'), true, 'globals.css must define dark --bg-main token');
-assert.strictEqual(globalsCss.includes('.dark .leaflet-tile-pane'), true, 'globals.css must define Leaflet dark tile filter');
+assert.strictEqual(globalsCss.includes('.google-map-container'), true, 'globals.css must define Google Maps container isolation');
+assert.strictEqual(globalsCss.includes('filter: none !important;'), true, 'globals.css must prevent dark filters on Google Maps');
+assert.strictEqual(globalsCss.includes('.dark .leaflet-tile-pane'), false, 'globals.css must not contain legacy Leaflet invert filters');
 
 const mobileNavContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components/navigation/MobileBottomNav.tsx'), 'utf-8');
 assert.strictEqual(mobileNavContent.includes('dark:bg-[#181411]'), true, 'MobileBottomNav must include dark:bg-[#181411]');
@@ -434,9 +436,39 @@ assert.strictEqual(explorePageFile.includes('maps.google.com'), false, 'Explore 
 assert.strictEqual(explorePageFile.includes('maps.apple.com'), false, 'Explore page must not redirect externally');
 
 const mapPageFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'map', 'page.tsx'), 'utf-8');
-assert.strictEqual(mapPageFile.includes('maps.google.com'), false, 'Map page must keep internal Leaflet map');
-assert.strictEqual(mapPageFile.includes('maps.apple.com'), false, 'Map page must keep internal Leaflet map');
+assert.strictEqual(mapPageFile.includes('maps.google.com'), false, 'Map page must not redirect externally');
+assert.strictEqual(mapPageFile.includes('maps.apple.com'), false, 'Map page must not redirect externally');
 console.log('✓ Scenario 12: Route planning scope is strictly contained inside PujoPath; only explicit click initiates external handoff');
 
-console.log('\nAll 13 automated unit test suites passed successfully with zero errors!');
+// Test 14: Google Maps Platform Integration & Dark Mode Architecture
+console.log('\n--- Test Suite 14: Google Maps Platform Integration & Dark Mode ---');
+const pujoMapContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'map', 'PujoMap.tsx'), 'utf-8');
+assert.strictEqual(pujoMapContent.includes('@vis.gl/react-google-maps'), true, 'PujoMap must import from official @vis.gl/react-google-maps');
+assert.strictEqual(pujoMapContent.includes('AdvancedMarker'), true, 'PujoMap must use modern AdvancedMarkerElement');
+assert.strictEqual(pujoMapContent.includes('InfoWindow'), true, 'PujoMap must include InfoWindow for interactive pandal cards');
+assert.strictEqual(pujoMapContent.includes('APIProvider'), true, 'PujoMap must configure APIProvider');
+assert.strictEqual(pujoMapContent.includes('ColorScheme.LIGHT'), true, 'PujoMap must default to clear, readable light map style');
+assert.strictEqual(pujoMapContent.includes('gmp_git_agentskills_v1'), true, 'PujoMap must declare internalUsageAttributionIds');
+assert.strictEqual(pujoMapContent.includes('DEMO_MAP_ID'), true, 'PujoMap must supply a valid Map ID for AdvancedMarker');
+
+// Verify Leaflet has been removed from PujoMap
+assert.strictEqual(pujoMapContent.includes('leaflet/dist/leaflet.css'), false, 'PujoMap must no longer import leaflet.css');
+assert.strictEqual(pujoMapContent.includes('L.map'), false, 'PujoMap must not instantiate L.map');
+
+// Verify all pandal coordinates are strictly within valid Kolkata bounds
+const pandalsDataRaw = fs.readFileSync(path.join(__dirname, '..', 'src', 'data', 'pandals', 'index.ts'), 'utf-8');
+const latMatches = [...pandalsDataRaw.matchAll(/latitude:\s*([0-9.]+)/g)].map((m) => parseFloat(m[1]));
+const lngMatches = [...pandalsDataRaw.matchAll(/longitude:\s*([0-9.]+)/g)].map((m) => parseFloat(m[1]));
+assert.strictEqual(latMatches.length, 23, 'Must have coordinates for all 23 pandals');
+latMatches.forEach((lat) => {
+  assert.ok(lat >= 22.4 && lat <= 22.7, `Latitude ${lat} must be within Kolkata metro area`);
+});
+lngMatches.forEach((lng) => {
+  assert.ok(lng >= 88.2 && lng <= 88.5, `Longitude ${lng} must be within Kolkata metro area`);
+});
+console.log('✓ Google Maps Platform API integration & dark mode isolation verified');
+console.log('✓ Verified 23/23 real pandal GPS coordinates accurately bounded in Kolkata');
+
+console.log('\nAll 14 automated unit test suites passed successfully with zero errors!');
+
 
