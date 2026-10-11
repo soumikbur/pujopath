@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -26,6 +26,21 @@ export function MobileBottomNav() {
   const isBn = locale === 'bn';
   const [moreOpen, setMoreOpen] = useState(false);
 
+  // Close drawer on route change or Escape key
+  useEffect(() => {
+    setMoreOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setMoreOpen(false);
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const mainItems = [
     { href: '/', label: isBn ? 'হোম' : 'Home', icon: Home },
     { href: '/explore', label: isBn ? 'অন্বেষণ' : 'Explore', icon: Compass },
@@ -46,7 +61,7 @@ export function MobileBottomNav() {
     <>
       <nav
         aria-label="Mobile Bottom Navigation"
-        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] px-3 py-2 pb-safe shadow-elevated transition-colors duration-200"
+        className="md:hidden fixed bottom-0 inset-x-0 z-[1100] bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] px-3 py-2 pb-safe shadow-elevated transition-colors duration-200"
       >
         <div className="flex items-center justify-around max-w-sm mx-auto">
           {mainItems.map((item) => {
@@ -93,7 +108,7 @@ export function MobileBottomNav() {
 
       {/* More Drawer */}
       {moreOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end md:hidden bg-black/50 backdrop-blur-sm animate-in fade-in">
+        <div className="fixed inset-0 z-[1300] flex flex-col justify-end md:hidden bg-black/50 backdrop-blur-sm animate-in fade-in">
           <div className="bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] rounded-t-3xl p-6 space-y-4 shadow-elevated max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-[#eee8e1] dark:border-[#2a241f] pb-3">
               <h3 className="font-bold text-base text-[#242424] dark:text-[#ede5dc]">

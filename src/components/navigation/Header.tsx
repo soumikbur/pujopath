@@ -31,16 +31,34 @@ export function Header() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isBn = locale === 'bn';
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside or pressing Escape
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setMoreOpen(false);
       }
     }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setMoreOpen(false);
+        setMobileMenuOpen(false);
+      }
+    }
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
+
+  // Close dropdown and mobile menu whenever the active route changes
+  useEffect(() => {
+    setMoreOpen(false);
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   const primaryLinks = [
     { href: '/explore', label: isBn ? 'অন্বেষণ' : 'Explore' },
@@ -59,7 +77,7 @@ export function Header() {
   const isSecondaryActive = secondaryLinks.some((link) => pathname === link.href);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[#eee8e1] dark:border-[#2a241f] bg-[#fcfaf7]/90 dark:bg-[#14110e]/90 backdrop-blur-md transition-colors duration-200">
+    <header className="sticky top-0 z-[1100] border-b border-[#eee8e1] dark:border-[#2a241f] bg-[#fcfaf7]/98 dark:bg-[#14110e]/98 backdrop-blur-md transition-colors duration-200">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
         {/* Brand Logo */}
         <Link
@@ -93,10 +111,19 @@ export function Header() {
           {/* More Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
+              id="desktop-more-menu-button"
               onClick={() => setMoreOpen((open) => !open)}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setMoreOpen(true);
+                }
+              }}
+              aria-haspopup="menu"
               aria-expanded={moreOpen}
+              aria-controls="desktop-more-menu"
               className={cn(
-                'flex items-center gap-1 rounded-xl px-3 py-2 text-sm font-bold transition-all duration-150',
+                'flex items-center gap-1 rounded-xl px-3 py-2 text-sm font-bold transition-all duration-150 outline-none focus-visible:ring-2 focus-visible:ring-[#b42323]',
                 isSecondaryActive
                   ? 'bg-[#f9e9e7] dark:bg-[#341b18] text-[#b42323]'
                   : 'text-[#625b55] dark:text-[#a89e95] hover:bg-[#f5f1ec] dark:hover:bg-[#201c18] hover:text-[#242424] dark:hover:text-[#EDE5DC]'
@@ -107,7 +134,13 @@ export function Header() {
             </button>
 
             {moreOpen && (
-              <div className="absolute right-0 mt-2 w-48 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] p-1.5 shadow-xl animate-in fade-in zoom-in-95 duration-150 z-50">
+              <div
+                id="desktop-more-menu"
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="desktop-more-menu-button"
+                className="absolute right-0 top-full mt-2 w-52 sm:w-56 rounded-2xl border border-[#e8e1d9] dark:border-[#2f2720] bg-white/98 dark:bg-[#1a1613]/98 backdrop-blur-xl p-1.5 shadow-2xl shadow-black/15 dark:shadow-black/60 z-[1200] max-h-[calc(100vh-5rem)] overflow-y-auto animate-in fade-in zoom-in-95 duration-150"
+              >
                 {secondaryLinks.map((link) => {
                   const Icon = link.icon;
                   const isActive = pathname === link.href;
@@ -115,15 +148,17 @@ export function Header() {
                     <Link
                       key={link.href}
                       href={link.href}
+                      role="menuitem"
+                      tabIndex={0}
                       onClick={() => setMoreOpen(false)}
                       className={cn(
-                        'flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
+                        'flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-semibold transition-colors outline-none focus-visible:bg-[#f7f3ee] dark:focus-visible:bg-[#241f1a] focus-visible:ring-2 focus-visible:ring-[#b42323]',
                         isActive
                           ? 'bg-[#f9e9e7] dark:bg-[#341b18] text-[#b42323]'
                           : 'text-[#4a423d] dark:text-[#c4b9ae] hover:bg-[#f7f3ee] dark:hover:bg-[#241f1a]'
                       )}
                     >
-                      <Icon className="h-4 w-4 text-[#b42323]" />
+                      <Icon className="h-4 w-4 text-[#b42323] shrink-0" aria-hidden="true" />
                       <span>{link.label}</span>
                     </Link>
                   );
@@ -199,8 +234,9 @@ export function Header() {
           {/* Mobile Hamburger Menu Trigger */}
           <button
             onClick={() => setMobileMenuOpen((open) => !open)}
-            aria-label="Open menu"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-nav-drawer"
             className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#e8e1d9] dark:border-[#332b24] text-[#625b55] dark:text-[#b4a99e] hover:bg-[#f5f1ec] dark:hover:bg-[#221c17] md:hidden transition-all active:scale-95"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -210,7 +246,13 @@ export function Header() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="border-t border-[#eee8e1] dark:border-[#2a241f] bg-white dark:bg-[#181411] px-4 py-4 md:hidden shadow-xl animate-in slide-in-from-top-2 duration-150">
+        <div
+          id="mobile-nav-drawer"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile navigation menu"
+          className="border-t border-[#eee8e1] dark:border-[#2a241f] bg-white dark:bg-[#181411] px-4 py-4 md:hidden shadow-2xl animate-in slide-in-from-top-2 duration-150"
+        >
           <div className="mx-auto grid max-w-6xl grid-cols-2 gap-2">
             {[...primaryLinks, ...secondaryLinks].map((link) => (
               <Link

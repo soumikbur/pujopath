@@ -61,7 +61,7 @@ export function BottomMusicPlayer() {
       {/* ── Wide Floating Frosted Glass Media Player ── */}
       <aside
         aria-label="Media Player"
-        className="fixed z-40 left-1/2 -translate-x-1/2 bottom-16 md:bottom-5 pointer-events-auto
+        className="fixed z-[1150] left-1/2 -translate-x-1/2 bottom-16 md:bottom-5 pointer-events-auto
                    w-[calc(100%-20px)] md:w-[820px] transition-all duration-300 animate-in slide-in-from-bottom-3"
       >
         {/* Glass container */}
@@ -327,7 +327,7 @@ export function BottomMusicPlayer() {
 
       {/* ── Playlist Drawer Modal ── */}
       {playlistDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+        <div className="fixed inset-0 z-[1300] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
           <div
             className="w-full max-w-md p-4 space-y-3 rounded-3xl border border-[#eadcce] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] shadow-2xl"
           >

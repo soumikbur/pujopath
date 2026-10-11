@@ -39,7 +39,7 @@ export function FullScreenPlayer() {
   const lyrics = locale === 'bn' ? currentTrack.lyricsSnippetBn : currentTrack.lyricsSnippet;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/98 backdrop-blur-2xl text-white flex flex-col justify-between p-6 sm:p-10 animate-in fade-in duration-300 overflow-y-auto">
+    <div className="fixed inset-0 z-[1400] bg-slate-950/98 backdrop-blur-2xl text-white flex flex-col justify-between p-6 sm:p-10 animate-in fade-in duration-300 overflow-y-auto">
       {/* Top Bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

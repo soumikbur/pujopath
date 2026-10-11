@@ -468,11 +468,61 @@ latMatches.forEach((lat) => {
 lngMatches.forEach((lng) => {
   assert.ok(lng >= 88.2 && lng <= 88.5, `Longitude ${lng} must be within Kolkata metro area`);
 });
-console.log('✓ Full-scale interactive map & automatic fallback verified');
-console.log('✓ Complete removal of user-facing API activation screen verified');
-console.log('✓ Verified 23/23 real pandal GPS coordinates accurately bounded in Kolkata');
+// Test Suite 15: Header & More Dropdown Stacking, Positioning & Keyboard Accessibility
+console.log('\n--- Test Suite 15: Header, More Dropdown & Stacking Architecture ---');
+const headerSource = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'navigation', 'Header.tsx'), 'utf-8');
 
-console.log('\nAll 14 automated unit test suites passed successfully with zero errors!');
+// 1. Header z-index must be higher than Leaflet maximum control z-index (1000)
+assert.strictEqual(headerSource.includes('z-[1100]'), true, 'Header must have z-[1100] to sit cleanly above all Leaflet map panes & controls');
+
+// 2. Dropdown menu positioning & elevation
+assert.strictEqual(headerSource.includes('z-[1200]'), true, 'More dropdown must have z-[1200] for guaranteed elevation');
+assert.strictEqual(headerSource.includes('top-full mt-2'), true, 'More dropdown must anchor to top-full with mt-2 offset');
+assert.strictEqual(headerSource.includes('max-h-[calc(100vh-5rem)]'), true, 'More dropdown must constrain height and allow scrolling within viewport');
+
+// 3. ARIA attributes for accessibility
+assert.strictEqual(headerSource.includes('aria-haspopup="menu"'), true, 'More trigger button must have aria-haspopup="menu"');
+assert.strictEqual(headerSource.includes('aria-controls="desktop-more-menu"'), true, 'More trigger button must control desktop-more-menu');
+assert.strictEqual(headerSource.includes('role="menu"'), true, 'Dropdown panel must have role="menu"');
+assert.strictEqual(headerSource.includes('role="menuitem"'), true, 'Dropdown links must have role="menuitem"');
+
+// 4. Outside-click and touch dismissal
+assert.strictEqual(headerSource.includes("document.addEventListener('mousedown', handleClickOutside)"), true, 'Must listen to mousedown for desktop click-away');
+assert.strictEqual(headerSource.includes("document.addEventListener('touchstart', handleClickOutside)"), true, 'Must listen to touchstart for mobile/touch click-away');
+
+// 5. Escape key dismissal
+assert.strictEqual(headerSource.includes("event.key === 'Escape'"), true, 'Must close dropdown when Escape key is pressed');
+
+// 6. Navigation change dismissal
+assert.strictEqual(headerSource.includes('[pathname]'), true, 'Must close dropdown on route navigation');
+
+// 7. Verify all secondary links are present in dropdown (Calendar, Metro, Music, Mahalaya, About)
+assert.strictEqual(headerSource.includes('/calendar'), true, 'Must include Calendar link');
+assert.strictEqual(headerSource.includes('/metro'), true, 'Must include Metro link');
+assert.strictEqual(headerSource.includes('/music'), true, 'Must include Music link');
+assert.strictEqual(headerSource.includes('/mahalaya'), true, 'Must include Mahalaya link');
+assert.strictEqual(headerSource.includes('/about'), true, 'Must include About link');
+
+// 8. Mobile Bottom Nav & Modals stacking hierarchy verification
+const mobileNavSource = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'navigation', 'MobileBottomNav.tsx'), 'utf-8');
+assert.strictEqual(mobileNavSource.includes('z-[1100]'), true, 'MobileBottomNav must have z-[1100]');
+assert.strictEqual(mobileNavSource.includes('z-[1300]'), true, 'Mobile drawer must have z-[1300]');
+
+const modalContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'ui', 'Modal.tsx'), 'utf-8');
+assert.strictEqual(modalContent.includes('z-[1300]'), true, 'Modal dialog must have z-[1300]');
+
+const bottomPlayerContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'music', 'BottomMusicPlayer.tsx'), 'utf-8');
+assert.strictEqual(bottomPlayerContent.includes('z-[1150]'), true, 'BottomMusicPlayer must have z-[1150]');
+assert.strictEqual(bottomPlayerContent.includes('z-[1300]'), true, 'Queue modal must have z-[1300]');
+
+console.log('✓ Header z-[1100] elevation above Leaflet (1000) verified');
+console.log('✓ More dropdown z-[1200] elevation, top-full positioning & viewport scrolling verified');
+console.log('✓ ARIA menu semantics & keyboard Escape dismissal verified');
+console.log('✓ Outside click & touch event listeners verified');
+console.log('✓ Automatic dismissal on route change verified');
+console.log('✓ Global stacking order (Header, Nav, Player, Modals) verified');
+
+console.log('\nAll 15 automated unit test suites passed successfully with zero errors!');
 
 
 
