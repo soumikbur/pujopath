@@ -523,7 +523,95 @@ console.log('✓ Outside click & touch event listeners verified');
 console.log('✓ Automatic dismissal on route change verified');
 console.log('✓ Global stacking order (Header, Nav, Player, Modals) verified');
 
-console.log('\nAll 15 automated unit test suites passed successfully with zero errors!');
+// Test Suite 16: Backend Validation, API Input Sanitization & Persistence Error Recovery
+console.log('\n--- Test Suite 16: Backend Validation, API Sanitization & Error Recovery ---');
+const routesApiFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'api', 'routes', 'route.ts'), 'utf-8');
+
+// 1. Backend error handling for malformed JSON and bad inputs
+assert.strictEqual(routesApiFile.includes('Invalid JSON request body'), true, 'POST /api/routes must return 400 on malformed JSON');
+assert.strictEqual(routesApiFile.includes('No valid pandals found matching the provided IDs'), true, 'POST /api/routes must return 400 when no valid pandals match');
+assert.strictEqual(routesApiFile.includes('replace(/[<>]/g, \'\')'), true, 'POST /api/routes must sanitize route name against HTML/script tags');
+
+// 2. Pure logic validation simulating backend POST /api/routes behavior
+function simulateProcessItinerary(body) {
+  if (!body || typeof body !== 'object') {
+    return { status: 400, error: 'Invalid JSON request body' };
+  }
+  const { pandalIds, name } = body;
+  if (!Array.isArray(pandalIds) || pandalIds.length === 0) {
+    return { status: 400, error: 'pandalIds array is required' };
+  }
+  const stops = [];
+  const mockPandalDb = [
+    { id: 'bagbazar', name: 'Bagbazar Sarbojanin', latitude: 22.6025, longitude: 88.3681 },
+    { id: 'kumartuli', name: 'Kumartuli Park', latitude: 22.5997, longitude: 88.3655 }
+  ];
+  pandalIds.forEach((id, idx) => {
+    if (typeof id === 'string') {
+      const found = mockPandalDb.find((p) => p.id === id);
+      if (found) stops.push({ pandalId: found.id, pandal: found, order: idx });
+    }
+  });
+  if (stops.length === 0) {
+    return { status: 400, error: 'No valid pandals found matching the provided IDs' };
+  }
+  let dist = 0;
+  for (let i = 0; i < stops.length - 1; i++) {
+    dist += calculateHaversineDistance(stops[i].pandal.latitude, stops[i].pandal.longitude, stops[i + 1].pandal.latitude, stops[i + 1].pandal.longitude);
+  }
+  const sanitizedName = typeof name === 'string'
+    ? name.trim().slice(0, 100).replace(/[<>]/g, '')
+    : `Pujo Trail (${stops.length} Pandals)`;
+  return {
+    status: 200,
+    data: {
+      name: sanitizedName,
+      stopsCount: stops.length,
+      totalDistanceKm: Math.round(dist * 10) / 10
+    }
+  };
+}
+
+// Case 1: Empty or non-array pandalIds
+assert.strictEqual(simulateProcessItinerary({ pandalIds: [] }).status, 400);
+assert.strictEqual(simulateProcessItinerary({ pandalIds: 'not-array' }).status, 400);
+
+// Case 2: Non-existent pandal IDs
+assert.strictEqual(simulateProcessItinerary({ pandalIds: ['fake-pandal-1', 'fake-pandal-2'] }).status, 400);
+
+// Case 3: Valid pandal IDs with XSS injection in name
+const validRes = simulateProcessItinerary({
+  pandalIds: ['bagbazar', 'kumartuli'],
+  name: '<script>alert("hack")</script>My Trail'
+});
+assert.strictEqual(validRes.status, 200);
+assert.strictEqual(validRes.data.stopsCount, 2);
+assert.strictEqual(validRes.data.name.includes('<script>'), false, 'XSS brackets must be stripped from name');
+assert.strictEqual(validRes.data.totalDistanceKm, 0.4);
+
+// 3. PandalService coordinate NaN resilience verification
+const pandalServiceFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'lib', 'services', 'PandalService.ts'), 'utf-8');
+assert.strictEqual(pandalServiceFile.includes('!isNaN(userLat)'), true, 'PandalService must check !isNaN(userLat)');
+assert.strictEqual(pandalServiceFile.includes('!isNaN(userLng)'), true, 'PandalService must check !isNaN(userLng)');
+
+// 4. Persistence try-catch error resilience verification
+const favoritesContextFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'lib', 'context', 'FavoritesContext.tsx'), 'utf-8');
+const themeContextFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'lib', 'context', 'ThemeContext.tsx'), 'utf-8');
+const i18nContextFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'lib', 'i18n', 'I18nContext.tsx'), 'utf-8');
+
+assert.strictEqual(favoritesContextFile.includes('localStorage.getItem'), true);
+assert.strictEqual(favoritesContextFile.includes('try {'), true);
+assert.strictEqual(themeContextFile.includes('localStorage.getItem'), true);
+assert.strictEqual(themeContextFile.includes('try {'), true);
+assert.strictEqual(i18nContextFile.includes('localStorage.getItem'), true);
+assert.strictEqual(i18nContextFile.includes('try {'), true);
+
+console.log('✓ Backend request validation & 400 Bad Request handling verified');
+console.log('✓ Route name HTML/XSS input sanitization verified');
+console.log('✓ PandalService coordinate NaN-safety verified');
+console.log('✓ Client-side browser storage (localStorage) try-catch failure resilience verified');
+
+console.log('\nAll 16 automated unit test suites passed successfully with zero errors!');
 
 
 

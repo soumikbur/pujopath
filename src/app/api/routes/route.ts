@@ -4,9 +4,18 @@ import { calculateHaversineDistance, estimateWalkingMinutes } from '@/lib/geo';
 import { RouteItinerary, RouteStop } from '@/types';
 
 export async function POST(request: NextRequest) {
+  let body: any;
   try {
-    const body = await request.json();
-    const { pandalIds, name } = body;
+    body = await request.json();
+  } catch (parseError) {
+    return NextResponse.json(
+      { success: false, error: 'Invalid JSON request body' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const { pandalIds, name } = body || {};
 
     if (!Array.isArray(pandalIds) || pandalIds.length === 0) {
       return NextResponse.json(
@@ -17,15 +26,24 @@ export async function POST(request: NextRequest) {
 
     const stops: RouteStop[] = [];
     pandalIds.forEach((id: string, idx: number) => {
-      const pandal = PANDALS_DATA.find((p) => p.id === id);
-      if (pandal) {
-        stops.push({
-          pandalId: pandal.id,
-          pandal,
-          order: idx,
-        });
+      if (typeof id === 'string') {
+        const pandal = PANDALS_DATA.find((p) => p.id === id);
+        if (pandal) {
+          stops.push({
+            pandalId: pandal.id,
+            pandal,
+            order: idx,
+          });
+        }
       }
     });
+
+    if (stops.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'No valid pandals found matching the provided IDs' },
+        { status: 400 }
+      );
+    }
 
     let totalDist = 0;
     for (let i = 0; i < stops.length - 1; i++) {
@@ -40,9 +58,13 @@ export async function POST(request: NextRequest) {
     const totalDistanceKm = Math.round(totalDist * 10) / 10;
     const estimatedDurationMinutes = estimateWalkingMinutes(totalDistanceKm) + stops.length * 30;
 
+    const sanitizedName = typeof name === 'string'
+      ? name.trim().slice(0, 100).replace(/[<>]/g, '')
+      : `Pujo Trail (${stops.length} Pandals)`;
+
     const itinerary: RouteItinerary = {
       id: 'route-' + Date.now(),
-      name: name || `Pujo Trail (${stops.length} Pandals)`,
+      name: sanitizedName || `Pujo Trail (${stops.length} Pandals)`,
       createdAt: new Date().toISOString(),
       stops,
       totalDistanceKm,

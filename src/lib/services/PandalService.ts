@@ -4,7 +4,13 @@ import { calculateHaversineDistance } from '@/lib/geo';
 
 export class PandalService {
   static getAllPandals(userLat?: number, userLng?: number): Pandal[] {
-    if (userLat !== undefined && userLng !== undefined) {
+    const hasValidCoords =
+      typeof userLat === 'number' &&
+      typeof userLng === 'number' &&
+      !isNaN(userLat) &&
+      !isNaN(userLng);
+
+    if (hasValidCoords) {
       return PANDALS_DATA.map((p) => ({
         ...p,
         distanceKm: calculateHaversineDistance(userLat, userLng, p.latitude, p.longitude),
@@ -16,7 +22,14 @@ export class PandalService {
   static getPandalBySlug(slug: string, userLat?: number, userLng?: number): Pandal | null {
     const found = PANDALS_DATA.find((p) => p.slug === slug || p.id === slug);
     if (!found) return null;
-    if (userLat !== undefined && userLng !== undefined) {
+
+    const hasValidCoords =
+      typeof userLat === 'number' &&
+      typeof userLng === 'number' &&
+      !isNaN(userLat) &&
+      !isNaN(userLng);
+
+    if (hasValidCoords) {
       return {
         ...found,
         distanceKm: calculateHaversineDistance(userLat, userLng, found.latitude, found.longitude),
