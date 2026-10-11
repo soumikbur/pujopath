@@ -14,7 +14,7 @@ import { useAudio } from '@/lib/context/AudioContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useTheme } from '@/lib/context/ThemeContext';
 import { toBengaliDigits } from '@/lib/geo';
-import { cn } from '@/lib/utils/cn';
+import { cn, getAssetPath } from '@/lib/utils';
 
 export function BottomMusicPlayer() {
   const {
@@ -103,7 +103,7 @@ export function BottomMusicPlayer() {
               }}
             >
               <Image
-                src="/images/mahalaya-thumb.jpg"
+                src={getAssetPath('/images/mahalaya-thumb.jpg')}
                 alt={displayTitle}
                 fill
                 className="object-cover"
@@ -242,7 +242,7 @@ export function BottomMusicPlayer() {
                 }}
               >
                 <Image
-                  src="/images/mahalaya-thumb.jpg"
+                  src={getAssetPath('/images/mahalaya-thumb.jpg')}
                   alt={displayTitle}
                   fill
                   className="object-cover"

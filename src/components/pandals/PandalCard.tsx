@@ -8,7 +8,7 @@ import { Pandal } from '@/types';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { toBengaliDigits, formatDistance } from '@/lib/geo';
-import { cn } from '@/lib/utils/cn';
+import { cn, getAssetPath } from '@/lib/utils';
 
 interface PandalCardProps {
   pandal: Pandal;
@@ -20,7 +20,11 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
   const isBn = locale === 'bn';
   const { isPandalInRoute, addPandalToRoute, removePandalFromRoute, isPandalSaved, toggleSavePandal } = useFavorites();
 
-  const [imgSrc, setImgSrc] = useState(pandal.imageUrl || '/images/pandals/ekchala-traditional.jpg');
+  const [imgSrc, setImgSrc] = useState(() => getAssetPath(pandal.imageUrl || '/images/pandals/pandal-fallback.webp'));
+
+  React.useEffect(() => {
+    setImgSrc(getAssetPath(pandal.imageUrl || '/images/pandals/pandal-fallback.webp'));
+  }, [pandal.imageUrl]);
 
   const inRoute = isPandalInRoute(pandal.id);
   const isSaved = isPandalSaved(pandal.id);
@@ -59,7 +63,7 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
             src={imgSrc}
             alt={displayName}
             fill
-            onError={() => setImgSrc('/images/pandals/pandal-fallback.jpg')}
+            onError={() => setImgSrc(getAssetPath('/images/pandals/pandal-fallback.webp'))}
             className="object-cover"
             sizes="56px"
           />
@@ -81,7 +85,7 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
             src={imgSrc}
             alt={displayName}
             fill
-            onError={() => setImgSrc('/images/pandals/pandal-fallback.jpg')}
+            onError={() => setImgSrc(getAssetPath('/images/pandals/pandal-fallback.webp'))}
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />

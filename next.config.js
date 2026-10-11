@@ -1,9 +1,13 @@
 /** @type {import('next').NextConfig} */
 const isDev = process.env.NODE_ENV === 'development';
 const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
+const basePath = isGithubActions ? '/pujopath' : '';
 
 const nextConfig = {
   reactStrictMode: true,
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
   ...(isDev
     ? {
         async rewrites() {
@@ -18,10 +22,10 @@ const nextConfig = {
     : {
         output: 'export',
         trailingSlash: true,
-        ...(isGithubActions
+        ...(basePath
           ? {
-              basePath: '/pujopath',
-              assetPrefix: '/pujopath',
+              basePath,
+              assetPrefix: basePath,
             }
           : {}),
       }),

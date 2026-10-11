@@ -6,6 +6,7 @@ import { Sparkles, Play, Radio, Volume2 } from 'lucide-react';
 import { useAudio } from '@/lib/context/AudioContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { MUSIC_TRACKS_DATA } from '@/data/music';
+import { getAssetPath } from '@/lib/utils';
 
 export default function MahalayaPage() {
   const { playTrack, isPlaying, togglePlay, currentTrack } = useAudio();
@@ -36,7 +37,7 @@ export default function MahalayaPage() {
       <div className="p-6 sm:p-8 rounded-3xl bg-pujo-bg-hero border border-pujo-border shadow-card flex flex-col md:flex-row items-center gap-6">
         <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-3xl overflow-hidden shadow-card border border-pujo-border shrink-0 bg-white">
           <Image
-            src="/images/mahalaya-thumb.jpg"
+            src={getAssetPath('/images/mahalaya-thumb.jpg')}
             alt="মহালয়া চণ্ডীপাঠ"
             fill
             priority

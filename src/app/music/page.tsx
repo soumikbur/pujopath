@@ -7,7 +7,7 @@ import { useAudio } from '@/lib/context/AudioContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { MUSIC_TRACKS_DATA } from '@/data/music';
 import { toBengaliDigits } from '@/lib/geo';
-import { cn } from '@/lib/utils/cn';
+import { cn, getAssetPath } from '@/lib/utils';
 
 export default function MusicPage() {
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudio();
@@ -43,7 +43,7 @@ export default function MusicPage() {
         <div className="p-6 sm:p-8 rounded-3xl bg-pujo-bg-hero border border-pujo-border shadow-card flex flex-col md:flex-row items-center gap-6">
           <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-3xl overflow-hidden shadow-card border border-pujo-border shrink-0 bg-white">
             <Image
-              src="/images/mahalaya-thumb.jpg"
+              src={getAssetPath('/images/mahalaya-thumb.jpg')}
               alt={currentTrack.title}
               fill
               className="object-cover"

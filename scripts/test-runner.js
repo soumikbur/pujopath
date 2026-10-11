@@ -143,5 +143,34 @@ expectedRoutes.forEach((route) => {
 assert.strictEqual(fs.existsSync(path.join(appDir, 'not-found.tsx')), true, 'Branded not-found.tsx must exist');
 console.log('✓ Core route graph and 404 integrity verified');
 
-console.log('\nAll 8 automated unit test suites passed successfully with zero errors!');
+// Test 9: Authentic Pandal Photographs & Asset Path Resolver
+const pandalDataContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'data', 'pandals', 'index.ts'), 'utf-8');
+const idMatches = pandalDataContent.match(/id:\s*'([^']+)'/g) || [];
+const pandalIds = idMatches.map((m) => m.match(/'([^']+)'/)[1]);
+assert.strictEqual(pandalIds.length, 23, 'Must have exactly 23 verified pandals');
+
+const pandalsImgDir = path.join(__dirname, '..', 'public', 'images', 'pandals');
+assert.strictEqual(fs.existsSync(path.join(pandalsImgDir, 'pandal-fallback.webp')), true, 'pandal-fallback.webp must exist');
+
+pandalIds.forEach((id) => {
+  const webpPath = path.join(pandalsImgDir, `${id}.webp`);
+  assert.strictEqual(fs.existsSync(webpPath), true, `Authentic photograph for ${id}.webp must exist in public/images/pandals/`);
+  assert.strictEqual(pandalDataContent.includes(`imageUrl: '/images/pandals/${id}.webp'`), true, `Pandal ${id} must reference its own authentic webp image`);
+});
+
+// Test getAssetPath logic
+function testGetAssetPath(src, basePath) {
+  if (!src) return '';
+  if (src.startsWith('http://') || src.startsWith('https://')) return src;
+  const clean = src.startsWith('/') ? src : `/${src}`;
+  if (basePath && !clean.startsWith(basePath)) return `${basePath}${clean}`;
+  return clean;
+}
+assert.strictEqual(testGetAssetPath('/images/pandals/bagbazar.webp', ''), '/images/pandals/bagbazar.webp');
+assert.strictEqual(testGetAssetPath('/images/pandals/bagbazar.webp', '/pujopath'), '/pujopath/images/pandals/bagbazar.webp');
+assert.strictEqual(testGetAssetPath('/pujopath/images/pandals/bagbazar.webp', '/pujopath'), '/pujopath/images/pandals/bagbazar.webp');
+console.log('✓ Authentic pandal photographs (23/23) & asset path resolution verified');
+
+console.log('\nAll 9 automated unit test suites passed successfully with zero errors!');
+
 

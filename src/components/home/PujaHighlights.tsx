@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
+import { getAssetPath } from '@/lib/utils';
 
 export function PujaHighlights() {
   const { locale } = useI18n();
@@ -14,21 +15,21 @@ export function PujaHighlights() {
     {
       title: isBn ? 'ঐতিহ্যবাহী সাবেকি পুজো' : 'Traditional Puja',
       desc: isBn ? 'শতবর্ষের বনেদি বাড়ির পুজো পরিক্রমা।' : "Discover Bengal's timeless community celebrations.",
-      image: '/images/pandals/sovabazar-rajbari.jpg',
+      image: getAssetPath('/images/pandals/sovabazar-rajbari.webp'),
       href: '/explore?heritageOnly=true',
       badge: isBn ? 'ঐতিহ্য' : 'Heritage',
     },
     {
       title: isBn ? 'মণ্ডপ শিল্পকলা' : 'Pandal Art',
       desc: isBn ? 'কলকাতার সেরা সৃজনশীল শিল্পকর্ম।' : 'Explore creative installations across Kolkata.',
-      image: '/images/pandals/art-craft-terracotta.jpg',
+      image: getAssetPath('/images/pandals/behala-natun-dal.webp'),
       href: '/explore',
       badge: isBn ? 'শিল্প' : 'Artistry',
     },
     {
       title: isBn ? 'সন্ধ্যায় পুজো পরিক্রমা' : 'Pujo Evenings',
       desc: isBn ? 'আলোকসজ্জা ও রাতের মণ্ডপ দর্শন।' : 'Plan your route for the best evening experience.',
-      image: '/images/pandals/college-square-water.jpg',
+      image: getAssetPath('/images/pandals/college-square.webp'),
       href: '/planner',
       badge: isBn ? 'পরিক্রমা' : 'Routes',
     },

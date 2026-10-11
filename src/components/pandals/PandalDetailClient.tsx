@@ -16,7 +16,7 @@ import { Pandal } from '@/types';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { formatDistance } from '@/lib/geo';
-import { cn } from '@/lib/utils/cn';
+import { cn, getAssetPath } from '@/lib/utils';
 
 interface PandalDetailClientProps {
   pandal: Pandal;
@@ -27,7 +27,11 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
   const isBn = locale === 'bn';
   const { isPandalInRoute, addPandalToRoute, removePandalFromRoute, isPandalSaved, toggleSavePandal } = useFavorites();
 
-  const [imgSrc, setImgSrc] = useState(pandal.imageUrl || '/images/pandals/ekchala-traditional.jpg');
+  const [imgSrc, setImgSrc] = useState(() => getAssetPath(pandal.imageUrl || '/images/pandals/pandal-fallback.webp'));
+
+  React.useEffect(() => {
+    setImgSrc(getAssetPath(pandal.imageUrl || '/images/pandals/pandal-fallback.webp'));
+  }, [pandal.imageUrl]);
 
   const inRoute = isPandalInRoute(pandal.id);
   const isSaved = isPandalSaved(pandal.id);
@@ -73,7 +77,7 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
             alt={displayName}
             fill
             priority
-            onError={() => setImgSrc('/images/pandals/pandal-fallback.jpg')}
+            onError={() => setImgSrc(getAssetPath('/images/pandals/pandal-fallback.webp'))}
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 1024px"
           />
