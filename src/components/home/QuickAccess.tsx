@@ -3,60 +3,96 @@
 import React from 'react';
 import Link from 'next/link';
 import {
-  MapPin,
-  Route,
-  Train,
-  Music2,
   Calendar,
+  MapPin,
+  Music2,
+  Route,
   Sparkles,
-  Heart,
+  Train,
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
-import { cn } from '@/lib/utils/cn';
 
 export function QuickAccess() {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
 
   const items = [
-    { href: '/map', label: isBn ? 'মানচিত্র' : 'Map', icon: MapPin, iconColor: '#D52F2F', iconBg: 'rgba(213,47,47,0.08)' },
-    { href: '/planner', label: isBn ? 'পরিকল্পনা' : 'Planner', icon: Route, iconColor: '#0D9488', iconBg: 'rgba(13,148,136,0.08)' },
-    { href: '/metro', label: isBn ? 'মেট্রো' : 'Metro', icon: Train, iconColor: '#2563EB', iconBg: 'rgba(37,99,235,0.08)' },
-    { href: '/music', label: isBn ? 'সঙ্গীত' : 'Music', icon: Music2, iconColor: '#7C3AED', iconBg: 'rgba(124,58,237,0.08)' },
-    { href: '/calendar', label: isBn ? 'ক্যালেন্ডার' : 'Calendar', icon: Calendar, iconColor: '#EA580C', iconBg: 'rgba(234,88,12,0.08)' },
-    { href: '/mahalaya', label: isBn ? 'মহালয়া' : 'Mahalaya', icon: Sparkles, iconColor: '#D97706', iconBg: 'rgba(217,119,6,0.08)' },
-    { href: '/saved', label: isBn ? 'সংরক্ষিত' : 'Saved', icon: Heart, iconColor: '#E11D48', iconBg: 'rgba(225,29,72,0.08)' },
+    {
+      href: '/map',
+      label: isBn ? 'মানচিত্র' : 'Map',
+      description: isBn ? 'সব প্যান্ডেল একসঙ্গে দেখুন' : 'See all pandals at a glance',
+      icon: MapPin,
+      color: '#b42323',
+    },
+    {
+      href: '/planner',
+      label: isBn ? 'রুট প্ল্যানার' : 'Route Planner',
+      description: isBn ? 'স্মার্ট পরিক্রমা তৈরি করুন' : 'Optimize your hopping trail',
+      icon: Route,
+      color: '#0d9488',
+    },
+    {
+      href: '/metro',
+      label: isBn ? 'মেট্রো গাইড' : 'Metro Guide',
+      description: isBn ? 'কাছের স্টেশন খুঁজুন' : 'Find nearest metro stations',
+      icon: Train,
+      color: '#2563eb',
+    },
+    {
+      href: '/calendar',
+      label: isBn ? 'পঞ্জিকা' : 'Calendar',
+      description: isBn ? 'পুজোর তিথি ও শুভ সময়' : 'Auspicious tithis and hours',
+      icon: Calendar,
+      color: '#ea580c',
+    },
+    {
+      href: '/music',
+      label: isBn ? 'শারদীয়া সঙ্গীত' : 'Puja Music',
+      description: isBn ? 'চণ্ডীপাঠ ও ঢাকের বোল' : 'Chandi Path & Dhak beats',
+      icon: Music2,
+      color: '#7c3aed',
+    },
+    {
+      href: '/mahalaya',
+      label: isBn ? 'মহালয়া' : 'Mahalaya',
+      description: isBn ? 'বীরেন্দ্রকৃষ্ণ ভদ্রের চণ্ডীপাঠ' : 'Timeless dawn broadcast',
+      icon: Sparkles,
+      color: '#d97706',
+    },
   ];
 
   return (
-    <section className="space-y-2 pt-0.5">
-      <h2 className="text-[15px] font-bold text-[#242424] tracking-tight">
-        {isBn ? 'দ্রুত প্রবেশ' : 'Quick Access'}
-      </h2>
+    <section className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h2 className="text-base sm:text-lg font-bold text-[#242424] dark:text-[#ede5dc] tracking-tight">
+          {isBn ? 'দ্রুত প্রবেশ' : 'Quick Access'}
+        </h2>
+      </div>
 
-      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {items.map((item) => {
           const Icon = item.icon;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className="group flex flex-col items-center justify-center h-[76px] p-2 rounded-[16px] hover:shadow-md transition-all duration-150 text-center"
-              style={{
-                background: 'rgba(255, 255, 255, 0.75)',
-                border: '1px solid rgba(234, 220, 206, 0.9)',
-                boxShadow: '0 1px 4px rgba(70, 35, 15, 0.03)',
-              }}
+              className="group flex flex-col justify-between rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] p-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#b42323]/50 hover:shadow-md active:scale-95"
             >
               <div
-                className="w-7 h-7 rounded-xl flex items-center justify-center mb-1 group-hover:scale-105 transition-transform shrink-0"
-                style={{ background: item.iconBg }}
+                className="grid h-10 w-10 place-items-center rounded-xl transition-transform duration-200 group-hover:scale-110"
+                style={{ backgroundColor: `${item.color}15`, color: item.color }}
               >
-                <Icon className="w-3.5 h-3.5 stroke-[2.2]" style={{ color: item.iconColor }} />
+                <Icon className="h-5 w-5" />
               </div>
-              <span className="text-xs sm:text-[13px] font-bold text-[#242424] group-hover:text-[#D52F2F] transition-colors truncate w-full">
-                {item.label}
-              </span>
+
+              <div className="mt-3">
+                <span className="block text-sm font-bold text-[#242424] dark:text-[#ede5dc] group-hover:text-[#b42323] transition-colors truncate">
+                  {item.label}
+                </span>
+                <span className="mt-0.5 block text-xs text-[#776d65] dark:text-[#a89e95] line-clamp-1">
+                  {item.description}
+                </span>
+              </div>
             </Link>
           );
         })}

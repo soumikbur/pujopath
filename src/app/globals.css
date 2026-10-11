@@ -21,37 +21,32 @@
     padding: 0;
     width: 100%;
     min-height: 100%;
-    background-color: #F8EFE5;
+    background-color: #FCFAF7;
     color: #242424;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
   }
-}
 
-/* Page Background Layer with Realistic Durga Photo & Blur */
-.page-bg-fixed {
-  position: fixed;
-  inset: 0;
-  background-image: url('/images/durga-bg.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(12px) brightness(0.98);
-  transform: scale(1.06);
-  z-index: 0;
-  pointer-events: none;
-}
+  html.dark,
+  html.dark body {
+    background-color: #14110E;
+    color: #EDE5DC;
+  }
 
-.page-bg-wash {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(248, 238, 228, 0.40) 0%, rgba(248, 238, 228, 0.65) 100%);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 1;
-  pointer-events: none;
+  /* Accessible focus indicators */
+  :focus-visible {
+    outline: 2px solid #D52F2F;
+    outline-offset: 2px;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible {
+    outline: 2px solid #D52F2F;
+    outline-offset: 2px;
+  }
 }
 
 /* Custom Scrollbar */
@@ -73,6 +68,14 @@
   background: #C4B9AD;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #1C1814;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #3B332B;
+}
+
 /* Safe area padding for mobile bottom nav */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 1rem);
@@ -85,4 +88,16 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Respect user's motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

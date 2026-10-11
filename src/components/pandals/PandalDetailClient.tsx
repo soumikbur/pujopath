@@ -45,7 +45,7 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
       <div className="flex items-center justify-between">
         <Link
           href="/explore"
-          className="inline-flex items-center gap-1.5 text-sm font-bold text-pujo-text-secondary hover:text-pujo-red transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm font-bold text-[#625b55] dark:text-[#a89e95] hover:text-[#b42323] transition-colors active:scale-95"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>{isBn ? 'প্যান্ডেল তালিকায় ফিরুন' : 'Back to Explore'}</span>
@@ -54,10 +54,10 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
         <button
           onClick={() => toggleSavePandal(pandal.id)}
           className={cn(
-            'px-4 py-2 rounded-2xl border text-sm font-bold flex items-center gap-2 transition-all shadow-sm',
+            'px-4 py-2 rounded-xl border text-sm font-bold flex items-center gap-2 transition-all active:scale-95 shadow-xs',
             isSaved
-              ? 'bg-pujo-red text-white border-pujo-red'
-              : 'bg-white text-pujo-text-secondary border-pujo-border hover:border-pujo-red hover:text-pujo-red'
+              ? 'bg-[#b42323] text-white border-[#b42323]'
+              : 'bg-white dark:bg-[#1a1613] text-[#625b55] dark:text-[#a89e95] border-[#eee8e1] dark:border-[#2f2720] hover:border-[#b42323] hover:text-[#b42323]'
           )}
         >
           <Heart className={cn('w-4 h-4', isSaved && 'fill-current')} />
@@ -66,7 +66,7 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
       </div>
 
       {/* Hero Image */}
-      <div className="relative rounded-3xl overflow-hidden bg-gray-100 border border-pujo-border shadow-card">
+      <div className="relative rounded-3xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-[#eee8e1] dark:border-[#2f2720] shadow-sm">
         <div className="relative h-64 sm:h-80 md:h-96 w-full">
           <Image
             src={imgSrc}
@@ -77,14 +77,14 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 1024px"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
           <div className="absolute top-4 left-4 flex gap-2">
-            <span className="px-3.5 py-1 rounded-full text-xs font-bold bg-white/95 backdrop-blur-md text-pujo-text-primary border border-white/60 shadow-sm">
+            <span className="px-3.5 py-1 rounded-full text-xs font-bold bg-white/95 backdrop-blur-md text-[#242424] border border-white/60 shadow-xs">
               {pandal.zone}
             </span>
             {pandal.isHeritage && (
-              <span className="px-3.5 py-1 rounded-full text-xs font-bold bg-amber-500 text-white shadow-sm">
+              <span className="px-3.5 py-1 rounded-full text-xs font-bold bg-amber-500 text-white shadow-xs">
                 {isBn ? 'ঐতিহ্যবাহী সাবেকি' : 'Heritage Sabeki'}
               </span>
             )}
@@ -95,7 +95,7 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
               {displayName}
             </h1>
             <p className="text-sm sm:text-base text-white/90 flex items-center gap-1.5 font-medium">
-              <MapPin className="w-4 h-4 text-pujo-red shrink-0" />
+              <MapPin className="w-4 h-4 text-[#b42323] shrink-0" />
               <span>{displayAddress}</span>
             </p>
           </div>
@@ -105,26 +105,26 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
       {/* 2-Column Info Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
-          <div className="p-6 sm:p-7 rounded-3xl bg-white border border-pujo-border shadow-card space-y-4">
+          <div className="p-6 sm:p-7 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] shadow-xs space-y-4">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-pujo-red">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#b42323]">
                 {isBn ? 'মণ্ডপ ও প্রতিমার শিল্প ভাবনা' : 'Theme & Art Concept'}
               </span>
-              <h2 className="text-xl sm:text-2xl font-black text-pujo-text-primary mt-1">
+              <h2 className="text-xl sm:text-2xl font-black text-[#242424] dark:text-[#ede5dc] mt-1">
                 {displayTheme}
               </h2>
             </div>
 
-            <p className="text-sm sm:text-base text-pujo-text-secondary leading-relaxed">
+            <p className="text-sm sm:text-base text-[#4a423d] dark:text-[#c4b9ae] leading-relaxed">
               {displayDesc}
             </p>
 
             {displayHistory && (
-              <div className="pt-4 border-t border-pujo-border space-y-1.5">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-pujo-red">
+              <div className="pt-4 border-t border-[#eee8e1] dark:border-[#2f2720] space-y-1.5">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#b42323]">
                   {isBn ? 'ইতিহাস ও ঐতিহ্য' : 'Heritage & History'}
                 </h3>
-                <p className="text-sm text-pujo-text-muted leading-relaxed">
+                <p className="text-sm text-[#776d65] dark:text-[#a89e95] leading-relaxed">
                   {displayHistory}
                 </p>
               </div>
@@ -132,14 +132,14 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
           </div>
 
           {/* Highlights */}
-          <div className="p-6 sm:p-7 rounded-3xl bg-white border border-pujo-border shadow-card space-y-3.5">
-            <h3 className="text-base sm:text-lg font-bold text-pujo-text-primary">
+          <div className="p-6 sm:p-7 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] shadow-xs space-y-3.5">
+            <h3 className="text-base sm:text-lg font-bold text-[#242424] dark:text-[#ede5dc]">
               {isBn ? 'প্রধান আকর্ষণসমূহ' : 'Key Highlights'}
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-pujo-text-secondary">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-[#4a423d] dark:text-[#c4b9ae]">
               {(isBn ? pandal.highlightsBn : pandal.highlights)?.map((hl, idx) => (
                 <div key={idx} className="flex items-center gap-2.5">
-                  <span className="w-2 h-2 rounded-full bg-pujo-red shrink-0" />
+                  <span className="w-2 h-2 rounded-full bg-[#b42323] shrink-0" />
                   <span className="font-semibold">{hl}</span>
                 </div>
               ))}
@@ -149,40 +149,40 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
 
         {/* Right Info Box */}
         <div className="space-y-4">
-          <div className="p-6 rounded-3xl bg-white border border-pujo-border shadow-card space-y-4 text-sm">
+          <div className="p-6 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] shadow-xs space-y-4 text-sm">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-pujo-text-muted">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95]">
                 {isBn ? 'দর্শনার্থীদের প্রবেশের সময়' : 'Viewing Timings'}
               </span>
-              <div className="text-base font-bold text-pujo-text-primary mt-1 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-pujo-red" />
+              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc] mt-1 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-[#b42323]" />
                 <span>{pandal.openingTime} – {pandal.closingTime}</span>
               </div>
             </div>
 
             {primaryMetro && (
-              <div className="pt-3 border-t border-pujo-border">
-                <span className="text-xs font-bold uppercase tracking-wider text-pujo-text-muted">
+              <div className="pt-3 border-t border-[#eee8e1] dark:border-[#2f2720]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95]">
                   {isBn ? 'নিকটতম মেট্রো স্টেশন' : 'Nearest Metro'}
                 </span>
-                <div className="text-base font-bold text-pujo-text-primary mt-1 flex items-center gap-2">
-                  <Train className="w-4 h-4 text-sky-600" />
+                <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc] mt-1 flex items-center gap-2">
+                  <Train className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                   <span>{isBn ? primaryMetro.stationNameBn : primaryMetro.stationName} ({formatDistance(primaryMetro.walkingDistanceMeters / 1000, locale)})</span>
                 </div>
               </div>
             )}
 
-            <div className="pt-3 border-t border-pujo-border flex flex-col gap-2.5">
+            <div className="pt-3 border-t border-[#eee8e1] dark:border-[#2f2720] flex flex-col gap-2.5">
               <button
                 onClick={() => (inRoute ? removePandalFromRoute(pandal.id) : addPandalToRoute(pandal))}
                 className={cn(
-                  'w-full py-3 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 text-sm shadow-sm',
+                  'w-full py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm shadow-xs active:scale-95',
                   inRoute
-                    ? 'bg-pujo-red text-white'
-                    : 'bg-pujo-bg-surface border border-pujo-border text-pujo-text-primary hover:border-pujo-red'
+                    ? 'bg-[#b42323] text-white hover:bg-[#971c1c]'
+                    : 'bg-[#fcfaf7] dark:bg-[#14110e] border border-[#eee8e1] dark:border-[#2f2720] text-[#242424] dark:text-[#ede5dc] hover:border-[#b42323]'
                 )}
               >
-                {inRoute ? <Check className="w-4 h-4" /> : <Navigation className="w-4 h-4 text-pujo-red" />}
+                {inRoute ? <Check className="w-4 h-4" /> : <Navigation className="w-4 h-4 text-[#b42323]" />}
                 <span>{inRoute ? (isBn ? 'রুটে যোগ করা আছে' : 'Added to Route') : (isBn ? 'রুটে যোগ করুন' : 'Add to Route')}</span>
               </button>
 
@@ -190,9 +190,9 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
                 href={`https://www.google.com/maps/dir/?api=1&destination=${pandal.latitude},${pandal.longitude}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-3 rounded-2xl bg-white hover:bg-pujo-bg-surface border border-pujo-border text-center font-bold text-pujo-text-primary flex items-center justify-center gap-2 text-sm"
+                className="w-full py-3 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-center font-bold text-[#242424] dark:text-[#ede5dc] hover:bg-[#f7f3ee] dark:hover:bg-[#251e18] flex items-center justify-center gap-2 text-sm transition-all active:scale-95 shadow-xs"
               >
-                <MapPin className="w-4 h-4 text-pujo-red" />
+                <MapPin className="w-4 h-4 text-[#b42323]" />
                 <span>{isBn ? 'গুগল ম্যাপে দিকনির্দেশ' : 'Get Directions'}</span>
               </a>
             </div>

@@ -24,7 +24,7 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
 
   const inRoute = isPandalInRoute(pandal.id);
   const isSaved = isPandalSaved(pandal.id);
-  const primaryMetro = pandal.metroLinks[0];
+  const primaryMetro = pandal.metroLinks?.[0];
 
   const displayName = isBn ? pandal.nameBn : pandal.name;
   const displayLocality = isBn ? pandal.localityBn : pandal.locality;
@@ -52,9 +52,9 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
     return (
       <Link
         href={`/pandals/${pandal.slug}`}
-        className="flex items-center gap-3 p-3 rounded-2xl bg-white hover:bg-pujo-bg-surface border border-pujo-border shadow-card transition-all group"
+        className="group flex items-center gap-3 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] p-3 transition-all hover:bg-[#fcfaf7] dark:hover:bg-[#251e18] shadow-xs active:scale-98"
       >
-        <div className="relative w-14 h-14 rounded-2xl overflow-hidden shrink-0 bg-gray-100">
+        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
           <Image
             src={imgSrc}
             alt={displayName}
@@ -65,18 +65,18 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
           />
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm sm:text-base font-bold text-pujo-text-primary truncate">{displayName}</h4>
-          <p className="text-xs text-pujo-text-muted truncate">{displayLocality}</p>
+          <h4 className="text-sm sm:text-base font-bold text-[#242424] dark:text-[#ede5dc] truncate">{displayName}</h4>
+          <p className="text-xs text-[#776d65] dark:text-[#a89e95] truncate">{displayLocality} • {pandal.zone}</p>
         </div>
       </Link>
     );
   }
 
   return (
-    <div className="group rounded-3xl bg-white hover:bg-pujo-bg-surface border border-pujo-border hover:border-pujo-red-border overflow-hidden shadow-card transition-all duration-200 flex flex-col justify-between h-full">
-      <div>
+    <div className="group flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-[#b42323]/40 shadow-xs">
+      <div className="relative">
         {/* Pandal Image (16:9 ratio, object-fit cover) */}
-        <Link href={`/pandals/${pandal.slug}`} className="block relative aspect-video w-full bg-gray-100 overflow-hidden">
+        <Link href={`/pandals/${pandal.slug}`} className="block relative aspect-video w-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
           <Image
             src={imgSrc}
             alt={displayName}
@@ -88,29 +88,16 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
 
           {/* Top Badges */}
-          <div className="absolute top-3 left-3 flex items-center gap-1.5">
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/95 backdrop-blur-md text-pujo-text-primary border border-white/60 shadow-sm">
+          <div className="absolute left-3 top-3 flex items-center gap-1.5">
+            <span className="rounded-full border border-white/60 bg-white/95 px-2.5 py-1 text-xs font-bold text-[#242424] backdrop-blur-md shadow-xs">
               {pandal.zone}
             </span>
             {pandal.isHeritage && (
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500 text-white shadow-sm">
+              <span className="rounded-full bg-amber-500 px-2.5 py-1 text-xs font-bold text-white shadow-xs">
                 {isBn ? 'সাবেকি' : 'Heritage'}
               </span>
             )}
           </div>
-
-          <button
-            onClick={handleSaveToggle}
-            className={cn(
-              'absolute top-3 right-3 p-2 rounded-xl backdrop-blur-md transition-all active:scale-95 shadow-sm',
-              isSaved
-                ? 'bg-pujo-red text-white'
-                : 'bg-white/90 text-pujo-text-secondary hover:text-pujo-red'
-            )}
-            title={isBn ? 'প্যান্ডেল সংরক্ষণ করুন' : 'Save Pandal'}
-          >
-            <Heart className={cn('w-4 h-4', isSaved && 'fill-current')} />
-          </button>
 
           {/* Bottom Title in Image */}
           <div className="absolute bottom-3 left-3.5 right-3.5">
@@ -120,11 +107,26 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
           </div>
         </Link>
 
-        {/* Info Content with 14-16px Typography */}
-        <div className="p-4 space-y-2.5">
-          <div className="flex items-center justify-between text-sm text-pujo-text-secondary">
+        {/* Favorite Heart Button */}
+        <button
+          onClick={handleSaveToggle}
+          className={cn(
+            'absolute right-3 top-3 rounded-xl p-2 backdrop-blur-md transition-all active:scale-90 shadow-xs',
+            isSaved
+              ? 'bg-[#b42323] text-white'
+              : 'bg-white/90 dark:bg-black/60 text-[#625b55] dark:text-gray-300 hover:text-[#b42323]'
+          )}
+          title={isBn ? 'প্যান্ডেল সংরক্ষণ করুন' : 'Save Pandal'}
+          aria-label={isSaved ? 'Remove from saved' : 'Save pandal'}
+        >
+          <Heart className={cn('w-4 h-4', isSaved && 'fill-current')} />
+        </button>
+
+        {/* Info Content with Typography */}
+        <div className="space-y-2 p-4">
+          <div className="flex items-center justify-between text-sm text-[#4a423d] dark:text-[#c4b9ae]">
             <div className="flex items-center gap-1.5 truncate font-medium">
-              <MapPin className="w-4 h-4 text-pujo-red shrink-0" />
+              <MapPin className="w-4 h-4 text-[#b42323] shrink-0" />
               <span className="truncate">{displayLocality}</span>
             </div>
 
@@ -135,8 +137,8 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
           </div>
 
           {primaryMetro && (
-            <div className="flex items-center gap-1.5 text-pujo-text-muted text-xs sm:text-[13px] font-medium">
-              <Train className="w-4 h-4 text-sky-600 shrink-0" />
+            <div className="flex items-center gap-1.5 text-[#776d65] dark:text-[#a89e95] text-xs sm:text-[13px] font-medium">
+              <Train className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
               <span className="truncate">
                 {displayMetroName} {isBn ? 'মেট্রো' : 'Metro'} ({formatDistance(primaryMetro.walkingDistanceMeters / 1000, locale)})
               </span>
@@ -146,10 +148,10 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
       </div>
 
       {/* Footer Actions Aligned at Bottom */}
-      <div className="p-4 pt-0 flex items-center justify-between gap-2 border-t border-pujo-border/60 mt-2">
+      <div className="mt-2 flex items-center justify-between gap-2 border-t border-[#eee8e1] dark:border-[#2f2720] p-4 pt-3">
         <Link
           href={`/pandals/${pandal.slug}`}
-          className="text-sm font-bold text-pujo-red hover:text-pujo-red-hover transition-colors"
+          className="text-sm font-bold text-[#b42323] hover:text-[#971c1c] transition-colors"
         >
           {isBn ? 'বিস্তারিত দেখুন →' : 'View Details →'}
         </Link>
@@ -157,14 +159,14 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
         <button
           onClick={handleRouteToggle}
           className={cn(
-            'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold border transition-all flex items-center gap-1.5',
+            'flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all active:scale-95 shadow-xs',
             inRoute
-              ? 'bg-pujo-red text-white border-pujo-red'
-              : 'bg-white text-pujo-text-secondary border-pujo-border hover:border-pujo-red hover:text-pujo-red'
+              ? 'bg-[#b42323] text-white border-[#b42323]'
+              : 'bg-white dark:bg-[#1a1613] text-[#625b55] dark:text-[#a89e95] border-[#eee8e1] dark:border-[#2f2720] hover:border-[#b42323] hover:text-[#b42323]'
           )}
         >
-          {inRoute ? <Check className="w-4 h-4" /> : <Navigation className="w-4 h-4 text-pujo-red" />}
-          <span>{inRoute ? (isBn ? 'যোগ করা হয়েছে' : 'Added') : (isBn ? 'রুট যোগ করুন' : 'Add Route')}</span>
+          {inRoute ? <Check className="w-4 h-4" /> : <Navigation className="w-4 h-4 text-[#b42323]" />}
+          <span>{inRoute ? (isBn ? 'যোগ হয়েছে' : 'Added') : (isBn ? 'রুট যোগ' : 'Add Route')}</span>
         </button>
       </div>
     </div>

@@ -18,15 +18,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem('pujopath_theme') as Theme | null;
-      if (saved && (saved === 'light' || saved === 'dark')) {
-        setThemeState(saved);
-        applyTheme(saved);
-      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      // Light mode is the strict default across the entire application.
+      // Dark mode is only activated if the user explicitly previously toggled it.
+      if (saved === 'dark') {
         setThemeState('dark');
         applyTheme('dark');
+      } else {
+        setThemeState('light');
+        applyTheme('light');
       }
     } catch {
-      // ignore
+      applyTheme('light');
     }
   }, []);
 

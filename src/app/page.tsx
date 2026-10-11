@@ -3,23 +3,23 @@
 import React from 'react';
 import { HeroSection } from '@/components/home/HeroSection';
 import { QuickAccess } from '@/components/home/QuickAccess';
-import { FeatureFooter } from '@/components/home/FeatureFooter';
 import { PujaHighlights } from '@/components/home/PujaHighlights';
+import { FeatureFooter } from '@/components/home/FeatureFooter';
 
 export default function HomePage() {
   return (
-    <div className="space-y-4 sm:space-y-4.5 max-w-7xl mx-auto w-full">
-      {/* 1. Large Hero Card */}
+    <div className="mx-auto w-full max-w-6xl space-y-6">
+      {/* 1. Hero Showcase with Realtime Countdown and Action Buttons */}
       <HeroSection />
 
-      {/* 2. Quick Access 7-Column Shortcuts */}
+      {/* 2. Quick Access Key Shortcuts */}
       <QuickAccess />
 
-      {/* 3. Six Compact Feature Cards */}
-      <FeatureFooter />
-
-      {/* 4. Puja Highlights 3 Horizontal Cards */}
+      {/* 3. Curated Puja Highlights (Traditional, Art, Routes) */}
       <PujaHighlights />
+
+      {/* 4. Interactive Feature Highlights & Utility Controls */}
+      <FeatureFooter />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Search, RotateCcw } from 'lucide-react';
+import { Search, RotateCcw, X, SlidersHorizontal } from 'lucide-react';
 import { FilterOptions, LocalityZone } from '@/types';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { toBengaliDigits } from '@/lib/geo';
@@ -13,12 +13,55 @@ interface PandalFiltersProps {
   totalCount: number;
 }
 
+/**
+ * Accessible, animated toggle switch component
+ */
+function ToggleSwitch({
+  checked,
+  onChange,
+  label,
+  id,
+}: {
+  checked: boolean;
+  onChange: (val: boolean) => void;
+  label: string;
+  id: string;
+}) {
+  return (
+    <button
+      id={id}
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className="inline-flex items-center gap-2 cursor-pointer select-none group text-left"
+    >
+      <span
+        className={cn(
+          'relative inline-block h-5 w-9 shrink-0 rounded-full transition-colors duration-200 ease-in-out',
+          checked ? 'bg-[#b42323]' : 'bg-[#ded6ce] dark:bg-[#3f3833]'
+        )}
+      >
+        <span
+          className={cn(
+            'inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out mt-0.5',
+            checked ? 'translate-x-4.5 ml-0.5' : 'translate-x-0.5'
+          )}
+        />
+      </span>
+      <span className="text-xs sm:text-sm font-semibold text-[#4a423d] dark:text-[#c4b9ae] group-hover:text-[#242424] dark:group-hover:text-white transition-colors">
+        {label}
+      </span>
+    </button>
+  );
+}
+
 export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersProps) {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
 
   const zoneOptions: { value: LocalityZone | 'All'; label: string }[] = [
-    { value: 'All', label: isBn ? 'সব' : 'All' },
+    { value: 'All', label: isBn ? 'সব এলাকা' : 'All Zones' },
     { value: 'North Kolkata', label: isBn ? 'উত্তর কলকাতা' : 'North Kolkata' },
     { value: 'South Kolkata', label: isBn ? 'দক্ষিণ কলকাতা' : 'South Kolkata' },
     { value: 'Central Kolkata', label: isBn ? 'মধ্য কলকাতা' : 'Central Kolkata' },
@@ -46,11 +89,20 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
     });
   };
 
+  const isFiltered =
+    Boolean(filters.searchQuery) ||
+    filters.zone !== 'All' ||
+    filters.metroAccessibleOnly ||
+    filters.heritageOnly ||
+    filters.wheelchairAccessibleOnly ||
+    filters.featuredOnly ||
+    filters.sortBy !== 'recommended';
+
   return (
-    <div className="p-5 sm:p-6 rounded-3xl bg-white border border-pujo-border shadow-card space-y-4">
-      {/* Search Input */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-pujo-text-muted" />
+    <div className="space-y-4 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] p-4 sm:p-5 shadow-xs transition-colors">
+      {/* Search Bar + Clear button */}
+      <div className="relative flex items-center">
+        <Search className="absolute left-4 w-4 h-4 text-[#8a8179] pointer-events-none" />
         <input
           type="text"
           value={filters.searchQuery}
@@ -60,25 +112,34 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
               ? 'প্যান্ডেলের নাম, এলাকা, থিম বা মেট্রো স্টেশন দিয়ে খুঁজুন...'
               : 'Search pandals by name, theme, locality or metro station...'
           }
-          className="w-full pl-12 pr-4 py-3 rounded-2xl bg-pujo-bg-surface border border-pujo-border text-sm sm:text-base text-pujo-text-primary placeholder:text-pujo-text-muted focus:outline-none focus:border-pujo-red transition-colors"
+          className="w-full rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-[#fcfaf7] dark:bg-[#14110e] py-3 pl-11 pr-10 text-sm text-[#242424] dark:text-[#ede5dc] placeholder:text-[#8a8179] transition-all focus:border-[#b42323] focus:bg-white dark:focus:bg-[#1a1613] focus:outline-none"
         />
+        {filters.searchQuery && (
+          <button
+            onClick={() => update({ searchQuery: '' })}
+            aria-label="Clear search"
+            className="absolute right-3 p-1 rounded-lg text-[#8a8179] hover:text-[#b42323] hover:bg-[#f5f1ec] dark:hover:bg-[#251e18] transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
-      {/* Zone Pills */}
+      {/* Zone Filter Horizontal Scroll */}
       <div>
-        <div className="text-xs sm:text-sm font-bold uppercase tracking-wider text-pujo-text-muted mb-2.5">
+        <div className="text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95] mb-2">
           {isBn ? 'এলাকা অনুযায়ী ফিল্টার' : 'Filter by Zone'}
         </div>
-        <div className="flex items-center gap-2 overflow-x-auto pb-1.5 no-scrollbar">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
           {zoneOptions.map((z) => (
             <button
               key={z.value}
               onClick={() => update({ zone: z.value })}
               className={cn(
-                'px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-colors border shadow-sm',
+                'rounded-lg border px-3 py-1.5 text-xs font-bold whitespace-nowrap transition-all duration-150',
                 filters.zone === z.value
-                  ? 'bg-pujo-red text-white border-pujo-red'
-                  : 'bg-white border-pujo-border text-pujo-text-secondary hover:text-pujo-text-primary hover:border-pujo-red/40'
+                  ? 'bg-[#b42323] text-white border-[#b42323] shadow-xs'
+                  : 'bg-white dark:bg-[#1a1613] border-[#eee8e1] dark:border-[#2f2720] text-[#625b55] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white hover:border-[#b42323]/50'
               )}
             >
               {z.label}
@@ -87,45 +148,80 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
         </div>
       </div>
 
-      {/* Checkboxes & Counter */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-pujo-border text-xs sm:text-sm">
-        <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-          <label className="inline-flex items-center gap-2 cursor-pointer text-pujo-text-secondary font-semibold">
-            <input
-              type="checkbox"
-              checked={filters.metroAccessibleOnly}
-              onChange={(e) => update({ metroAccessibleOnly: e.target.checked })}
-              className="w-4 h-4 rounded accent-pujo-red"
-            />
-            <span>{isBn ? 'মেট্রোর কাছে' : 'Near Metro Station'}</span>
-          </label>
-
-          <label className="inline-flex items-center gap-2 cursor-pointer text-pujo-text-secondary font-semibold">
-            <input
-              type="checkbox"
-              checked={filters.heritageOnly}
-              onChange={(e) => update({ heritageOnly: e.target.checked })}
-              className="w-4 h-4 rounded accent-pujo-red"
-            />
-            <span>{isBn ? 'ঐতিহ্যবাহী পুজো' : 'Heritage Sabeki'}</span>
-          </label>
+      {/* Interactive Feature Switches Grid */}
+      <div className="pt-2 border-t border-[#eee8e1] dark:border-[#2f2720]">
+        <div className="text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95] mb-2.5">
+          {isBn ? 'সুবিধা ও বৈশিষ্ট্য সুইচ' : 'Feature Filters'}
         </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          <ToggleSwitch
+            id="switch-metro"
+            checked={filters.metroAccessibleOnly}
+            onChange={(val) => update({ metroAccessibleOnly: val })}
+            label={isBn ? 'মেট্রোর কাছে' : 'Near Metro'}
+          />
 
-        <div className="flex items-center gap-3 sm:gap-4">
-          <span className="text-pujo-text-muted font-bold">
+          <ToggleSwitch
+            id="switch-heritage"
+            checked={filters.heritageOnly}
+            onChange={(val) => update({ heritageOnly: val })}
+            label={isBn ? 'ঐতিহ্যবাহী সাবেকি' : 'Heritage Sabeki'}
+          />
+
+          <ToggleSwitch
+            id="switch-wheelchair"
+            checked={filters.wheelchairAccessibleOnly}
+            onChange={(val) => update({ wheelchairAccessibleOnly: val })}
+            label={isBn ? 'হুইলচেয়ার সুবিধা' : 'Wheelchair Access'}
+          />
+
+          <ToggleSwitch
+            id="switch-featured"
+            checked={filters.featuredOnly}
+            onChange={(val) => update({ featuredOnly: val })}
+            label={isBn ? 'বিশেষ সেরা মণ্ডপ' : 'Featured Only'}
+          />
+        </div>
+      </div>
+
+      {/* Footer Summary + Sort By + Reset Button */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#eee8e1] dark:border-[#2f2720] text-xs sm:text-sm">
+        {/* Results Counter */}
+        <div className="flex items-center gap-2">
+          <span className="text-[#776d65] dark:text-[#a89e95] font-semibold">
             {isBn ? (
-              <>মোট <strong className="text-pujo-red text-base">{toBengaliDigits(totalCount)}</strong> টি প্যান্ডেল</>
+              <>মোট <strong className="text-[#b42323] text-sm font-black">{toBengaliDigits(totalCount)}</strong> টি প্যান্ডেল পাওয়া গেছে</>
             ) : (
-              <>Found <strong className="text-pujo-red text-base">{totalCount}</strong> pandals</>
+              <>Showing <strong className="text-[#b42323] text-sm font-black">{totalCount}</strong> pandals</>
             )}
           </span>
-          <button
-            onClick={handleReset}
-            className="text-xs sm:text-sm text-pujo-red hover:underline flex items-center gap-1 font-bold"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>{isBn ? 'রিসেট' : 'Reset'}</span>
-          </button>
+        </div>
+
+        {/* Sort By Dropdown + Reset */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 text-xs text-[#776d65] dark:text-[#a89e95] font-bold">
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            <select
+              value={filters.sortBy}
+              onChange={(e) => update({ sortBy: e.target.value as FilterOptions['sortBy'] })}
+              aria-label="Sort pandals"
+              className="rounded-lg border border-[#eee8e1] dark:border-[#2f2720] bg-[#fcfaf7] dark:bg-[#14110e] px-2 py-1 text-xs font-bold text-[#4a423d] dark:text-[#c4b9ae] focus:border-[#b42323] focus:outline-none"
+            >
+              <option value="recommended">{isBn ? 'সুপারিশকৃত' : 'Recommended'}</option>
+              <option value="popularity">{isBn ? 'জনপ্রিয়তা' : 'Most Popular'}</option>
+              <option value="name">{isBn ? 'নাম অনুযায়ী' : 'Alphabetical'}</option>
+            </select>
+          </div>
+
+          {isFiltered && (
+            <button
+              onClick={handleReset}
+              className="inline-flex items-center gap-1 text-xs font-bold text-[#b42323] hover:underline"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>{isBn ? 'রিসেট' : 'Reset All'}</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

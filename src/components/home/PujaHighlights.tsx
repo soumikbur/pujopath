@@ -35,22 +35,22 @@ export function PujaHighlights() {
   ];
 
   return (
-    <section className="space-y-2.5 pt-1">
+    <section className="space-y-3 pt-1">
       {/* Heading */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-[17px] font-bold text-[#242424] tracking-tight flex items-center gap-1.5">
-            <span className="text-[#D52F2F] font-black text-lg">✣</span>
+          <h2 className="text-base sm:text-lg font-bold text-[#242424] dark:text-[#ede5dc] tracking-tight flex items-center gap-1.5">
+            <span className="text-[#b42323] font-black text-lg">✣</span>
             <span>{isBn ? 'পূজার বিশেষ আকর্ষণ' : 'Puja Highlights'}</span>
           </h2>
-          <p className="text-[13px] text-[#665A54] mt-0.5 font-medium">
+          <p className="text-xs sm:text-sm text-[#776d65] dark:text-[#a89e95] mt-0.5 font-medium">
             {isBn ? 'বাংলার দুর্গাপূজা সংস্কৃতির একটি ঝলক' : "A glimpse of Bengal's Durga Puja culture"}
           </p>
         </div>
 
         <Link
           href="/explore"
-          className="inline-flex items-center gap-1 text-sm font-bold text-[#D52F2F] hover:text-[#BD2424] transition-colors"
+          className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-[#b42323] hover:text-[#971c1c] transition-colors"
         >
           <span>{isBn ? 'সব দেখুন' : 'View all'}</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -63,15 +63,10 @@ export function PujaHighlights() {
           <Link
             key={idx}
             href={item.href}
-            className="group flex items-center gap-3.5 p-3 rounded-[16px] hover:shadow-md transition-all duration-200"
-            style={{
-              background: 'rgba(255, 255, 255, 0.75)',
-              border: '1px solid rgba(234, 220, 206, 0.9)',
-              boxShadow: '0 1px 4px rgba(70, 35, 15, 0.03)',
-            }}
+            className="group flex items-center gap-3.5 p-3 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] hover:border-[#b42323]/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-98 shadow-xs"
           >
             {/* Left Image */}
-            <div className="relative w-24 h-20 sm:w-[110px] sm:h-[80px] rounded-xl overflow-hidden shrink-0" style={{ border: '1px solid rgba(0,0,0,0.05)' }}>
+            <div className="relative w-24 h-20 sm:w-[110px] sm:h-[80px] rounded-xl overflow-hidden shrink-0 border border-black/5 dark:border-white/10">
               <Image
                 src={item.image}
                 alt={item.title}
@@ -79,20 +74,17 @@ export function PujaHighlights() {
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
                 sizes="110px"
               />
-              <span
-                className="absolute top-1 left-1 px-1.5 py-0.5 rounded-md text-[9px] font-bold text-white"
-                style={{ background: 'rgba(0, 0, 0, 0.55)', backdropFilter: 'blur(8px)' }}
-              >
+              <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded-md text-[9px] font-bold text-white bg-black/60 backdrop-blur-md">
                 {item.badge}
               </span>
             </div>
 
             {/* Content */}
             <div className="min-w-0 flex-1 space-y-0.5">
-              <h3 className="text-[14px] sm:text-[15px] font-bold text-[#242424] group-hover:text-[#D52F2F] transition-colors truncate">
+              <h3 className="text-sm sm:text-[15px] font-bold text-[#242424] dark:text-[#ede5dc] group-hover:text-[#b42323] transition-colors truncate">
                 {item.title}
               </h3>
-              <p className="text-xs text-[#665A54] line-clamp-2 leading-relaxed">
+              <p className="text-xs text-[#776d65] dark:text-[#a89e95] line-clamp-2 leading-relaxed">
                 {item.desc}
               </p>
             </div>

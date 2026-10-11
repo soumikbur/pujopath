@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useAudio } from '@/lib/context/AudioContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
+import { useTheme } from '@/lib/context/ThemeContext';
 import { toBengaliDigits } from '@/lib/geo';
 import { cn } from '@/lib/utils/cn';
 
@@ -30,11 +31,14 @@ export function BottomMusicPlayer() {
   } = useAudio();
 
   const { locale } = useI18n();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const isBn = locale === 'bn';
 
   const [playlistDrawerOpen, setPlaylistDrawerOpen] = useState(false);
 
-  if (!currentTrack) return null;
+  // Keep the interface quiet until the visitor chooses to play something.
+  if (!currentTrack || (!isPlaying && currentTime === 0)) return null;
 
   const formatSeconds = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -58,20 +62,21 @@ export function BottomMusicPlayer() {
       <aside
         aria-label="Media Player"
         className="fixed z-40 left-1/2 -translate-x-1/2 bottom-16 md:bottom-5 pointer-events-auto
-                   w-[calc(100%-20px)] md:w-[820px]"
+                   w-[calc(100%-20px)] md:w-[820px] transition-all duration-300 animate-in slide-in-from-bottom-3"
       >
         {/* Glass container */}
         <div
-          className="relative overflow-hidden flex items-center"
+          className="relative overflow-hidden flex items-center transition-colors duration-300"
           style={{
             height: '78px',
             borderRadius: '24px',
-            background: 'rgba(255, 250, 244, 0.62)',
-            backdropFilter: 'blur(24px) saturate(120%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(120%)',
-            border: '1px solid rgba(255, 255, 255, 0.65)',
-            boxShadow:
-              '0 12px 40px rgba(80, 50, 30, 0.12), inset 0 1px 0 rgba(255,255,255,0.70)',
+            background: isDark ? 'rgba(26, 22, 19, 0.82)' : 'rgba(255, 250, 244, 0.72)',
+            backdropFilter: 'blur(24px) saturate(130%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(130%)',
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.65)',
+            boxShadow: isDark
+              ? '0 12px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.08)'
+              : '0 12px 40px rgba(80, 50, 30, 0.12), inset 0 1px 0 rgba(255,255,255,0.70)',
           }}
         >
           {/* Glass top highlight */}
@@ -79,8 +84,9 @@ export function BottomMusicPlayer() {
             className="absolute inset-0 pointer-events-none"
             style={{
               borderRadius: 'inherit',
-              background:
-                'linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 50%)',
+              background: isDark
+                ? 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 50%)'
+                : 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 50%)',
             }}
           />
 
@@ -92,8 +98,8 @@ export function BottomMusicPlayer() {
               style={{
                 width: 48,
                 height: 48,
-                border: '1px solid rgba(255,255,255,0.50)',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.50)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
               }}
             >
               <Image
@@ -109,13 +115,13 @@ export function BottomMusicPlayer() {
             <div className="min-w-0" style={{ width: 220, flexShrink: 0 }}>
               <h4
                 className="truncate leading-tight"
-                style={{ fontSize: 13, fontWeight: 700, color: '#292525' }}
+                style={{ fontSize: 13, fontWeight: 700, color: isDark ? '#EDE5DC' : '#292525' }}
               >
                 {displayTitle}
               </h4>
               <p
                 className="truncate mt-0.5"
-                style={{ fontSize: 10, fontWeight: 500, color: 'rgba(41,37,37,0.58)' }}
+                style={{ fontSize: 10, fontWeight: 500, color: isDark ? 'rgba(237,229,220,0.60)' : 'rgba(41,37,37,0.58)' }}
               >
                 {displaySubtitle}
               </p>
@@ -127,7 +133,7 @@ export function BottomMusicPlayer() {
                 onClick={prevTrack}
                 aria-label="Previous"
                 className="p-1 transition-opacity hover:opacity-70 active:scale-95"
-                style={{ color: '#292525' }}
+                style={{ color: isDark ? '#EDE5DC' : '#292525' }}
               >
                 <SkipBack className="w-[18px] h-[18px] fill-current" />
               </button>
@@ -157,7 +163,7 @@ export function BottomMusicPlayer() {
                 onClick={nextTrack}
                 aria-label="Next"
                 className="p-1 transition-opacity hover:opacity-70 active:scale-95"
-                style={{ color: '#292525' }}
+                style={{ color: isDark ? '#EDE5DC' : '#292525' }}
               >
                 <SkipForward className="w-[18px] h-[18px] fill-current" />
               </button>
@@ -167,14 +173,14 @@ export function BottomMusicPlayer() {
             <div className="flex items-center gap-2.5 flex-1 min-w-0">
               <span
                 className="shrink-0 font-mono tabular-nums"
-                style={{ fontSize: 10, color: 'rgba(41,37,37,0.52)' }}
+                style={{ fontSize: 10, color: isDark ? 'rgba(237,229,220,0.55)' : 'rgba(41,37,37,0.52)' }}
               >
                 {formatSeconds(currentTime)}
               </span>
 
               <div
                 className="relative flex-1 cursor-pointer group"
-                style={{ height: 4, borderRadius: 4, background: 'rgba(0,0,0,0.08)' }}
+                style={{ height: 4, borderRadius: 4, background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)' }}
               >
                 <input
                   type="range"
@@ -206,7 +212,7 @@ export function BottomMusicPlayer() {
 
               <span
                 className="shrink-0 font-mono tabular-nums"
-                style={{ fontSize: 10, color: 'rgba(41,37,37,0.52)' }}
+                style={{ fontSize: 10, color: isDark ? 'rgba(237,229,220,0.55)' : 'rgba(41,37,37,0.52)' }}
               >
                 {formatSeconds(duration || 245)}
               </span>
@@ -215,8 +221,8 @@ export function BottomMusicPlayer() {
             {/* 5. Queue button */}
             <button
               onClick={() => setPlaylistDrawerOpen(!playlistDrawerOpen)}
-              className="p-1.5 shrink-0 transition-opacity hover:opacity-70"
-              style={{ color: '#292525' }}
+              className="p-1.5 shrink-0 transition-opacity hover:opacity-70 active:scale-95"
+              style={{ color: isDark ? '#EDE5DC' : '#292525' }}
               aria-label="Playlist"
             >
               <ListMusic className="w-[18px] h-[18px]" />
@@ -232,7 +238,7 @@ export function BottomMusicPlayer() {
                 style={{
                   width: 40,
                   height: 40,
-                  border: '1px solid rgba(255,255,255,0.45)',
+                  border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.45)',
                 }}
               >
                 <Image
@@ -247,13 +253,13 @@ export function BottomMusicPlayer() {
               <div className="flex-1 min-w-0">
                 <h4
                   className="truncate leading-tight"
-                  style={{ fontSize: 12, fontWeight: 700, color: '#292525' }}
+                  style={{ fontSize: 12, fontWeight: 700, color: isDark ? '#EDE5DC' : '#292525' }}
                 >
                   {displayTitle}
                 </h4>
                 <p
                   className="truncate"
-                  style={{ fontSize: 10, color: 'rgba(41,37,37,0.55)' }}
+                  style={{ fontSize: 10, color: isDark ? 'rgba(237,229,220,0.55)' : 'rgba(41,37,37,0.55)' }}
                 >
                   {displaySubtitle}
                 </p>
@@ -262,7 +268,7 @@ export function BottomMusicPlayer() {
               <button
                 onClick={togglePlay}
                 aria-label={isPlaying ? 'Pause' : 'Play'}
-                className="shrink-0 flex items-center justify-center"
+                className="shrink-0 flex items-center justify-center active:scale-95 transition-transform"
                 style={{
                   width: 36,
                   height: 36,
@@ -282,7 +288,7 @@ export function BottomMusicPlayer() {
               <button
                 onClick={() => setPlaylistDrawerOpen(!playlistDrawerOpen)}
                 className="p-1 shrink-0"
-                style={{ color: 'rgba(41,37,37,0.55)' }}
+                style={{ color: isDark ? '#EDE5DC' : 'rgba(41,37,37,0.55)' }}
                 aria-label="Playlist"
               >
                 <ListMusic className="w-4 h-4" />
@@ -291,12 +297,12 @@ export function BottomMusicPlayer() {
 
             {/* Bottom row: progress */}
             <div className="flex items-center gap-2">
-              <span style={{ fontSize: 9, color: 'rgba(41,37,37,0.45)' }} className="font-mono tabular-nums">
+              <span style={{ fontSize: 9, color: isDark ? 'rgba(237,229,220,0.50)' : 'rgba(41,37,37,0.45)' }} className="font-mono tabular-nums">
                 {formatSeconds(currentTime)}
               </span>
               <div
                 className="relative flex-1"
-                style={{ height: 3, borderRadius: 3, background: 'rgba(0,0,0,0.07)' }}
+                style={{ height: 3, borderRadius: 3, background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.07)' }}
               >
                 <input
                   type="range"
@@ -311,7 +317,7 @@ export function BottomMusicPlayer() {
                   style={{ width: `${progressPercent}%`, background: '#D52F2F' }}
                 />
               </div>
-              <span style={{ fontSize: 9, color: 'rgba(41,37,37,0.45)' }} className="font-mono tabular-nums">
+              <span style={{ fontSize: 9, color: isDark ? 'rgba(237,229,220,0.50)' : 'rgba(41,37,37,0.45)' }} className="font-mono tabular-nums">
                 {formatSeconds(duration || 245)}
               </span>
             </div>
@@ -321,25 +327,18 @@ export function BottomMusicPlayer() {
 
       {/* ── Playlist Drawer Modal ── */}
       {playlistDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
           <div
-            className="w-full max-w-md p-4 space-y-3"
-            style={{
-              borderRadius: 24,
-              background: 'rgba(255, 255, 255, 0.96)',
-              border: '1px solid rgba(234, 220, 206, 0.8)',
-              boxShadow: '0 20px 60px rgba(70, 35, 15, 0.18)',
-            }}
+            className="w-full max-w-md p-4 space-y-3 rounded-3xl border border-[#eadcce] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] shadow-2xl"
           >
-            <div className="flex items-center justify-between border-b pb-2.5" style={{ borderColor: '#EADCCE' }}>
-              <h3 className="font-bold text-sm flex items-center gap-2" style={{ color: '#242424' }}>
+            <div className="flex items-center justify-between border-b pb-2.5 border-[#eadcce] dark:border-[#2f2720]">
+              <h3 className="font-bold text-sm flex items-center gap-2 text-[#242424] dark:text-[#ede5dc]">
                 <ListMusic className="w-4 h-4 text-[#D52F2F]" />
                 <span>{isBn ? 'শারদীয়া গানের তালিকা' : 'Sharodiya Playlist'}</span>
               </h3>
               <button
                 onClick={() => setPlaylistDrawerOpen(false)}
-                className="p-1 rounded-lg"
-                style={{ color: '#665A54' }}
+                className="p-1 rounded-lg text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -358,19 +357,18 @@ export function BottomMusicPlayer() {
                       playTrack(track);
                       setPlaylistDrawerOpen(false);
                     }}
-                    className="p-2.5 rounded-xl flex items-center justify-between cursor-pointer transition-colors"
-                    style={{
-                      background: isSelected ? '#FDEEEB' : '#F8F0E8',
-                      border: `1px solid ${isSelected ? '#F6CECA' : '#EADCCE'}`,
-                      color: isSelected ? '#D52F2F' : '#4A423D',
-                      fontWeight: isSelected ? 700 : 400,
-                    }}
+                    className={cn(
+                      'p-2.5 rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-98',
+                      isSelected
+                        ? 'bg-[#fdeeee] dark:bg-[#341b18] border border-[#f6ceca] dark:border-[#4a2420] text-[#d52f2f] font-bold'
+                        : 'bg-[#f8f0e8] dark:bg-[#201c18] border border-[#eadcce] dark:border-[#2a241f] text-[#4a423d] dark:text-[#c4b9ae] hover:border-[#d52f2f]/40'
+                    )}
                   >
                     <div className="min-w-0">
                       <h4 className="text-xs font-bold truncate">{tTitle}</h4>
-                      <p className="text-[10px] truncate" style={{ color: '#665A54' }}>{tArtist}</p>
+                      <p className="text-[10px] truncate text-[#665a54] dark:text-[#a89e95]">{tArtist}</p>
                     </div>
-                    <span className="text-[11px] font-mono font-bold" style={{ color: '#D52F2F' }}>
+                    <span className="text-[11px] font-mono font-bold text-[#d52f2f]">
                       {formatSeconds(track.durationSeconds)}
                     </span>
                   </div>

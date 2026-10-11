@@ -39,7 +39,7 @@ export class PandalService {
           p.theme.toLowerCase().includes(q) ||
           p.themeBn.includes(q) ||
           p.zone.toLowerCase().includes(q) ||
-          p.metroLinks.some((m) => m.stationName.toLowerCase().includes(q) || m.stationNameBn.includes(q))
+          p.metroLinks.some((m) => m.stationName.toLowerCase().includes(q) || Boolean(m.stationNameBn && m.stationNameBn.includes(q)))
         );
       });
     }
@@ -74,9 +74,11 @@ export class PandalService {
 
     const sortBy = options.sortBy || 'recommended';
     switch (sortBy) {
+      case 'distance':
       case 'nearest':
         list.sort((a, b) => (a.distanceKm ?? 999) - (b.distanceKm ?? 999));
         break;
+      case 'popularity':
       case 'popular':
         list.sort((a, b) => b.popularityScore - a.popularityScore);
         break;

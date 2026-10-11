@@ -6,13 +6,17 @@ import {
   Zap,
   Smartphone,
   Moon,
+  Sun,
   Languages,
-  Watch,
+  Heart,
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
+import { useTheme } from '@/lib/context/ThemeContext';
+import { cn } from '@/lib/utils/cn';
 
 export function FeatureFooter() {
-  const { locale } = useI18n();
+  const { locale, setLocale } = useI18n();
+  const { theme, toggleTheme } = useTheme();
   const isBn = locale === 'bn';
 
   const features = [
@@ -20,63 +24,75 @@ export function FeatureFooter() {
       icon: Sparkles,
       title: isBn ? 'অতি সহজ' : 'Ultra Simple',
       desc: isBn ? 'শুধু প্রয়োজনীয় জিনিস' : 'Only what you need',
+      onClick: undefined,
     },
     {
       icon: Zap,
       title: isBn ? 'দ্রুত ও মসৃণ' : 'Lightning Fast',
       desc: isBn ? 'মসৃণ অভিজ্ঞতা' : 'Smooth experience',
+      onClick: undefined,
     },
     {
       icon: Smartphone,
       title: isBn ? 'সব ডিভাইসে উপযোগী' : 'Fully Responsive',
       desc: isBn ? 'সব ডিভাইসে' : 'All devices',
+      onClick: undefined,
     },
     {
-      icon: Moon,
-      title: isBn ? 'ডার্ক মোড' : 'Dark Mode',
-      desc: isBn ? 'চোখের স্বস্তি' : 'Easy on your eyes',
+      icon: theme === 'dark' ? Sun : Moon,
+      title: theme === 'dark' ? (isBn ? 'লাইট মোড' : 'Light Mode') : (isBn ? 'ডার্ক মোড' : 'Dark Mode'),
+      desc: isBn ? 'ক্লিক করে বদলান' : 'Click to toggle',
+      onClick: toggleTheme,
+      isAction: true,
     },
     {
       icon: Languages,
       title: isBn ? 'বাংলা ও ইংরেজি' : 'Bengali & English',
-      desc: isBn ? 'দ্বিভাষিক প্ল্যাটফর্ম' : 'Multi-language',
+      desc: isBn ? 'ভাষা পরিবর্তন করুন' : 'Click to toggle',
+      onClick: () => setLocale(locale === 'en' ? 'bn' : 'en'),
+      isAction: true,
     },
     {
-      icon: Watch,
-      title: isBn ? 'সবার জন্য তৈরি' : 'Made for Everyone',
-      desc: isBn ? 'এমনকি ঘড়িতেও' : 'Even on your wrist',
+      icon: Heart,
+      title: isBn ? 'প্রিয় প্যান্ডেল' : 'Saved Trails',
+      desc: isBn ? 'পছন্দের তালিকা' : 'Saved favorites',
+      onClick: () => {
+        window.location.href = '/saved';
+      },
+      isAction: true,
     },
   ];
 
   return (
-    <section className="py-0.5 shrink-0">
+    <section className="py-1 shrink-0">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
         {features.map((f, idx) => {
           const Icon = f.icon;
+          const Component = f.onClick ? 'button' : 'div';
           return (
-            <div
+            <Component
               key={idx}
-              className="flex items-center gap-2 p-2.5 rounded-[14px]"
-              style={{
-                background: 'rgba(255, 255, 255, 0.65)',
-                border: '1px solid rgba(234, 220, 206, 0.85)',
-              }}
+              onClick={f.onClick}
+              className={cn(
+                'flex items-center gap-2 p-2.5 rounded-2xl border text-left transition-all duration-150',
+                'bg-white/80 dark:bg-[#1a1613]/80 border-[#eadcce] dark:border-[#2f2720] shadow-xs',
+                f.isAction && 'hover:border-[#d52f2f] hover:bg-[#fff9f8] dark:hover:bg-[#251e18] cursor-pointer active:scale-95'
+              )}
             >
               <div
-                className="p-1.5 rounded-xl shrink-0"
-                style={{ background: 'rgba(213, 47, 47, 0.07)' }}
+                className="p-1.5 rounded-xl shrink-0 bg-[#d52f2f]/10 text-[#d52f2f]"
               >
-                <Icon className="w-3.5 h-3.5 stroke-[2.2] text-[#D52F2F]" />
+                <Icon className="w-3.5 h-3.5 stroke-[2.2]" />
               </div>
               <div className="min-w-0">
-                <h4 className="text-xs font-bold text-[#242424] leading-tight truncate">
+                <h4 className="text-xs font-bold text-[#242424] dark:text-[#EDE5DC] leading-tight truncate">
                   {f.title}
                 </h4>
-                <p className="text-[10px] text-[#665A54] truncate mt-0.5 font-medium">
+                <p className="text-[10px] text-[#665a54] dark:text-[#a89e95] truncate mt-0.5 font-medium">
                   {f.desc}
                 </p>
               </div>
-            </div>
+            </Component>
           );
         })}
       </div>

@@ -1,159 +1,130 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Heart,
-  Menu,
-  X,
+  Calendar,
   ChevronDown,
-  Watch,
-  Train,
+  Heart,
+  Info,
+  Menu,
+  Moon,
   Music2,
   Sparkles,
-  Info,
+  Sun,
+  Train,
+  X,
 } from 'lucide-react';
-import { useI18n } from '@/lib/i18n/I18nContext';
 import { useFavorites } from '@/lib/context/FavoritesContext';
+import { useI18n } from '@/lib/i18n/I18nContext';
+import { useTheme } from '@/lib/context/ThemeContext';
 import { cn } from '@/lib/utils/cn';
 
-interface HeaderProps {
-  onToggleWatchMode?: () => void;
-  isWatchMode?: boolean;
-}
-
-export function Header({ onToggleWatchMode, isWatchMode }: HeaderProps) {
+export function Header() {
   const pathname = usePathname();
   const { locale, setLocale } = useI18n();
+  const { theme, toggleTheme } = useTheme();
   const { savedPandalIds } = useFavorites();
-  const isBn = locale === 'bn';
-
   const [moreOpen, setMoreOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const isBn = locale === 'bn';
 
-  const mainNavLinks = [
-    { href: '/', label: isBn ? 'হোম' : 'Home' },
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setMoreOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const primaryLinks = [
     { href: '/explore', label: isBn ? 'অন্বেষণ' : 'Explore' },
     { href: '/map', label: isBn ? 'মানচিত্র' : 'Map' },
-    { href: '/planner', label: isBn ? 'পরিকল্পনা' : 'Planner' },
-    { href: '/calendar', label: isBn ? 'ক্যালেন্ডার' : 'Calendar' },
+    { href: '/planner', label: isBn ? 'রুট' : 'Plan' },
   ];
 
-  const moreDropdownLinks = [
-    { href: '/metro', label: isBn ? 'মেট্রো গাইড' : 'Metro Guide', icon: Train },
-    { href: '/music', label: isBn ? 'সঙ্গীত ও ঢাক' : 'Puja Music', icon: Music2 },
-    { href: '/mahalaya', label: isBn ? 'মহালয়া বিশেষ' : 'Mahalaya Special', icon: Sparkles },
-    { href: '/about', label: isBn ? 'তথ্য ও হেল্পলাইন' : 'About & Helpline', icon: Info },
+  const secondaryLinks = [
+    { href: '/calendar', label: isBn ? 'ক্যালেন্ডার' : 'Calendar', icon: Calendar },
+    { href: '/metro', label: isBn ? 'মেট্রো' : 'Metro', icon: Train },
+    { href: '/music', label: isBn ? 'সঙ্গীত' : 'Music', icon: Music2 },
+    { href: '/mahalaya', label: isBn ? 'মহালয়া' : 'Mahalaya', icon: Sparkles },
+    { href: '/about', label: isBn ? 'সাহায্য' : 'Help', icon: Info },
   ];
+
+  const isSecondaryActive = secondaryLinks.some((link) => pathname === link.href);
 
   return (
-    <header
-      className="relative z-40 w-full shrink-0 px-5 sm:px-8"
-      style={{
-        height: '60px',
-        background: 'rgba(255, 255, 255, 0.35)',
-        borderBottom: '1px solid rgba(234, 220, 206, 0.7)',
-      }}
-    >
-      <div className="flex items-center justify-between gap-4 max-w-7xl mx-auto h-full">
-        {/* Left: Red Trishul Logo + PujoPath Wordmark */}
-        <div className="flex items-center gap-2.5">
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-1 text-[#4A423D] hover:text-[#242424] -ml-1 transition-colors"
-            aria-label="Toggle navigation menu"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+    <header className="sticky top-0 z-40 border-b border-[#eee8e1] dark:border-[#2a241f] bg-[#fcfaf7]/90 dark:bg-[#14110e]/90 backdrop-blur-md transition-colors duration-200">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+        {/* Brand Logo */}
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-lg font-black tracking-tight text-[#b42323] transition-transform active:scale-95"
+          aria-label="PujoPath home"
+        >
+          <span className="grid h-8 w-8 place-items-center rounded-xl bg-[#b42323] text-sm font-bold text-white shadow-sm">
+            প
+          </span>
+          <span className="font-extrabold text-[#b42323]">PujoPath</span>
+        </Link>
 
-          <Link href="/" className="flex items-center gap-2 group">
-            <div
-              className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
-              style={{
-                background: 'rgba(213, 47, 47, 0.08)',
-                border: '1px solid rgba(213, 47, 47, 0.2)',
-              }}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#D52F2F"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-3.5 h-3.5"
-              >
-                <path d="M12 2v20" />
-                <path d="M12 7a5 5 0 0 1 5 5v2a5 5 0 0 1-10 0v-2a5 5 0 0 1 5-5z" />
-                <path d="M5 9c1.5-2 3.5-3 7-3s5.5 1 7 3" />
-              </svg>
-            </div>
-
-            <span className="text-[20px] font-black tracking-tight text-[#D52F2F] font-display">
-              PujoPath
-            </span>
-          </Link>
-        </div>
-
-        {/* Center: Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-7 lg:gap-8">
-          {mainNavLinks.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'relative py-1 text-[14px] transition-colors duration-150',
-                  isActive
-                    ? 'text-[#D52F2F] font-bold'
-                    : 'text-[#242424] hover:text-[#D52F2F] font-medium'
-                )}
-              >
-                {link.label}
-                {isActive && (
-                  <span className="absolute -bottom-[14px] left-0 right-0 h-[2.5px] bg-[#D52F2F] rounded-full" />
-                )}
-              </Link>
-            );
-          })}
-
-          <div className="relative">
-            <button
-              onClick={() => setMoreOpen(!moreOpen)}
-              onBlur={() => setTimeout(() => setMoreOpen(false), 200)}
+        {/* Desktop Primary Nav */}
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Primary navigation">
+          {primaryLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
               className={cn(
-                'flex items-center gap-1 py-1 text-[14px] transition-colors duration-150',
-                pathname === '/metro' || pathname === '/music' || pathname === '/mahalaya' || pathname === '/about'
-                  ? 'text-[#D52F2F] font-bold'
-                  : 'text-[#242424] hover:text-[#D52F2F] font-medium'
+                'rounded-xl px-3 py-2 text-sm font-bold transition-all duration-150',
+                pathname === link.href
+                  ? 'bg-[#f9e9e7] dark:bg-[#341b18] text-[#b42323]'
+                  : 'text-[#625b55] dark:text-[#a89e95] hover:bg-[#f5f1ec] dark:hover:bg-[#201c18] hover:text-[#242424] dark:hover:text-[#EDE5DC]'
+              )}
+            >
+              {link.label}
+            </Link>
+          ))}
+
+          {/* More Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setMoreOpen((open) => !open)}
+              aria-expanded={moreOpen}
+              className={cn(
+                'flex items-center gap-1 rounded-xl px-3 py-2 text-sm font-bold transition-all duration-150',
+                isSecondaryActive
+                  ? 'bg-[#f9e9e7] dark:bg-[#341b18] text-[#b42323]'
+                  : 'text-[#625b55] dark:text-[#a89e95] hover:bg-[#f5f1ec] dark:hover:bg-[#201c18] hover:text-[#242424] dark:hover:text-[#EDE5DC]'
               )}
             >
               <span>{isBn ? 'আরও' : 'More'}</span>
-              <ChevronDown className={cn('w-3.5 h-3.5 transition-transform', moreOpen && 'rotate-180')} />
+              <ChevronDown className={cn('h-4 w-4 transition-transform duration-200', moreOpen && 'rotate-180')} />
             </button>
 
             {moreOpen && (
-              <div
-                className="absolute top-full right-0 mt-2.5 w-48 rounded-2xl p-1.5 space-y-1 z-50"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(234, 220, 206, 0.8)',
-                  boxShadow: '0 8px 32px rgba(70, 35, 15, 0.12)',
-                }}
-              >
-                {moreDropdownLinks.map((item) => {
-                  const Icon = item.icon;
+              <div className="absolute right-0 mt-2 w-48 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] p-1.5 shadow-xl animate-in fade-in zoom-in-95 duration-150 z-50">
+                {secondaryLinks.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = pathname === link.href;
                   return (
                     <Link
-                      key={item.href}
-                      href={item.href}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-[#4A423D] hover:text-[#242424] hover:bg-[#F8F0E8] transition-colors"
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMoreOpen(false)}
+                      className={cn(
+                        'flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
+                        isActive
+                          ? 'bg-[#f9e9e7] dark:bg-[#341b18] text-[#b42323]'
+                          : 'text-[#4a423d] dark:text-[#c4b9ae] hover:bg-[#f7f3ee] dark:hover:bg-[#241f1a]'
+                      )}
                     >
-                      <Icon className="w-4 h-4 text-[#D52F2F]" />
-                      <span>{item.label}</span>
+                      <Icon className="h-4 w-4 text-[#b42323]" />
+                      <span>{link.label}</span>
                     </Link>
                   );
                 })}
@@ -162,37 +133,33 @@ export function Header({ onToggleWatchMode, isWatchMode }: HeaderProps) {
           </div>
         </nav>
 
-        {/* Right: Watch UI Pill + Language Switcher + Heart + Hamburger */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
-          {onToggleWatchMode && (
-            <button
-              onClick={onToggleWatchMode}
-              title={isWatchMode ? 'Exit Watch Mode' : 'Preview Smartwatch UI'}
-              className="px-3 py-1 rounded-full text-xs font-semibold text-[#3D332F] hover:text-[#D52F2F] transition-colors flex items-center gap-1.5"
-              style={{
-                border: '1px solid rgba(234, 220, 206, 0.8)',
-                background: 'rgba(255, 255, 255, 0.6)',
-              }}
-            >
-              <Watch className="w-3.5 h-3.5" />
-              <span>Watch UI</span>
-            </button>
-          )}
+        {/* Right Controls: Theme Switch + Language Switch + Saved Heart + Mobile Hamburger */}
+        <div className="flex items-center gap-2">
 
-          <div
-            className="flex items-center p-0.5 rounded-full text-xs font-bold"
-            style={{
-              border: '1px solid rgba(234, 220, 206, 0.8)',
-              background: 'rgba(255, 255, 255, 0.6)',
-            }}
+          {/* Theme Switcher Toggle */}
+          <button
+            onClick={toggleTheme}
+            role="switch"
+            aria-checked={theme === 'dark'}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#e8e1d9] dark:border-[#332b24] text-[#625b55] dark:text-[#b4a99e] hover:bg-[#f5f1ec] dark:hover:bg-[#221c17] transition-all active:scale-95"
           >
+            {theme === 'dark' ? (
+              <Sun className="h-4 w-4 text-amber-400 animate-in spin-in-180 duration-200" />
+            ) : (
+              <Moon className="h-4 w-4 text-[#625b55] animate-in spin-in-180 duration-200" />
+            )}
+          </button>
+
+          {/* Language Switcher */}
+          <div className="hidden rounded-xl border border-[#e8e1d9] dark:border-[#332b24] p-0.5 text-xs font-bold sm:flex">
             <button
               onClick={() => setLocale('en')}
               className={cn(
-                'px-2.5 py-0.5 rounded-full transition-all text-xs',
+                'rounded-lg px-2 py-1 transition-all',
                 locale === 'en'
-                  ? 'bg-[#D52F2F] text-white shadow-sm'
-                  : 'text-[#4A423D] hover:text-[#242424]'
+                  ? 'bg-[#b42323] text-white shadow-sm'
+                  : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white'
               )}
             >
               EN
@@ -200,60 +167,74 @@ export function Header({ onToggleWatchMode, isWatchMode }: HeaderProps) {
             <button
               onClick={() => setLocale('bn')}
               className={cn(
-                'px-2.5 py-0.5 rounded-full transition-all text-xs',
+                'rounded-lg px-2 py-1 transition-all',
                 locale === 'bn'
-                  ? 'bg-[#D52F2F] text-white shadow-sm'
-                  : 'text-[#4A423D] hover:text-[#242424]'
+                  ? 'bg-[#b42323] text-white shadow-sm'
+                  : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white'
               )}
             >
               বাংলা
             </button>
           </div>
 
+          {/* Saved Pandals Heart with Dynamic Counter Badge */}
           <Link
             href="/saved"
-            aria-label={isBn ? 'সংরক্ষিত' : 'Saved Pandals'}
-            className="p-1.5 text-[#242424] hover:text-[#D52F2F] transition-colors"
+            aria-label={isBn ? 'সংরক্ষিত প্যান্ডেল' : 'Saved pandals'}
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[#e8e1d9] dark:border-[#332b24] text-[#625b55] dark:text-[#b4a99e] hover:bg-[#f5f1ec] dark:hover:bg-[#221c17] hover:text-[#b42323] transition-all active:scale-95"
           >
-            <Heart className={cn('w-[18px] h-[18px]', savedPandalIds.length > 0 && 'text-[#D52F2F] fill-[#D52F2F]')} />
+            <Heart
+              className={cn(
+                'h-4 w-4 transition-transform',
+                savedPandalIds.length > 0 && 'fill-[#b42323] text-[#b42323]'
+              )}
+            />
+            {savedPandalIds.length > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#b42323] px-1 text-[10px] font-bold text-white shadow-sm">
+                {savedPandalIds.length}
+              </span>
+            )}
           </Link>
 
+          {/* Mobile Hamburger Menu Trigger */}
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-1.5 text-[#242424] hover:text-[#D52F2F] transition-colors"
-            aria-label="Menu"
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            aria-label="Open menu"
+            aria-expanded={mobileMenuOpen}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#e8e1d9] dark:border-[#332b24] text-[#625b55] dark:text-[#b4a99e] hover:bg-[#f5f1ec] dark:hover:bg-[#221c17] md:hidden transition-all active:scale-95"
           >
-            <Menu className="w-5 h-5" />
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Drawer Menu for Mobile */}
+      {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div
-          className="mt-3 p-3.5 rounded-2xl space-y-2"
-          style={{
-            background: 'rgba(255, 255, 255, 0.95)',
-            border: '1px solid rgba(234, 220, 206, 0.8)',
-            boxShadow: '0 8px 32px rgba(70, 35, 15, 0.12)',
-          }}
-        >
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {[...mainNavLinks, ...moreDropdownLinks, { href: '/saved', label: isBn ? 'সংরক্ষিত' : 'Saved', icon: Heart }].map((link) => (
+        <div className="border-t border-[#eee8e1] dark:border-[#2a241f] bg-white dark:bg-[#181411] px-4 py-4 md:hidden shadow-xl animate-in slide-in-from-top-2 duration-150">
+          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-2">
+            {[...primaryLinks, ...secondaryLinks].map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  'p-3 rounded-xl text-xs font-semibold flex items-center gap-2 border transition-colors',
+                  'rounded-xl px-3 py-2.5 text-sm font-bold transition-colors',
                   pathname === link.href
-                    ? 'bg-red-50 border-red-200 text-[#D52F2F]'
-                    : 'bg-[#F8F0E8] border-[#EADCCE] text-[#4A423D] hover:text-[#242424]'
+                    ? 'bg-[#f9e9e7] dark:bg-[#341b18] text-[#b42323]'
+                    : 'text-[#4a423d] dark:text-[#c4b9ae] hover:bg-[#f7f3ee] dark:hover:bg-[#221c17]'
                 )}
               >
-                <span>{link.label}</span>
+                {link.label}
               </Link>
             ))}
+
+            {/* Mobile Language Switcher button */}
+            <button
+              onClick={() => setLocale(locale === 'en' ? 'bn' : 'en')}
+              className="rounded-xl px-3 py-2.5 text-left text-sm font-bold text-[#4a423d] dark:text-[#c4b9ae] hover:bg-[#f7f3ee] dark:hover:bg-[#221c17] border border-[#eee8e1] dark:border-[#2a241f]"
+            >
+              {locale === 'en' ? 'বাংলা সংস্করণ' : 'English Version'}
+            </button>
           </div>
         </div>
       )}

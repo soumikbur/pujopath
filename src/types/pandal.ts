@@ -18,18 +18,23 @@ export interface PandalFacility {
   medicalBooth: boolean;
   vipPassEntry: boolean;
   parkingAvailable: boolean;
-  foodStallsNearby: boolean;
-  publicToilets: boolean;
+  foodStallsNearby?: boolean;
+  publicToilets?: boolean;
+  restArea?: boolean;
+  emergencyExitCount?: number;
+  volunteerCount?: number;
 }
 
-export interface PandalMetroLink {
+export interface MetroLink {
   stationId: string;
   stationName: string;
-  stationNameBn: string;
+  stationNameBn?: string;
   walkingDistanceMeters: number;
   walkingDurationMinutes: number;
   exitGate?: string;
 }
+
+export type PandalMetroLink = MetroLink;
 
 export interface Pandal {
   id: string;
@@ -50,7 +55,7 @@ export interface Pandal {
   descriptionBn: string;
   history?: string;
   historyBn?: string;
-  establishedYear: number;
+  establishedYear?: number;
   openingTime: string;
   closingTime: string;
   crowdLevel: CrowdLevel;
@@ -61,10 +66,11 @@ export interface Pandal {
   galleryImages: string[];
   isFeatured: boolean;
   isHeritage: boolean;
-  metroLinks: PandalMetroLink[];
+  metroLinks: MetroLink[];
   facilities: PandalFacility;
-  highlights: string[];
-  highlightsBn: string[];
+  highlights?: string[];
+  highlightsBn?: string[];
+  specialAttractions?: string[];
   distanceKm?: number;
 }
 
@@ -77,5 +83,5 @@ export interface FilterOptions {
   wheelchairAccessibleOnly: boolean;
   featuredOnly: boolean;
   heritageOnly: boolean;
-  sortBy: 'recommended' | 'nearest' | 'popular' | 'rating' | 'leastCrowded' | 'name';
+  sortBy: 'recommended' | 'nearest' | 'popular' | 'rating' | 'leastCrowded' | 'name' | 'popularity' | 'distance';
 }

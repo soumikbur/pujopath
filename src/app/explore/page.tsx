@@ -17,16 +17,18 @@ function ExploreContent() {
   const initialQuery = searchParams.get('q') || '';
   const initialZone = (searchParams.get('zone') as LocalityZone) || 'All';
   const initialFeatured = searchParams.get('featuredOnly') === 'true';
+  const initialHeritage = searchParams.get('heritageOnly') === 'true';
+  const initialMetro = searchParams.get('metroOnly') === 'true' || searchParams.get('metroAccessibleOnly') === 'true';
 
   const [filters, setFilters] = useState<FilterOptions>({
     searchQuery: initialQuery,
     zone: initialZone,
     crowdLevel: 'All',
     category: 'All',
-    metroAccessibleOnly: false,
+    metroAccessibleOnly: initialMetro,
     wheelchairAccessibleOnly: false,
     featuredOnly: initialFeatured,
-    heritageOnly: false,
+    heritageOnly: initialHeritage,
     sortBy: 'recommended',
   });
 
@@ -34,12 +36,17 @@ function ExploreContent() {
     const q = searchParams.get('q');
     const z = searchParams.get('zone') as LocalityZone | null;
     const f = searchParams.get('featuredOnly') === 'true';
-    if (q !== null || z !== null || f) {
+    const h = searchParams.get('heritageOnly') === 'true';
+    const m = searchParams.get('metroOnly') === 'true' || searchParams.get('metroAccessibleOnly') === 'true';
+
+    if (q !== null || z !== null || f || h || m) {
       setFilters((prev) => ({
         ...prev,
         searchQuery: q || '',
         zone: z || 'All',
         featuredOnly: f,
+        heritageOnly: h,
+        metroAccessibleOnly: m,
       }));
     }
   }, [searchParams]);
@@ -47,19 +54,19 @@ function ExploreContent() {
   const filteredPandals = PandalService.filterPandals(filters);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-8">
+    <div className="mx-auto max-w-6xl space-y-6 pb-8">
       <div>
-        <div className="flex items-center gap-2 text-pujo-red text-xs sm:text-sm font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-2 text-[#b42323] text-xs sm:text-sm font-bold uppercase tracking-wider">
           <Search className="w-4 h-4" />
-          <span>{isBn ? 'প্যান্ডেল সন্ধান' : 'Pandal Explorer'}</span>
+          <span>{isBn ? 'প্যান্ডেল সন্ধান' : 'Pandal Directory'}</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-black text-pujo-text-primary mt-1 tracking-tight">
-          {isBn ? 'কলকাতার শ্রেষ্ঠ পূজামণ্ডপ অন্বেষণ' : 'Explore Durga Puja Pandals'}
+        <h1 className="mt-1 text-3xl font-black tracking-tight text-[#242424] dark:text-[#ede5dc] sm:text-4xl">
+          {isBn ? 'প্যান্ডেল খুঁজুন' : 'Explore Kolkata Pandals'}
         </h1>
-        <p className="text-sm sm:text-base text-pujo-text-muted mt-1 max-w-3xl">
+        <p className="text-sm sm:text-base text-[#776d65] dark:text-[#a89e95] mt-1 max-w-3xl">
           {isBn
-            ? 'উত্তর, দক্ষিণ, মধ্য কলকাতা, সল্টলেক ও সংলগ্ন অঞ্চলের সেরা থিম পুজো, ঐতিহাসিক বনেদি বাড়ির সাবেকি আরাধনা ও শ্রেষ্ঠ শিল্পকর্ম দেখুন।'
-            : 'Discover iconic community celebrations, art installations, and traditional Bonedi Bari pujas across Bengal.'}
+            ? 'নাম, এলাকা, থিম বা নিকটতম মেট্রো স্টেশন দিয়ে কলকাতার সেরা পূজামণ্ডপ খুঁজুন।'
+            : 'Filter by heritage traditions, thematic craftsmanship, nearby metro stations, and crowd levels.'}
         </p>
       </div>
 
@@ -76,7 +83,7 @@ function ExploreContent() {
 
 export default function ExplorePage() {
   return (
-    <React.Suspense fallback={<div className="p-12 text-center text-pujo-text-muted font-bold">Loading Pandals...</div>}>
+    <React.Suspense fallback={<div className="p-12 text-center text-[#776d65] dark:text-[#a89e95] font-bold">Loading Pandals...</div>}>
       <ExploreContent />
     </React.Suspense>
   );
