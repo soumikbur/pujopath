@@ -73,17 +73,21 @@ export function MobileBottomNav() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-xl transition-all duration-150 relative select-none',
+                  'flex flex-col items-center justify-center min-w-[56px] min-h-[48px] py-1 px-2 rounded-xl relative select-none transition-all duration-150 ease-out active:scale-[0.93] active:bg-[#f6eee3] dark:active:bg-[#251f1a]',
                   isActive
-                    ? 'text-pujo-red font-bold scale-105'
-                    : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-[#ede5dc]'
+                    ? 'text-pujo-red font-bold bg-[#fdeeee]/50 dark:bg-[#341b18]/50'
+                    : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-[#ede5dc] hover:bg-[#f8f4ef] dark:hover:bg-[#201c18]'
                 )}
               >
-                <Icon className={cn('w-5 h-5', isActive ? 'stroke-[2.4]' : 'stroke-[1.8]')} />
-                <span className="text-[11px] font-bold tracking-tight mt-0.5">{item.label}</span>
-                {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-pujo-red mt-0.5" />
-                )}
+                <Icon className={cn('w-5 h-5 transition-transform duration-200 ease-out', isActive ? 'stroke-[2.4]' : 'stroke-[1.8]')} />
+                <span className="text-[11px] font-bold tracking-tight mt-0.5 transition-colors duration-200">{item.label}</span>
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'w-1.5 h-1.5 rounded-full bg-pujo-red mt-0.5 transition-all duration-200 ease-out',
+                    isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+                  )}
+                />
               </Link>
             );
           })}
@@ -94,14 +98,15 @@ export function MobileBottomNav() {
             aria-label="More navigation options"
             aria-expanded={moreOpen}
             className={cn(
-              'flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-xl transition-all select-none',
+              'flex flex-col items-center justify-center min-w-[56px] min-h-[48px] py-1 px-2 rounded-xl relative select-none transition-all duration-150 ease-out active:scale-[0.93] active:bg-[#f6eee3] dark:active:bg-[#251f1a]',
               moreOpen
-                ? 'text-pujo-red font-bold'
-                : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-[#ede5dc]'
+                ? 'text-pujo-red font-bold bg-[#fdeeee]/50 dark:bg-[#341b18]/50'
+                : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-[#ede5dc] hover:bg-[#f8f4ef] dark:hover:bg-[#201c18]'
             )}
           >
-            <MoreHorizontal className="w-5 h-5 stroke-[1.8]" />
-            <span className="text-[11px] font-bold tracking-tight mt-0.5">{isBn ? 'আরও' : 'More'}</span>
+            <MoreHorizontal className="w-5 h-5 stroke-[1.8] transition-transform duration-200" />
+            <span className="text-[11px] font-bold tracking-tight mt-0.5 transition-colors duration-200">{isBn ? 'আরও' : 'More'}</span>
+            <span aria-hidden="true" className="w-1.5 h-1.5 mt-0.5 opacity-0" />
           </button>
         </div>
       </nav>
@@ -133,7 +138,7 @@ export function MobileBottomNav() {
                     href={item.href}
                     onClick={() => setMoreOpen(false)}
                     className={cn(
-                      'p-3.5 rounded-2xl flex items-center gap-3 border transition-colors',
+                      'p-3.5 rounded-2xl flex items-center gap-3 border transition-all duration-100 ease-out active:scale-[0.96]',
                       isActive
                         ? 'bg-[#fdeeee] dark:bg-[#341b18] border-[#f6ceca] dark:border-[#4a2420] text-[#d52f2f] dark:text-[#e05656]'
                         : 'bg-[#fcfaf7] dark:bg-[#201c18] border-[#eee8e1] dark:border-[#2a241f] text-[#4a423d] dark:text-[#c4b9ae] hover:text-[#242424] dark:hover:text-white'
