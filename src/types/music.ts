@@ -32,6 +32,7 @@ export interface MusicTrack {
   category: MusicCategory;
   durationSeconds: number;
   audioUrl?: string;
+  embedUrl?: string;
   coverUrl: string;
   description: string;
   descriptionBn: string;

@@ -3,8 +3,19 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Sparkles, Radio, ExternalLink, ShieldCheck, Music2, Info } from 'lucide-react';
+import {
+  Sparkles,
+  Radio,
+  ExternalLink,
+  ShieldCheck,
+  Music2,
+  Info,
+  Play,
+  Pause,
+  Loader2,
+} from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
+import { useAudio } from '@/lib/context/AudioContext';
 import { MUSIC_TRACKS_DATA } from '@/data/music';
 import { getAssetPath } from '@/lib/utils';
 
@@ -12,11 +23,17 @@ export default function MahalayaPage() {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
 
+  const { currentTrack, isPlaying, isLoading, playTrack, togglePlay } = useAudio();
+
   const mahalayaTrack =
     MUSIC_TRACKS_DATA.find((t) => t.id === 'track-mahalaya-original') || MUSIC_TRACKS_DATA[0];
 
+  const isSelected = currentTrack?.id === mahalayaTrack.id;
+
   const officialListenUrl =
-    mahalayaTrack.externalListenUrl || 'https://www.youtube.com/watch?v=kYIebq19Mck';
+    mahalayaTrack.externalListenUrl ||
+    mahalayaTrack.sourceUrl ||
+    'https://www.youtube.com/watch?v=kmQEtYOtbmI';
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-20">
@@ -56,7 +73,7 @@ export default function MahalayaPage() {
             </div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>{isBn ? 'অফিসিয়াল আর্কাইভ' : 'Authorized Archive'}</span>
+              <span>{isBn ? 'অনুমোদিত ইন-পেজ স্ট্রিম' : 'Authorized In-Page Stream'}</span>
             </div>
           </div>
 
@@ -70,15 +87,26 @@ export default function MahalayaPage() {
           </p>
 
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center md:justify-start gap-3">
-            <a
-              href={officialListenUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={() => (isSelected ? togglePlay() : playTrack(mahalayaTrack))}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-2xl bg-[#b42323] hover:bg-[#971c1c] text-white font-bold text-sm shadow-sm transition-all active:scale-95 cursor-pointer"
             >
-              <ExternalLink className="w-4 h-4" />
-              <span>{isBn ? 'অফিসিয়াল স্ট্রিমে শুনুন' : 'Listen on Official Stream'}</span>
-            </a>
+              {isSelected && isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : isSelected && isPlaying ? (
+                <Pause className="w-4 h-4 fill-current" />
+              ) : (
+                <Play className="w-4 h-4 fill-current ml-0.5" />
+              )}
+              <span>
+                {isSelected && isLoading
+                  ? (isBn ? 'লোড হচ্ছে...' : 'Buffering...')
+                  : isSelected && isPlaying
+                  ? (isBn ? 'থামান' : 'Pause Recitation')
+                  : (isBn ? 'মহালয়া সরাসরি শুনুন' : 'Play Mahishasura Mardini')}
+              </span>
+            </button>
 
             <Link
               href="/music"
@@ -87,9 +115,33 @@ export default function MahalayaPage() {
               <Music2 className="w-4 h-4 text-[#b42323]" />
               <span>{isBn ? 'শারদীয়া সঙ্গীত সম্ভার' : 'Browse Puja Music'}</span>
             </Link>
+
+            <a
+              href={officialListenUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-xs font-semibold text-[#665a54] dark:text-[#a89e95] hover:text-[#b42323] transition-colors"
+            >
+              <span>{isBn ? 'আর্কাইভ সোর্স' : 'Archive Source'}</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
           </div>
+
+          {/* In-Page Stream Player Box when playing */}
+          {isSelected && isPlaying && mahalayaTrack.embedUrl && (
+            <div className="w-full mt-4 rounded-2xl overflow-hidden aspect-video max-w-lg bg-black border border-[#eee8e1] dark:border-[#2f2720] shadow-lg">
+              <iframe
+                src={`${mahalayaTrack.embedUrl}?autoplay=1&enablejsapi=1`}
+                title={mahalayaTrack.title}
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          )}
         </div>
       </div>
+
 
       {/* Broadcast Credits Grid */}
       <div className="p-5 sm:p-7 rounded-3xl bg-white dark:bg-[#1a1613] border border-[#eee8e1] dark:border-[#2f2720] space-y-4">

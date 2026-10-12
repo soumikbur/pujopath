@@ -4,16 +4,25 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import { MusicTrack } from '@/types';
 import { PUJA_MUSIC_DATA } from '@/data/music';
 
+export type PlaybackState = 'IDLE' | 'LOADING' | 'PLAYING' | 'PAUSED' | 'ENDED' | 'ERROR';
+export type PlaybackType = 'direct' | 'embed' | null;
+
 interface AudioContextType {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
   isLoading: boolean;
+  playbackState: PlaybackState;
+  playbackType: PlaybackType;
   playbackError: string | null;
   currentTime: number;
   duration: number;
   volume: number;
+  isMuted: boolean;
+  toggleMute: () => void;
   queue: MusicTrack[];
   isFullScreenOpen: boolean;
+  isStreamExpanded: boolean;
+  setIsStreamExpanded: (expanded: boolean) => void;
   playTrack: (track: MusicTrack) => void;
   togglePlay: () => void;
   pause: () => void;
@@ -33,6 +42,7 @@ interface AudioContextType {
   clearError: () => void;
   isPlayerDismissed: boolean;
   closePlayer: () => void;
+  resumePlayer: () => void;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
@@ -43,22 +53,21 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(PUJA_MUSIC_DATA[0]);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [playbackState, setPlaybackState] = useState<PlaybackState>('IDLE');
+  const [playbackType, setPlaybackType] = useState<PlaybackType>(null);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(PUJA_MUSIC_DATA[0]?.durationSeconds || 100);
+  const [duration, setDuration] = useState<number>(PUJA_MUSIC_DATA[0]?.durationSeconds || 99);
   const [volume, setVolumeState] = useState<number>(0.85);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
   const [queue, setQueue] = useState<MusicTrack[]>(PUJA_MUSIC_DATA);
   const [isFullScreenOpen, setIsFullScreenOpen] = useState<boolean>(false);
+  const [isStreamExpanded, setIsStreamExpanded] = useState<boolean>(false);
   const [userPlaylistIds, setUserPlaylistIds] = useState<string[]>([]);
   const [isPlayerDismissed, setIsPlayerDismissed] = useState<boolean>(false);
 
-  const closePlayer = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-    setIsPlaying(false);
-    setIsPlayerDismissed(true);
-  }, []);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const embedTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Hydrate user playlist from localStorage
   useEffect(() => {
@@ -72,8 +81,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       // safe fallback
     }
   }, []);
-
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Initialize single HTML5 Audio element on client mount
   useEffect(() => {
@@ -96,6 +103,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
     const handleWaiting = () => {
       setIsLoading(true);
+      setPlaybackState('LOADING');
     };
 
     const handleCanPlay = () => {
@@ -105,14 +113,17 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const handlePlay = () => {
       setIsPlaying(true);
       setIsLoading(false);
+      setPlaybackState('PLAYING');
     };
 
     const handlePause = () => {
       setIsPlaying(false);
+      setPlaybackState('PAUSED');
     };
 
     const handleEnded = () => {
       setIsPlaying(false);
+      setPlaybackState('ENDED');
       // Auto-advance to next track in queue
       const currentIndex = queue.findIndex((t) => t.id === currentTrack?.id);
       if (currentIndex !== -1 && currentIndex < queue.length - 1) {
@@ -124,9 +135,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const handleError = () => {
       setIsLoading(false);
       setIsPlaying(false);
+      setPlaybackState('ERROR');
       if (audio.src && audio.src !== window.location.href) {
         setPlaybackError(
-          'Audio stream could not be loaded directly. Use the official source link to listen.'
+          'Audio stream could not be loaded directly. Please check your connection and retry.'
         );
       }
     };
@@ -153,7 +165,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       audio.removeEventListener('error', handleError);
       audioRef.current = null;
     };
-  }, []);
+  }, [currentTrack?.id, queue]);
 
   // Update MediaSession on supported devices
   useEffect(() => {
@@ -182,6 +194,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
   }, [currentTrack]);
 
+  // Internal playback handler enforcing ONE active session
   const playTrackInternal = useCallback(
     (track: MusicTrack) => {
       setIsPlayerDismissed(false);
@@ -191,69 +204,145 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       setDuration(track.durationSeconds || 60);
 
       const audio = audioRef.current;
-      if (!audio) return;
 
-      if (track.playbackMethod === 'external_listen_link' || !track.audioUrl) {
-        audio.pause();
-        audio.src = '';
-        setIsPlaying(false);
-        setIsLoading(false);
-        if (track.externalListenUrl && typeof window !== 'undefined') {
-          window.open(track.externalListenUrl, '_blank', 'noopener,noreferrer');
+      // Handle Direct HTML5 Audio playback
+      if (track.playbackMethod === 'direct_audio' && track.audioUrl) {
+        setPlaybackType('direct');
+        setIsStreamExpanded(false);
+
+        if (audio) {
+          audio.pause();
+          setIsLoading(true);
+          setPlaybackState('LOADING');
+          audio.src = track.audioUrl;
+          audio.volume = isMuted ? 0 : volume;
+          audio.currentTime = 0;
+
+          const playPromise = audio.play();
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                setIsPlaying(true);
+                setIsLoading(false);
+                setPlaybackState('PLAYING');
+              })
+              .catch((err) => {
+                setIsLoading(false);
+                setIsPlaying(false);
+                setPlaybackState('ERROR');
+                if (err.name === 'NotAllowedError') {
+                  setPlaybackError('Browser autoplay blocked. Click play to listen.');
+                } else {
+                  setPlaybackError('Could not load audio. Click play to retry.');
+                }
+              });
+          }
         }
         return;
       }
 
-      setIsLoading(true);
-      audio.src = track.audioUrl;
-      audio.volume = volume;
-      audio.currentTime = 0;
+      // Handle Authorized In-Page Stream (e.g. YouTube oEmbed/iFrame)
+      if (track.playbackMethod === 'authorized_stream' || track.embedUrl) {
+        // STRICT ENFORCEMENT: Stop any currently playing HTML5 direct audio immediately!
+        if (audio) {
+          audio.pause();
+          audio.src = '';
+        }
 
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          setIsLoading(false);
-          setIsPlaying(false);
-          if (err.name === 'NotAllowedError') {
-            // Autoplay prevented by browser policy; user interaction required
-            setPlaybackError('Click play to allow audio playback.');
-          } else {
-            setPlaybackError('Playback error. Use the source link to listen.');
-          }
-        });
+        setPlaybackType('embed');
+        setIsStreamExpanded(true);
+        setIsLoading(false);
+        setIsPlaying(true);
+        setPlaybackState('PLAYING');
+        return;
       }
+
+      // Fallback for non-direct or external link tracks
+      if (audio) {
+        audio.pause();
+        audio.src = '';
+      }
+      setIsPlaying(false);
+      setIsLoading(false);
+      setPlaybackState('IDLE');
     },
-    [volume]
+    [isMuted, volume]
   );
+
+  // Virtual playback timer for authorized embed streams so progress & duration are displayed
+  useEffect(() => {
+    if (embedTimerRef.current) {
+      clearInterval(embedTimerRef.current);
+      embedTimerRef.current = null;
+    }
+
+    if (playbackType === 'embed' && isPlaying) {
+      embedTimerRef.current = setInterval(() => {
+        setCurrentTime((prev) => {
+          if (prev >= duration) {
+            setIsPlaying(false);
+            setPlaybackState('ENDED');
+            return duration;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (embedTimerRef.current) {
+        clearInterval(embedTimerRef.current);
+      }
+    };
+  }, [playbackType, isPlaying, duration]);
 
   const playTrack = (track: MusicTrack) => {
     playTrackInternal(track);
   };
 
   const togglePlay = () => {
+    if (!currentTrack) return;
     const audio = audioRef.current;
-    if (!audio || !currentTrack) return;
 
-    if (currentTrack.playbackMethod === 'external_listen_link' || !currentTrack.audioUrl) {
-      if (currentTrack.externalListenUrl && typeof window !== 'undefined') {
-        window.open(currentTrack.externalListenUrl, '_blank', 'noopener,noreferrer');
-      }
-      return;
-    }
-
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      setIsPlayerDismissed(false);
-      setPlaybackError(null);
-      if (!audio.src || audio.src === window.location.href) {
-        audio.src = currentTrack.audioUrl;
-      }
-      audio.play().catch((err) => {
-        if (err.name !== 'AbortError') {
-          setPlaybackError('Playback blocked by browser. Click play to start.');
+    if (playbackType === 'direct') {
+      if (!audio) return;
+      if (isPlaying) {
+        audio.pause();
+        setIsPlaying(false);
+        setPlaybackState('PAUSED');
+      } else {
+        setIsPlayerDismissed(false);
+        setPlaybackError(null);
+        if (!audio.src || audio.src === window.location.href) {
+          audio.src = currentTrack.audioUrl || '';
         }
-      });
+        audio.volume = isMuted ? 0 : volume;
+        audio
+          .play()
+          .then(() => {
+            setIsPlaying(true);
+            setPlaybackState('PLAYING');
+          })
+          .catch((err) => {
+            if (err.name !== 'AbortError') {
+              setPlaybackError('Playback blocked by browser. Click play to start.');
+            }
+          });
+      }
+    } else if (playbackType === 'embed') {
+      if (isPlaying) {
+        setIsPlaying(false);
+        setPlaybackState('PAUSED');
+      } else {
+        setIsPlayerDismissed(false);
+        setPlaybackError(null);
+        setIsPlaying(true);
+        setPlaybackState('PLAYING');
+        setIsStreamExpanded(true);
+      }
+    } else {
+      // Track selected but not yet started
+      playTrackInternal(currentTrack);
     }
   };
 
@@ -261,7 +350,26 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     if (audioRef.current) {
       audioRef.current.pause();
     }
+    setIsPlaying(false);
+    setPlaybackState('PAUSED');
   };
+
+  const closePlayer = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    setIsPlaying(false);
+    setPlaybackState('PAUSED');
+    setIsPlayerDismissed(true);
+    setIsStreamExpanded(false);
+  }, []);
+
+  const resumePlayer = useCallback(() => {
+    setIsPlayerDismissed(false);
+    if (currentTrack) {
+      togglePlay();
+    }
+  }, [currentTrack]);
 
   const nextTrack = () => {
     if (!currentTrack || queue.length === 0) return;
@@ -278,19 +386,83 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   };
 
   const seek = (seconds: number) => {
-    if (audioRef.current && isFinite(seconds)) {
-      audioRef.current.currentTime = seconds;
-      setCurrentTime(seconds);
+    if (!isFinite(seconds)) return;
+    const clamped = Math.max(0, Math.min(seconds, duration));
+    setCurrentTime(clamped);
+    if (playbackType === 'direct' && audioRef.current) {
+      audioRef.current.currentTime = clamped;
     }
   };
 
   const setVolume = (vol: number) => {
     const clamped = Math.max(0, Math.min(1, vol));
     setVolumeState(clamped);
+    setIsMuted(false);
     if (audioRef.current) {
       audioRef.current.volume = clamped;
     }
   };
+
+  const toggleMute = () => {
+    setIsMuted((prev) => {
+      const next = !prev;
+      if (audioRef.current) {
+        audioRef.current.volume = next ? 0 : volume;
+      }
+      return next;
+    });
+  };
+
+  // Keyboard navigation shortcuts for media playback
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept when user is typing in forms or search boxes
+      const activeEl = document.activeElement;
+      if (
+        activeEl &&
+        (activeEl.tagName === 'INPUT' ||
+          activeEl.tagName === 'TEXTAREA' ||
+          (activeEl as HTMLElement).isContentEditable)
+      ) {
+        return;
+      }
+
+      if (e.code === 'Space') {
+        if (!isPlayerDismissed && currentTrack) {
+          e.preventDefault();
+          togglePlay();
+        }
+      } else if (e.code === 'ArrowRight' && e.shiftKey) {
+        if (!isPlayerDismissed && currentTrack) {
+          e.preventDefault();
+          nextTrack();
+        }
+      } else if (e.code === 'ArrowLeft' && e.shiftKey) {
+        if (!isPlayerDismissed && currentTrack) {
+          e.preventDefault();
+          prevTrack();
+        }
+      } else if (e.code === 'KeyM') {
+        if (!isPlayerDismissed) {
+          e.preventDefault();
+          toggleMute();
+        }
+      } else if (e.code === 'Escape') {
+        if (isStreamExpanded) {
+          e.preventDefault();
+          setIsStreamExpanded(false);
+        } else if (!isPlayerDismissed && isPlaying) {
+          e.preventDefault();
+          closePlayer();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPlayerDismissed, currentTrack, isPlaying, isStreamExpanded, togglePlay, nextTrack, prevTrack, toggleMute, closePlayer]);
 
   const addToQueue = (track: MusicTrack) => {
     setQueue((prev) => (prev.some((t) => t.id === track.id) ? prev : [...prev, track]));
@@ -353,12 +525,18 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         currentTrack,
         isPlaying,
         isLoading,
+        playbackState,
+        playbackType,
         playbackError,
         currentTime,
         duration,
         volume,
+        isMuted,
+        toggleMute,
         queue,
         isFullScreenOpen,
+        isStreamExpanded,
+        setIsStreamExpanded,
         playTrack,
         togglePlay,
         pause,
@@ -378,6 +556,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         clearError,
         isPlayerDismissed,
         closePlayer,
+        resumePlayer,
       }}
     >
       {children}
@@ -392,3 +571,4 @@ export function useAudio() {
   }
   return context;
 }
+

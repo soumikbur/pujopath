@@ -225,38 +225,28 @@ export default function MusicPage() {
             </p>
 
             <div className="pt-1 flex flex-col xs:flex-row flex-wrap items-center justify-center md:justify-start gap-2.5 sm:gap-3 w-full">
-              {currentTrack.playbackMethod === 'external_listen_link' ? (
-                <a
-                  href={currentTrack.externalListenUrl || currentTrack.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full xs:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-[#b42323] hover:bg-[#971c1c] text-white font-bold text-sm shadow-sm transition-all active:scale-95 cursor-pointer"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  <span>{isBn ? 'অফিসিয়াল স্ট্রিমে শুনুন' : 'Listen on Official Stream'}</span>
-                </a>
-              ) : (
-                <button
-                  type="button"
-                  onClick={togglePlay}
-                  className="w-full xs:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3 rounded-2xl bg-[#b42323] hover:bg-[#971c1c] text-white font-bold text-sm shadow-sm transition-all active:scale-95 cursor-pointer"
-                >
-                  {isLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : isPlaying ? (
-                    <Pause className="w-4 h-4 fill-current" />
-                  ) : (
-                    <Play className="w-4 h-4 fill-current ml-0.5" />
-                  )}
-                  <span>
-                    {isLoading
-                      ? (isBn ? 'লোড হচ্ছে...' : 'Buffering...')
-                      : isPlaying
-                      ? (isBn ? 'থামান' : 'Pause Audio')
-                      : (isBn ? 'গান শুনুন' : 'Play Soundscape')}
-                  </span>
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={togglePlay}
+                className="w-full xs:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3 rounded-2xl bg-[#b42323] hover:bg-[#971c1c] text-white font-bold text-sm shadow-sm transition-all active:scale-95 cursor-pointer"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : isPlaying ? (
+                  <Pause className="w-4 h-4 fill-current" />
+                ) : (
+                  <Play className="w-4 h-4 fill-current ml-0.5" />
+                )}
+                <span>
+                  {isLoading
+                    ? (isBn ? 'লোড হচ্ছে...' : 'Buffering...')
+                    : isPlaying
+                    ? (isBn ? 'থামান' : 'Pause Audio')
+                    : currentTrack.playbackMethod === 'authorized_stream'
+                    ? (isBn ? 'ইন-পেজ স্ট্রিম শুনুন' : 'Play In-Page Stream')
+                    : (isBn ? 'গান শুনুন' : 'Play Soundscape')}
+                </span>
+              </button>
 
               <button
                 type="button"
@@ -472,8 +462,6 @@ export default function MusicPage() {
                           <Loader2 className="w-4 h-4 animate-spin" />
                         ) : isSelected && isPlaying ? (
                           <Pause className="w-4 h-4 fill-current" />
-                        ) : track.playbackMethod === 'external_listen_link' ? (
-                          <ExternalLink className="w-4 h-4" />
                         ) : (
                           <Play className="w-4 h-4 fill-current ml-0.5" />
                         )}
@@ -518,22 +506,29 @@ export default function MusicPage() {
 
                   {/* Cultural Context / License Details Footer */}
                   <div className="pt-2.5 border-t border-black/5 dark:border-white/5 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[#776d65] dark:text-[#a89e95]">
-                    <span className="truncate max-w-[220px] sm:max-w-xs">{track.licenseType}</span>
-                    <div className="flex items-center gap-3 shrink-0">
-                      {track.playbackMethod === 'external_listen_link' && (
-                        <span className="text-[#b42323] font-bold flex items-center gap-1">
-                          <span>{isBn ? 'অফিসিয়াল স্ট্রিম' : 'Official Stream'}</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </span>
-                      )}
+                    <span className="truncate max-w-[200px] sm:max-w-xs">{track.licenseType}</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span
+                        className={cn(
+                          'px-2 py-0.5 rounded-md font-bold text-[9px]',
+                          track.playbackMethod === 'direct_audio'
+                            ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+                            : 'bg-[#b42323]/10 text-[#b42323]'
+                        )}
+                      >
+                        {track.playbackMethod === 'direct_audio'
+                          ? (isBn ? 'সরাসরি অডিও' : 'Direct Audio')
+                          : (isBn ? 'অনুমোদিত স্ট্রিম' : 'Authorized Stream')}
+                      </span>
                       <a
                         href={track.sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="hover:text-[#b42323] underline font-medium"
+                        className="hover:text-[#b42323] underline font-medium flex items-center gap-0.5"
                       >
-                        {isBn ? 'সোর্স' : 'Source'}
+                        <span>{isBn ? 'সোর্স' : 'Source'}</span>
+                        <ExternalLink className="w-2.5 h-2.5" />
                       </a>
                     </div>
                   </div>
