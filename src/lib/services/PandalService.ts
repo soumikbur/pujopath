@@ -61,6 +61,12 @@ export class PandalService {
           p.nameBn.includes(q) ||
           p.locality.toLowerCase().includes(q) ||
           p.localityBn.includes(q) ||
+          p.address.toLowerCase().includes(q) ||
+          p.addressBn.includes(q) ||
+          Boolean(p.neighborhood && p.neighborhood.toLowerCase().includes(q)) ||
+          Boolean(p.neighborhoodBn && p.neighborhoodBn.includes(q)) ||
+          Boolean(p.committeeName && p.committeeName.toLowerCase().includes(q)) ||
+          Boolean(p.committeeNameBn && p.committeeNameBn.includes(q)) ||
           p.theme.toLowerCase().includes(q) ||
           p.themeBn.includes(q) ||
           p.zone.toLowerCase().includes(q) ||

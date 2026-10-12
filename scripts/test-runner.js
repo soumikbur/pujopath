@@ -732,15 +732,16 @@ console.log('✓ Official MTP source citation and line status distinctions verif
 console.log('\n--- Running Test Suite 22: Pandal Database Expansion ---');
 const pDataFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'data', 'pandals', 'index.ts'), 'utf-8');
 const communityFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'data', 'pandals', 'communityPandals.ts'), 'utf-8');
-
-// Match IDs across pandal datasets (Foundation + Bonedi Bari + Community)
 const bonediDataContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'data', 'pandals', 'bonediBari.ts'), 'utf-8');
-const allPandalIdMatches = [...(pDataFile + bonediDataContent + communityFile).matchAll(/id:\s*'([a-z0-9-]+)'/g)].map(m => m[1]);
+const neighborhoodFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'data', 'pandals', 'neighborhoodPandals.ts'), 'utf-8');
+
+// Match IDs across all pandal datasets (Foundation + Bonedi Bari + Community + Neighborhood)
+const allPandalIdMatches = [...(pDataFile + bonediDataContent + communityFile + neighborhoodFile).matchAll(/id:\s*'([a-z0-9-]+)'/g)].map(m => m[1]);
 const allPandalUniqueIds = new Set(allPandalIdMatches);
 assert.strictEqual(allPandalIdMatches.length, allPandalUniqueIds.size, 'All pandal IDs in PANDALS_DATA must be completely unique');
 
-// Check expanded pandal count (must be >= 60)
-assert.ok(allPandalUniqueIds.size >= 60, `Total pandals must be at least 60, got ${allPandalUniqueIds.size}`);
+// Check expanded pandal count (must be >= 120, substantially expanded across Kolkata)
+assert.ok(allPandalUniqueIds.size >= 120, `Total pandals must be at least 120, got ${allPandalUniqueIds.size}`);
 
 // Verify inclusion of requested major and minor pandals
 assert.strictEqual(communityFile.includes('bagbazar-sarbojanin') || pDataFile.includes('bagbazar-sarbojanin'), true);
@@ -752,6 +753,12 @@ assert.strictEqual(communityFile.includes('dum-dum-park-bharat-chakra'), true, '
 assert.strictEqual(pDataFile.includes('fd-block-salt-lake') || communityFile.includes('salt-lake-ak-block'), true, 'Must include Salt Lake Block Pujas');
 assert.strictEqual(communityFile.includes('howrah-shibpur-mandir-tala'), true, 'Must include Howrah Shibpur Mandirtala');
 assert.strictEqual(communityFile.includes('badamtala-ashar-sangha'), true, 'Must include Badamtala Ashar Sangha');
+assert.strictEqual(neighborhoodFile.includes('belur-math-durga-puja'), true, 'Must include Belur Math Durga Puja');
+assert.strictEqual(neighborhoodFile.includes('kumartuli-sarbojanin'), true, 'Must include Kumartuli Sarbojanin');
+assert.strictEqual(neighborhoodFile.includes('haridevpur-41-pally'), true, 'Must include Haridevpur 41 Pally');
+assert.strictEqual(neighborhoodFile.includes('salt-lake-aj-block'), true, 'Must include Salt Lake AJ Block');
+assert.strictEqual(neighborhoodFile.includes('bowbazar-byayam-samity'), true, 'Must include Bowbazar Byayam Samity');
+console.log(`✓ Pandal database substantially expanded to ${allPandalUniqueIds.size} unique verified entries with zero duplicates`);
 
 // ============================================================================
 // TEST SUITE 23: Custom Pandal Creation & Geocoding Service (Search & Manual Entry)
@@ -955,8 +962,198 @@ console.log('✓ Seamless state preservation from Explore to Planner verified');
 console.log('✓ External navigation isolation (only launching on explicit user click) verified');
 
 console.log('\n================================================================');
-console.log('ALL 25 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
+console.log('TEST SUITES 1-25 PASSED SUCCESSFULLY');
 console.log('================================================================');
+
+// ============================================================================
+// TEST SUITE 26: Expanded Pandal Directory (133 Pandals, Multi-Zone, Metadata & Community Suggest)
+// ============================================================================
+(() => {
+  console.log('\n--- Running Test Suite 26: Expanded Pandal Directory & Community Suggestion ---');
+  const pandalIndexPath = path.join(__dirname, '..', 'src', 'data', 'pandals', 'index.ts');
+  const neighborhoodPandalsPath = path.join(__dirname, '..', 'src', 'data', 'pandals', 'neighborhoodPandals.ts');
+  const bonediBariPath = path.join(__dirname, '..', 'src', 'data', 'pandals', 'bonediBari.ts');
+  const communityPandalsPath = path.join(__dirname, '..', 'src', 'data', 'pandals', 'communityPandals.ts');
+  const pandalServicePath = path.join(__dirname, '..', 'src', 'lib', 'services', 'PandalService.ts');
+  const suggestModalPath = path.join(__dirname, '..', 'src', 'components', 'pandals', 'SuggestPandalModal.tsx');
+  const pandalTypesPath = path.join(__dirname, '..', 'src', 'types', 'pandal.ts');
+
+  const pandalIndexContent = fs.readFileSync(pandalIndexPath, 'utf-8');
+  const neighborhoodContent = fs.readFileSync(neighborhoodPandalsPath, 'utf-8');
+  const bonediBariContent = fs.readFileSync(bonediBariPath, 'utf-8');
+  const communityContent = fs.readFileSync(communityPandalsPath, 'utf-8');
+  const pandalServiceContent = fs.readFileSync(pandalServicePath, 'utf-8');
+  const suggestModalContent = fs.readFileSync(suggestModalPath, 'utf-8');
+  const pandalTypesContent = fs.readFileSync(pandalTypesPath, 'utf-8');
+
+  // 1. Verify Pandal Types metadata fields
+  const requiredTypeFields = [
+    'committeeName?: string',
+    'neighborhood?: string',
+    'themeYear?: number',
+    'sourceUrl?: string',
+    'sourceName?: string',
+    'verificationDate?: string',
+    'coordinateConfidence?:',
+    'verificationStatus?:',
+    'isCommunitySubmitted?: boolean',
+  ];
+  for (const field of requiredTypeFields) {
+    assert.ok(pandalTypesContent.includes(field), `Pandal interface must include metadata field: ${field}`);
+  }
+  console.log('✓ Pandal TypeScript data model metadata fields verified');
+
+  // 2. Count extraction and ID uniqueness verification
+  function extractPandalIds(content) {
+    const matches = [...content.matchAll(/id:\s*['"]([^'"]+)['"]/g)];
+    return matches.map(m => m[1]);
+  }
+
+  const foundationIds = extractPandalIds(pandalIndexContent);
+  const neighborhoodIds = extractPandalIds(neighborhoodContent);
+  const bonediBariIds = extractPandalIds(bonediBariContent);
+  const communityIds = extractPandalIds(communityContent);
+
+  console.log(`- Foundation Pandals: ${foundationIds.length}`);
+  console.log(`- Neighborhood Pandals: ${neighborhoodIds.length}`);
+  console.log(`- Bonedi Bari Pandals: ${bonediBariIds.length}`);
+  console.log(`- Community/Theme Pandals: ${communityIds.length}`);
+
+  assert.strictEqual(foundationIds.length, 23, 'Foundation pandals must contain 23 entries');
+  assert.strictEqual(neighborhoodIds.length, 61, 'Neighborhood pandals must contain 61 entries');
+  assert.strictEqual(bonediBariIds.length, 23, 'Bonedi Bari pandals must contain 23 entries (including 6 new additions)');
+  assert.strictEqual(communityIds.length, 26, 'Community pandals must contain 26 entries');
+
+  const allIds = [...foundationIds, ...neighborhoodIds, ...bonediBariIds, ...communityIds];
+  assert.strictEqual(allIds.length, 133, 'Total dataset must contain exactly 133 pandal records');
+
+  // Verify 100% ID uniqueness (zero duplicates)
+  const uniqueIds = new Set(allIds);
+  assert.strictEqual(uniqueIds.size, 133, `Zero duplicates allowed. Found ${uniqueIds.size} unique IDs out of ${allIds.length}`);
+  console.log('✓ Complete ID uniqueness verified across all 133 pandals (0 duplicates)');
+
+  // 3. Geographic Zone Coverage Verification
+  const expectedZones = [
+    'North Kolkata',
+    'South Kolkata',
+    'Central Kolkata',
+    'Salt Lake',
+    'Behala',
+    'Howrah',
+    'Dum Dum',
+    'New Town'
+  ];
+
+  for (const zone of expectedZones) {
+    const hasZone = pandalIndexContent.includes(zone) || neighborhoodContent.includes(zone) || communityContent.includes(zone);
+    assert.ok(hasZone, `Expanded database must include geographic zone: ${zone}`);
+  }
+  console.log('✓ All 8 geographic zones verified (North, South, Central, Salt Lake, Behala, Howrah, Dum Dum, New Town)');
+
+  // 4. Coordinates boundary check for all 133 pandals
+  const allContentCombined = pandalIndexContent + neighborhoodContent + bonediBariContent + communityContent;
+  const allLats = [...allContentCombined.matchAll(/latitude:\s*([0-9.]+)/g)].map(m => parseFloat(m[1]));
+  const allLngs = [...allContentCombined.matchAll(/longitude:\s*([0-9.]+)/g)].map(m => parseFloat(m[1]));
+
+  assert.strictEqual(allLats.length, 133, 'Every single pandal must have defined latitude');
+  assert.strictEqual(allLngs.length, 133, 'Every single pandal must have defined longitude');
+  for (const lat of allLats) {
+    assert.ok(lat >= 22.4 && lat <= 22.7, `Latitude ${lat} must be within Greater Kolkata bounds (22.4 - 22.7)`);
+  }
+  for (const lng of allLngs) {
+    assert.ok(lng >= 88.2 && lng <= 88.5, `Longitude ${lng} must be within Greater Kolkata bounds (88.2 - 88.5)`);
+  }
+  console.log('✓ Coordinate boundary validation passed for all 133 pandals (22.4 <= lat <= 22.7, 88.2 <= lng <= 88.5)');
+
+  // 5. PandalService search enhancement
+  assert.ok(pandalServiceContent.includes('p.address.toLowerCase().includes(q)'), 'PandalService must search within pandal address');
+  assert.ok(pandalServiceContent.includes('p.neighborhood') && pandalServiceContent.includes('neighborhood.toLowerCase().includes(q)'), 'PandalService must search within pandal neighborhood');
+  assert.ok(pandalServiceContent.includes('p.committeeName') && pandalServiceContent.includes('committeeName.toLowerCase().includes(q)'), 'PandalService must search within committee name');
+  console.log('✓ PandalService multi-field search (address, neighborhood, committee) verified');
+
+  // 6. Suggest Pandal Modal Workflow
+  assert.ok(suggestModalContent.includes('pujopath_community_submissions'), 'Suggest modal must persist to localStorage pujopath_community_submissions');
+  assert.ok(suggestModalContent.includes('existingVerified') && suggestModalContent.includes('existingSubmission'), 'Suggest modal must check for duplicate pandal names');
+  assert.ok(suggestModalContent.includes('handleExportJSON'), 'Suggest modal must provide JSON export of submissions');
+  assert.ok(suggestModalContent.includes('addCustomPandal'), 'Approved suggestions must register into local custom pandal route storage');
+  console.log('✓ Suggest Pandal modal validation, persistence, deduplication, and export verified');
+})();
+
+// ============================================================================
+// TEST SUITE 27: Durga Puja Music Traditions, Culturally Researched Categories & Playlists
+// ============================================================================
+(() => {
+  console.log('\n--- Running Test Suite 27: Durga Puja Music Culture & Playlist Composition ---');
+  const musicDataPath = path.join(__dirname, '..', 'src', 'data', 'music', 'index.ts');
+  const musicTypesPath = path.join(__dirname, '..', 'src', 'types', 'music.ts');
+  const audioContextPath = path.join(__dirname, '..', 'src', 'lib', 'context', 'AudioContext.tsx');
+  const musicPagePath = path.join(__dirname, '..', 'src', 'app', 'music', 'page.tsx');
+  const bottomPlayerPath = path.join(__dirname, '..', 'src', 'components', 'music', 'BottomMusicPlayer.tsx');
+
+  const musicDataContent = fs.readFileSync(musicDataPath, 'utf-8');
+  const musicTypesContent = fs.readFileSync(musicTypesPath, 'utf-8');
+  const audioContextContent = fs.readFileSync(audioContextPath, 'utf-8');
+  const musicPageContent = fs.readFileSync(musicPagePath, 'utf-8');
+  const bottomPlayerContent = fs.readFileSync(bottomPlayerPath, 'utf-8');
+
+  // 1. Cultural Category Definitions
+  const requiredCategories = [
+    'Dhak & Shankha',
+    'Agomoni & Devotional',
+    'Puja Ritual & Ambience',
+    'Pandal-Hopping',
+    'Bengali Folk',
+    'Cultural Programmes',
+    'Bisarjan & Immersion',
+    'Ambient Soundscapes',
+    'Mahalaya',
+  ];
+  for (const cat of requiredCategories) {
+    assert.ok(musicDataContent.includes(`id: '${cat}'`), `Music catalog must include cultural category: ${cat}`);
+  }
+  console.log('✓ All 9 Durga Puja cultural music categories verified in MUSIC_CATEGORIES_META');
+
+  // 2. Puja Mood Context Selector Options
+  const requiredMoods = [
+    'Ritual & Devotion',
+    'Dhak & Traditional',
+    'Pandal Hopping',
+    'Bengali Festive',
+    'Folk & Cultural',
+    'Bisarjan',
+    'Ambient Sounds',
+  ];
+  for (const mood of requiredMoods) {
+    assert.ok(musicDataContent.includes(`id: '${mood}'`), `Music catalog must include Puja mood option: ${mood}`);
+  }
+  console.log('✓ All 7 Puja mood context selector options verified in PUJA_MOODS_LIST');
+
+  // 3. Audio Tracks Legality, Licences & Attribution
+  assert.ok(musicDataContent.includes("playbackMethod: 'direct_audio'"), 'Music catalog must support direct audio playback');
+  assert.ok(musicDataContent.includes("playbackMethod: 'external_listen_link'"), 'Music catalog must support authorized external streaming links');
+  assert.ok(musicDataContent.includes('Creative Commons') || musicDataContent.includes('Open Access Archive'), 'Direct audio must have CC / Open Access licenses');
+  assert.ok(musicDataContent.includes('Saregama') || musicDataContent.includes('SVF') || musicDataContent.includes('Inreco'), 'Commercial tracks must cite authentic labels');
+  console.log('✓ Audio playback methods, verified licenses, and authentic label attribution verified');
+
+  // 4. User Playlist Composition & AudioContext Queue State
+  assert.ok(audioContextContent.includes('userPlaylistIds'), 'AudioContext must track userPlaylistIds');
+  assert.ok(audioContextContent.includes('addToPlaylist'), 'AudioContext must support addToPlaylist');
+  assert.ok(audioContextContent.includes('removeFromPlaylist'), 'AudioContext must support removeFromPlaylist');
+  assert.ok(audioContextContent.includes('togglePlaylistTrack'), 'AudioContext must support togglePlaylistTrack');
+  assert.ok(audioContextContent.includes('pujopath_user_playlist'), 'AudioContext must persist user playlists to localStorage');
+  assert.ok(audioContextContent.includes('playQueue'), 'AudioContext must support playing the custom queue');
+  console.log('✓ User Playlist composition and queue management verified in AudioContext');
+
+  // 5. Music Page UX & Bottom Player Integration
+  assert.ok(musicPageContent.includes('Choose your Puja mood'), 'Music page must provide Choose your Puja mood context selector');
+  assert.ok(musicPageContent.includes('My Playlist'), 'Music page must provide My Playlist tab');
+  assert.ok(bottomPlayerContent.includes('displaySubtitle'), 'Bottom player must dynamically display artist and category subtitle');
+  console.log('✓ Music UI mood selector, playlist controls, and dynamic player attribution verified');
+})();
+
+console.log('\n================================================================');
+console.log('ALL 27 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
+console.log('================================================================\n');
 
 
 

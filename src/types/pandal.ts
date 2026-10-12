@@ -99,6 +99,21 @@ export interface Pandal {
   isUserAdded?: boolean;
   hasUnresolvedCoordinates?: boolean;
   addedAt?: string;
+  committeeName?: string;
+  committeeNameBn?: string;
+  neighborhood?: string;
+  neighborhoodBn?: string;
+  themeYear?: number;
+  sourceUrl?: string;
+  sourceName?: string;
+  verificationDate?: string;
+  coordinateConfidence?: 'High' | 'Approximate' | 'Needs verification';
+  verificationStatus?: 'Verified' | 'Partially verified' | 'Needs coordinate verification' | 'Historical listing' | 'Visitor access unconfirmed';
+  visitorAccessStatus?: string;
+  visitorAccessStatusBn?: string;
+  heritageClassification?: string;
+  isCommunitySubmitted?: boolean;
+  submittedBy?: string;
 }
 
 export interface FilterOptions {

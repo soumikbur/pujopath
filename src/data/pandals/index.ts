@@ -1,6 +1,7 @@
 import { Pandal } from '@/types';
 import { BONEDI_BARI_PANDALS } from './bonediBari';
 import { EXPANDED_COMMUNITY_PANDALS } from './communityPandals';
+import { NEIGHBORHOOD_PANDALS } from './neighborhoodPandals';
 
 export const FOUNDATION_PANDALS: Pandal[] = [
   {
@@ -1315,10 +1316,13 @@ export const FOUNDATION_PANDALS: Pandal[] = [
 
 export { BONEDI_BARI_PANDALS } from './bonediBari';
 export { EXPANDED_COMMUNITY_PANDALS } from './communityPandals';
+export { NEIGHBORHOOD_PANDALS } from './neighborhoodPandals';
 
 export const PANDALS_DATA: Pandal[] = [
   ...FOUNDATION_PANDALS,
   ...BONEDI_BARI_PANDALS,
   ...EXPANDED_COMMUNITY_PANDALS,
+  ...NEIGHBORHOOD_PANDALS,
 ];
+
 

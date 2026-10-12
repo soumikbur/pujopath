@@ -23,10 +23,19 @@ interface AudioContextType {
   setVolume: (vol: number) => void;
   setIsFullScreenOpen: (open: boolean) => void;
   addToQueue: (track: MusicTrack) => void;
+  removeFromQueue: (trackId: string) => void;
+  playQueue: (tracks: MusicTrack[]) => void;
+  userPlaylistIds: string[];
+  addToPlaylist: (trackId: string) => void;
+  removeFromPlaylist: (trackId: string) => void;
+  togglePlaylistTrack: (trackId: string) => void;
+  isInPlaylist: (trackId: string) => boolean;
   clearError: () => void;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
+
+const USER_PLAYLIST_STORAGE_KEY = 'pujopath_user_playlist';
 
 export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(PUJA_MUSIC_DATA[0]);
@@ -38,6 +47,20 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [volume, setVolumeState] = useState<number>(0.85);
   const [queue, setQueue] = useState<MusicTrack[]>(PUJA_MUSIC_DATA);
   const [isFullScreenOpen, setIsFullScreenOpen] = useState<boolean>(false);
+  const [userPlaylistIds, setUserPlaylistIds] = useState<string[]>([]);
+
+  // Hydrate user playlist from localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const stored = localStorage.getItem(USER_PLAYLIST_STORAGE_KEY);
+      if (stored) {
+        setUserPlaylistIds(JSON.parse(stored));
+      }
+    } catch {
+      // safe fallback
+    }
+  }, []);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -260,6 +283,53 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     setQueue((prev) => (prev.some((t) => t.id === track.id) ? prev : [...prev, track]));
   };
 
+  const removeFromQueue = (trackId: string) => {
+    setQueue((prev) => prev.filter((t) => t.id !== trackId));
+  };
+
+  const playQueue = (tracks: MusicTrack[]) => {
+    if (tracks.length === 0) return;
+    setQueue(tracks);
+    playTrackInternal(tracks[0]);
+  };
+
+  const addToPlaylist = (trackId: string) => {
+    setUserPlaylistIds((prev) => {
+      if (prev.includes(trackId)) return prev;
+      const updated = [...prev, trackId];
+      try {
+        localStorage.setItem(USER_PLAYLIST_STORAGE_KEY, JSON.stringify(updated));
+      } catch {
+        // safe
+      }
+      return updated;
+    });
+  };
+
+  const removeFromPlaylist = (trackId: string) => {
+    setUserPlaylistIds((prev) => {
+      const updated = prev.filter((id) => id !== trackId);
+      try {
+        localStorage.setItem(USER_PLAYLIST_STORAGE_KEY, JSON.stringify(updated));
+      } catch {
+        // safe
+      }
+      return updated;
+    });
+  };
+
+  const togglePlaylistTrack = (trackId: string) => {
+    if (userPlaylistIds.includes(trackId)) {
+      removeFromPlaylist(trackId);
+    } else {
+      addToPlaylist(trackId);
+    }
+  };
+
+  const isInPlaylist = (trackId: string) => {
+    return userPlaylistIds.includes(trackId);
+  };
+
   const clearError = () => {
     setPlaybackError(null);
   };
@@ -285,6 +355,13 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         setVolume,
         setIsFullScreenOpen,
         addToQueue,
+        removeFromQueue,
+        playQueue,
+        userPlaylistIds,
+        addToPlaylist,
+        removeFromPlaylist,
+        togglePlaylistTrack,
+        isInPlaylist,
         clearError,
       }}
     >

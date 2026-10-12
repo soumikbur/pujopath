@@ -53,8 +53,8 @@ export function BottomMusicPlayer() {
     ? currentTrack.titleBn || currentTrack.title
     : currentTrack.title;
   const displaySubtitle = isBn
-    ? 'ঐতিহ্যবাহী স্তোত্র ও চণ্ডীপাঠ'
-    : 'Traditional Stotram & Chandi Path';
+    ? currentTrack.artistBn || currentTrack.artist || 'শারদীয়া সুর ও চণ্ডীপাঠ'
+    : currentTrack.artist || 'Traditional Soundscape';
 
   return (
     <>
