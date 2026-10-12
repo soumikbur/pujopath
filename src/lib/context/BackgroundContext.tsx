@@ -9,11 +9,13 @@ import React, {
   useCallback,
   useMemo,
 } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   GHIBLI_BACKGROUNDS,
   BACKGROUND_SETTINGS,
   GhibliBackground,
   getNextRandomIndex,
+  isHomepageRoute,
 } from '@/data/config/backgroundConfig';
 import { getAssetPath } from '@/lib/utils/asset';
 
@@ -26,11 +28,15 @@ interface BackgroundContextValue {
   nextBackground: () => void;
   prefersReducedMotion: boolean;
   currentIndex: number;
+  isHomepage: boolean;
 }
 
 const BackgroundContext = createContext<BackgroundContextValue | null>(null);
 
 export function BackgroundProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isHomepage = isHomepageRoute(pathname);
+
   // Initial state uses index 0 for SSR consistency, then randomizes on client mount
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [incomingIndex, setIncomingIndex] = useState<number | null>(null);
@@ -76,10 +82,10 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
     };
   }, []);
 
-  // 2. Perform smooth transition to next background
+  // 2. Perform smooth transition to next background (only active on homepage)
   const triggerTransitionTo = useCallback(
     (targetIndex: number) => {
-      if (targetIndex === currentIndex || isTransitioning) return;
+      if (!isHomepage || targetIndex === currentIndex || isTransitioning) return;
 
       const targetBg = GHIBLI_BACKGROUNDS[targetIndex];
       if (!targetBg) return;
@@ -120,24 +126,25 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
         };
       }
     },
-    [currentIndex, isTransitioning]
+    [currentIndex, isHomepage, isTransitioning]
   );
 
   // 3. Step forward manually
   const nextBackground = useCallback(() => {
+    if (!isHomepage) return;
     const nextIdx = getNextRandomIndex(currentIndex);
     triggerTransitionTo(nextIdx);
-  }, [currentIndex, triggerTransitionTo]);
+  }, [currentIndex, isHomepage, triggerTransitionTo]);
 
   // 4. Toggle pause
   const togglePause = useCallback(() => {
     setIsPaused((prev) => !prev);
   }, []);
 
-  // 5. Automatic interval timer rotation (28 seconds)
+  // 5. Automatic interval timer rotation (28 seconds, homepage only)
   useEffect(() => {
-    // If paused, reduced-motion active, or transitioning, clear timer
-    if (isPaused || prefersReducedMotion) {
+    // If not on homepage, paused, reduced-motion active, or transitioning, clear timer
+    if (!isHomepage || isPaused || prefersReducedMotion) {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -161,7 +168,7 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
         transitionTimerRef.current = null;
       }
     };
-  }, [currentIndex, isPaused, prefersReducedMotion, triggerTransitionTo]);
+  }, [currentIndex, isHomepage, isPaused, prefersReducedMotion, triggerTransitionTo]);
 
   const value = useMemo<BackgroundContextValue>(() => {
     return {
@@ -173,6 +180,7 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
       nextBackground,
       prefersReducedMotion,
       currentIndex,
+      isHomepage,
     };
   }, [
     currentIndex,
@@ -182,6 +190,7 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
     togglePause,
     nextBackground,
     prefersReducedMotion,
+    isHomepage,
   ]);
 
   return <BackgroundContext.Provider value={value}>{children}</BackgroundContext.Provider>;

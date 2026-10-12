@@ -9,7 +9,7 @@ import { Pause, Play } from 'lucide-react';
 export function Footer() {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
-  const { currentBackground, isPaused, togglePause, prefersReducedMotion } = useBackground();
+  const { currentBackground, isPaused, togglePause, prefersReducedMotion, isHomepage } = useBackground();
 
   return (
     <footer className="mt-auto w-full border-t border-[#eee8e1] dark:border-[#2a221b] bg-white/60 dark:bg-[#181411]/60 backdrop-blur-md">
@@ -60,33 +60,37 @@ export function Footer() {
         <div className="mt-5 pt-4 border-t border-[#f0eae2] dark:border-[#251e18] flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs text-[#776d65] dark:text-[#a89e95]">
           <div className="order-3 sm:order-1 flex flex-wrap items-center justify-center sm:justify-start gap-2 text-[11px] text-[#9c9187] dark:text-[#73685f]">
             <span>© {new Date().getFullYear()} PujoPath. {isBn ? 'সর্বস্বত্ব সংরক্ষিত।' : 'All rights reserved.'}</span>
-            <span className="hidden sm:inline">•</span>
-            {/* Subtle Ghibli Artwork Scene Badge & Pause Control */}
-            <div className="inline-flex items-center gap-1.5 text-[10px] text-[#80756a] dark:text-[#8a7f74]">
-              <span className="opacity-80">
-                🎨 {isBn ? currentBackground?.titleBn : currentBackground?.titleEn}
-              </span>
-              {!prefersReducedMotion && (
-                <button
-                  type="button"
-                  onClick={togglePause}
-                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#f2ece4] dark:bg-[#231b15] hover:text-[#b42323] dark:hover:text-[#e05656] transition-colors"
-                  title={
-                    isPaused
-                      ? isBn
-                        ? 'ব্যাকগ্রাউন্ড পরিবর্তন চালু করুন'
-                        : 'Resume background rotation'
-                      : isBn
-                      ? 'ব্যাকগ্রাউন্ড পরিবর্তন স্থগিত করুন'
-                      : 'Pause background rotation'
-                  }
-                  aria-label={isPaused ? 'Resume background rotation' : 'Pause background rotation'}
-                >
-                  {isPaused ? <Play className="w-2.5 h-2.5" /> : <Pause className="w-2.5 h-2.5" />}
-                  <span>{isPaused ? (isBn ? 'চালু' : 'Resume') : (isBn ? 'স্থগিত' : 'Pause')}</span>
-                </button>
-              )}
-            </div>
+            {isHomepage && (
+              <>
+                <span className="hidden sm:inline">•</span>
+                {/* Subtle Ghibli Artwork Scene Badge & Pause Control (Homepage Only) */}
+                <div className="inline-flex items-center gap-1.5 text-[10px] text-[#80756a] dark:text-[#8a7f74]">
+                  <span className="opacity-80">
+                    🎨 {isBn ? currentBackground?.titleBn : currentBackground?.titleEn}
+                  </span>
+                  {!prefersReducedMotion && (
+                    <button
+                      type="button"
+                      onClick={togglePause}
+                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#f2ece4] dark:bg-[#231b15] hover:text-[#b42323] dark:hover:text-[#e05656] transition-colors"
+                      title={
+                        isPaused
+                          ? isBn
+                            ? 'ব্যাকগ্রাউন্ড পরিবর্তন চালু করুন'
+                            : 'Resume background rotation'
+                          : isBn
+                          ? 'ব্যাকগ্রাউন্ড পরিবর্তন স্থগিত করুন'
+                          : 'Pause background rotation'
+                      }
+                      aria-label={isPaused ? 'Resume background rotation' : 'Pause background rotation'}
+                    >
+                      {isPaused ? <Play className="w-2.5 h-2.5" /> : <Pause className="w-2.5 h-2.5" />}
+                      <span>{isPaused ? (isBn ? 'চালু' : 'Resume') : (isBn ? 'স্থগিত' : 'Pause')}</span>
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
           </div>
 
           <div

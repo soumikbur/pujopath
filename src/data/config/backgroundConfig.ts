@@ -97,10 +97,28 @@ export interface BackgroundRotationSettings {
 export const BACKGROUND_SETTINGS: BackgroundRotationSettings = {
   intervalMs: 28000,          // 28 seconds
   transitionDurationMs: 2000,  // 2.0 seconds smooth crossfade
-  lightModeOpacity: 0.32,      // 32% opacity ensures artwork is visibly recognizable in light mode
-  darkModeOpacity: 0.38,       // 38% opacity provides warm glowing festive night in dark mode
+  lightModeOpacity: 0.18,      // 18% opacity ensures artwork is understated & text is immediately readable
+  darkModeOpacity: 0.22,       // 22% opacity provides soft warm glowing festive atmosphere without competing with text
   blurPx: 0,
 };
+
+/**
+ * Reliably identifies if the current pathname corresponds to the homepage.
+ * Normalizes trailing slashes, Next.js basePath (/pujopath), query params, and hashes.
+ * Ensures non-homepage routes (e.g. /map, /planner, /explore, /pandals/...) never show background images.
+ */
+export function isHomepageRoute(pathname?: string | null): boolean {
+  if (!pathname) return true;
+  const clean = pathname.split('?')[0].split('#')[0].trim();
+  const normalized = clean.replace(/\/+$/, '') || '/';
+  return (
+    normalized === '/' ||
+    normalized === '' ||
+    normalized === '/pujopath' ||
+    normalized === '/index.html' ||
+    normalized === '/pujopath/index.html'
+  );
+}
 
 /**
  * Returns a truly random background index that is guaranteed
@@ -114,3 +132,4 @@ export function getNextRandomIndex(currentIndex: number, total: number = GHIBLI_
   }
   return next;
 }
+

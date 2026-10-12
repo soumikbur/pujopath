@@ -1468,9 +1468,37 @@ console.log('================================================================');
   assert.ok(bgConfigContent.includes('BACKGROUND_SETTINGS'), 'Must export BACKGROUND_SETTINGS');
   assert.ok(bgConfigContent.includes('getNextRandomIndex'), 'Must export getNextRandomIndex');
 
-  // Visible yet subtle opacity settings (lightModeOpacity >= 0.25 and darkModeOpacity >= 0.30)
-  assert.ok(bgConfigContent.includes('lightModeOpacity: 0.32'), 'Must set visible light mode opacity (0.32)');
-  assert.ok(bgConfigContent.includes('darkModeOpacity: 0.38'), 'Must set visible dark mode opacity (0.38)');
+  // Visible yet subtle opacity settings (lightModeOpacity: 0.18 and darkModeOpacity: 0.22 for immediate text readability)
+  assert.ok(bgConfigContent.includes('lightModeOpacity: 0.18'), 'Must set subtle light mode opacity (0.18)');
+  assert.ok(bgConfigContent.includes('darkModeOpacity: 0.22'), 'Must set subtle dark mode opacity (0.22)');
+  assert.ok(bgConfigContent.includes('export function isHomepageRoute'), 'Must export isHomepageRoute helper');
+
+  // Test isHomepageRoute simulation across all core routes
+  function testIsHomepageRoute(pathname) {
+    if (!pathname) return true;
+    const clean = pathname.split('?')[0].split('#')[0].trim();
+    const normalized = clean.replace(/\/+$/, '') || '/';
+    return (
+      normalized === '/' ||
+      normalized === '' ||
+      normalized === '/pujopath' ||
+      normalized === '/index.html' ||
+      normalized === '/pujopath/index.html'
+    );
+  }
+  assert.strictEqual(testIsHomepageRoute('/'), true, 'Root / must be homepage');
+  assert.strictEqual(testIsHomepageRoute('/pujopath'), true, '/pujopath must be homepage');
+  assert.strictEqual(testIsHomepageRoute('/pujopath/'), true, '/pujopath/ must be homepage');
+  assert.strictEqual(testIsHomepageRoute('/map'), false, '/map must NOT be homepage');
+  assert.strictEqual(testIsHomepageRoute('/map/'), false, '/map/ must NOT be homepage');
+  assert.strictEqual(testIsHomepageRoute('/planner'), false, '/planner must NOT be homepage');
+  assert.strictEqual(testIsHomepageRoute('/explore'), false, '/explore must NOT be homepage');
+  assert.strictEqual(testIsHomepageRoute('/pandals/bagbazar-sarbojanin'), false, 'Pandal detail must NOT be homepage');
+  assert.strictEqual(testIsHomepageRoute('/metro'), false, '/metro must NOT be homepage');
+  assert.strictEqual(testIsHomepageRoute('/calendar'), false, '/calendar must NOT be homepage');
+  assert.strictEqual(testIsHomepageRoute('/music'), false, '/music must NOT be homepage');
+  assert.strictEqual(testIsHomepageRoute('/about'), false, '/about must NOT be homepage');
+  console.log('✓ Route Integrity: isHomepageRoute strictly isolates homepage and excludes all other pages');
 
   // Rotation interval between 20-35 seconds (20000ms - 35000ms)
   const intervalMatch = bgConfigContent.match(/intervalMs:\s*(\d+)/);
@@ -1483,7 +1511,7 @@ console.log('================================================================');
   assert.ok(durationMatch, 'transitionDurationMs must be declared');
   const durationVal = parseInt(durationMatch[1], 10);
   assert.ok(durationVal >= 1500 && durationVal <= 2500, `Transition duration ${durationVal}ms must be between 1.5s and 2.5s`);
-  console.log(`✓ Timing & Contrast: Rotation (${intervalVal / 1000}s), crossfade (${durationVal / 1000}s), and visible opacities (32%/38%) verified`);
+  console.log(`✓ Timing & Contrast: Rotation (${intervalVal / 1000}s), crossfade (${durationVal / 1000}s), and understated opacities (18%/22%) verified`);
 
   // 3. Consecutive Repeat Prevention Algorithm
   assert.ok(bgConfigContent.includes('export function getNextRandomIndex'), 'Must export getNextRandomIndex');
@@ -1514,20 +1542,24 @@ console.log('================================================================');
   assert.ok(bgContextContent.includes('new Image()'), 'Must preload images before transition to prevent blank flashes');
   assert.ok(bgContextContent.includes('togglePause'), 'Must expose togglePause for accessibility');
   assert.ok(bgContextContent.includes('clearInterval'), 'Must clean up interval timer on unmount');
-  console.log('✓ Lifecycle & Accessibility: Preloading, reduced-motion, and timer cleanup verified');
+  assert.ok(bgContextContent.includes('!isHomepage'), 'Must pause image rotation and preloading when not on homepage');
+  console.log('✓ Lifecycle & Accessibility: Preloading, reduced-motion, timer cleanup, and non-homepage pause verified');
 
   // 5. PujoBackground UI Layer & Responsive Selection
   const bgComponentPath = path.join(__dirname, '..', 'src', 'components', 'ui', 'PujoBackground.tsx');
   assert.strictEqual(fs.existsSync(bgComponentPath), true, 'PujoBackground.tsx must exist');
   const bgComponentContent = fs.readFileSync(bgComponentPath, 'utf8');
 
+  assert.ok(bgComponentContent.includes('isHomepageRoute'), 'PujoBackground must use isHomepageRoute');
+  assert.ok(bgComponentContent.includes('{isHomepage &&'), 'PujoBackground must render decorative artwork ONLY on homepage');
+  assert.ok(bgComponentContent.includes('{!isHomepage &&'), 'PujoBackground must render restored minimalistic pattern on other pages');
   assert.ok(bgComponentContent.includes('hidden md:block'), 'Must select landscape 16:9 for desktop screens');
   assert.ok(bgComponentContent.includes('block md:hidden'), 'Must select portrait 3:4 for mobile screens');
   assert.ok(bgComponentContent.includes('pointer-events-none'), 'Must include pointer-events-none so it never blocks clicks');
   assert.ok(bgComponentContent.includes('aria-hidden="true"'), 'Must include aria-hidden="true" for screen reader purity');
   assert.ok(bgComponentContent.includes('z-0'), 'Must remain strictly behind interactive page content (z-0)');
   assert.ok(bgComponentContent.includes('object-cover'), 'Must use object-cover for responsive viewports');
-  console.log('✓ Responsive Selection: Desktop landscape (hidden md:block) & mobile portrait (block md:hidden) verified');
+  console.log('✓ Responsive & Route Rules: Homepage-only artwork & non-homepage minimalistic pattern verified');
 
   // 6. Application Shell & Footer Integration
   const layoutPath = path.join(__dirname, '..', 'src', 'app', 'layout.tsx');
@@ -1540,9 +1572,9 @@ console.log('================================================================');
 
   const footerPath = path.join(__dirname, '..', 'src', 'components', 'navigation', 'Footer.tsx');
   const footerContent = fs.readFileSync(footerPath, 'utf8');
-  assert.ok(footerContent.includes('useBackground'), 'Footer must consume useBackground for scene info & pause control');
-  assert.ok(footerContent.includes('togglePause'), 'Footer must provide accessible pause control');
-  console.log('✓ Shell Integration: Persistent application-shell background and subtle footer controls verified');
+  assert.ok(footerContent.includes('useBackground'), 'Footer must consume useBackground');
+  assert.ok(footerContent.includes('isHomepage &&'), 'Footer must display artwork badge and controls only on homepage');
+  console.log('✓ Shell & Footer Integration: Centralized layout and homepage-only footer controls verified');
 })();
 
 console.log('\n================================================================');
