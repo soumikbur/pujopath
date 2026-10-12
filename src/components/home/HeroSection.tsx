@@ -20,16 +20,16 @@ export function HeroSection() {
   const days = isBn ? toBengaliDigits(countdown.days) : countdown.days;
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-[#eee8e1]/90 dark:border-[#2f2720]/90 bg-white/85 dark:bg-[#1a1613]/85 backdrop-blur-md p-5 sm:p-10 shadow-xs transition-colors duration-200">
+    <section className="relative overflow-hidden rounded-3xl border border-[#eee8e1]/95 dark:border-[#2f2720]/95 bg-white/90 dark:bg-[#1a1613]/90 backdrop-blur-md p-6 sm:p-10 shadow-sm transition-colors duration-200">
       <div className="max-w-2xl relative z-10">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#f9e9e7]/90 dark:bg-[#341b18]/90 px-3.5 py-1.5 text-xs font-bold text-[#b42323] shadow-xs">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#f5c6c2]/60 dark:border-[#4d221e]/60 bg-[#fbe8e6] dark:bg-[#341b18] px-3.5 py-1.5 text-xs font-bold text-[#a61c1c] dark:text-[#ff8787] shadow-xs">
           <CalendarDays className="h-4 w-4" />
           {countdown.isLive ? (isBn ? 'পুজো চলছে' : 'Puja is live') : (isBn ? `${days} দিন বাকি` : `${days} days to Puja`)}
         </div>
-        <h1 className="text-2xl font-black tracking-tight text-[#242424] dark:text-[#ede5dc] sm:text-5xl leading-tight">
+        <h1 className="text-2xl font-black tracking-tight text-[#1a1715] dark:text-[#faf6f0] sm:text-5xl leading-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.7)] dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
           {isBn ? 'আপনার পুজো, সহজভাবে।' : 'Your Puja, made simple.'}
         </h1>
-        <p className="mt-3 max-w-xl text-sm leading-6 sm:leading-7 text-[#665a54] dark:text-[#a89e95] sm:text-lg">
+        <p className="mt-3.5 max-w-xl text-sm leading-6 sm:leading-7 text-[#4a4039] dark:text-[#cdc1b5] font-medium sm:text-lg">
           {isBn ? 'পছন্দের প্যান্ডেল খুঁজুন, রুট বানান, আর নিশ্চিন্তে বেরিয়ে পড়ুন।' : 'Find the pandals you love, build a route, and head out with confidence.'}
         </p>
         <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -43,7 +43,7 @@ export function HeroSection() {
           </Link>
           <Link
             href="/planner"
-            className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-[#ded6ce] dark:border-[#383129] bg-white/90 dark:bg-[#1a1613]/90 px-5 py-3 text-sm font-bold text-[#3f3833] dark:text-[#ede5dc] transition-all duration-150 hover:bg-[#f7f3ee] dark:hover:bg-[#241f1a] active:scale-95 shadow-xs"
+            className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-[#d2c7bc] dark:border-[#3c342c] bg-white/95 dark:bg-[#201b17]/95 px-5 py-3 text-sm font-bold text-[#1c1917] dark:text-[#faf6f0] transition-all duration-150 hover:bg-[#f7f2ec] dark:hover:bg-[#28221c] active:scale-95 shadow-xs"
           >
             <Navigation className="h-4 w-4 text-[#b42323]" />
             <span>{isBn ? 'রুট তৈরি করুন' : 'Build a route'}</span>

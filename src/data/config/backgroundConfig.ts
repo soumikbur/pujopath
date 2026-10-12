@@ -97,8 +97,8 @@ export interface BackgroundRotationSettings {
 export const BACKGROUND_SETTINGS: BackgroundRotationSettings = {
   intervalMs: 28000,          // 28 seconds
   transitionDurationMs: 2000,  // 2.0 seconds smooth crossfade
-  lightModeOpacity: 0.18,      // 18% opacity ensures artwork is understated & text is immediately readable
-  darkModeOpacity: 0.22,       // 22% opacity provides soft warm glowing festive atmosphere without competing with text
+  lightModeOpacity: 0.32,      // Restored original visible opacity (32%) for vibrant atmospheric light mode
+  darkModeOpacity: 0.38,       // Restored original visible opacity (38%) for glowing festive night dark mode
   blurPx: 0,
 };
 

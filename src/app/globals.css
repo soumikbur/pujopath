@@ -164,6 +164,65 @@
   scrollbar-width: none;
 }
 
+/* Subtle Bengali Alpana & Geometric Background Animations */
+@keyframes alpanaRotateSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes alpanaRotateReverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes alpanaDrift {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(6px, -12px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes alpanaPulse {
+  0%, 100% {
+    opacity: 0.03;
+  }
+  50% {
+    opacity: 0.055;
+  }
+}
+
+.animate-alpana-spin {
+  animation: alpanaRotateSlow 75s linear infinite;
+  transform-origin: center;
+}
+
+.animate-alpana-spin-reverse {
+  animation: alpanaRotateReverse 90s linear infinite;
+  transform-origin: center;
+}
+
+.animate-alpana-drift {
+  animation: alpanaDrift 28s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.animate-alpana-pulse {
+  animation: alpanaPulse 18s ease-in-out infinite;
+}
+
 /* Respect user's motion preference */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -174,4 +233,11 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  .animate-alpana-spin,
+  .animate-alpana-spin-reverse,
+  .animate-alpana-drift,
+  .animate-alpana-pulse {
+    animation: none !important;
+  }
 }
+

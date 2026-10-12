@@ -1468,9 +1468,9 @@ console.log('================================================================');
   assert.ok(bgConfigContent.includes('BACKGROUND_SETTINGS'), 'Must export BACKGROUND_SETTINGS');
   assert.ok(bgConfigContent.includes('getNextRandomIndex'), 'Must export getNextRandomIndex');
 
-  // Visible yet subtle opacity settings (lightModeOpacity: 0.18 and darkModeOpacity: 0.22 for immediate text readability)
-  assert.ok(bgConfigContent.includes('lightModeOpacity: 0.18'), 'Must set subtle light mode opacity (0.18)');
-  assert.ok(bgConfigContent.includes('darkModeOpacity: 0.22'), 'Must set subtle dark mode opacity (0.22)');
+  // Visible yet subtle opacity settings restored to original values (0.32 light mode and 0.38 dark mode)
+  assert.ok(bgConfigContent.includes('lightModeOpacity: 0.32'), 'Must set original visible light mode opacity (0.32)');
+  assert.ok(bgConfigContent.includes('darkModeOpacity: 0.38'), 'Must set original visible dark mode opacity (0.38)');
   assert.ok(bgConfigContent.includes('export function isHomepageRoute'), 'Must export isHomepageRoute helper');
 
   // Test isHomepageRoute simulation across all core routes
@@ -1511,7 +1511,7 @@ console.log('================================================================');
   assert.ok(durationMatch, 'transitionDurationMs must be declared');
   const durationVal = parseInt(durationMatch[1], 10);
   assert.ok(durationVal >= 1500 && durationVal <= 2500, `Transition duration ${durationVal}ms must be between 1.5s and 2.5s`);
-  console.log(`✓ Timing & Contrast: Rotation (${intervalVal / 1000}s), crossfade (${durationVal / 1000}s), and understated opacities (18%/22%) verified`);
+  console.log(`✓ Timing & Contrast: Rotation (${intervalVal / 1000}s), crossfade (${durationVal / 1000}s), and restored original opacities (32%/38%) verified`);
 
   // 3. Consecutive Repeat Prevention Algorithm
   assert.ok(bgConfigContent.includes('export function getNextRandomIndex'), 'Must export getNextRandomIndex');
@@ -1553,13 +1553,17 @@ console.log('================================================================');
   assert.ok(bgComponentContent.includes('isHomepageRoute'), 'PujoBackground must use isHomepageRoute');
   assert.ok(bgComponentContent.includes('{isHomepage &&'), 'PujoBackground must render decorative artwork ONLY on homepage');
   assert.ok(bgComponentContent.includes('{!isHomepage &&'), 'PujoBackground must render restored minimalistic pattern on other pages');
+  assert.ok(bgComponentContent.includes('animate-alpana-spin'), 'PujoBackground must animate top-left alpana rotation');
+  assert.ok(bgComponentContent.includes('animate-alpana-spin-reverse'), 'PujoBackground must animate top-right mandala reverse rotation');
+  assert.ok(bgComponentContent.includes('animate-alpana-drift'), 'PujoBackground must animate kash flower drift');
+  assert.ok(bgComponentContent.includes('animate-alpana-pulse'), 'PujoBackground must animate bottom border pulse');
   assert.ok(bgComponentContent.includes('hidden md:block'), 'Must select landscape 16:9 for desktop screens');
   assert.ok(bgComponentContent.includes('block md:hidden'), 'Must select portrait 3:4 for mobile screens');
   assert.ok(bgComponentContent.includes('pointer-events-none'), 'Must include pointer-events-none so it never blocks clicks');
   assert.ok(bgComponentContent.includes('aria-hidden="true"'), 'Must include aria-hidden="true" for screen reader purity');
   assert.ok(bgComponentContent.includes('z-0'), 'Must remain strictly behind interactive page content (z-0)');
   assert.ok(bgComponentContent.includes('object-cover'), 'Must use object-cover for responsive viewports');
-  console.log('✓ Responsive & Route Rules: Homepage-only artwork & non-homepage minimalistic pattern verified');
+  console.log('✓ Responsive & Route Rules: Homepage-only artwork & animated non-homepage alpana patterns verified');
 
   // 6. Application Shell & Footer Integration
   const layoutPath = path.join(__dirname, '..', 'src', 'app', 'layout.tsx');

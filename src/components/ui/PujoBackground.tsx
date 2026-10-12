@@ -12,19 +12,22 @@ import { BACKGROUND_SETTINGS, isHomepageRoute } from '@/data/config/backgroundCo
  *
  * RULES:
  * 1. HOMEPAGE:
- *    Displays subtle, understated Ghibli-inspired Durga Puja illustrations
- *    (16:9 Landscape on desktop, 3:4 Portrait on mobile) with soft radial vignette
- *    framing to keep text and interactive controls immediately readable.
+ *    Restores the original, vibrant Ghibli-inspired Durga Puja illustrations
+ *    (16:9 Landscape on desktop, 3:4 Portrait on mobile) with original visual intensity
+ *    (30-36% desktop, 32-38% mobile opacity) and soft radial framing vignette so the
+ *    artwork is clearly visible and atmospheric.
  *
  * 2. ALL NON-HOMEPAGE PAGES (/map, /planner, /explore, /pandals/[slug], /calendar, /metro, etc.):
- *    Strictly NO photographic or illustrative background images. Restores the clean,
+ *    Strictly NO photographic or illustrative background images. Displays the clean,
  *    minimalistic Bengali cultural background featuring base ambient warmth, sacred
- *    alpana line art, autumn kash flower curves, and geometric border accents.
+ *    alpana line art with slow, elegant background animations (slow 75-90s rotation,
+ *    subtle drift, and gentle pulsing) that stay decorative and non-intrusive.
  */
 export function PujoBackground() {
   const pathname = usePathname();
   const isHomepage = isHomepageRoute(pathname);
-  const { currentBackground, incomingBackground, isTransitioning } = useBackground();
+  const { currentBackground, incomingBackground, isTransitioning, prefersReducedMotion } =
+    useBackground();
 
   // Current assets (resolved ONLY when on homepage)
   const currentLandscape = isHomepage
@@ -44,17 +47,20 @@ export function PujoBackground() {
       ? getAssetPath(incomingBackground.srcPortrait || incomingBackground.src)
       : null;
 
+  // Non-homepage subtle animation flag (disabled if reduced motion preferred)
+  const shouldAnimateAlpana = !isHomepage && !prefersReducedMotion;
+
   return (
     <div
       aria-hidden="true"
       className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none transition-colors duration-500"
     >
       {/* ============================================================== */}
-      {/* 1. HOMEPAGE-ONLY: Subtle Ghibli-Inspired Atmospheric Artwork   */}
+      {/* 1. HOMEPAGE-ONLY: Original Visible Ghibli Durga Puja Artwork   */}
       {/* ============================================================== */}
       {isHomepage && (
         <>
-          {/* Current Illustration Layer */}
+          {/* Current Illustration Layer (Original Opacity Restored) */}
           <div
             className="absolute inset-0 transition-opacity ease-in-out"
             style={{
@@ -72,7 +78,7 @@ export function PujoBackground() {
                   priority
                   unoptimized
                   sizes="100vw"
-                  className="object-cover object-center opacity-[0.18] dark:opacity-[0.22] transition-opacity duration-500"
+                  className="object-cover object-center opacity-[0.30] dark:opacity-[0.36] transition-opacity duration-500"
                 />
               </div>
             )}
@@ -87,7 +93,7 @@ export function PujoBackground() {
                   priority
                   unoptimized
                   sizes="100vw"
-                  className="object-cover object-top opacity-[0.19] dark:opacity-[0.23] transition-opacity duration-500"
+                  className="object-cover object-top opacity-[0.32] dark:opacity-[0.38] transition-opacity duration-500"
                 />
               </div>
             )}
@@ -111,7 +117,7 @@ export function PujoBackground() {
                     fill
                     unoptimized
                     sizes="100vw"
-                    className="object-cover object-center opacity-[0.18] dark:opacity-[0.22] transition-opacity duration-500"
+                    className="object-cover object-center opacity-[0.30] dark:opacity-[0.36] transition-opacity duration-500"
                   />
                 </div>
               )}
@@ -125,28 +131,28 @@ export function PujoBackground() {
                     fill
                     unoptimized
                     sizes="100vw"
-                    className="object-cover object-top opacity-[0.19] dark:opacity-[0.23] transition-opacity duration-500"
+                    className="object-cover object-top opacity-[0.32] dark:opacity-[0.38] transition-opacity duration-500"
                   />
                 </div>
               )}
             </div>
           )}
 
-          {/* Soft Radial Vignette Framing (Light Mode, Homepage) */}
+          {/* Soft Radial Vignette Framing (Light Mode, Homepage - Restored Original) */}
           <div
             className="absolute inset-0 dark:opacity-0 transition-opacity duration-500"
             style={{
               background:
-                'radial-gradient(ellipse 95% 70% at 50% 25%, rgba(254, 248, 240, 0.40) 0%, rgba(252, 250, 247, 0.72) 55%, rgba(252, 250, 247, 0.92) 100%)',
+                'radial-gradient(ellipse 95% 70% at 50% 25%, rgba(254, 248, 240, 0.22) 0%, rgba(252, 250, 247, 0.55) 55%, rgba(252, 250, 247, 0.85) 100%)',
             }}
           />
 
-          {/* Soft Radial Vignette Framing (Dark Mode, Homepage) */}
+          {/* Soft Radial Vignette Framing (Dark Mode, Homepage - Restored Original) */}
           <div
             className="absolute inset-0 opacity-0 dark:opacity-100 transition-opacity duration-500"
             style={{
               background:
-                'radial-gradient(ellipse 95% 70% at 50% 25%, rgba(20, 17, 14, 0.35) 0%, rgba(20, 17, 14, 0.70) 55%, rgba(20, 17, 14, 0.92) 100%)',
+                'radial-gradient(ellipse 95% 70% at 50% 25%, rgba(20, 17, 14, 0.2) 0%, rgba(20, 17, 14, 0.58) 55%, rgba(20, 17, 14, 0.88) 100%)',
             }}
           />
         </>
@@ -179,10 +185,13 @@ export function PujoBackground() {
 
       {/* ============================================================== */}
       {/* 3. SITE-WIDE: Subtle Cultural Bengali Alpana & Geometric Art   */}
+      {/*    (Gently animated on non-homepage pages, static on home)     */}
       {/* ============================================================== */}
-      {/* Top-Left Traditional Alpana Motif (Subtle sacred concentric petals & rays) */}
+      {/* Top-Left Sacred Alpana Motif (Subtle slow 75s rotation on non-homepage) */}
       <svg
-        className="absolute -top-16 -left-16 w-80 h-80 sm:w-96 sm:h-96 text-[#B42323] opacity-[0.038] dark:opacity-[0.05] transition-opacity duration-300"
+        className={`absolute -top-16 -left-16 w-80 h-80 sm:w-96 sm:h-96 text-[#B42323] opacity-[0.038] dark:opacity-[0.05] transition-opacity duration-300 ${
+          shouldAnimateAlpana ? 'animate-alpana-spin' : ''
+        }`}
         viewBox="0 0 200 200"
         fill="none"
         stroke="currentColor"
@@ -213,9 +222,11 @@ export function PujoBackground() {
         ))}
       </svg>
 
-      {/* Top-Right Traditional Alpana Motif (Mirrored mandala accent) */}
+      {/* Top-Right Mirrored Mandala Accent (Subtle slow 90s reverse rotation on non-homepage) */}
       <svg
-        className="absolute -top-20 -right-20 w-88 h-88 sm:w-[420px] sm:h-[420px] text-[#B42323] opacity-[0.035] dark:opacity-[0.05] transition-opacity duration-300"
+        className={`absolute -top-20 -right-20 w-88 h-88 sm:w-[420px] sm:h-[420px] text-[#B42323] opacity-[0.035] dark:opacity-[0.05] transition-opacity duration-300 ${
+          shouldAnimateAlpana ? 'animate-alpana-spin-reverse' : ''
+        }`}
         viewBox="0 0 200 200"
         fill="none"
         stroke="currentColor"
@@ -234,9 +245,11 @@ export function PujoBackground() {
         ))}
       </svg>
 
-      {/* Autumn Kash Flower (কাশফুল) Graceful Swirl Accent — Center-Right */}
+      {/* Autumn Kash Flower (কাশফুল) Graceful Swirl Accent (Subtle drifting movement on non-homepage) */}
       <svg
-        className="hidden md:block absolute top-1/3 -right-12 w-64 h-96 text-[#B42323] opacity-[0.025] dark:opacity-[0.04]"
+        className={`hidden md:block absolute top-1/3 -right-12 w-64 h-96 text-[#B42323] opacity-[0.025] dark:opacity-[0.04] ${
+          shouldAnimateAlpana ? 'animate-alpana-drift' : ''
+        }`}
         viewBox="0 0 100 200"
         fill="none"
         stroke="currentColor"
@@ -249,9 +262,11 @@ export function PujoBackground() {
         <path d="M18,150 C34,142 50,146 58,138" />
       </svg>
 
-      {/* Bottom Delicate Geometric Border Accent */}
+      {/* Bottom Delicate Geometric Border Accent (Subtle gentle pulsing on non-homepage) */}
       <svg
-        className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-[700px] h-36 text-[#B42323] opacity-[0.03] dark:opacity-[0.04]"
+        className={`absolute -bottom-16 left-1/2 -translate-x-1/2 w-[700px] h-36 text-[#B42323] opacity-[0.03] dark:opacity-[0.04] ${
+          shouldAnimateAlpana ? 'animate-alpana-pulse' : ''
+        }`}
         viewBox="0 0 600 80"
         fill="none"
         stroke="currentColor"
