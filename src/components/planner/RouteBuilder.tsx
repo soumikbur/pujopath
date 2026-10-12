@@ -19,6 +19,7 @@ import {
   Layers,
   Smartphone,
   Info,
+  Plus,
 } from 'lucide-react';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
@@ -36,6 +37,7 @@ import {
   isValidCoordinate,
 } from '@/lib/maps/navigationUrl';
 import { AnimatedSegmentedControl } from '@/components/ui/AnimatedSegmentedControl';
+import { AddCustomPandalModal } from '@/components/planner/AddCustomPandalModal';
 import { cn } from '@/lib/utils/cn';
 
 export function RouteBuilder() {
@@ -44,9 +46,11 @@ export function RouteBuilder() {
     removePandalFromRoute,
     moveRouteStop,
     optimizeCurrentRoute,
+    lastOptimizationResult,
     clearCurrentRoute,
     saveCurrentRoute,
     addPandalToRoute,
+    customPandals,
   } = useFavorites();
 
   const { locale } = useI18n();
@@ -82,17 +86,7 @@ export function RouteBuilder() {
     }
   }, []);
 
-  const handleSave = () => {
-    saveCurrentRoute();
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 2500);
-  };
-
-  const handleOptimize = () => {
-    optimizeCurrentRoute();
-    setOptimizedSuccess(true);
-    setTimeout(() => setOptimizedSuccess(false), 2000);
-  };
+  const [customModalOpen, setCustomModalOpen] = useState(false);
 
   // Request device GPS location on-demand
   const handleAcquireLocation = async () => {
@@ -153,6 +147,27 @@ export function RouteBuilder() {
     };
   }, [originMode, gpsLocation, selectedStationId, currentRouteStops]);
 
+  const handleSave = () => {
+    saveCurrentRoute();
+    setSavedSuccess(true);
+    setTimeout(() => setSavedSuccess(false), 2500);
+  };
+
+  const handleOptimize = () => {
+    const originCoords =
+      (originMode === 'current_location' || originMode === 'custom_station') &&
+      typeof activeOrigin.lat === 'number' &&
+      typeof activeOrigin.lng === 'number'
+        ? { lat: activeOrigin.lat, lng: activeOrigin.lng }
+        : null;
+
+    const result = optimizeCurrentRoute(originCoords);
+    if (result) {
+      setOptimizedSuccess(true);
+      setTimeout(() => setOptimizedSuccess(false), 2500);
+    }
+  };
+
   // Check for invalid coordinates
   const invalidStops = useMemo(() => {
     return currentRouteStops.filter(
@@ -190,9 +205,10 @@ export function RouteBuilder() {
     ? Math.round(estimateWalkingMinutes(totalDistance) + currentRouteStops.length * 20)
     : 0;
 
-  // Filtered available pandals for Route Planner Explorer / Quick-Add
+  // Filtered available pandals for Route Planner Explorer / Quick-Add (merging static and custom pandals)
   const availablePandals = useMemo(() => {
-    let list = PANDALS_DATA.filter((p) => !currentRouteStops.some((s) => s.pandalId === p.id));
+    const all = [...PANDALS_DATA, ...customPandals];
+    let list = all.filter((p) => !currentRouteStops.some((s) => s.pandalId === p.id));
 
     if (quickAddCategory === 'bonedi-bari') {
       list = list.filter((p) => p.isBonediBari || p.category === 'Bonedi Bari');
@@ -218,7 +234,7 @@ export function RouteBuilder() {
     }
 
     return list;
-  }, [currentRouteStops, quickAddCategory, quickAddSearch]);
+  }, [currentRouteStops, customPandals, quickAddCategory, quickAddSearch]);
 
   const handleAddAllBonediBari = () => {
     const bonediList = PANDALS_DATA.filter(
@@ -278,16 +294,51 @@ export function RouteBuilder() {
         </div>
       </div>
 
-      {/* Save & Clear Controls */}
+      {/* 2-Opt Optimization Feedback Banner */}
+      {lastOptimizationResult && (
+        <div className="p-4 rounded-2xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-100 text-xs sm:text-sm space-y-1 animate-in fade-in duration-200">
+          <div className="flex items-center gap-2 font-bold text-emerald-800 dark:text-emerald-200">
+            <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>
+              {isBn
+                ? `রুট স্মার্ট অপ্টিমাইজ হয়েছে! নিকটবর্তী মণ্ডপগুলো পরপর সাজানো হয়েছে (${lastOptimizationResult.savingsPercent}% দূরত্ব সাশ্রয়, ~${lastOptimizationResult.savingsKm} কিমি)।`
+                : `Trail optimized! Consecutive visits to nearby pandals saved ~${lastOptimizationResult.savingsKm} km (${lastOptimizationResult.savingsPercent}% reduction).`}
+            </span>
+          </div>
+          <p className="text-[11px] text-emerald-700 dark:text-emerald-300 pl-6">
+            {isBn
+              ? '* সরলরেখা দূরত্বের অনুমান; বাস্তব সড়ক পথের অবস্থা ও ট্র্যাফিকের ওপর নির্ভর করে পরিবর্তন হতে পারে।'
+              : '* Straight-line distance estimate; actual road travel may vary.'}
+          </p>
+          {lastOptimizationResult.hasUnresolvedStops && (
+            <p className="text-[11px] text-amber-700 dark:text-amber-300 pl-6 font-semibold">
+              {isBn
+                ? `⚠️ দ্রষ্টব্য: ${lastOptimizationResult.unresolvedCount}টি কাস্টম মণ্ডপের স্থানাঙ্ক না থাকায় সেগুলোকে রুটের শেষে রাখা হয়েছে।`
+                : `⚠️ Notice: ${lastOptimizationResult.unresolvedCount} stop(s) (${lastOptimizationResult.unresolvedStopNames.join(', ')}) lack coordinates and were placed at the end.`}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Save, Add Custom Pandal & Clear Controls */}
       {currentRouteStops.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={handleSave}
               className="px-4 py-2.5 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-xs sm:text-sm font-bold text-[#242424] dark:text-[#ede5dc] hover:bg-[#f7f3ee] dark:hover:bg-[#251e18] flex items-center gap-2 transition-all active:scale-95 shadow-xs"
             >
               {savedSuccess ? <Check className="w-4 h-4 text-emerald-600" /> : <Save className="w-4 h-4 text-[#b42323]" />}
               <span>{savedSuccess ? (isBn ? 'সংরক্ষিত হয়েছে!' : 'Saved to Itineraries!') : (isBn ? 'রুট সংরক্ষণ করুন' : 'Save Itinerary')}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setCustomModalOpen(true)}
+              className="px-4 py-2.5 rounded-xl border-2 border-[#b42323] bg-white dark:bg-[#1a1613] hover:bg-[#b42323] text-[#b42323] hover:text-white text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all active:scale-95 shadow-xs"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{isBn ? '+ নিজস্ব মণ্ডপ যোগ করুন' : '+ Add Custom Pandal'}</span>
             </button>
           </div>
 
@@ -595,16 +646,26 @@ export function RouteBuilder() {
           </h3>
           <p className="text-sm text-[#776d65] dark:text-[#a89e95] max-w-md mx-auto">
             {isBn
-              ? 'প্যান্ডেল তালিকায় গিয়ে যেকোনো মণ্ডপে "রুট যোগ করুন" বাটনে ক্লিক করে নিজের পছন্দমতো পরিক্রমা তৈরি করুন।'
-              : 'Browse pandals in the directory and click "Add to Route" to build your personalized walking or metro hopping route.'}
+              ? 'প্যান্ডেল তালিকায় গিয়ে যেকোনো মণ্ডপে "রুট যোগ করুন" বাটনে ক্লিক করে নিজের পছন্দমতো পরিক্রমা তৈরি করুন অথবা সরাসরি যেকোনো নতুন মণ্ডপ যোগ করুন।'
+              : 'Browse pandals in the directory and click "Add Route" to build your personalized walking trail, or add your own custom pandal.'}
           </p>
-          <Link
-            href="/explore"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#b42323] text-white text-sm font-bold shadow-sm transition-all hover:bg-[#971c1c] active:scale-95 mt-2"
-          >
-            <Search className="w-4 h-4" />
-            <span>{isBn ? 'প্যান্ডেল সন্ধান করুন' : 'Explore Pandals'}</span>
-          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <Link
+              href="/explore"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#b42323] text-white text-sm font-bold shadow-sm transition-all hover:bg-[#971c1c] active:scale-95"
+            >
+              <Search className="w-4 h-4" />
+              <span>{isBn ? 'প্যান্ডেল সন্ধান করুন' : 'Explore Pandals'}</span>
+            </Link>
+            <button
+              type="button"
+              onClick={() => setCustomModalOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-[#b42323] bg-white dark:bg-[#1a1613] text-[#b42323] hover:bg-[#b42323] hover:text-white text-sm font-extrabold transition-all active:scale-95 shadow-xs"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{isBn ? '+ নিজস্ব মণ্ডপ যোগ করুন' : '+ Add Custom Pandal'}</span>
+            </button>
+          </div>
         </div>
       ) : (
         <div className="space-y-3">
@@ -627,10 +688,22 @@ export function RouteBuilder() {
                   {isBn ? toBengaliDigits(idx + 1) : idx + 1}
                 </div>
                 <div className="min-w-0">
-                  <h4 className="text-sm sm:text-base font-bold text-[#242424] dark:text-[#ede5dc] truncate">
-                    {isBn ? stop.pandal.nameBn : stop.pandal.name}
-                  </h4>
-                  <p className="text-xs sm:text-[13px] text-[#776d65] dark:text-[#a89e95] truncate">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="text-sm sm:text-base font-bold text-[#242424] dark:text-[#ede5dc] truncate">
+                      {isBn ? stop.pandal.nameBn : stop.pandal.name}
+                    </h4>
+                    {stop.pandal.isUserAdded && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold shrink-0 border border-purple-200 dark:border-purple-800">
+                        {isBn ? '👤 নিজস্ব যোগ' : '👤 User Added'}
+                      </span>
+                    )}
+                    {stop.pandal.hasUnresolvedCoordinates && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold shrink-0 border border-amber-200 dark:border-amber-800">
+                        {isBn ? '⚠️ স্থানাঙ্ক অনুপস্থিত' : '⚠️ Missing Coordinates'}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs sm:text-[13px] text-[#776d65] dark:text-[#a89e95] truncate mt-0.5">
                     {isBn ? stop.pandal.localityBn : stop.pandal.locality} • {stop.pandal.zone}
                   </p>
                 </div>
@@ -683,21 +756,32 @@ export function RouteBuilder() {
             </h3>
             <p className="text-xs text-[#776d65] dark:text-[#a89e95] mt-0.5">
               {isBn
-                ? 'অঞ্চল বা বনেদি বাড়ি বিভাগ নির্বাচন করে সহজে পছন্দের মণ্ডপগুলো যোগ করুন।'
-                : 'Filter by locality or Bonedi Bari heritage houses to quickly build your route.'}
+                ? 'অঞ্চল বা বনেদি বাড়ি বিভাগ নির্বাচন করে সহজে পছন্দের মণ্ডপগুলো যোগ করুন অথবা নিজস্ব মণ্ডপ যুক্ত করুন।'
+                : 'Filter by locality, heritage houses, or add your own custom pandal.'}
             </p>
           </div>
 
-          {/* Quick Search inside Route Planner */}
-          <div className="relative w-full md:w-64">
-            <Search className="w-3.5 h-3.5 text-[#776d65] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={quickAddSearch}
-              onChange={(e) => setQuickAddSearch(e.target.value)}
-              placeholder={isBn ? 'মণ্ডপ বা এলাকা খুঁজুন...' : 'Search pandals...'}
-              className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-xs font-medium text-[#242424] dark:text-[#ede5dc] placeholder-[#a89e95] focus:outline-none focus:ring-1 focus:ring-[#b42323]"
-            />
+          {/* Quick Search & Add Custom Button */}
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <div className="relative flex-1 md:w-60">
+              <Search className="w-3.5 h-3.5 text-[#776d65] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={quickAddSearch}
+                onChange={(e) => setQuickAddSearch(e.target.value)}
+                placeholder={isBn ? 'মণ্ডপ বা এলাকা খুঁজুন...' : 'Search pandals...'}
+                className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-xs font-medium text-[#242424] dark:text-[#ede5dc] placeholder-[#a89e95] focus:outline-none focus:ring-1 focus:ring-[#b42323]"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setCustomModalOpen(true)}
+              className="px-3 py-1.5 rounded-xl border-2 border-[#b42323] bg-white dark:bg-[#1a1613] hover:bg-[#b42323] text-[#b42323] hover:text-white text-xs font-bold shrink-0 transition-all active:scale-95 shadow-xs flex items-center gap-1"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>{isBn ? '+ নিজস্ব' : '+ Custom'}</span>
+            </button>
           </div>
         </div>
 
@@ -773,6 +857,11 @@ export function RouteBuilder() {
                       {isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari'}
                     </span>
                   )}
+                  {p.isUserAdded && (
+                    <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold">
+                      {isBn ? '👤 নিজস্ব যোগ' : '👤 User Added'}
+                    </span>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -787,6 +876,12 @@ export function RouteBuilder() {
           </div>
         )}
       </div>
+
+      {/* Add Custom Pandal Modal */}
+      <AddCustomPandalModal
+        isOpen={customModalOpen}
+        onClose={() => setCustomModalOpen(false)}
+      />
     </div>
   );
 }

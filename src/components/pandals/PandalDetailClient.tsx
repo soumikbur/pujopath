@@ -15,6 +15,7 @@ import {
 import { Pandal } from '@/types';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useFavorites } from '@/lib/context/FavoritesContext';
+import { SelectedPandalsBar } from '@/components/planner/SelectedPandalsBar';
 import { formatDistance } from '@/lib/geo';
 import { cn, getAssetPath } from '@/lib/utils';
 
@@ -279,6 +280,9 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
           </div>
         </div>
       </div>
+
+      {/* Floating Selected-Pandal Summary & Plan My Navigation Bar */}
+      <SelectedPandalsBar />
     </div>
   );
 }

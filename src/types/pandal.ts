@@ -95,6 +95,10 @@ export interface Pandal {
   highlightsBn?: string[];
   specialAttractions?: string[];
   distanceKm?: number;
+  isCustom?: boolean;
+  isUserAdded?: boolean;
+  hasUnresolvedCoordinates?: boolean;
+  addedAt?: string;
 }
 
 export interface FilterOptions {

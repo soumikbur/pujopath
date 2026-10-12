@@ -1,9 +1,23 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Pandal, RouteItinerary, RouteStop } from '@/types';
+import { Pandal, RouteItinerary, RouteStop, LocalityZone } from '@/types';
 import { PANDALS_DATA } from '@/data/pandals';
 import { calculateHaversineDistance, estimateWalkingMinutes } from '@/lib/geo';
+import { RouteOptimizer, RouteOptimizationResult } from '@/lib/services/RouteOptimizer';
+
+interface CustomPandalInput {
+  name: string;
+  nameBn?: string;
+  address: string;
+  addressBn?: string;
+  locality?: string;
+  localityBn?: string;
+  zone?: LocalityZone;
+  latitude?: number;
+  longitude?: number;
+  hasUnresolvedCoordinates?: boolean;
+}
 
 interface FavoritesContextType {
   savedPandalIds: string[];
@@ -17,12 +31,17 @@ interface FavoritesContextType {
   removePandalFromRoute: (pandalId: string) => void;
   moveRouteStop: (fromIndex: number, toIndex: number) => void;
   isPandalInRoute: (pandalId: string) => boolean;
-  optimizeCurrentRoute: () => void;
+  optimizeCurrentRoute: (origin?: { lat: number; lng: number } | null) => RouteOptimizationResult | null;
+  lastOptimizationResult: RouteOptimizationResult | null;
   clearCurrentRoute: () => void;
   saveCurrentRoute: (name?: string) => RouteItinerary;
   savedRoutes: RouteItinerary[];
   deleteSavedRoute: (id: string) => void;
   loadSavedRoute: (route: RouteItinerary) => void;
+  // Custom Pandal Store
+  customPandals: Pandal[];
+  addCustomPandal: (input: CustomPandalInput, addToActiveRoute?: boolean) => Pandal;
+  removeCustomPandal: (id: string) => void;
 }
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
@@ -32,10 +51,13 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   const [savedTrackIds, setSavedTrackIds] = useState<string[]>([]);
   const [savedRoutes, setSavedRoutes] = useState<RouteItinerary[]>([]);
   const [currentRouteStops, setCurrentRouteStops] = useState<RouteStop[]>([]);
+  const [customPandals, setCustomPandals] = useState<Pandal[]>([]);
+  const [lastOptimizationResult, setLastOptimizationResult] = useState<RouteOptimizationResult | null>(null);
 
   useEffect(() => {
     try {
       if (typeof window === 'undefined') return;
+
       const savedPandals = localStorage.getItem('pujopath_saved_pandals');
       if (savedPandals) setSavedPandalIds(JSON.parse(savedPandals));
 
@@ -45,19 +67,26 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       const routes = localStorage.getItem('pujopath_saved_routes');
       if (routes) setSavedRoutes(JSON.parse(routes));
 
+      // Hydrate custom user-added pandals
+      const savedCustom = localStorage.getItem('pujopath_custom_pandals');
+      const loadedCustom: Pandal[] = savedCustom ? JSON.parse(savedCustom) : [];
+      setCustomPandals(loadedCustom);
+
+      // Hydrate active route stops (looking in both static pandals and custom pandals)
+      const allPandals = [...PANDALS_DATA, ...loadedCustom];
       const activeRoute = localStorage.getItem('pujopath_active_route');
       if (activeRoute) {
         const parsedStops: RouteStop[] = JSON.parse(activeRoute);
         const hydrated = parsedStops
           .map((s, idx) => {
-            const found = PANDALS_DATA.find((p) => p.id === s.pandalId);
+            const found = allPandals.find((p) => p.id === s.pandalId) || s.pandal;
             return found ? { ...s, pandal: found, order: idx } : null;
           })
           .filter(Boolean) as RouteStop[];
         setCurrentRouteStops(hydrated);
       }
     } catch {
-      // ignore
+      // Storage hydration failure recovery
     }
   }, []);
 
@@ -121,7 +150,13 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   };
 
   const moveRouteStop = (fromIndex: number, toIndex: number) => {
-    if (fromIndex < 0 || fromIndex >= currentRouteStops.length || toIndex < 0 || toIndex >= currentRouteStops.length) return;
+    if (
+      fromIndex < 0 ||
+      fromIndex >= currentRouteStops.length ||
+      toIndex < 0 ||
+      toIndex >= currentRouteStops.length
+    )
+      return;
     const copy = [...currentRouteStops];
     const [moved] = copy.splice(fromIndex, 1);
     copy.splice(toIndex, 0, moved);
@@ -134,43 +169,104 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const optimizeCurrentRoute = () => {
-    if (currentRouteStops.length <= 2) return;
-    const remaining = [...currentRouteStops];
-    const optimized: RouteStop[] = [];
-    let current = remaining.shift()!;
-    optimized.push(current);
+  // Add custom user pandal with stable ID
+  const addCustomPandal = (input: CustomPandalInput, addToActiveRoute: boolean = true): Pandal => {
+    const customId = `custom-pandal-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const slug = `custom-${input.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'pandal'}-${Date.now().toString().slice(-4)}`;
 
-    while (remaining.length > 0) {
-      let nearestIdx = 0;
-      let minDistance = Infinity;
-      for (let i = 0; i < remaining.length; i++) {
-        const dist = calculateHaversineDistance(
-          current.pandal.latitude,
-          current.pandal.longitude,
-          remaining[i].pandal.latitude,
-          remaining[i].pandal.longitude
-        );
-        if (dist < minDistance) {
-          minDistance = dist;
-          nearestIdx = i;
-        }
-      }
-      current = remaining.splice(nearestIdx, 1)[0];
-      optimized.push(current);
-    }
+    const hasCoords =
+      typeof input.latitude === 'number' &&
+      typeof input.longitude === 'number' &&
+      !isNaN(input.latitude) &&
+      !isNaN(input.longitude);
 
-    const reindexed = optimized.map((s, idx) => ({ ...s, order: idx }));
-    setCurrentRouteStops(reindexed);
+    const newPandal: Pandal = {
+      id: customId,
+      slug,
+      name: input.name,
+      nameBn: input.nameBn || input.name,
+      zone: input.zone || 'Central Kolkata',
+      locality: input.locality || input.address.split(',')[0].trim() || 'Kolkata',
+      localityBn: input.localityBn || input.locality || 'কলকাতা',
+      address: input.address,
+      addressBn: input.addressBn || input.address,
+      latitude: hasCoords ? input.latitude! : 0,
+      longitude: hasCoords ? input.longitude! : 0,
+      theme: 'Community Durgotsav',
+      themeBn: 'সার্বজনীন দুর্গোৎসব',
+      category: 'Community',
+      description: `User-added Durga Puja destination at ${input.address}.`,
+      descriptionBn: `ব্যবহারকারী কর্তৃক যুক্ত দুর্গাপূজা মণ্ডপ। ঠিকানা: ${input.address}।`,
+      openingTime: '06:00',
+      closingTime: '02:00',
+      crowdLevel: 'Moderate',
+      popularityScore: 75,
+      rating: 4.5,
+      reviewCount: 1,
+      imageUrl: '/images/pandals/pandal-fallback.webp',
+      galleryImages: [],
+      isFeatured: false,
+      isHeritage: false,
+      facilities: {
+        wheelchairAccessible: true,
+        drinkingWater: true,
+        medicalBooth: false,
+        vipPassEntry: false,
+        parkingAvailable: false,
+      },
+      metroLinks: [],
+      isCustom: true,
+      isUserAdded: true,
+      hasUnresolvedCoordinates: !hasCoords || Boolean(input.hasUnresolvedCoordinates),
+      addedAt: new Date().toISOString(),
+    };
+
+    const updatedCustom = [newPandal, ...customPandals];
+    setCustomPandals(updatedCustom);
     try {
-      localStorage.setItem('pujopath_active_route', JSON.stringify(reindexed));
+      localStorage.setItem('pujopath_custom_pandals', JSON.stringify(updatedCustom));
     } catch {
       // ignore
     }
+
+    if (addToActiveRoute) {
+      addPandalToRoute(newPandal);
+    }
+
+    return newPandal;
+  };
+
+  const removeCustomPandal = (id: string) => {
+    const updatedCustom = customPandals.filter((p) => p.id !== id);
+    setCustomPandals(updatedCustom);
+    try {
+      localStorage.setItem('pujopath_custom_pandals', JSON.stringify(updatedCustom));
+    } catch {
+      // ignore
+    }
+    removePandalFromRoute(id);
+  };
+
+  // Smart route optimization using RouteOptimizer (Nearest Neighbor + 2-Opt)
+  const optimizeCurrentRoute = (origin?: { lat: number; lng: number } | null) => {
+    if (currentRouteStops.length <= 1) return null;
+
+    const result = RouteOptimizer.optimizeStops(currentRouteStops, origin);
+    setCurrentRouteStops(result.optimizedStops);
+    setLastOptimizationResult(result);
+
+    try {
+      localStorage.setItem('pujopath_active_route', JSON.stringify(result.optimizedStops));
+    } catch {
+      // ignore
+    }
+
+    return result;
   };
 
   const clearCurrentRoute = () => {
     setCurrentRouteStops([]);
+    setLastOptimizationResult(null);
     try {
       localStorage.removeItem('pujopath_active_route');
     } catch {
@@ -243,11 +339,15 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
         moveRouteStop,
         isPandalInRoute,
         optimizeCurrentRoute,
+        lastOptimizationResult,
         clearCurrentRoute,
         saveCurrentRoute,
         savedRoutes,
         deleteSavedRoute,
         loadSavedRoute,
+        customPandals,
+        addCustomPandal,
+        removeCustomPandal,
       }}
     >
       {children}

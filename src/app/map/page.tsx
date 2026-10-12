@@ -7,6 +7,8 @@ import { METRO_STATIONS_DATA } from '@/data/metro';
 import { Pandal, LocalityZone } from '@/types';
 import { PandalCard } from '@/components/pandals/PandalCard';
 import { useI18n } from '@/lib/i18n/I18nContext';
+import { useFavorites } from '@/lib/context/FavoritesContext';
+import { SelectedPandalsBar } from '@/components/planner/SelectedPandalsBar';
 import { Layers, X } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
@@ -25,10 +27,13 @@ const PujoMap = dynamic(() => import('@/components/map/PujoMap'), {
 export default function MapPage() {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
+  const { customPandals } = useFavorites();
 
   const [selectedFilter, setSelectedFilter] = useState<LocalityZone | 'All' | 'Bonedi Bari'>('All');
   const [selectedPandal, setSelectedPandal] = useState<Pandal | null>(null);
   const [showMetro, setShowMetro] = useState(true);
+
+  const allAvailablePandals = [...PANDALS_DATA, ...customPandals];
 
   const filterOptions: { value: LocalityZone | 'All' | 'Bonedi Bari'; label: string; isSpecial?: boolean }[] = [
     { value: 'All', label: isBn ? 'সব এলাকা' : 'All' },
@@ -44,10 +49,10 @@ export default function MapPage() {
 
   const filteredPandals =
     selectedFilter === 'All'
-      ? PANDALS_DATA
+      ? allAvailablePandals
       : selectedFilter === 'Bonedi Bari'
-      ? PANDALS_DATA.filter((p) => Boolean(p.isBonediBari || p.category === 'Bonedi Bari'))
-      : PANDALS_DATA.filter((p) => p.zone === selectedFilter);
+      ? allAvailablePandals.filter((p) => Boolean(p.isBonediBari || p.category === 'Bonedi Bari'))
+      : allAvailablePandals.filter((p) => p.zone === selectedFilter);
 
   return (
     <div className="space-y-4 max-w-7xl mx-auto h-[calc(100vh-12rem)] flex flex-col pb-4">
@@ -136,6 +141,9 @@ export default function MapPage() {
           </div>
         )}
       </div>
+
+      {/* Floating Selected-Pandal Summary & Plan My Navigation Bar */}
+      <SelectedPandalsBar />
     </div>
   );
 }

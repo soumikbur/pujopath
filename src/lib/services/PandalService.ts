@@ -3,7 +3,8 @@ import { PANDALS_DATA } from '@/data/pandals';
 import { calculateHaversineDistance } from '@/lib/geo';
 
 export class PandalService {
-  static getAllPandals(userLat?: number, userLng?: number): Pandal[] {
+  static getAllPandals(userLat?: number, userLng?: number, extraPandals?: Pandal[]): Pandal[] {
+    const base = [...PANDALS_DATA, ...(extraPandals || [])];
     const hasValidCoords =
       typeof userLat === 'number' &&
       typeof userLng === 'number' &&
@@ -11,16 +12,22 @@ export class PandalService {
       !isNaN(userLng);
 
     if (hasValidCoords) {
-      return PANDALS_DATA.map((p) => ({
+      return base.map((p) => ({
         ...p,
         distanceKm: calculateHaversineDistance(userLat, userLng, p.latitude, p.longitude),
       }));
     }
-    return [...PANDALS_DATA];
+    return base;
   }
 
-  static getPandalBySlug(slug: string, userLat?: number, userLng?: number): Pandal | null {
-    const found = PANDALS_DATA.find((p) => p.slug === slug || p.id === slug);
+  static getPandalBySlug(
+    slug: string,
+    userLat?: number,
+    userLng?: number,
+    extraPandals?: Pandal[]
+  ): Pandal | null {
+    const base = [...PANDALS_DATA, ...(extraPandals || [])];
+    const found = base.find((p) => p.slug === slug || p.id === slug);
     if (!found) return null;
 
     const hasValidCoords =
@@ -38,8 +45,13 @@ export class PandalService {
     return found;
   }
 
-  static filterPandals(options: Partial<FilterOptions>, userLat?: number, userLng?: number): Pandal[] {
-    let list = this.getAllPandals(userLat, userLng);
+  static filterPandals(
+    options: Partial<FilterOptions>,
+    userLat?: number,
+    userLng?: number,
+    extraPandals?: Pandal[]
+  ): Pandal[] {
+    let list = this.getAllPandals(userLat, userLng, extraPandals);
 
     if (options.searchQuery && options.searchQuery.trim()) {
       const q = options.searchQuery.toLowerCase().trim();
