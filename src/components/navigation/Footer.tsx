@@ -12,8 +12,8 @@ export function Footer() {
   const { currentBackground, isPaused, togglePause, prefersReducedMotion, isHomepage } = useBackground();
 
   return (
-    <footer className="mt-auto w-full border-t border-[#eee8e1] dark:border-[#2a221b] bg-white/60 dark:bg-[#181411]/60 backdrop-blur-md">
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-7">
+    <footer className="mt-auto shrink-0 w-full border-t border-[#eee8e1] dark:border-[#2a221b] bg-white/60 dark:bg-[#181411]/60 backdrop-blur-md">
+      <div className="mx-auto max-w-6xl px-4 pt-6 pb-20 sm:px-6 sm:pt-7 sm:pb-20 md:pb-7">
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row text-center sm:text-left">
           {/* Brand & Cultural Tagline */}
           <div className="space-y-1">

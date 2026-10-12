@@ -73,6 +73,7 @@
     padding: 0;
     width: 100%;
     min-height: 100%;
+    min-height: 100dvh;
     background-color: var(--bg-main);
     color: var(--text-primary);
     font-family: var(--font-sans);
@@ -80,6 +81,23 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
     transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  /* Responsive sticky footer layout architecture */
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .page-content {
+    flex: 1 0 auto;
+  }
+
+  .app-shell footer {
+    flex-shrink: 0;
+    margin-top: auto;
   }
 
   /* Accessible focus indicators */
