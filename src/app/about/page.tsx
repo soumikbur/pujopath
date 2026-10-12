@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { PhoneCall, ShieldCheck, Info } from 'lucide-react';
+import { PhoneCall, ShieldCheck, Info, Users, Github } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
 
 export default function AboutPage() {
@@ -71,6 +71,67 @@ export default function AboutPage() {
           <li>{isBn ? 'প্রচুর জল পান করুন এবং সাথে জলের বোতল রাখুন।' : 'Carry reusable water bottles and stay hydrated while hopping.'}</li>
           <li>{isBn ? 'জরুরি পরিস্থিতিতে নিকটস্থ কলকাতা পুলিশ "মে আই হেল্প ইউ" বুথে যোগাযোগ করুন।' : 'In case of overcrowding or emergency, reach out to the nearest Kolkata Police May I Help You kiosk.'}</li>
         </ul>
+      </div>
+
+      {/* Project Co-Creators */}
+      <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#1a1613] border border-[#eee8e1] dark:border-[#2f2720] space-y-4 transition-colors">
+        <div className="flex items-center gap-2 text-[#b42323] dark:text-[#e05656] text-xs sm:text-sm font-bold uppercase tracking-wider">
+          <Users className="w-4 h-4" />
+          <span>{isBn ? 'প্রকল্পের সহ-নির্মাতা' : 'Project Co-Creators'}</span>
+        </div>
+
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-[#242424] dark:text-[#ede5dc]">
+            {isBn ? 'পুজোপথ — আমাদের উদ্যোগ' : 'About PujoPath'}
+          </h2>
+          <p className="text-sm sm:text-base text-[#665a54] dark:text-[#a89e95] mt-1.5 leading-relaxed">
+            {isBn
+              ? 'পুজোপথ হলো সৌমিক এবং মৌমিতার একটি যৌথ সৃষ্টি, যা মানুষকে কলকাতার দুর্গোৎসবের মণ্ডপ আবিষ্কার ও সুষ্ঠু পরিকল্পনা করতে সাহায্য করে।'
+              : 'PujoPath is a collaborative project created by Soumik and Moumita to help people discover Kolkata\'s Durga Puja pandals and plan their Puja experiences.'}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+          {/* Soumik */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3">
+            <div className="space-y-0.5">
+              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc]">Soumik</div>
+              <div className="text-xs font-semibold text-[#b42323] dark:text-[#e05656]">
+                {isBn ? 'সহ-নির্মাতা' : 'Co-creator'}
+              </div>
+            </div>
+            <a
+              href="https://github.com/soumikbur"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#242424] dark:text-[#ede5dc] border border-[#e5ded6] dark:border-[#3d332a] hover:bg-[#b42323] hover:text-white dark:hover:bg-[#b42323] hover:border-[#b42323] transition-colors shadow-sm"
+              aria-label="Soumik's GitHub profile"
+            >
+              <Github className="w-3.5 h-3.5" />
+              <span>GitHub</span>
+            </a>
+          </div>
+
+          {/* Moumita */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3">
+            <div className="space-y-0.5">
+              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc]">Moumita</div>
+              <div className="text-xs font-semibold text-[#b42323] dark:text-[#e05656]">
+                {isBn ? 'সহ-নির্মাতা' : 'Co-creator'}
+              </div>
+            </div>
+            <a
+              href="https://github.com/Moumita-08"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#242424] dark:text-[#ede5dc] border border-[#e5ded6] dark:border-[#3d332a] hover:bg-[#b42323] hover:text-white dark:hover:bg-[#b42323] hover:border-[#b42323] transition-colors shadow-sm"
+              aria-label="Moumita's GitHub profile"
+            >
+              <Github className="w-3.5 h-3.5" />
+              <span>GitHub</span>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );

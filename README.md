@@ -54,7 +54,7 @@ Live Production URL: **[https://soumikbur.github.io/pujopath/](https://soumikbur
   - Fully tested across small mobile (320px), standard mobile (375px/390px/430px), tablet (768px/1024px), laptop (1366px), and wide desktop (1920px).
 
 - **Creator Watermark Signature:**
-  - Subtly integrated in the global footer: *"Made by Soumik & Moumita with ❤️"*.
+  - Subtly integrated in the global footer: *"Made with care by Soumik & Moumita with ❤️"* with direct links to both co-creators' verified GitHub profiles.
 
 ---
 
@@ -173,6 +173,15 @@ Generates 64 pre-rendered static HTML routes and assets in the `out/` directory.
 
 ### Continuous Deployment
 The project deploys automatically to **GitHub Pages** via the GitHub Actions workflow in `.github/workflows/deploy.yml` upon push to `main`. The live site is served with basePath `/pujopath`.
+
+---
+
+## 👥 Project Creators
+
+PujoPath is a collaborative project created by Soumik and Moumita to help people discover Kolkata's Durga Puja pandals and plan their Puja experiences.
+
+- [Soumik](https://github.com/soumikbur) — Co-creator
+- [Moumita](https://github.com/Moumita-08) — Co-creator
 
 ---
 

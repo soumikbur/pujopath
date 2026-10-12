@@ -95,10 +95,28 @@ export function Footer() {
 
           <div
             className="order-1 sm:order-2 font-medium tracking-wide text-xs sm:text-[13px] select-text"
-            aria-label="Made by Soumik & Moumita with love"
+            aria-label="Made with care by Soumik & Moumita with love"
           >
-            <span>Made by </span>
-            <span className="font-semibold text-[#b42323] dark:text-[#e05656]">Soumik & Moumita</span>
+            <span>Made with care by </span>
+            <a
+              href="https://github.com/soumikbur"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-[#b42323] dark:text-[#e05656] hover:underline underline-offset-2 transition-colors"
+              aria-label="Soumik's GitHub profile"
+            >
+              Soumik
+            </a>
+            <span> &amp; </span>
+            <a
+              href="https://github.com/Moumita-08"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-[#b42323] dark:text-[#e05656] hover:underline underline-offset-2 transition-colors"
+              aria-label="Moumita's GitHub profile"
+            >
+              Moumita
+            </a>
             <span> with </span>
             <span className="text-[#e02424] inline-block text-sm" role="img" aria-label="heart">❤️</span>
           </div>

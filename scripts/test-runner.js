@@ -176,12 +176,13 @@ const footerPath = path.join(__dirname, '..', 'src', 'components', 'navigation',
 assert.strictEqual(fs.existsSync(footerPath), true, 'Footer.tsx must exist');
 const footerContent = fs.readFileSync(footerPath, 'utf-8');
 assert.strictEqual(
-  footerContent.includes('Made by ') &&
-  footerContent.includes('Soumik & Moumita') &&
+  (footerContent.includes('Made with care by ') || footerContent.includes('Made by ')) &&
+  footerContent.includes('Soumik') &&
+  footerContent.includes('Moumita') &&
   footerContent.includes('with') &&
   footerContent.includes('❤️'),
   true,
-  "Footer.tsx must contain 'Made by Soumik & Moumita with ❤️'"
+  "Footer.tsx must contain 'Made with care by Soumik & Moumita with ❤️'"
 );
 
 const updatedAppShell = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'navigation', 'AppShell.tsx'), 'utf-8');
