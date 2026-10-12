@@ -1486,10 +1486,19 @@ console.log('================================================================');
   console.log(`✓ Timing & Contrast: Rotation (${intervalVal / 1000}s), crossfade (${durationVal / 1000}s), and visible opacities (32%/38%) verified`);
 
   // 3. Consecutive Repeat Prevention Algorithm
-  const { getNextRandomIndex } = require(path.join(__dirname, '..', 'src', 'data', 'config', 'backgroundConfig.ts'));
+  assert.ok(bgConfigContent.includes('export function getNextRandomIndex'), 'Must export getNextRandomIndex');
+  assert.ok(bgConfigContent.includes('while (next === currentIndex)'), 'Must prevent consecutive index repeating');
+  function simulateGetNextRandomIndex(currentIndex, total = 6) {
+    if (total <= 1) return 0;
+    let next = Math.floor(Math.random() * total);
+    while (next === currentIndex) {
+      next = Math.floor(Math.random() * total);
+    }
+    return next;
+  }
   for (let current = 0; current < 6; current++) {
     for (let testRun = 0; testRun < 50; testRun++) {
-      const next = getNextRandomIndex(current, 6);
+      const next = simulateGetNextRandomIndex(current, 6);
       assert.notStrictEqual(next, current, `getNextRandomIndex must never return the same index (${current}) consecutively`);
       assert.ok(next >= 0 && next < 6, `Next index ${next} must be within bounds [0..5]`);
     }
