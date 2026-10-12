@@ -17,17 +17,14 @@ import {
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { toBengaliDigits, formatDistance } from '@/lib/geo';
-import { AddCustomPandalModal } from '@/components/planner/AddCustomPandalModal';
 import { cn } from '@/lib/utils/cn';
 
 interface SelectedPandalsBarProps {
   className?: string;
-  showCustomPandalTrigger?: boolean;
 }
 
 export function SelectedPandalsBar({
   className,
-  showCustomPandalTrigger = true,
 }: SelectedPandalsBarProps) {
   const pathname = usePathname();
   const { locale } = useI18n();
@@ -39,25 +36,14 @@ export function SelectedPandalsBar({
   } = useFavorites();
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const [customModalOpen, setCustomModalOpen] = useState(false);
 
   // If already on the planner page, the full interactive planner is rendered on screen.
-  // We can hide or simplify the floating bar on /planner to avoid duplicate sticky UI.
   const isPlannerPage = pathname === '/planner';
 
   const stopCount = currentRouteStops.length;
 
   if (isPlannerPage) {
-    return (
-      <>
-        {customModalOpen && (
-          <AddCustomPandalModal
-            isOpen={customModalOpen}
-            onClose={() => setCustomModalOpen(false)}
-          />
-        )}
-      </>
-    );
+    return null;
   }
 
   // Calculate approximate route distance
@@ -146,7 +132,7 @@ export function SelectedPandalsBar({
             </div>
           )}
 
-          {/* Main Bar: Summary Stats + Add Custom Pandal + Primary 'Plan My Navigation' CTA */}
+          {/* Main Bar: Summary Stats + Primary 'Plan My Navigation' CTA */}
           <div className="p-3 sm:p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
             {/* Left: Stop Count & Expand Toggle */}
             <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
@@ -192,19 +178,7 @@ export function SelectedPandalsBar({
 
             {/* Right: Actions */}
             <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-              {showCustomPandalTrigger && (
-                <button
-                  type="button"
-                  onClick={() => setCustomModalOpen(true)}
-                  className="px-3 py-2 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-[#fcfaf7] dark:bg-[#201a15] hover:border-[#b42323] text-[#b42323] text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-2xs shrink-0"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span className="hidden xs:inline">{isBn ? 'নিজস্ব মণ্ডপ' : 'Add Custom'}</span>
-                  <span className="xs:hidden">{isBn ? 'নতুন' : 'Custom'}</span>
-                </button>
-              )}
-
-              {/* HIGH PRIORITY USABILITY REQUIREMENT: Direct "Plan My Navigation" Button */}
+              {/* Direct "Plan My Navigation" Button */}
               {stopCount > 0 ? (
                 <Link
                   href="/planner"
@@ -226,12 +200,6 @@ export function SelectedPandalsBar({
           </div>
         </div>
       </aside>
-
-      {/* Add Custom Pandal Modal */}
-      <AddCustomPandalModal
-        isOpen={customModalOpen}
-        onClose={() => setCustomModalOpen(false)}
-      />
     </>
   );
 }

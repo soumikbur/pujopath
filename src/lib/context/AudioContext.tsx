@@ -31,6 +31,8 @@ interface AudioContextType {
   togglePlaylistTrack: (trackId: string) => void;
   isInPlaylist: (trackId: string) => boolean;
   clearError: () => void;
+  isPlayerDismissed: boolean;
+  closePlayer: () => void;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
@@ -48,6 +50,15 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [queue, setQueue] = useState<MusicTrack[]>(PUJA_MUSIC_DATA);
   const [isFullScreenOpen, setIsFullScreenOpen] = useState<boolean>(false);
   const [userPlaylistIds, setUserPlaylistIds] = useState<string[]>([]);
+  const [isPlayerDismissed, setIsPlayerDismissed] = useState<boolean>(false);
+
+  const closePlayer = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    setIsPlaying(false);
+    setIsPlayerDismissed(true);
+  }, []);
 
   // Hydrate user playlist from localStorage
   useEffect(() => {
@@ -173,6 +184,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
   const playTrackInternal = useCallback(
     (track: MusicTrack) => {
+      setIsPlayerDismissed(false);
       setPlaybackError(null);
       setCurrentTrack(track);
       setCurrentTime(0);
@@ -232,6 +244,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     if (isPlaying) {
       audio.pause();
     } else {
+      setIsPlayerDismissed(false);
       setPlaybackError(null);
       if (!audio.src || audio.src === window.location.href) {
         audio.src = currentTrack.audioUrl;
@@ -363,6 +376,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         togglePlaylistTrack,
         isInPlaylist,
         clearError,
+        isPlayerDismissed,
+        closePlayer,
       }}
     >
       {children}

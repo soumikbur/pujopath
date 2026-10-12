@@ -8,13 +8,11 @@ import {
   ChevronDown,
   Heart,
   Info,
-  Menu,
   Moon,
   Music2,
   Sparkles,
   Sun,
   Train,
-  X,
 } from 'lucide-react';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
@@ -27,7 +25,6 @@ export function Header() {
   const { theme, toggleTheme } = useTheme();
   const { savedPandalIds } = useFavorites();
   const [moreOpen, setMoreOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isBn = locale === 'bn';
 
@@ -41,7 +38,6 @@ export function Header() {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         setMoreOpen(false);
-        setMobileMenuOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -54,10 +50,9 @@ export function Header() {
     };
   }, []);
 
-  // Close dropdown and mobile menu whenever the active route changes
+  // Close dropdown whenever the active route changes
   useEffect(() => {
     setMoreOpen(false);
-    setMobileMenuOpen(false);
   }, [pathname]);
 
   const primaryLinks = [
@@ -82,13 +77,10 @@ export function Header() {
         {/* Brand Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 text-lg font-black tracking-tight text-[#b42323] transition-transform active:scale-95"
+          className="flex items-center text-xl font-extrabold tracking-tight text-[#b42323] transition-transform active:scale-95"
           aria-label="PujoPath home"
         >
-          <span className="grid h-8 w-8 place-items-center rounded-xl bg-[#b42323] text-sm font-bold text-white shadow-sm">
-            প
-          </span>
-          <span className="font-extrabold text-[#b42323]">PujoPath</span>
+          <span>PujoPath</span>
         </Link>
 
         {/* Desktop Primary Nav */}
@@ -169,8 +161,8 @@ export function Header() {
           </div>
         </nav>
 
-        {/* Right Controls: Theme Switch + Language Switch + Saved Heart + Mobile Hamburger */}
-        <div className="flex items-center gap-2">
+        {/* Right Controls: Theme Switch + Language Switch + Saved Heart */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
 
           {/* Theme Switcher Toggle */}
           <button
@@ -188,7 +180,7 @@ export function Header() {
           </button>
 
           {/* Language Switcher */}
-          <div className="hidden rounded-xl border border-[#e8e1d9] dark:border-[#332b24] p-0.5 text-xs font-bold sm:flex">
+          <div className="flex rounded-xl border border-[#e8e1d9] dark:border-[#332b24] p-0.5 text-xs font-bold">
             <button
               onClick={() => setLocale('en')}
               className={cn(
@@ -231,56 +223,8 @@ export function Header() {
               </span>
             )}
           </Link>
-
-          {/* Mobile Hamburger Menu Trigger */}
-          <button
-            onClick={() => setMobileMenuOpen((open) => !open)}
-            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-nav-drawer"
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#e8e1d9] dark:border-[#332b24] text-[#625b55] dark:text-[#b4a99e] hover:bg-[#f5f1ec] dark:hover:bg-[#221c17] md:hidden transition-all active:scale-95"
-          >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
         </div>
       </div>
-
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div
-          id="mobile-nav-drawer"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Mobile navigation menu"
-          className="border-t border-[#eee8e1] dark:border-[#2a241f] bg-white dark:bg-[#181411] px-4 py-4 md:hidden shadow-2xl animate-in slide-in-from-top-2 duration-150"
-        >
-          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-2">
-            {[...primaryLinks, ...secondaryLinks].map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  'rounded-xl px-3 py-2.5 text-sm font-bold transition-colors',
-                  pathname === link.href
-                    ? 'bg-[#f9e9e7] dark:bg-[#341b18] text-[#b42323]'
-                    : 'text-[#4a423d] dark:text-[#c4b9ae] hover:bg-[#f7f3ee] dark:hover:bg-[#221c17]'
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-
-            {/* Mobile Language Switcher button */}
-            <button
-              onClick={() => setLocale(locale === 'en' ? 'bn' : 'en')}
-              className="rounded-xl px-3 py-2.5 text-left text-sm font-bold text-[#4a423d] dark:text-[#c4b9ae] hover:bg-[#f7f3ee] dark:hover:bg-[#221c17] border border-[#eee8e1] dark:border-[#2a241f]"
-            >
-              {locale === 'en' ? 'বাংলা সংস্করণ' : 'English Version'}
-            </button>
-          </div>
-        </div>
-      )}
     </header>
   );
 }

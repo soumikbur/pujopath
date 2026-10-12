@@ -54,7 +54,7 @@ export function MobileBottomNav() {
     { href: '/music', label: isBn ? 'পুজোর সঙ্গীত' : 'Puja Music', icon: Music2 },
     { href: '/mahalaya', label: isBn ? 'মহালয়া বিশেষ' : 'Mahalaya Special', icon: Sparkles },
     { href: '/saved', label: isBn ? 'সংরক্ষিত প্যান্ডেল' : 'Saved Pandals', icon: Heart },
-    { href: '/about', label: isBn ? 'তথ্য ও হেল্পলাইন' : 'About & Helpline', icon: Info },
+    { href: '/about', label: isBn ? 'হেল্পলাইন' : 'Helpline', icon: Info },
   ];
 
   return (

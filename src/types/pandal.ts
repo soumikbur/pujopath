@@ -161,6 +161,7 @@ export interface Pandal {
   distanceKm?: number;
   isCustom?: boolean;
   isUserAdded?: boolean;
+  isPersonalStop?: boolean;
   hasUnresolvedCoordinates?: boolean;
   addedAt?: string;
   committeeName?: string;

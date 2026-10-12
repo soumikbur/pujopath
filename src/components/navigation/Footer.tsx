@@ -33,25 +33,10 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Quick Links */}
+          {/* Essential Helpline & Contact Link */}
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs font-medium text-[#776d65] dark:text-[#a89e95]">
-            <Link href="/explore" className="hover:text-[#b42323] transition-colors">
-              {isBn ? 'প্যান্ডেল' : 'Explore'}
-            </Link>
-            <Link href="/planner" className="hover:text-[#b42323] transition-colors">
-              {isBn ? 'পরিক্রমা' : 'Planner'}
-            </Link>
-            <Link href="/metro" className="hover:text-[#b42323] transition-colors">
-              {isBn ? 'মেট্রো' : 'Metro'}
-            </Link>
-            <Link href="/calendar" className="hover:text-[#b42323] transition-colors">
-              {isBn ? 'পঞ্জিকা' : 'Calendar'}
-            </Link>
-            <Link href="/music" className="hover:text-[#b42323] transition-colors">
-              {isBn ? 'সুরতরঙ্গ' : 'Music'}
-            </Link>
-            <Link href="/about" className="hover:text-[#b42323] transition-colors">
-              {isBn ? 'পরিচিতি' : 'About'}
+            <Link href="/about" className="hover:text-[#b42323] dark:hover:text-[#e05656] transition-colors">
+              {isBn ? 'জরুরি হেল্পলাইন ও পরিচিতি' : 'Helpline & About'}
             </Link>
           </div>
         </div>
@@ -94,31 +79,18 @@ export function Footer() {
           </div>
 
           <div
-            className="order-1 sm:order-2 font-medium tracking-wide text-xs sm:text-[13px] select-text"
-            aria-label="Made with care by Soumik & Moumita with love"
+            className="order-1 sm:order-2 font-medium tracking-wide text-xs sm:text-[13px] select-text text-[#776d65] dark:text-[#a89e95]"
+            aria-label="Made with care by Co-Creators Soumik Ghosh and Moumita Shee"
           >
-            <span>Made with care by </span>
-            <a
-              href="https://github.com/soumikbur"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-[#b42323] dark:text-[#e05656] hover:underline underline-offset-2 transition-colors"
-              aria-label="Soumik's GitHub profile"
-            >
-              Soumik
-            </a>
+            <span>{isBn ? 'সহ-নির্মাতা: ' : 'Co-Creators: '}</span>
+            <span className="font-semibold text-[#b42323] dark:text-[#e05656]">
+              {isBn ? 'সৌমিক ঘোষ' : 'Soumik Ghosh'}
+            </span>
             <span> &amp; </span>
-            <a
-              href="https://github.com/Moumita-08"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-[#b42323] dark:text-[#e05656] hover:underline underline-offset-2 transition-colors"
-              aria-label="Moumita's GitHub profile"
-            >
-              Moumita
-            </a>
-            <span> with </span>
-            <span className="text-[#e02424] inline-block text-sm" role="img" aria-label="heart">❤️</span>
+            <span className="font-semibold text-[#b42323] dark:text-[#e05656]">
+              {isBn ? 'মৌমিতা শী' : 'Moumita Shee'}
+            </span>
+            <span className="ml-1 text-[#e02424] inline-block text-sm" role="img" aria-label="heart">❤️</span>
           </div>
         </div>
       </div>

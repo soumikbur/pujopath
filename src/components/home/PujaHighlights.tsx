@@ -13,22 +13,28 @@ export function PujaHighlights() {
 
   const highlights = [
     {
-      title: isBn ? 'ঐতিহ্যবাহী সাবেকি পুজো' : 'Traditional Puja',
-      desc: isBn ? 'শতবর্ষের বনেদি বাড়ির পুজো পরিক্রমা।' : "Discover Bengal's timeless community celebrations.",
+      title: isBn ? 'ঐতিহ্য ও মণ্ডপ শিল্পকলা' : 'Traditions & Pandal Art',
+      desc: isBn
+        ? 'শতবর্ষের বনেদি বাড়ির পুজো ও কলকাতার সেরা সৃজনশীল শিল্পকর্ম।'
+        : "Discover Bengal's timeless heritage celebrations and creative installations.",
       image: getAssetPath('/images/pandals/sovabazar-rajbari.webp'),
-      href: '/explore?heritageOnly=true',
-      badge: isBn ? 'ঐতিহ্য' : 'Heritage',
-    },
-    {
-      title: isBn ? 'মণ্ডপ শিল্পকলা' : 'Pandal Art',
-      desc: isBn ? 'কলকাতার সেরা সৃজনশীল শিল্পকর্ম।' : 'Explore creative installations across Kolkata.',
-      image: getAssetPath('/images/pandals/behala-natun-dal.webp'),
       href: '/explore',
-      badge: isBn ? 'শিল্প' : 'Artistry',
+      badge: isBn ? 'ঐতিহ্য ও শিল্প' : 'Traditions & Art',
     },
     {
-      title: isBn ? 'সন্ধ্যায় পুজো পরিক্রমা' : 'Pujo Evenings',
-      desc: isBn ? 'আলোকসজ্জা ও রাতের মণ্ডপ দর্শন।' : 'Plan your route for the best evening experience.',
+      title: isBn ? 'পুজোর নির্ঘণ্ট ও পঞ্জিকা' : 'Sacred Almanac & Timings',
+      desc: isBn
+        ? 'মহাষ্টমীর সন্ধিপূজা, পুষ্পাঞ্জলি ও তিথির সঠিক সময়সূচি।'
+        : 'Accurate Ashtami Sandhi Puja, Pushpanjali, and tithi timings.',
+      image: getAssetPath('/images/pandals/bagbazar-sarbojanin.webp'),
+      href: '/calendar',
+      badge: isBn ? 'পঞ্জিকা' : 'Almanac',
+    },
+    {
+      title: isBn ? 'সন্ধ্যায় পুজো পরিক্রমা' : 'Pujo Evenings & Routes',
+      desc: isBn
+        ? 'আলোকসজ্জা ও রাতের মণ্ডপ দর্শন সহজে পরিকল্পনা করুন।'
+        : 'Plan your route for the best evening hopping and illumination.',
       image: getAssetPath('/images/pandals/college-square.webp'),
       href: '/planner',
       badge: isBn ? 'পরিক্রমা' : 'Routes',

@@ -82,9 +82,9 @@ export const GHIBLI_BACKGROUNDS: GhibliBackground[] = [
 ];
 
 export interface BackgroundRotationSettings {
-  /** Rotation interval in milliseconds (approx 20–35s, default 28s) */
+  /** Rotation interval in milliseconds (~60s, default 60000ms) */
   intervalMs: number;
-  /** Crossfade transition duration in milliseconds (approx 1.5–2.5s, default 2s) */
+  /** Crossfade transition duration in milliseconds (approx 1.5–3s, default 2s) */
   transitionDurationMs: number;
   /** Visible yet subtle image opacity for Light Mode (default 0.32) */
   lightModeOpacity: number;
@@ -95,7 +95,7 @@ export interface BackgroundRotationSettings {
 }
 
 export const BACKGROUND_SETTINGS: BackgroundRotationSettings = {
-  intervalMs: 28000,          // 28 seconds
+  intervalMs: 60000,          // 60 seconds interval
   transitionDurationMs: 2000,  // 2.0 seconds smooth crossfade
   lightModeOpacity: 0.32,      // Restored original visible opacity (32%) for vibrant atmospheric light mode
   darkModeOpacity: 0.38,       // Restored original visible opacity (38%) for glowing festive night dark mode

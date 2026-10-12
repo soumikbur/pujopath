@@ -28,6 +28,8 @@ export function BottomMusicPlayer() {
     seek,
     queue,
     playTrack,
+    isPlayerDismissed,
+    closePlayer,
   } = useAudio();
 
   const { locale } = useI18n();
@@ -37,8 +39,8 @@ export function BottomMusicPlayer() {
 
   const [playlistDrawerOpen, setPlaylistDrawerOpen] = useState(false);
 
-  // Keep the interface quiet until the visitor chooses to play something.
-  if (!currentTrack || (!isPlaying && currentTime === 0)) return null;
+  // Keep the interface quiet until the visitor chooses to play something, or if explicitly closed
+  if (isPlayerDismissed || !currentTrack || (!isPlaying && currentTime === 0)) return null;
 
   const formatSeconds = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -61,7 +63,7 @@ export function BottomMusicPlayer() {
       {/* ── Wide Floating Frosted Glass Media Player ── */}
       <aside
         aria-label="Media Player"
-        className="fixed z-[1150] left-1/2 -translate-x-1/2 bottom-16 md:bottom-5 pointer-events-auto
+        className="fixed z-[1150] left-1/2 -translate-x-1/2 bottom-[calc(68px+env(safe-area-inset-bottom,0px))] sm:bottom-5 pointer-events-auto
                    w-[calc(100%-20px)] md:w-[820px] transition-all duration-300 animate-in slide-in-from-bottom-3"
       >
         {/* Glass container */}
@@ -227,6 +229,17 @@ export function BottomMusicPlayer() {
             >
               <ListMusic className="w-[18px] h-[18px]" />
             </button>
+
+            {/* 6. Close button */}
+            <button
+              onClick={closePlayer}
+              className="p-1.5 shrink-0 transition-opacity hover:opacity-70 active:scale-95 rounded-full hover:bg-black/5 dark:hover:bg-white/10"
+              style={{ color: isDark ? '#EDE5DC' : '#292525' }}
+              aria-label="Close music player"
+              title="Close music player"
+            >
+              <X className="w-[18px] h-[18px]" />
+            </button>
           </div>
 
           {/* ── Mobile layout ── */}
@@ -287,11 +300,21 @@ export function BottomMusicPlayer() {
 
               <button
                 onClick={() => setPlaylistDrawerOpen(!playlistDrawerOpen)}
-                className="p-1 shrink-0"
+                className="p-1 shrink-0 transition-opacity hover:opacity-70 active:scale-95"
                 style={{ color: isDark ? '#EDE5DC' : 'rgba(41,37,37,0.55)' }}
                 aria-label="Playlist"
               >
                 <ListMusic className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={closePlayer}
+                className="p-1 shrink-0 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-opacity hover:opacity-70 active:scale-95"
+                style={{ color: isDark ? '#EDE5DC' : 'rgba(41,37,37,0.55)' }}
+                aria-label="Close music player"
+                title="Close music player"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
 

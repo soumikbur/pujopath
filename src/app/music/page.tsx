@@ -117,7 +117,7 @@ export default function MusicPage() {
   };
 
   return (
-    <div className="space-y-7 max-w-6xl mx-auto pb-24">
+    <div className="space-y-7 max-w-6xl mx-auto pb-36 sm:pb-28">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
@@ -186,19 +186,19 @@ export default function MusicPage() {
 
       {/* Featured Now Playing Showcase */}
       {currentTrack && (
-        <div className="p-6 sm:p-8 rounded-3xl bg-linear-to-br from-white to-[#fbf8f4] dark:from-[#1a1613] dark:to-[#14100d] border border-[#eee8e1] dark:border-[#2f2720] shadow-card flex flex-col md:flex-row items-center gap-6">
-          <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-3xl overflow-hidden shadow-card border border-[#eee8e1] dark:border-[#2f2720] shrink-0 bg-white dark:bg-[#14110e]">
+        <div className="p-4 sm:p-6 md:p-8 rounded-3xl bg-linear-to-br from-white to-[#fbf8f4] dark:from-[#1a1613] dark:to-[#14100d] border border-[#eee8e1] dark:border-[#2f2720] shadow-card flex flex-col md:flex-row items-center gap-5 sm:gap-6">
+          <div className="relative w-28 h-28 sm:w-40 sm:h-40 rounded-3xl overflow-hidden shadow-card border border-[#eee8e1] dark:border-[#2f2720] shrink-0 bg-white dark:bg-[#14110e]">
             <Image
               src={getAssetPath('/images/mahalaya-thumb.jpg')}
               alt={currentTrack.title}
               fill
               className="object-cover"
-              sizes="200px"
+              sizes="(max-width: 640px) 112px, 160px"
             />
           </div>
 
-          <div className="space-y-3 flex-1 text-center md:text-left min-w-0">
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+          <div className="space-y-2.5 sm:space-y-3 flex-1 text-center md:text-left min-w-0 w-full">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2">
               <span className="text-xs font-bold uppercase tracking-wider text-[#b42323]">
                 {isPlaying ? (isBn ? 'বর্তমানে বাজছে' : 'Now Playing') : (isBn ? 'নির্বাচিত গান' : 'Selected Track')}
               </span>
@@ -213,7 +213,7 @@ export default function MusicPage() {
               )}
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-black text-[#242424] dark:text-[#ede5dc] leading-tight truncate">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[#242424] dark:text-[#ede5dc] leading-tight break-words">
               {isBn ? currentTrack.titleBn || currentTrack.title : currentTrack.title}
             </h2>
             <p className="text-xs sm:text-sm text-[#665a54] dark:text-[#a89e95]">
@@ -224,13 +224,13 @@ export default function MusicPage() {
               {isBn ? currentTrack.descriptionBn : currentTrack.description}
             </p>
 
-            <div className="pt-1 flex flex-wrap items-center justify-center md:justify-start gap-3">
+            <div className="pt-1 flex flex-col xs:flex-row flex-wrap items-center justify-center md:justify-start gap-2.5 sm:gap-3 w-full">
               {currentTrack.playbackMethod === 'external_listen_link' ? (
                 <a
                   href={currentTrack.externalListenUrl || currentTrack.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#b42323] hover:bg-[#971c1c] text-white font-bold text-sm shadow-sm transition-all active:scale-95 cursor-pointer"
+                  className="w-full xs:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-[#b42323] hover:bg-[#971c1c] text-white font-bold text-sm shadow-sm transition-all active:scale-95 cursor-pointer"
                 >
                   <ExternalLink className="w-4 h-4" />
                   <span>{isBn ? 'অফিসিয়াল স্ট্রিমে শুনুন' : 'Listen on Official Stream'}</span>
@@ -239,7 +239,7 @@ export default function MusicPage() {
                 <button
                   type="button"
                   onClick={togglePlay}
-                  className="inline-flex items-center gap-2.5 px-7 py-3 rounded-2xl bg-[#b42323] hover:bg-[#971c1c] text-white font-bold text-sm shadow-sm transition-all active:scale-95 cursor-pointer"
+                  className="w-full xs:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3 rounded-2xl bg-[#b42323] hover:bg-[#971c1c] text-white font-bold text-sm shadow-sm transition-all active:scale-95 cursor-pointer"
                 >
                   {isLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -261,7 +261,7 @@ export default function MusicPage() {
               <button
                 type="button"
                 onClick={() => togglePlaylistTrack(currentTrack.id)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-xs font-semibold text-[#665a54] dark:text-[#a89e95] hover:text-[#b42323] transition-colors cursor-pointer"
+                className="w-full xs:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-xs font-semibold text-[#665a54] dark:text-[#a89e95] hover:text-[#b42323] transition-colors cursor-pointer"
               >
                 {isInPlaylist(currentTrack.id) ? (
                   <>
@@ -281,7 +281,7 @@ export default function MusicPage() {
                   href={currentTrack.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-xs font-semibold text-[#665a54] dark:text-[#a89e95] hover:text-[#b42323] transition-colors"
+                  className="w-full xs:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-xs font-semibold text-[#665a54] dark:text-[#a89e95] hover:text-[#b42323] transition-colors"
                 >
                   <span>{isBn ? 'লাইসেন্স ও সোর্স' : 'Source & License'}</span>
                   <ExternalLink className="w-3 h-3" />

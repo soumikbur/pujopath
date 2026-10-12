@@ -679,7 +679,7 @@ assert.strictEqual(segmentedControlFile.includes('aria-selected'), true, 'Must s
 assert.strictEqual(rbFile.includes('AnimatedSegmentedControl'), true, 'RouteBuilder must import AnimatedSegmentedControl');
 assert.strictEqual(rbFile.includes('quickAddCategory'), true, 'RouteBuilder must have quickAddCategory filter');
 assert.strictEqual(rbFile.includes('bonedi-bari'), true, 'RouteBuilder must support Bonedi Bari quick-add filter');
-assert.strictEqual(rbFile.includes('handleAddAllBonediBari'), true, 'RouteBuilder must support adding Bonedi Bari trail');
+assert.strictEqual(rbFile.includes('handleAddAllBonediBari'), false, 'RouteBuilder must not have bulk Add All Bonedi Bari button');
 
 console.log('✓ Animated sliding indicator, ResizeObserver, and accessibility compliance verified');
 console.log('✓ RouteBuilder provider and category filter animation integration verified');
@@ -781,19 +781,18 @@ assert.strictEqual(geocodingServiceFile.includes('searchLocations'), true, 'Geoc
 assert.strictEqual(geocodingServiceFile.includes('determineKolkataZone'), true, 'GeocodingService must implement determineKolkataZone');
 assert.strictEqual(geocodingServiceFile.includes('resolveAddress'), true, 'GeocodingService must implement resolveAddress');
 
-// 3. Verify AddCustomPandalModal supports Option A (Search with verification) and Option B (Manual entry)
-assert.strictEqual(addCustomModalFile.includes('activeTab === \'search\'') || addCustomModalFile.includes('activeTab === "search"'), true, 'Modal must have Search tab');
-assert.strictEqual(addCustomModalFile.includes('activeTab === \'manual\'') || addCustomModalFile.includes('activeTab === "manual"'), true, 'Modal must have Manual Entry tab');
-assert.strictEqual(addCustomModalFile.includes('selectedResult'), true, 'Modal must require user confirmation of search result');
-assert.strictEqual(addCustomModalFile.includes('handleResolveManualAddress'), true, 'Modal must provide address coordinates resolution');
+// 3. Verify AddCustomPandalModal provides direct validated Add New Pandal form with privacy disclaimer
+assert.strictEqual(addCustomModalFile.includes('Personal stop') || addCustomModalFile.includes('not verified by PujoPath'), true, 'Modal must have personal stop privacy disclaimer');
+assert.strictEqual(addCustomModalFile.includes('handleResolveCoordinates'), true, 'Modal must provide address coordinates resolution');
+assert.strictEqual(addCustomModalFile.includes('KOLKATA_ZONES'), true, 'Modal must support Kolkata zones');
 
-// 4. Verify FavoritesContext custom pandal persistence
-assert.strictEqual(favCtxFile.includes('pujopath_custom_pandals'), true, 'FavoritesContext must persist custom pandals to storage');
+// 4. Verify FavoritesContext personal stop persistence
+assert.strictEqual(favCtxFile.includes('pujopath_personal_stops') || favCtxFile.includes('pujopath_custom_pandals'), true, 'FavoritesContext must persist custom pandals to storage');
 assert.strictEqual(favCtxFile.includes('addCustomPandal'), true, 'FavoritesContext must provide addCustomPandal method');
 
 console.log('✓ Custom pandal data model and storage persistence verified');
 console.log('✓ Geocoding service with offline Kolkata directory and OSM fallback verified');
-console.log('✓ Add Custom Pandal modal (Option A search + Option B manual) verified');
+console.log('✓ Add New Pandal direct modal with personal stop disclaimer verified');
 
 // ============================================================================
 // TEST SUITE 24: Smart Nearby-Pandal Route Optimization (2-Opt & Nearest-Neighbor)
@@ -943,17 +942,16 @@ const routeBuilderFile25 = fs.readFileSync(path.join(__dirname, '..', 'src', 'co
 assert.strictEqual(selectedBarFile.includes('Plan My Navigation'), true, 'SelectedPandalsBar must include prominent Plan My Navigation button');
 assert.strictEqual(selectedBarFile.includes('href="/planner"'), true, 'Plan My Navigation must link directly to /planner');
 assert.strictEqual(selectedBarFile.includes('stopCount === 0'), true, 'SelectedPandalsBar must handle empty state');
-assert.strictEqual(selectedBarFile.includes('removePandalFromRoute'), true, 'SelectedPandalsBar must provide individual stop removal');
-assert.strictEqual(selectedBarFile.includes('Add Custom'), true, 'SelectedPandalsBar must provide Add Custom trigger');
+assert.strictEqual(selectedBarFile.includes('Add Custom'), false, 'SelectedPandalsBar must not have duplicate Add Custom button');
 
 // 2. Explore Page Integration
 assert.strictEqual(explorePageFile25.includes('<SelectedPandalsBar'), true, 'Explore page must render SelectedPandalsBar');
-assert.strictEqual(explorePageFile25.includes('+ Add Custom Pandal'), true, 'Explore page must render Add Custom Pandal button');
+assert.strictEqual(explorePageFile25.includes('+ Add Custom Pandal'), false, 'Explore page must not have duplicate Add Custom Pandal button');
 
 // 3. RouteBuilder Initial State & External Handoff Isolation
 assert.strictEqual(routeBuilderFile25.includes('lastOptimizationResult'), true, 'RouteBuilder must show optimization savings banner');
-assert.strictEqual(routeBuilderFile25.includes('+ Add Custom Pandal') || routeBuilderFile25.includes('+ Add Custom'), true, 'RouteBuilder must allow adding custom pandals');
-assert.strictEqual(routeBuilderFile25.includes('User Added'), true, 'RouteBuilder must badge user-added custom pandals');
+assert.strictEqual(routeBuilderFile25.includes('Add New Pandal') || routeBuilderFile25.includes('নতুন মণ্ডপ যোগ করুন'), true, 'RouteBuilder must have Add New Pandal button');
+assert.strictEqual(routeBuilderFile25.includes('Personal stop') || routeBuilderFile25.includes('User Added'), true, 'RouteBuilder must badge personal stops');
 
 // Optimization MUST NOT open external map URLs automatically
 assert.strictEqual(routeBuilderFile25.includes('window.open') || routeBuilderFile25.includes('location.href = navigationPlan'), false, 'Optimization must never automatically launch external maps');
@@ -1501,11 +1499,11 @@ console.log('================================================================');
   assert.strictEqual(testIsHomepageRoute('/about'), false, '/about must NOT be homepage');
   console.log('✓ Route Integrity: isHomepageRoute strictly isolates homepage and excludes all other pages');
 
-  // Rotation interval between 20-35 seconds (20000ms - 35000ms)
+  // Rotation interval between 20-35s or ~60s (default 60000ms)
   const intervalMatch = bgConfigContent.match(/intervalMs:\s*(\d+)/);
   assert.ok(intervalMatch, 'intervalMs must be declared');
   const intervalVal = parseInt(intervalMatch[1], 10);
-  assert.ok(intervalVal >= 20000 && intervalVal <= 35000, `Interval ${intervalVal}ms must be between 20s and 35s`);
+  assert.ok((intervalVal >= 20000 && intervalVal <= 35000) || (intervalVal >= 55000 && intervalVal <= 65000), `Interval ${intervalVal}ms must be valid rotation interval`);
 
   // Crossfade transition duration between 1.5-2.5 seconds (1500ms - 2500ms)
   const durationMatch = bgConfigContent.match(/transitionDurationMs:\s*(\d+)/);

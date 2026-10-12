@@ -67,9 +67,9 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       const routes = localStorage.getItem('pujopath_saved_routes');
       if (routes) setSavedRoutes(JSON.parse(routes));
 
-      // Hydrate custom user-added pandals
-      const savedCustom = localStorage.getItem('pujopath_custom_pandals');
-      const loadedCustom: Pandal[] = savedCustom ? JSON.parse(savedCustom) : [];
+      // Hydrate personal stops from dedicated device-local collection
+      const savedPersonal = localStorage.getItem('pujopath_personal_stops') || localStorage.getItem('pujopath_custom_pandals');
+      const loadedCustom: Pandal[] = savedPersonal ? JSON.parse(savedPersonal) : [];
       setCustomPandals(loadedCustom);
 
       // Hydrate active route stops (looking in both static pandals and custom pandals)
@@ -192,17 +192,17 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       addressBn: input.addressBn || input.address,
       latitude: hasCoords ? input.latitude! : 0,
       longitude: hasCoords ? input.longitude! : 0,
-      theme: 'Community Durgotsav',
-      themeBn: 'সার্বজনীন দুর্গোৎসব',
+      theme: 'Personal Route Stop',
+      themeBn: 'ব্যক্তিগত পরিক্রমা স্টপ',
       category: 'Community',
-      description: `User-added Durga Puja destination at ${input.address}.`,
-      descriptionBn: `ব্যবহারকারী কর্তৃক যুক্ত দুর্গাপূজা মণ্ডপ। ঠিকানা: ${input.address}।`,
+      description: `Personal stop added on this device: ${input.address}. Not verified by PujoPath.`,
+      descriptionBn: `এই ডিভাইসে যুক্ত ব্যক্তিগত স্টপ: ${input.address}। পুজোপথ কর্তৃক যাচাইকৃত নয়।`,
       openingTime: '06:00',
       closingTime: '02:00',
       crowdLevel: 'Moderate',
-      popularityScore: 75,
-      rating: 4.5,
-      reviewCount: 1,
+      popularityScore: 0,
+      rating: 0,
+      reviewCount: 0,
       imageUrl: '',
       hasVerifiedPhoto: false,
       photoMetadata: {
@@ -213,18 +213,18 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
         photoYear: null,
         priorityLevel: 4,
         confidenceScore: 0,
-        selectionReason: 'Custom user listing awaiting authentic photograph verification.',
+        selectionReason: 'Personal stop — not verified by PujoPath',
         verificationStatus: 'Photo Unavailable',
-        sourceName: 'User Added Custom Listing',
+        sourceName: 'Personal Device Entry',
         verifiedDate: new Date().toISOString().split('T')[0],
-        notes: 'Custom pandal awaiting photograph verification.',
+        notes: 'Personal stop — not verified by PujoPath.',
       },
       galleryImages: [],
       isFeatured: false,
       isHeritage: false,
       facilities: {
-        wheelchairAccessible: true,
-        drinkingWater: true,
+        wheelchairAccessible: false,
+        drinkingWater: false,
         medicalBooth: false,
         vipPassEntry: false,
         parkingAvailable: false,
@@ -232,6 +232,8 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       metroLinks: [],
       isCustom: true,
       isUserAdded: true,
+      isPersonalStop: true,
+      verificationStatus: 'Visitor access unconfirmed',
       hasUnresolvedCoordinates: !hasCoords || Boolean(input.hasUnresolvedCoordinates),
       addedAt: new Date().toISOString(),
     };
@@ -239,9 +241,11 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     const updatedCustom = [newPandal, ...customPandals];
     setCustomPandals(updatedCustom);
     try {
+      localStorage.setItem('pujopath_personal_stops', JSON.stringify(updatedCustom));
       localStorage.setItem('pujopath_custom_pandals', JSON.stringify(updatedCustom));
-    } catch {
-      // ignore
+    } catch (err) {
+      console.error('Failed to persist personal stop to device local storage:', err);
+      throw new Error('Local device storage failed. Could not save personal stop.');
     }
 
     if (addToActiveRoute) {
@@ -255,6 +259,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     const updatedCustom = customPandals.filter((p) => p.id !== id);
     setCustomPandals(updatedCustom);
     try {
+      localStorage.setItem('pujopath_personal_stops', JSON.stringify(updatedCustom));
       localStorage.setItem('pujopath_custom_pandals', JSON.stringify(updatedCustom));
     } catch {
       // ignore

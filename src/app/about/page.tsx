@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { PhoneCall, ShieldCheck, Info, Users, Github } from 'lucide-react';
+import { PhoneCall, ShieldCheck, Info, Users } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
 
 export default function AboutPage() {
@@ -86,50 +86,40 @@ export default function AboutPage() {
           </h2>
           <p className="text-sm sm:text-base text-[#665a54] dark:text-[#a89e95] mt-1.5 leading-relaxed">
             {isBn
-              ? 'পুজোপথ হলো সৌমিক এবং মৌমিতার একটি যৌথ সৃষ্টি, যা মানুষকে কলকাতার দুর্গোৎসবের মণ্ডপ আবিষ্কার ও সুষ্ঠু পরিকল্পনা করতে সাহায্য করে।'
-              : 'PujoPath is a collaborative project created by Soumik and Moumita to help people discover Kolkata\'s Durga Puja pandals and plan their Puja experiences.'}
+              ? 'পুজোপথ হলো সৌমিক ঘোষ এবং মৌমিতা শী-র একটি যৌথ সৃষ্টি, যা মানুষকে কলকাতার দুর্গোৎসবের মণ্ডপ আবিষ্কার ও সুষ্ঠু পরিকল্পনা করতে সাহায্য করে।'
+              : 'PujoPath is a collaborative project co-created by Soumik Ghosh and Moumita Shee to help people discover Kolkata\'s Durga Puja pandals and plan their festive experiences.'}
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-          {/* Soumik */}
+          {/* Soumik Ghosh */}
           <div className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3">
             <div className="space-y-0.5">
-              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc]">Soumik</div>
+              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc]">
+                {isBn ? 'সৌমিক ঘোষ' : 'Soumik Ghosh'}
+              </div>
               <div className="text-xs font-semibold text-[#b42323] dark:text-[#e05656]">
-                {isBn ? 'সহ-নির্মাতা' : 'Co-creator'}
+                {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
               </div>
             </div>
-            <a
-              href="https://github.com/soumikbur"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#242424] dark:text-[#ede5dc] border border-[#e5ded6] dark:border-[#3d332a] hover:bg-[#b42323] hover:text-white dark:hover:bg-[#b42323] hover:border-[#b42323] transition-colors shadow-sm"
-              aria-label="Soumik's GitHub profile"
-            >
-              <Github className="w-3.5 h-3.5" />
-              <span>GitHub</span>
-            </a>
+            <span className="px-3 py-1 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a]">
+              {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
+            </span>
           </div>
 
-          {/* Moumita */}
+          {/* Moumita Shee */}
           <div className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3">
             <div className="space-y-0.5">
-              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc]">Moumita</div>
+              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc]">
+                {isBn ? 'মৌমিতা শী' : 'Moumita Shee'}
+              </div>
               <div className="text-xs font-semibold text-[#b42323] dark:text-[#e05656]">
-                {isBn ? 'সহ-নির্মাতা' : 'Co-creator'}
+                {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
               </div>
             </div>
-            <a
-              href="https://github.com/Moumita-08"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#242424] dark:text-[#ede5dc] border border-[#e5ded6] dark:border-[#3d332a] hover:bg-[#b42323] hover:text-white dark:hover:bg-[#b42323] hover:border-[#b42323] transition-colors shadow-sm"
-              aria-label="Moumita's GitHub profile"
-            >
-              <Github className="w-3.5 h-3.5" />
-              <span>GitHub</span>
-            </a>
+            <span className="px-3 py-1 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a]">
+              {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
+            </span>
           </div>
         </div>
       </div>

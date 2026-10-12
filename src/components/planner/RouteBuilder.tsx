@@ -51,6 +51,7 @@ export function RouteBuilder() {
     saveCurrentRoute,
     addPandalToRoute,
     customPandals,
+    removeCustomPandal,
   } = useFavorites();
 
   const { locale } = useI18n();
@@ -241,13 +242,6 @@ export function RouteBuilder() {
 
     return list;
   }, [currentRouteStops, customPandals, quickAddCategory, quickAddSearch]);
-
-  const handleAddAllBonediBari = () => {
-    const bonediList = PANDALS_DATA.filter(
-      (p) => (p.isBonediBari || p.category === 'Bonedi Bari') && !currentRouteStops.some((s) => s.pandalId === p.id)
-    );
-    bonediList.forEach((p) => addPandalToRoute(p));
-  };
 
   return (
     <div className="space-y-6">
@@ -669,7 +663,7 @@ export function RouteBuilder() {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-[#b42323] bg-white dark:bg-[#1a1613] text-[#b42323] hover:bg-[#b42323] hover:text-white text-sm font-extrabold transition-all active:scale-95 shadow-xs"
             >
               <Plus className="w-4 h-4" />
-              <span>{isBn ? '+ নিজস্ব মণ্ডপ যোগ করুন' : '+ Add Custom Pandal'}</span>
+              <span>{isBn ? 'নতুন মণ্ডপ যোগ করুন' : 'Add New Pandal'}</span>
             </button>
           </div>
         </div>
@@ -698,9 +692,9 @@ export function RouteBuilder() {
                     <h4 className="text-sm sm:text-base font-bold text-[#242424] dark:text-[#ede5dc] truncate">
                       {isBn ? stop.pandal.nameBn : stop.pandal.name}
                     </h4>
-                    {stop.pandal.isUserAdded && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold shrink-0 border border-purple-200 dark:border-purple-800">
-                        {isBn ? '👤 নিজস্ব যোগ' : '👤 User Added'}
+                    {(stop.pandal.isUserAdded || stop.pandal.isPersonalStop) && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold shrink-0 border border-amber-300 dark:border-amber-700">
+                        {isBn ? 'ব্যক্তিগত স্টপ — অযাচাইকৃত' : 'Personal stop — not verified by PujoPath'}
                       </span>
                     )}
                     {stop.pandal.hasUnresolvedCoordinates && (
@@ -783,10 +777,10 @@ export function RouteBuilder() {
             <button
               type="button"
               onClick={() => setCustomModalOpen(true)}
-              className="px-3 py-1.5 rounded-xl border-2 border-[#b42323] bg-white dark:bg-[#1a1613] hover:bg-[#b42323] text-[#b42323] hover:text-white text-xs font-bold shrink-0 transition-all active:scale-95 shadow-xs flex items-center gap-1"
+              className="px-3 py-1.5 rounded-xl border-2 border-[#b42323] bg-white dark:bg-[#1a1613] hover:bg-[#b42323] text-[#b42323] hover:text-white text-xs font-bold shrink-0 transition-all active:scale-95 shadow-xs flex items-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>{isBn ? '+ নিজস্ব' : '+ Custom'}</span>
+              <span>{isBn ? 'নতুন মণ্ডপ যোগ করুন' : 'Add New Pandal'}</span>
             </button>
           </div>
         </div>
@@ -816,7 +810,7 @@ export function RouteBuilder() {
           />
         </div>
 
-        {/* Bonedi Bari Special Quick-Action */}
+        {/* Bonedi Bari Special Heritage Section Note */}
         {quickAddCategory === 'bonedi-bari' && (
           <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div className="text-xs text-[#776d65] dark:text-[#c4b5a7]">
@@ -825,18 +819,10 @@ export function RouteBuilder() {
               </span>
               <span className="sm:ml-2">
                 {isBn
-                  ? 'শোভাবাজার, জোড়াসাঁকো, দার্জিপাড়া ও জানবাজারের ঐতিহাসিক পারিবারিক পুজো।'
-                  : 'Historical heritage pujas of Sovabazar, Jorasanko, Darjipara, and Janbazar.'}
+                  ? 'শোভাবাজার, জোড়াসাঁকো, দার্জিপাড়া ও জানবাজারের ঐতিহাসিক পারিবারিক পুজো। নিচে পৃথকভাবে নির্বাচন করুন।'
+                  : 'Historical heritage family pujas of Sovabazar, Jorasanko, Darjipara, and Janbazar. Add individual stops below.'}
               </span>
             </div>
-            <button
-              type="button"
-              onClick={handleAddAllBonediBari}
-              className="px-3.5 py-1.5 rounded-lg bg-[#b42323] hover:bg-[#971c1c] text-white text-xs font-bold shrink-0 transition-all shadow-xs active:scale-95 flex items-center justify-center gap-1.5"
-            >
-              <span>+</span>
-              <span>{isBn ? 'সব বনেদি পুজো যোগ করুন' : 'Add All Bonedi Bari Pujas'}</span>
-            </button>
           </div>
         )}
 
@@ -866,10 +852,23 @@ export function RouteBuilder() {
                       {isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari'}
                     </span>
                   )}
-                  {p.isUserAdded && (
-                    <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold">
-                      {isBn ? '👤 নিজস্ব যোগ' : '👤 User Added'}
-                    </span>
+                  {(p.isUserAdded || p.isPersonalStop) && (
+                    <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold border border-amber-300 dark:border-amber-700">
+                        {isBn ? 'ব্যক্তিগত স্টপ (অযাচাইকৃত)' : 'Personal stop (Unverified)'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeCustomPandal(p.id);
+                        }}
+                        className="text-[10px] text-rose-600 dark:text-rose-400 hover:underline font-bold"
+                        title={isBn ? 'ব্যক্তিগত স্টপ মুছুন' : 'Delete personal stop'}
+                      >
+                        {isBn ? 'মুছুন' : 'Delete'}
+                      </button>
+                    </div>
                   )}
                 </div>
                 <button

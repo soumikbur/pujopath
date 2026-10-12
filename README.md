@@ -178,10 +178,10 @@ The project deploys automatically to **GitHub Pages** via the GitHub Actions wor
 
 ## 👥 Project Creators
 
-PujoPath is a collaborative project created by Soumik and Moumita to help people discover Kolkata's Durga Puja pandals and plan their Puja experiences.
+PujoPath is a collaborative project created by Soumik Ghosh and Moumita Shee to help people discover Kolkata's Durga Puja pandals and plan their Puja experiences.
 
-- [Soumik](https://github.com/soumikbur) — Co-creator
-- [Moumita](https://github.com/Moumita-08) — Co-creator
+- Soumik Ghosh — Co-Creator
+- Moumita Shee — Co-Creator
 
 ---
 
