@@ -66,6 +66,12 @@ export function RouteBuilder() {
   // Quick Add category filter state
   const [quickAddCategory, setQuickAddCategory] = useState<string>('all');
   const [quickAddSearch, setQuickAddSearch] = useState<string>('');
+  const [quickAddLimit, setQuickAddLimit] = useState<number>(12);
+
+  const totalBonediCount = useMemo(
+    () => PANDALS_DATA.filter((p) => p.isBonediBari || p.category === 'Bonedi Bari').length,
+    []
+  );
 
   // GPS Location state
   const [isLocating, setIsLocating] = useState<boolean>(false);
@@ -793,7 +799,7 @@ export function RouteBuilder() {
               {
                 id: 'bonedi-bari',
                 label: isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari',
-                badge: isBn ? '১৭' : '17',
+                badge: isBn ? toBengaliDigits(totalBonediCount) : String(totalBonediCount),
               },
               { id: 'north', label: isBn ? 'উত্তর কলকাতা' : 'North' },
               { id: 'south', label: isBn ? 'দক্ষিণ কলকাতা' : 'South' },
@@ -801,7 +807,10 @@ export function RouteBuilder() {
               { id: 'east', label: isBn ? 'সল্টলেক ও পূর্ব' : 'Salt Lake & East' },
             ]}
             value={quickAddCategory}
-            onChange={setQuickAddCategory}
+            onChange={(cat) => {
+              setQuickAddCategory(cat);
+              setQuickAddLimit(12);
+            }}
             size="sm"
             ariaLabel={isBn ? 'রুট প্ল্যানার প্যান্ডেল ফিল্টার' : 'Route planner pandal filter'}
           />
@@ -840,7 +849,7 @@ export function RouteBuilder() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {availablePandals.slice(0, 9).map((p) => (
+            {availablePandals.slice(0, quickAddLimit).map((p) => (
               <div
                 key={p.id}
                 className="p-3.5 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] flex items-center justify-between gap-2.5 shadow-xs transition-all hover:border-[#b42323]/40"
@@ -873,6 +882,20 @@ export function RouteBuilder() {
                 </button>
               </div>
             ))}
+
+            {availablePandals.length > quickAddLimit && (
+              <div className="col-span-full pt-2 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setQuickAddLimit((prev) => prev + 12)}
+                  className="px-4 py-2 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] hover:border-[#b42323] text-[#4a423d] dark:text-[#c4b9ae] hover:text-[#b42323] text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
+                >
+                  {isBn
+                    ? `আরও মণ্ডপ দেখুন (+${toBengaliDigits(Math.min(12, availablePandals.length - quickAddLimit))})`
+                    : `Show More Pandals (+${Math.min(12, availablePandals.length - quickAddLimit)})`}
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

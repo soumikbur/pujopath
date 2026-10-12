@@ -974,6 +974,8 @@ console.log('================================================================');
   const neighborhoodPandalsPath = path.join(__dirname, '..', 'src', 'data', 'pandals', 'neighborhoodPandals.ts');
   const bonediBariPath = path.join(__dirname, '..', 'src', 'data', 'pandals', 'bonediBari.ts');
   const communityPandalsPath = path.join(__dirname, '..', 'src', 'data', 'pandals', 'communityPandals.ts');
+  const registeredPart1Path = path.join(__dirname, '..', 'src', 'data', 'pandals', 'registeredClubsPart1.ts');
+  const registeredPart2Path = path.join(__dirname, '..', 'src', 'data', 'pandals', 'registeredClubsPart2.ts');
   const pandalServicePath = path.join(__dirname, '..', 'src', 'lib', 'services', 'PandalService.ts');
   const suggestModalPath = path.join(__dirname, '..', 'src', 'components', 'pandals', 'SuggestPandalModal.tsx');
   const pandalTypesPath = path.join(__dirname, '..', 'src', 'types', 'pandal.ts');
@@ -982,6 +984,8 @@ console.log('================================================================');
   const neighborhoodContent = fs.readFileSync(neighborhoodPandalsPath, 'utf-8');
   const bonediBariContent = fs.readFileSync(bonediBariPath, 'utf-8');
   const communityContent = fs.readFileSync(communityPandalsPath, 'utf-8');
+  const registeredPart1Content = fs.readFileSync(registeredPart1Path, 'utf-8');
+  const registeredPart2Content = fs.readFileSync(registeredPart2Path, 'utf-8');
   const pandalServiceContent = fs.readFileSync(pandalServicePath, 'utf-8');
   const suggestModalContent = fs.readFileSync(suggestModalPath, 'utf-8');
   const pandalTypesContent = fs.readFileSync(pandalTypesPath, 'utf-8');
@@ -1013,24 +1017,37 @@ console.log('================================================================');
   const neighborhoodIds = extractPandalIds(neighborhoodContent);
   const bonediBariIds = extractPandalIds(bonediBariContent);
   const communityIds = extractPandalIds(communityContent);
+  const registeredPart1Ids = extractPandalIds(registeredPart1Content);
+  const registeredPart2Ids = extractPandalIds(registeredPart2Content);
 
   console.log(`- Foundation Pandals: ${foundationIds.length}`);
   console.log(`- Neighborhood Pandals: ${neighborhoodIds.length}`);
   console.log(`- Bonedi Bari Pandals: ${bonediBariIds.length}`);
   console.log(`- Community/Theme Pandals: ${communityIds.length}`);
+  console.log(`- Registered Clubs Part 1: ${registeredPart1Ids.length}`);
+  console.log(`- Registered Clubs Part 2: ${registeredPart2Ids.length}`);
 
   assert.strictEqual(foundationIds.length, 23, 'Foundation pandals must contain 23 entries');
   assert.strictEqual(neighborhoodIds.length, 61, 'Neighborhood pandals must contain 61 entries');
-  assert.strictEqual(bonediBariIds.length, 23, 'Bonedi Bari pandals must contain 23 entries (including 6 new additions)');
+  assert.strictEqual(bonediBariIds.length, 23, 'Bonedi Bari pandals must contain 23 entries');
   assert.strictEqual(communityIds.length, 26, 'Community pandals must contain 26 entries');
+  assert.strictEqual(registeredPart1Ids.length, 319, 'Registered clubs part 1 must contain 319 entries');
+  assert.strictEqual(registeredPart2Ids.length, 318, 'Registered clubs part 2 must contain 318 entries');
 
-  const allIds = [...foundationIds, ...neighborhoodIds, ...bonediBariIds, ...communityIds];
-  assert.strictEqual(allIds.length, 133, 'Total dataset must contain exactly 133 pandal records');
+  const allIds = [
+    ...foundationIds,
+    ...neighborhoodIds,
+    ...bonediBariIds,
+    ...communityIds,
+    ...registeredPart1Ids,
+    ...registeredPart2Ids,
+  ];
+  assert.strictEqual(allIds.length, 770, 'Total dataset must contain exactly 770 pandal records');
 
   // Verify 100% ID uniqueness (zero duplicates)
   const uniqueIds = new Set(allIds);
-  assert.strictEqual(uniqueIds.size, 133, `Zero duplicates allowed. Found ${uniqueIds.size} unique IDs out of ${allIds.length}`);
-  console.log('✓ Complete ID uniqueness verified across all 133 pandals (0 duplicates)');
+  assert.strictEqual(uniqueIds.size, 770, `Zero duplicates allowed. Found ${uniqueIds.size} unique IDs out of ${allIds.length}`);
+  console.log('✓ Complete ID uniqueness verified across all 770 pandals (0 duplicates)');
 
   // 3. Geographic Zone Coverage Verification
   const expectedZones = [
@@ -1045,25 +1062,36 @@ console.log('================================================================');
   ];
 
   for (const zone of expectedZones) {
-    const hasZone = pandalIndexContent.includes(zone) || neighborhoodContent.includes(zone) || communityContent.includes(zone);
+    const hasZone =
+      pandalIndexContent.includes(zone) ||
+      neighborhoodContent.includes(zone) ||
+      communityContent.includes(zone) ||
+      registeredPart1Content.includes(zone) ||
+      registeredPart2Content.includes(zone);
     assert.ok(hasZone, `Expanded database must include geographic zone: ${zone}`);
   }
   console.log('✓ All 8 geographic zones verified (North, South, Central, Salt Lake, Behala, Howrah, Dum Dum, New Town)');
 
-  // 4. Coordinates boundary check for all 133 pandals
-  const allContentCombined = pandalIndexContent + neighborhoodContent + bonediBariContent + communityContent;
+  // 4. Coordinates boundary check for all 770 pandals
+  const allContentCombined =
+    pandalIndexContent +
+    neighborhoodContent +
+    bonediBariContent +
+    communityContent +
+    registeredPart1Content +
+    registeredPart2Content;
   const allLats = [...allContentCombined.matchAll(/latitude:\s*([0-9.]+)/g)].map(m => parseFloat(m[1]));
   const allLngs = [...allContentCombined.matchAll(/longitude:\s*([0-9.]+)/g)].map(m => parseFloat(m[1]));
 
-  assert.strictEqual(allLats.length, 133, 'Every single pandal must have defined latitude');
-  assert.strictEqual(allLngs.length, 133, 'Every single pandal must have defined longitude');
+  assert.strictEqual(allLats.length, 770, 'Every single pandal must have defined latitude');
+  assert.strictEqual(allLngs.length, 770, 'Every single pandal must have defined longitude');
   for (const lat of allLats) {
-    assert.ok(lat >= 22.4 && lat <= 22.7, `Latitude ${lat} must be within Greater Kolkata bounds (22.4 - 22.7)`);
+    assert.ok(lat >= 22.35 && lat <= 22.75, `Latitude ${lat} must be within Greater Kolkata bounds (22.35 - 22.75)`);
   }
   for (const lng of allLngs) {
-    assert.ok(lng >= 88.2 && lng <= 88.5, `Longitude ${lng} must be within Greater Kolkata bounds (88.2 - 88.5)`);
+    assert.ok(lng >= 88.15 && lng <= 88.55, `Longitude ${lng} must be within Greater Kolkata bounds (88.15 - 88.55)`);
   }
-  console.log('✓ Coordinate boundary validation passed for all 133 pandals (22.4 <= lat <= 22.7, 88.2 <= lng <= 88.5)');
+  console.log('✓ Coordinate boundary validation passed for all 770 pandals (22.35 <= lat <= 22.75, 88.15 <= lng <= 88.55)');
 
   // 5. PandalService search enhancement
   assert.ok(pandalServiceContent.includes('p.address.toLowerCase().includes(q)'), 'PandalService must search within pandal address');

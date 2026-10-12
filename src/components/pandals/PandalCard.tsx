@@ -34,7 +34,9 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
   const displayLocality = isBn ? pandal.localityBn : pandal.locality;
   const displayMetroName = isBn ? (primaryMetro?.stationNameBn || primaryMetro?.stationName) : primaryMetro?.stationName;
 
-  const displayRating = isBn ? toBengaliDigits(pandal.rating.toFixed(1)) : pandal.rating.toFixed(1);
+  const displayRating = typeof pandal.rating === 'number' && pandal.rating > 0
+    ? (isBn ? toBengaliDigits(pandal.rating.toFixed(1)) : pandal.rating.toFixed(1))
+    : null;
 
   const handleRouteToggle = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -140,10 +142,18 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
               <span className="truncate">{displayLocality}</span>
             </div>
 
-            <div className="flex items-center gap-1 text-amber-500 font-bold font-sans text-sm sm:text-base">
-              <Star className="w-4 h-4 fill-current" />
-              <span>{displayRating}</span>
-            </div>
+            {displayRating ? (
+              <div className="flex items-center gap-1 text-amber-500 font-bold font-sans text-sm sm:text-base shrink-0">
+                <Star className="w-4 h-4 fill-current" />
+                <span>{displayRating}</span>
+              </div>
+            ) : (
+              (pandal.coordinateConfidence === 'Needs verification' || pandal.hasUnresolvedCoordinates) && (
+                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800 shrink-0">
+                  {isBn ? 'যাচাই প্রয়োজন' : 'Unverified'}
+                </span>
+              )
+            )}
           </div>
 
           {primaryMetro && (

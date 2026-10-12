@@ -2,6 +2,8 @@ import { Pandal } from '@/types';
 import { BONEDI_BARI_PANDALS } from './bonediBari';
 import { EXPANDED_COMMUNITY_PANDALS } from './communityPandals';
 import { NEIGHBORHOOD_PANDALS } from './neighborhoodPandals';
+import { REGISTERED_CLUBS_PART1 } from './registeredClubsPart1';
+import { REGISTERED_CLUBS_PART2 } from './registeredClubsPart2';
 
 export const FOUNDATION_PANDALS: Pandal[] = [
   {
@@ -1317,12 +1319,16 @@ export const FOUNDATION_PANDALS: Pandal[] = [
 export { BONEDI_BARI_PANDALS } from './bonediBari';
 export { EXPANDED_COMMUNITY_PANDALS } from './communityPandals';
 export { NEIGHBORHOOD_PANDALS } from './neighborhoodPandals';
+export { REGISTERED_CLUBS_PART1 } from './registeredClubsPart1';
+export { REGISTERED_CLUBS_PART2 } from './registeredClubsPart2';
 
 export const PANDALS_DATA: Pandal[] = [
   ...FOUNDATION_PANDALS,
   ...BONEDI_BARI_PANDALS,
   ...EXPANDED_COMMUNITY_PANDALS,
   ...NEIGHBORHOOD_PANDALS,
+  ...REGISTERED_CLUBS_PART1,
+  ...REGISTERED_CLUBS_PART2,
 ];
 
 
