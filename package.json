@@ -8,7 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node scripts/test-runner.js"
+    "test": "node scripts/test-runner.js",
+    "photo:simulate": "node scripts/photo-system/simulate-season-test.js",
+    "photo:advance": "node scripts/photo-system/advance-season.js",
+    "photo:review": "node scripts/photo-system/review-candidates.js"
   },
   "dependencies": {
     "@types/leaflet": "^1.9.22",

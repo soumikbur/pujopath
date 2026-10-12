@@ -6,7 +6,19 @@ import { REGISTERED_CLUBS_PART1 } from './registeredClubsPart1';
 import { REGISTERED_CLUBS_PART2 } from './registeredClubsPart2';
 import { getPandalPhotoRecord, VERIFIED_2025_PHOTOS, validatePhotoUniqueness } from './photoRegistry';
 
-export { VERIFIED_2025_PHOTOS, getPandalPhotoRecord, validatePhotoUniqueness } from './photoRegistry';
+export {
+  VERIFIED_PHOTOS_REGISTRY,
+  VERIFIED_2025_PHOTOS,
+  getPandalPhotoRecord,
+  hasVerifiedPhoto,
+  hasVerified2025Photo,
+  getPandalPhotoBadge,
+  validatePhotoUniqueness,
+  advanceSeason,
+  rollbackPhoto,
+  stageCandidatePhoto,
+  getPhotoRegistryStats,
+} from './photoRegistry';
 
 export const FOUNDATION_PANDALS: Pandal[] = [
   {

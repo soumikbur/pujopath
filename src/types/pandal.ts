@@ -57,18 +57,66 @@ export interface BonediBariDetails {
   confidence: 'Verified' | 'High' | 'Moderate';
 }
 
+export type PhotoVerificationStatus =
+  | 'Verified Latest Season'
+  | 'Verified Recent Online'
+  | 'Verified Earlier Season'
+  | 'Photo Unavailable'
+  | 'Verified 2025';
+
+export interface PandalPhotoHistoryItem {
+  imageUrl: string;
+  captureYear: number;
+  uploadDate?: string;
+  verificationStatus: PhotoVerificationStatus;
+  photographer?: string;
+  sourceName: string;
+  sourceUrl?: string;
+  license?: string;
+  replacedAt: string;
+  replacedByYear: number;
+  imageHash?: string;
+  selectionReason?: string;
+}
+
+export interface PandalCandidatePhoto {
+  candidateId: string;
+  pandalId: string;
+  imageUrl: string;
+  captureYear: number;
+  uploadDate: string;
+  discoveredDate: string;
+  sourceName: string;
+  sourceUrl: string;
+  license: string;
+  photographer?: string;
+  confidenceScore: number;
+  reviewStatus: 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
+  rejectionReason?: string;
+  imageHash?: string;
+  notes?: string;
+}
+
 export interface PandalPhotoMetadata {
   pandalId: string;
   imageUrl: string;
   isAvailable: boolean;
+  captureYear: number | null;
+  uploadDate?: string;
   photoYear: number | null;
-  verificationStatus: 'Verified 2025' | 'Photo Unavailable';
+  verificationStatus: PhotoVerificationStatus;
+  priorityLevel: 1 | 2 | 3 | 4;
+  confidenceScore: number;
+  selectionReason: string;
   photographer?: string;
   sourceName: string;
   sourceUrl?: string;
   license?: string;
   verifiedDate: string;
+  discoveredDate?: string;
+  imageHash?: string;
   notes?: string;
+  history?: PandalPhotoHistoryItem[];
 }
 
 export interface Pandal {
