@@ -1,12 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { MusicTrack } from '@/types';
 import { PUJA_MUSIC_DATA } from '@/data/music';
 
 interface AudioContextType {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
+  isLoading: boolean;
+  playbackError: string | null;
   currentTime: number;
   duration: number;
   volume: number;
@@ -21,6 +23,7 @@ interface AudioContextType {
   setVolume: (vol: number) => void;
   setIsFullScreenOpen: (open: boolean) => void;
   addToQueue: (track: MusicTrack) => void;
+  clearError: () => void;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
@@ -28,194 +31,237 @@ const AudioContext = createContext<AudioContextType | undefined>(undefined);
 export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(PUJA_MUSIC_DATA[0]);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [playbackError, setPlaybackError] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(PUJA_MUSIC_DATA[0].durationSeconds);
+  const [duration, setDuration] = useState<number>(PUJA_MUSIC_DATA[0]?.durationSeconds || 100);
   const [volume, setVolumeState] = useState<number>(0.85);
   const [queue, setQueue] = useState<MusicTrack[]>(PUJA_MUSIC_DATA);
   const [isFullScreenOpen, setIsFullScreenOpen] = useState<boolean>(false);
 
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const synthTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const stopSynth = () => {
-    if (synthTimerRef.current) {
-      clearInterval(synthTimerRef.current);
-      synthTimerRef.current = null;
-    }
-  };
-
-  const startSynth = (track: MusicTrack) => {
-    stopSynth();
-    try {
-      if (typeof window === 'undefined') return;
-      const AudioContextClass =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (!AudioContextClass) return;
-
-      if (!audioCtxRef.current) {
-        audioCtxRef.current = new AudioContextClass();
-      }
-      const ctx = audioCtxRef.current;
-      if (ctx.state === 'suspended') {
-        ctx.resume().catch(() => {});
-      }
-
-      let step = 0;
-      synthTimerRef.current = setInterval(() => {
-        if (!ctx || ctx.state === 'closed') return;
-        const now = ctx.currentTime;
-        step = (step + 1) % 16;
-
-        const master = ctx.createGain();
-        master.gain.setValueAtTime(volume * 0.15, now);
-        master.connect(ctx.destination);
-
-        if (track.category === 'Dhak' || track.category === 'Devotional') {
-          if (step === 0 || step === 4 || step === 8 || step === 12) {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(140, now);
-            osc.frequency.exponentialRampToValueAtTime(45, now + 0.18);
-            gain.gain.setValueAtTime(1, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-            osc.connect(gain);
-            gain.connect(master);
-            osc.start(now);
-            osc.stop(now + 0.25);
-          }
-
-          if (step % 2 === 0 || step === 7 || step === 15) {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(580, now);
-            osc.frequency.exponentialRampToValueAtTime(220, now + 0.08);
-            gain.gain.setValueAtTime(0.6, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
-            osc.connect(gain);
-            gain.connect(master);
-            osc.start(now);
-            osc.stop(now + 0.1);
-          }
-
-          if (step === 0 || step === 8) {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(1240, now);
-            gain.gain.setValueAtTime(0.4, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-            osc.connect(gain);
-            gain.connect(master);
-            osc.start(now);
-            osc.stop(now + 0.6);
-          }
-        } else {
-          if (step % 4 === 0) {
-            const notes = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25];
-            const freq = notes[Math.floor(Math.random() * notes.length)];
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, now);
-            gain.gain.setValueAtTime(0.01, now);
-            gain.gain.linearRampToValueAtTime(0.35, now + 0.15);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
-            osc.connect(gain);
-            gain.connect(master);
-            osc.start(now);
-            osc.stop(now + 0.75);
-          }
-        }
-      }, 160);
-    } catch {
-      // ignore
-    }
-  };
-
+  // Initialize single HTML5 Audio element on client mount
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    if (isPlaying) {
-      interval = setInterval(() => {
-        setCurrentTime((prev) => {
-          if (prev >= duration) {
-            nextTrack();
-            return 0;
-          }
-          return prev + 1;
-        });
-      }, 1000);
-    } else {
-      stopSynth();
-    }
-    return () => {
-      if (interval) clearInterval(interval);
+    if (typeof window === 'undefined') return;
+
+    const audio = new Audio();
+    audio.preload = 'metadata';
+    audioRef.current = audio;
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
     };
-  }, [isPlaying, duration]);
 
-  // Clean unmount
-  useEffect(() => {
-    return () => {
-      stopSynth();
-      if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
-        audioCtxRef.current.close().catch(() => {});
+    const handleLoadedMetadata = () => {
+      if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
+        setDuration(audio.duration);
       }
+      setIsLoading(false);
+    };
+
+    const handleWaiting = () => {
+      setIsLoading(true);
+    };
+
+    const handleCanPlay = () => {
+      setIsLoading(false);
+    };
+
+    const handlePlay = () => {
+      setIsPlaying(true);
+      setIsLoading(false);
+    };
+
+    const handlePause = () => {
+      setIsPlaying(false);
+    };
+
+    const handleEnded = () => {
+      setIsPlaying(false);
+      // Auto-advance to next track in queue
+      const currentIndex = queue.findIndex((t) => t.id === currentTrack?.id);
+      if (currentIndex !== -1 && currentIndex < queue.length - 1) {
+        const next = queue[currentIndex + 1];
+        playTrackInternal(next);
+      }
+    };
+
+    const handleError = () => {
+      setIsLoading(false);
+      setIsPlaying(false);
+      if (audio.src && audio.src !== window.location.href) {
+        setPlaybackError(
+          'Audio stream could not be loaded directly. Use the official source link to listen.'
+        );
+      }
+    };
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('waiting', handleWaiting);
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('pause', handlePause);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
+
+    return () => {
+      audio.pause();
+      audio.src = '';
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('waiting', handleWaiting);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
+      audioRef.current = null;
     };
   }, []);
 
+  // Update MediaSession on supported devices
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('mediaSession' in navigator) || !currentTrack) return;
+
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: currentTrack.title,
+        artist: currentTrack.artist,
+        album: 'PujoPath — Durga Puja 2026',
+        artwork: [
+          {
+            src: currentTrack.coverUrl,
+            sizes: '512x512',
+            type: 'image/jpeg',
+          },
+        ],
+      });
+
+      navigator.mediaSession.setActionHandler('play', () => togglePlay());
+      navigator.mediaSession.setActionHandler('pause', () => pause());
+      navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
+      navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
+    } catch {
+      // mediaSession safe fallback
+    }
+  }, [currentTrack]);
+
+  const playTrackInternal = useCallback(
+    (track: MusicTrack) => {
+      setPlaybackError(null);
+      setCurrentTrack(track);
+      setCurrentTime(0);
+      setDuration(track.durationSeconds || 60);
+
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      if (track.playbackMethod === 'external_listen_link' || !track.audioUrl) {
+        audio.pause();
+        audio.src = '';
+        setIsPlaying(false);
+        setIsLoading(false);
+        if (track.externalListenUrl && typeof window !== 'undefined') {
+          window.open(track.externalListenUrl, '_blank', 'noopener,noreferrer');
+        }
+        return;
+      }
+
+      setIsLoading(true);
+      audio.src = track.audioUrl;
+      audio.volume = volume;
+      audio.currentTime = 0;
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          setIsLoading(false);
+          setIsPlaying(false);
+          if (err.name === 'NotAllowedError') {
+            // Autoplay prevented by browser policy; user interaction required
+            setPlaybackError('Click play to allow audio playback.');
+          } else {
+            setPlaybackError('Playback error. Use the source link to listen.');
+          }
+        });
+      }
+    },
+    [volume]
+  );
+
   const playTrack = (track: MusicTrack) => {
-    setCurrentTrack(track);
-    setDuration(track.durationSeconds);
-    setCurrentTime(0);
-    setIsPlaying(true);
-    startSynth(track);
+    playTrackInternal(track);
   };
 
   const togglePlay = () => {
-    if (isPlaying) {
-      setIsPlaying(false);
-      stopSynth();
-    } else {
-      if (currentTrack) {
-        setIsPlaying(true);
-        startSynth(currentTrack);
+    const audio = audioRef.current;
+    if (!audio || !currentTrack) return;
+
+    if (currentTrack.playbackMethod === 'external_listen_link' || !currentTrack.audioUrl) {
+      if (currentTrack.externalListenUrl && typeof window !== 'undefined') {
+        window.open(currentTrack.externalListenUrl, '_blank', 'noopener,noreferrer');
       }
+      return;
+    }
+
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      setPlaybackError(null);
+      if (!audio.src || audio.src === window.location.href) {
+        audio.src = currentTrack.audioUrl;
+      }
+      audio.play().catch((err) => {
+        if (err.name !== 'AbortError') {
+          setPlaybackError('Playback blocked by browser. Click play to start.');
+        }
+      });
     }
   };
 
   const pause = () => {
-    setIsPlaying(false);
-    stopSynth();
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
   };
 
   const nextTrack = () => {
-    if (!currentTrack) return;
+    if (!currentTrack || queue.length === 0) return;
     const currentIndex = queue.findIndex((t) => t.id === currentTrack.id);
-    const nextIndex = (currentIndex + 1) % queue.length;
-    playTrack(queue[nextIndex]);
+    const nextIdx = (currentIndex + 1) % queue.length;
+    playTrackInternal(queue[nextIdx]);
   };
 
   const prevTrack = () => {
-    if (!currentTrack) return;
+    if (!currentTrack || queue.length === 0) return;
     const currentIndex = queue.findIndex((t) => t.id === currentTrack.id);
-    const prevIndex = (currentIndex - 1 + queue.length) % queue.length;
-    playTrack(queue[prevIndex]);
+    const prevIdx = (currentIndex - 1 + queue.length) % queue.length;
+    playTrackInternal(queue[prevIdx]);
   };
 
   const seek = (seconds: number) => {
-    setCurrentTime(Math.min(Math.max(0, seconds), duration));
+    if (audioRef.current && isFinite(seconds)) {
+      audioRef.current.currentTime = seconds;
+      setCurrentTime(seconds);
+    }
   };
 
   const setVolume = (vol: number) => {
-    setVolumeState(Math.min(Math.max(0, vol), 1));
+    const clamped = Math.max(0, Math.min(1, vol));
+    setVolumeState(clamped);
+    if (audioRef.current) {
+      audioRef.current.volume = clamped;
+    }
   };
 
   const addToQueue = (track: MusicTrack) => {
-    if (!queue.some((t) => t.id === track.id)) {
-      setQueue((prev) => [...prev, track]);
-    }
+    setQueue((prev) => (prev.some((t) => t.id === track.id) ? prev : [...prev, track]));
+  };
+
+  const clearError = () => {
+    setPlaybackError(null);
   };
 
   return (
@@ -223,6 +269,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       value={{
         currentTrack,
         isPlaying,
+        isLoading,
+        playbackError,
         currentTime,
         duration,
         volume,
@@ -237,6 +285,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         setVolume,
         setIsFullScreenOpen,
         addToQueue,
+        clearError,
       }}
     >
       {children}

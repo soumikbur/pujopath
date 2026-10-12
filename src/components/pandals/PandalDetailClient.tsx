@@ -83,11 +83,16 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
-          <div className="absolute top-4 left-4 flex gap-2">
+          <div className="absolute top-4 left-4 flex flex-wrap gap-2">
             <span className="px-3.5 py-1 rounded-full text-xs font-bold bg-white/95 backdrop-blur-md text-[#242424] border border-white/60 shadow-xs">
               {pandal.zone}
             </span>
-            {pandal.isHeritage && (
+            {pandal.isBonediBari && (
+              <span className="px-3.5 py-1 rounded-full text-xs font-bold bg-amber-600 text-white shadow-xs">
+                {isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari'}
+              </span>
+            )}
+            {pandal.isHeritage && !pandal.isBonediBari && (
               <span className="px-3.5 py-1 rounded-full text-xs font-bold bg-amber-500 text-white shadow-xs">
                 {isBn ? 'ঐতিহ্যবাহী সাবেকি' : 'Heritage Sabeki'}
               </span>
@@ -109,6 +114,77 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
       {/* 2-Column Info Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
+          {/* Bonedi Bari Ancestral Heritage Block */}
+          {pandal.isBonediBari && pandal.bonediBariInfo && (
+            <div className="p-6 sm:p-7 rounded-2xl border-2 border-amber-500/30 bg-amber-50/40 dark:bg-amber-950/20 shadow-xs space-y-3.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400">
+                  {isBn ? '🏛️ বনেদি বাড়ির ঐতিহ্য ও বংশবিবরণী' : '🏛️ Bonedi Bari Ancestral Heritage'}
+                </span>
+                <span
+                  className={cn(
+                    'px-2.5 py-1 rounded-full text-[11px] font-bold',
+                    pandal.bonediBariInfo.visitorAccessStatus === 'Visitor access confirmed'
+                      ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300'
+                      : 'bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-300'
+                  )}
+                >
+                  {isBn
+                    ? pandal.bonediBariInfo.visitorAccessStatusBn || pandal.bonediBariInfo.visitorAccessStatus
+                    : pandal.bonediBariInfo.visitorAccessStatus}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                {pandal.bonediBariInfo.ancestralHouseName && (
+                  <div>
+                    <span className="text-[#776d65] dark:text-[#a89e95] block font-medium">
+                      {isBn ? 'পৈতৃক ভবন' : 'Ancestral House'}
+                    </span>
+                    <span className="font-bold text-[#242424] dark:text-[#ede5dc]">
+                      {isBn
+                        ? pandal.bonediBariInfo.ancestralHouseNameBn || pandal.bonediBariInfo.ancestralHouseName
+                        : pandal.bonediBariInfo.ancestralHouseName}
+                    </span>
+                  </div>
+                )}
+                {pandal.establishedYear && (
+                  <div>
+                    <span className="text-[#776d65] dark:text-[#a89e95] block font-medium">
+                      {isBn ? 'প্রতিষ্ঠাকাল' : 'Established Year'}
+                    </span>
+                    <span className="font-bold text-[#242424] dark:text-[#ede5dc] font-sans">
+                      {pandal.establishedYear}
+                    </span>
+                  </div>
+                )}
+                {pandal.bonediBariInfo.familyLineage && (
+                  <div>
+                    <span className="text-[#776d65] dark:text-[#a89e95] block font-medium">
+                      {isBn ? 'বংশপরম্পরা' : 'Family Lineage'}
+                    </span>
+                    <span className="font-bold text-[#242424] dark:text-[#ede5dc]">
+                      {isBn
+                        ? pandal.bonediBariInfo.familyLineageBn || pandal.bonediBariInfo.familyLineage
+                        : pandal.bonediBariInfo.familyLineage}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {pandal.bonediBariInfo.visitingHours && (
+                <div className="pt-2 border-t border-amber-500/20 text-xs text-[#776d65] dark:text-[#c4b5a7]">
+                  <span className="font-bold text-[#242424] dark:text-[#ede5dc]">
+                    {isBn ? 'পরিচিত দর্শনের সময়:' : 'Known Visiting Hours:'}
+                  </span>{' '}
+                  {isBn
+                    ? pandal.bonediBariInfo.visitingHoursBn || pandal.bonediBariInfo.visitingHours
+                    : pandal.bonediBariInfo.visitingHours}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="p-6 sm:p-7 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] shadow-xs space-y-4">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-[#b42323]">

@@ -26,12 +26,13 @@ export default function MapPage() {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
 
-  const [selectedZone, setSelectedZone] = useState<LocalityZone | 'All'>('All');
+  const [selectedFilter, setSelectedFilter] = useState<LocalityZone | 'All' | 'Bonedi Bari'>('All');
   const [selectedPandal, setSelectedPandal] = useState<Pandal | null>(null);
   const [showMetro, setShowMetro] = useState(true);
 
-  const zoneOptions: { value: LocalityZone | 'All'; label: string }[] = [
+  const filterOptions: { value: LocalityZone | 'All' | 'Bonedi Bari'; label: string; isSpecial?: boolean }[] = [
     { value: 'All', label: isBn ? 'সব এলাকা' : 'All' },
+    { value: 'Bonedi Bari', label: isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari', isSpecial: true },
     { value: 'North Kolkata', label: isBn ? 'উত্তর কলকাতা' : 'North Kolkata' },
     { value: 'South Kolkata', label: isBn ? 'দক্ষিণ কলকাতা' : 'South Kolkata' },
     { value: 'Central Kolkata', label: isBn ? 'মধ্য কলকাতা' : 'Central Kolkata' },
@@ -42,30 +43,37 @@ export default function MapPage() {
   ];
 
   const filteredPandals =
-    selectedZone === 'All'
+    selectedFilter === 'All'
       ? PANDALS_DATA
-      : PANDALS_DATA.filter((p) => p.zone === selectedZone);
+      : selectedFilter === 'Bonedi Bari'
+      ? PANDALS_DATA.filter((p) => Boolean(p.isBonediBari || p.category === 'Bonedi Bari'))
+      : PANDALS_DATA.filter((p) => p.zone === selectedFilter);
 
   return (
     <div className="space-y-4 max-w-7xl mx-auto h-[calc(100vh-12rem)] flex flex-col pb-4">
       {/* Zone Switcher & Metro Toggle Bar */}
       <div className="flex items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-          {zoneOptions.map((z) => (
+          {filterOptions.map((opt) => (
             <button
-              key={z.value}
-              onClick={() => setSelectedZone(z.value)}
+              key={opt.value}
+              onClick={() => setSelectedFilter(opt.value)}
               className={cn(
                 'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-150 border shadow-xs active:scale-95',
-                selectedZone === z.value
-                  ? 'bg-[#b42323] text-white border-[#b42323]'
+                selectedFilter === opt.value
+                  ? opt.isSpecial
+                    ? 'bg-[#800020] text-amber-200 border-[#800020]'
+                    : 'bg-[#b42323] text-white border-[#b42323]'
+                  : opt.isSpecial
+                  ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border-amber-200 dark:border-amber-800 hover:border-[#800020]'
                   : 'bg-white dark:bg-[#1a1613] border-[#eee8e1] dark:border-[#2f2720] text-[#625b55] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white hover:border-[#b42323]/40'
               )}
             >
-              {z.label}
+              {opt.label}
             </button>
           ))}
         </div>
+
 
         <button
           onClick={() => setShowMetro(!showMetro)}

@@ -18,17 +18,19 @@ function ExploreContent() {
   const initialZone = (searchParams.get('zone') as LocalityZone) || 'All';
   const initialFeatured = searchParams.get('featuredOnly') === 'true';
   const initialHeritage = searchParams.get('heritageOnly') === 'true';
+  const initialBonedi = searchParams.get('bonediBariOnly') === 'true' || searchParams.get('category') === 'Bonedi Bari';
   const initialMetro = searchParams.get('metroOnly') === 'true' || searchParams.get('metroAccessibleOnly') === 'true';
 
   const [filters, setFilters] = useState<FilterOptions>({
     searchQuery: initialQuery,
     zone: initialZone,
     crowdLevel: 'All',
-    category: 'All',
+    category: initialBonedi ? 'Bonedi Bari' : 'All',
     metroAccessibleOnly: initialMetro,
     wheelchairAccessibleOnly: false,
     featuredOnly: initialFeatured,
     heritageOnly: initialHeritage,
+    bonediBariOnly: initialBonedi,
     sortBy: 'recommended',
   });
 
@@ -37,19 +39,23 @@ function ExploreContent() {
     const z = searchParams.get('zone') as LocalityZone | null;
     const f = searchParams.get('featuredOnly') === 'true';
     const h = searchParams.get('heritageOnly') === 'true';
+    const b = searchParams.get('bonediBariOnly') === 'true' || searchParams.get('category') === 'Bonedi Bari';
     const m = searchParams.get('metroOnly') === 'true' || searchParams.get('metroAccessibleOnly') === 'true';
 
-    if (q !== null || z !== null || f || h || m) {
+    if (q !== null || z !== null || f || h || b || m) {
       setFilters((prev) => ({
         ...prev,
         searchQuery: q || '',
         zone: z || 'All',
         featuredOnly: f,
         heritageOnly: h,
+        bonediBariOnly: b,
+        category: b ? 'Bonedi Bari' : prev.category,
         metroAccessibleOnly: m,
       }));
     }
   }, [searchParams]);
+
 
   const filteredPandals = PandalService.filterPandals(filters);
 

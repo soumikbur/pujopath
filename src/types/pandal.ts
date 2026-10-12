@@ -10,7 +10,14 @@ export type LocalityZone =
 
 export type CrowdLevel = 'Low' | 'Moderate' | 'High' | 'Extreme';
 
-export type PandalCategory = 'Traditional' | 'Artistic' | 'Theme' | 'Heritage' | 'Eco-Friendly' | 'Community';
+export type PandalCategory =
+  | 'Traditional'
+  | 'Artistic'
+  | 'Theme'
+  | 'Heritage'
+  | 'Eco-Friendly'
+  | 'Community'
+  | 'Bonedi Bari';
 
 export interface PandalFacility {
   wheelchairAccessible: boolean;
@@ -35,6 +42,20 @@ export interface MetroLink {
 }
 
 export type PandalMetroLink = MetroLink;
+
+export interface BonediBariDetails {
+  ancestralHouseName: string;
+  ancestralHouseNameBn?: string;
+  familyLineage: string;
+  familyLineageBn?: string;
+  visitorAccessStatus: 'Visitor access confirmed' | 'Visitor access not confirmed';
+  visitorAccessStatusBn: string;
+  visitingHours?: string;
+  visitingHoursBn?: string;
+  sourceUrl?: string;
+  verificationDate?: string;
+  confidence: 'Verified' | 'High' | 'Moderate';
+}
 
 export interface Pandal {
   id: string;
@@ -66,6 +87,8 @@ export interface Pandal {
   galleryImages: string[];
   isFeatured: boolean;
   isHeritage: boolean;
+  isBonediBari?: boolean;
+  bonediBariInfo?: BonediBariDetails;
   metroLinks: MetroLink[];
   facilities: PandalFacility;
   highlights?: string[];
@@ -83,5 +106,7 @@ export interface FilterOptions {
   wheelchairAccessibleOnly: boolean;
   featuredOnly: boolean;
   heritageOnly: boolean;
+  bonediBariOnly?: boolean;
   sortBy: 'recommended' | 'nearest' | 'popular' | 'rating' | 'leastCrowded' | 'name' | 'popularity' | 'distance';
 }
+

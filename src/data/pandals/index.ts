@@ -1,6 +1,8 @@
 import { Pandal } from '@/types';
+import { BONEDI_BARI_PANDALS } from './bonediBari';
+import { EXPANDED_COMMUNITY_PANDALS } from './communityPandals';
 
-export const PANDALS_DATA: Pandal[] = [
+export const FOUNDATION_PANDALS: Pandal[] = [
   {
     id: 'bagbazar-sarbojanin',
     slug: 'bagbazar-sarbojanin',
@@ -120,27 +122,27 @@ export const PANDALS_DATA: Pandal[] = [
   {
     id: 'sovabazar-rajbari',
     slug: 'sovabazar-rajbari',
-    name: 'Sovabazar Rajbari',
-    nameBn: 'শোভাবাজার রাজবাড়ি দুর্গাপূজা',
+    name: 'Sovabazar Rajbari (Boro Taraf)',
+    nameBn: 'শোভাবাজার রাজবাড়ি (বড় তরফ)',
     zone: 'North Kolkata',
     locality: 'Sovabazar',
     localityBn: 'শোভাবাজার',
-    address: '36 & 33, Raja Nabakrishna Street, Sovabazar, Kolkata - 700005',
-    addressBn: '৩৬ এবং ৩৩, রাজা নবকৃষ্ণ স্ট্রিট, শোভাবাজার, কলকাতা - ৭০০০MD',
-    latitude: 22.5978,
-    longitude: 88.3664,
-    theme: 'Heritage Rajbari Bonedi Puja & Natmandir Rituals',
-    themeBn: 'ঐতিহাসিক বনেদি রাজবাড়ির নাটমন্দিরে সাবেকি আরাধনা',
-    category: 'Heritage',
-    description: 'The archetype of Bengal Bonedi Bari (aristocratic mansion) Durga Puja, celebrated in the sprawling open courtyard (Thakur Dalan) of Raja Nabakrishna Deb palace since 1757.',
-    descriptionBn: 'বাংলার বনেদি বাড়ির দুর্গাপূজার শ্রেষ্ঠ প্রতিচ্ছবি। ১৭৫৭ সাল থেকে রাজা নবকৃষ্ণ দেবের ঐতিহাসিক রাজবাড়ির সুবিশাল ঠাকুরদালানে সম্পন্ন হয়ে আসছে এই পুজো।',
-    history: 'Commenced in 1757 after the Battle of Plassey by Raja Nabakrishna Deb. Lord Clive and Warren Hastings were famously hosted here.',
-    historyBn: 'পলাশীর যুদ্ধের পর ১৭৫৭ সালে রাজা নবকৃষ্ণ দেব এই পুজোর সূচনা করেন। লর্ড ক্লাইভ ও ওয়ারেন হেস্টিংসও এই রাজবাড়ির পুজোয় আমন্ত্রিত অতিথি ছিলেন।',
+    address: '35 Raja Naba Krishna Street, Sovabazar, Kolkata - 700005',
+    addressBn: '৩৫ রাজা নবকৃষ্ণ স্ট্রিট, শোভাবাজার, কলকাতা - ৭০০০MD',
+    latitude: 22.5963,
+    longitude: 88.3674,
+    theme: 'Heritage 1757 Daaker Saaj & Ekchala Ghotokmuki Singha',
+    themeBn: '১৭৫৭ সালের ঐতিহাসিক ডাকের সাজ ও ঘোটকমুখী সিংহ সমন্বিত একচালা প্রতিমা',
+    category: 'Bonedi Bari',
+    description: 'The foundational Bonedi Bari Durga Puja of Kolkata, inaugurated by Raja Nabakrishna Deb in 1757 following the Battle of Plassey. Celebrated in the magnificent open-pillared Natmandir with British and Indian historical luminaries having attended.',
+    descriptionBn: '১৭৫৭ সালে পলাশীর যুদ্ধের পর রাজা নবকৃষ্ণ দেব কর্তৃক সূচিত কলকাতার অন্যতম ঐতিহাসিক বনেদি বাড়ির দুর্গাপূজা। উন্মুক্ত থামযুক্ত নাটমন্দিরে দেবীর আরাধনা এবং ঘোটকমুখী সিংহের ঐতিহ্যবাহী রূপ।',
+    history: 'Commenced in 1757 after the Battle of Plassey by Raja Nabakrishna Deb. Lord Clive and Warren Hastings were historically hosted here. The idol features classical Daaker Saaj, silver filigree backdrop, and the unique horse-faced lion mount.',
+    historyBn: '১৭৫৭ সালে রাজা নবকৃষ্ণ দেব এই পুজোর সূচনা করেন। লর্ড ক্লাইভ ও ওয়ারেন হেস্টিংসও এই রাজবাড়ির পুজোয় আমন্ত্রিত অতিথি ছিলেন। রূপোর সাজ ও ঐতিহাসিক নাটমন্দির এই পুজোর গৌরব।',
     establishedYear: 1757,
-    openingTime: '07:00 AM',
+    openingTime: '06:00 AM',
     closingTime: '11:00 PM',
-    crowdLevel: 'Moderate',
-    popularityScore: 96,
+    crowdLevel: 'High',
+    popularityScore: 99,
     rating: 4.9,
     reviewCount: 4120,
     imageUrl: '/images/pandals/sovabazar-rajbari.webp',
@@ -149,24 +151,38 @@ export const PANDALS_DATA: Pandal[] = [
     ],
     isFeatured: true,
     isHeritage: true,
+    isBonediBari: true,
+    bonediBariInfo: {
+      ancestralHouseName: 'Sovabazar Rajbari Boro Taraf (Baag-ola Bari)',
+      ancestralHouseNameBn: 'শোভাবাজার রাজবাড়ি বড় তরফ (বাঘ-ওলা বাড়ি)',
+      familyLineage: 'Deb Family of Sovabazar (Descendants of Raja Nabakrishna Deb)',
+      familyLineageBn: 'শোভাবাজার দেব রাজপরিবার',
+      visitorAccessStatus: 'Visitor access confirmed',
+      visitorAccessStatusBn: 'দর্শনার্থীদের প্রবেশাধিকার সুনিশ্চিত',
+      visitingHours: '06:00 AM - 10:30 PM daily during festival',
+      visitingHoursBn: 'উৎসবের দিনগুলিতে সকাল ৬:০০ থেকে রাত ১০:৩০',
+      sourceUrl: 'https://wbhc.in/heritage-site-details.php?id=82',
+      verificationDate: '2026-10-12',
+      confidence: 'Verified',
+    },
     metroLinks: [
       {
         stationId: 'shobhabazar-sutanuti',
         stationName: 'Shobhabazar Sutanuti',
         stationNameBn: 'শোভাবাজার সুতানুটি',
-        walkingDistanceMeters: 350,
-        walkingDurationMinutes: 5,
-        exitGate: 'Gate 1',
+        walkingDistanceMeters: 300,
+        walkingDurationMinutes: 4,
+        exitGate: 'Gate 2 (BK Paul Ave)',
       },
     ],
     facilities: {
-      wheelchairAccessible: false,
+      wheelchairAccessible: true,
       drinkingWater: true,
-      medicalBooth: false,
+      medicalBooth: true,
       vipPassEntry: false,
       parkingAvailable: false,
       foodStallsNearby: true,
-      publicToilets: false,
+      publicToilets: true,
     },
     highlights: ['260+ Years Old Bonedi Tradition', 'Historical Thakur Dalan', 'Nilkantha Bird Release Tradition', 'Singhee Vaahan Maa Durga'],
     highlightsBn: ['২৬০+ বছরের বনেদি ঐতিহ্য', 'ঐতিহাসিক ঠাকুরদালান', 'সিংহবাহিনী দুর্গা প্রতিমা', 'অনবদ্য নাটমন্দির পরিবেশ'],
@@ -1296,3 +1312,13 @@ export const PANDALS_DATA: Pandal[] = [
     highlightsBn: ['বিশাল সুশৃঙ্খল পার্কিং ব্যবস্থা', 'প্রবীণ ও বিশেষ সক্ষমদের জন্য অত্যন্ত সুগম', 'ইকো পার্ক সংলগ্ন'],
   },
 ];
+
+export { BONEDI_BARI_PANDALS } from './bonediBari';
+export { EXPANDED_COMMUNITY_PANDALS } from './communityPandals';
+
+export const PANDALS_DATA: Pandal[] = [
+  ...FOUNDATION_PANDALS,
+  ...BONEDI_BARI_PANDALS,
+  ...EXPANDED_COMMUNITY_PANDALS,
+];
+

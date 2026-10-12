@@ -209,3 +209,6 @@ export const METRO_STATIONS_DATA: MetroStation[] = [
     nearbyPandalIds: ['howrah-shibpur-mandir-tala'],
   },
 ];
+
+export * from './timetables';
+

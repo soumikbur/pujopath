@@ -1,5 +1,6 @@
 import { PujaDay } from '@/types';
 import { PUJA_CALENDAR_DATA } from '@/data/calendar';
+import { getSandhiPujaSchedule, SandhiPujaAnnualSchedule } from '@/data/calendar/sandhiPuja';
 
 export class CalendarService {
   static getCalendar(): PujaDay[] {
@@ -8,6 +9,10 @@ export class CalendarService {
 
   static getPujaDayBySlug(slug: string): PujaDay | null {
     return PUJA_CALENDAR_DATA.find((d) => d.slug === slug || d.id === slug) || null;
+  }
+
+  static getSandhiPuja(year: number = 2026): SandhiPujaAnnualSchedule {
+    return getSandhiPujaSchedule(year);
   }
 
   static getCountdown(targetDateStr: string = '2026-10-16T06:00:00+05:30') {
@@ -43,3 +48,4 @@ export class CalendarService {
     return PUJA_CALENDAR_DATA[1];
   }
 }
+

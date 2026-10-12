@@ -52,10 +52,16 @@ export class PandalService {
           p.theme.toLowerCase().includes(q) ||
           p.themeBn.includes(q) ||
           p.zone.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q) ||
+          (p.bonediBariInfo && (
+            p.bonediBariInfo.ancestralHouseName.toLowerCase().includes(q) ||
+            p.bonediBariInfo.familyLineage.toLowerCase().includes(q)
+          )) ||
           p.metroLinks.some((m) => m.stationName.toLowerCase().includes(q) || Boolean(m.stationNameBn && m.stationNameBn.includes(q)))
         );
       });
     }
+
 
     if (options.zone && options.zone !== 'All') {
       list = list.filter((p) => p.zone === options.zone);
@@ -83,6 +89,10 @@ export class PandalService {
 
     if (options.heritageOnly) {
       list = list.filter((p) => p.isHeritage);
+    }
+
+    if (options.bonediBariOnly) {
+      list = list.filter((p) => Boolean(p.isBonediBari || p.category === 'Bonedi Bari'));
     }
 
     const sortBy = options.sortBy || 'recommended';
@@ -132,4 +142,9 @@ export class PandalService {
   static getPandalsByZone(zone: LocalityZone): Pandal[] {
     return PANDALS_DATA.filter((p) => p.zone === zone);
   }
+
+  static getBonediBariPandals(): Pandal[] {
+    return PANDALS_DATA.filter((p) => Boolean(p.isBonediBari || p.category === 'Bonedi Bari'));
+  }
 }
+

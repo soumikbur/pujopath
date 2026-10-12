@@ -85,6 +85,7 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
       wheelchairAccessibleOnly: false,
       featuredOnly: false,
       heritageOnly: false,
+      bonediBariOnly: false,
       sortBy: 'recommended',
     });
   };
@@ -94,6 +95,7 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
     filters.zone !== 'All' ||
     filters.metroAccessibleOnly ||
     filters.heritageOnly ||
+    filters.bonediBariOnly ||
     filters.wheelchairAccessibleOnly ||
     filters.featuredOnly ||
     filters.sortBy !== 'recommended';
@@ -109,8 +111,8 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
           onChange={(e) => update({ searchQuery: e.target.value })}
           placeholder={
             isBn
-              ? 'প্যান্ডেলের নাম, এলাকা, থিম বা মেট্রো স্টেশন দিয়ে খুঁজুন...'
-              : 'Search pandals by name, theme, locality or metro station...'
+              ? 'প্যান্ডেলের নাম, বনেদি বাড়ি, এলাকা, থিম বা মেট্রো স্টেশন দিয়ে খুঁজুন...'
+              : 'Search pandals by name, Bonedi Bari, theme, locality or metro...'
           }
           className="w-full rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-[#fcfaf7] dark:bg-[#14110e] py-3 pl-11 pr-10 text-sm text-[#242424] dark:text-[#ede5dc] placeholder:text-[#8a8179] transition-all focus:border-[#b42323] focus:bg-white dark:focus:bg-[#1a1613] focus:outline-none"
         />
@@ -153,7 +155,14 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
         <div className="text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95] mb-2.5">
           {isBn ? 'সুবিধা ও বৈশিষ্ট্য সুইচ' : 'Feature Filters'}
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          <ToggleSwitch
+            id="switch-bonedi-bari"
+            checked={Boolean(filters.bonediBariOnly)}
+            onChange={(val) => update({ bonediBariOnly: val })}
+            label={isBn ? 'বনেদি বাড়ির পুজো' : 'Bonedi Bari'}
+          />
+
           <ToggleSwitch
             id="switch-metro"
             checked={filters.metroAccessibleOnly}
@@ -183,6 +192,7 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
           />
         </div>
       </div>
+
 
       {/* Footer Summary + Sort By + Reset Button */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#eee8e1] dark:border-[#2f2720] text-xs sm:text-sm">

@@ -35,6 +35,7 @@ import {
   requestCurrentGeolocation,
   isValidCoordinate,
 } from '@/lib/maps/navigationUrl';
+import { AnimatedSegmentedControl } from '@/components/ui/AnimatedSegmentedControl';
 import { cn } from '@/lib/utils/cn';
 
 export function RouteBuilder() {
@@ -57,6 +58,10 @@ export function RouteBuilder() {
   const [selectedStationId, setSelectedStationId] = useState<string>(
     METRO_STATIONS_DATA[0]?.id || 'shobhabazar-sutanuti'
   );
+
+  // Quick Add category filter state
+  const [quickAddCategory, setQuickAddCategory] = useState<string>('all');
+  const [quickAddSearch, setQuickAddSearch] = useState<string>('');
 
   // GPS Location state
   const [isLocating, setIsLocating] = useState<boolean>(false);
@@ -184,6 +189,43 @@ export function RouteBuilder() {
   const totalWalkingMins = currentRouteStops.length > 0
     ? Math.round(estimateWalkingMinutes(totalDistance) + currentRouteStops.length * 20)
     : 0;
+
+  // Filtered available pandals for Route Planner Explorer / Quick-Add
+  const availablePandals = useMemo(() => {
+    let list = PANDALS_DATA.filter((p) => !currentRouteStops.some((s) => s.pandalId === p.id));
+
+    if (quickAddCategory === 'bonedi-bari') {
+      list = list.filter((p) => p.isBonediBari || p.category === 'Bonedi Bari');
+    } else if (quickAddCategory === 'north') {
+      list = list.filter((p) => p.zone === 'North Kolkata');
+    } else if (quickAddCategory === 'south') {
+      list = list.filter((p) => p.zone === 'South Kolkata');
+    } else if (quickAddCategory === 'central') {
+      list = list.filter((p) => p.zone === 'Central Kolkata');
+    } else if (quickAddCategory === 'east') {
+      list = list.filter((p) => p.zone === 'Salt Lake' || p.zone === 'New Town');
+    }
+
+    if (quickAddSearch.trim()) {
+      const q = quickAddSearch.toLowerCase().trim();
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.nameBn.includes(q) ||
+          p.locality.toLowerCase().includes(q) ||
+          p.localityBn.includes(q)
+      );
+    }
+
+    return list;
+  }, [currentRouteStops, quickAddCategory, quickAddSearch]);
+
+  const handleAddAllBonediBari = () => {
+    const bonediList = PANDALS_DATA.filter(
+      (p) => (p.isBonediBari || p.category === 'Bonedi Bari') && !currentRouteStops.some((s) => s.pandalId === p.id)
+    );
+    bonediList.forEach((p) => addPandalToRoute(p));
+  };
 
   return (
     <div className="space-y-6">
@@ -420,39 +462,23 @@ export function RouteBuilder() {
               <span>{isBn ? 'ন্যাভিগেশন প্রোভাইডার নির্বাচন' : 'Navigation Provider'}</span>
             </label>
 
-            <div className="flex flex-wrap items-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => setProvider('google')}
-                className={cn(
-                  'px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-bold flex items-center gap-2 transition-all active:scale-95',
-                  provider === 'google'
-                    ? 'border-[#b42323] bg-[#b42323] text-white shadow-xs'
-                    : 'border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-[#242424] dark:text-[#ede5dc] hover:border-[#b42323]/40'
-                )}
-              >
-                <span>Google Maps</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/20 uppercase tracking-wider">
-                  {isBn ? 'Android / Web' : 'Android & Web'}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setProvider('apple')}
-                className={cn(
-                  'px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-bold flex items-center gap-2 transition-all active:scale-95',
-                  provider === 'apple'
-                    ? 'border-[#b42323] bg-[#b42323] text-white shadow-xs'
-                    : 'border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-[#242424] dark:text-[#ede5dc] hover:border-[#b42323]/40'
-                )}
-              >
-                <span>Apple Maps</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/20 uppercase tracking-wider">
-                  {isBn ? 'iOS / Mac' : 'iOS & Mac'}
-                </span>
-              </button>
-            </div>
+            <AnimatedSegmentedControl<NavigationProvider>
+              options={[
+                {
+                  id: 'google',
+                  label: 'Google Maps',
+                  badge: isBn ? 'Android / Web' : 'Android & Web',
+                },
+                {
+                  id: 'apple',
+                  label: 'Apple Maps',
+                  badge: isBn ? 'iOS / Mac' : 'iOS & Mac',
+                },
+              ]}
+              value={provider}
+              onChange={setProvider}
+              ariaLabel={isBn ? 'ন্যাভিগেশন প্রোভাইডার নির্বাচন' : 'Navigation Provider Selection'}
+            />
           </div>
 
           {/* Validation Warning if invalid coordinates */}
@@ -645,34 +671,121 @@ export function RouteBuilder() {
         </div>
       )}
 
-      {/* Suggested Quick Add Section */}
-      <div className="p-5 sm:p-6 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-[#fcfaf7] dark:bg-[#14110e] space-y-3.5">
-        <h3 className="text-sm font-bold text-[#242424] dark:text-[#ede5dc] flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-[#b42323]" />
-          <span>{isBn ? 'জনপ্রিয় প্যান্ডেল দ্রুত যোগ করুন' : 'Quick Add Popular Pandals'}</span>
-        </h3>
+      {/* =========================================================================
+          STAGE D: ROUTE PANDAL EXPLORER & QUICK ADD (With Animated Filter Control)
+         ========================================================================= */}
+      <div className="p-5 sm:p-6 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-[#fcfaf7] dark:bg-[#14110e] space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h3 className="text-sm sm:text-base font-bold text-[#242424] dark:text-[#ede5dc] flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#b42323]" />
+              <span>{isBn ? 'পরিক্রমায় নতুন মণ্ডপ যোগ করুন' : 'Add Pandals to Your Trail'}</span>
+            </h3>
+            <p className="text-xs text-[#776d65] dark:text-[#a89e95] mt-0.5">
+              {isBn
+                ? 'অঞ্চল বা বনেদি বাড়ি বিভাগ নির্বাচন করে সহজে পছন্দের মণ্ডপগুলো যোগ করুন।'
+                : 'Filter by locality or Bonedi Bari heritage houses to quickly build your route.'}
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {PANDALS_DATA.filter((p) => !currentRouteStops.some((s) => s.pandalId === p.id))
-            .slice(0, 3)
-            .map((p) => (
+          {/* Quick Search inside Route Planner */}
+          <div className="relative w-full md:w-64">
+            <Search className="w-3.5 h-3.5 text-[#776d65] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={quickAddSearch}
+              onChange={(e) => setQuickAddSearch(e.target.value)}
+              placeholder={isBn ? 'মণ্ডপ বা এলাকা খুঁজুন...' : 'Search pandals...'}
+              className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-xs font-medium text-[#242424] dark:text-[#ede5dc] placeholder-[#a89e95] focus:outline-none focus:ring-1 focus:ring-[#b42323]"
+            />
+          </div>
+        </div>
+
+        {/* Animated Segmented Filter Bar */}
+        <div className="pt-1">
+          <AnimatedSegmentedControl<string>
+            options={[
+              { id: 'all', label: isBn ? 'সকল মণ্ডপ' : 'All Pandals' },
+              {
+                id: 'bonedi-bari',
+                label: isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari',
+                badge: isBn ? '১৭' : '17',
+              },
+              { id: 'north', label: isBn ? 'উত্তর কলকাতা' : 'North' },
+              { id: 'south', label: isBn ? 'দক্ষিণ কলকাতা' : 'South' },
+              { id: 'central', label: isBn ? 'মধ্য কলকাতা' : 'Central' },
+              { id: 'east', label: isBn ? 'সল্টলেক ও পূর্ব' : 'Salt Lake & East' },
+            ]}
+            value={quickAddCategory}
+            onChange={setQuickAddCategory}
+            size="sm"
+            ariaLabel={isBn ? 'রুট প্ল্যানার প্যান্ডেল ফিল্টার' : 'Route planner pandal filter'}
+          />
+        </div>
+
+        {/* Bonedi Bari Special Quick-Action */}
+        {quickAddCategory === 'bonedi-bari' && (
+          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="text-xs text-[#776d65] dark:text-[#c4b5a7]">
+              <span className="font-bold text-[#b42323] dark:text-amber-400 block sm:inline">
+                {isBn ? '🏛️ ঐতিহ্যবাহী পারিবারিক বনেদি পুজো' : '🏛️ Traditional Heritage Family Pujas'}
+              </span>
+              <span className="sm:ml-2">
+                {isBn
+                  ? 'শোভাবাজার, জোড়াসাঁকো, দার্জিপাড়া ও জানবাজারের ঐতিহাসিক পারিবারিক পুজো।'
+                  : 'Historical heritage pujas of Sovabazar, Jorasanko, Darjipara, and Janbazar.'}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleAddAllBonediBari}
+              className="px-3.5 py-1.5 rounded-lg bg-[#b42323] hover:bg-[#971c1c] text-white text-xs font-bold shrink-0 transition-all shadow-xs active:scale-95 flex items-center justify-center gap-1.5"
+            >
+              <span>+</span>
+              <span>{isBn ? 'সব বনেদি পুজো যোগ করুন' : 'Add All Bonedi Bari Pujas'}</span>
+            </button>
+          </div>
+        )}
+
+        {/* Available Pandals Cards Grid */}
+        {availablePandals.length === 0 ? (
+          <div className="p-8 text-center text-xs text-[#776d65] dark:text-[#a89e95] bg-white dark:bg-[#1a1613] rounded-xl border border-[#eee8e1] dark:border-[#2f2720]">
+            {isBn
+              ? 'এই বিভাগের সকল মণ্ডপ ইতিমধ্যেই আপনার পরিক্রমা তালিকায় যুক্ত আছে।'
+              : 'All pandals in this category are already added to your itinerary.'}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {availablePandals.slice(0, 9).map((p) => (
               <div
                 key={p.id}
-                className="p-3.5 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] flex items-center justify-between gap-2 text-sm shadow-xs"
+                className="p-3.5 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] flex items-center justify-between gap-2.5 shadow-xs transition-all hover:border-[#b42323]/40"
               >
                 <div className="min-w-0">
-                  <div className="font-bold text-[#242424] dark:text-[#ede5dc] truncate">{isBn ? p.nameBn : p.name}</div>
-                  <div className="text-xs text-[#776d65] dark:text-[#a89e95] truncate">{isBn ? p.localityBn : p.locality}</div>
+                  <div className="font-bold text-xs sm:text-sm text-[#242424] dark:text-[#ede5dc] truncate">
+                    {isBn ? p.nameBn : p.name}
+                  </div>
+                  <div className="text-[11px] text-[#776d65] dark:text-[#a89e95] truncate">
+                    {isBn ? p.localityBn : p.locality} • {p.zone}
+                  </div>
+                  {p.isBonediBari && (
+                    <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 font-bold">
+                      {isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari'}
+                    </span>
+                  )}
                 </div>
                 <button
+                  type="button"
                   onClick={() => addPandalToRoute(p)}
                   className="px-3 py-1.5 rounded-lg bg-[#f9e9e7] dark:bg-[#341b18] border border-[#f6ceca] dark:border-[#4a2420] text-[#b42323] hover:bg-[#b42323] hover:text-white font-bold text-xs shrink-0 transition-all active:scale-95"
+                  title={isBn ? 'পরিক্রমায় যোগ করুন' : 'Add to route'}
                 >
                   + {isBn ? 'যোগ' : 'Add'}
                 </button>
               </div>
             ))}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

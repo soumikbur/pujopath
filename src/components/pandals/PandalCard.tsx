@@ -92,16 +92,22 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
 
           {/* Top Badges */}
-          <div className="absolute left-3 top-3 flex items-center gap-1.5">
+          <div className="absolute left-3 top-3 flex items-center gap-1.5 flex-wrap max-w-[80%]">
             <span className="rounded-full border border-white/60 bg-white/95 px-2.5 py-1 text-xs font-bold text-[#242424] backdrop-blur-md shadow-xs">
               {pandal.zone}
             </span>
-            {pandal.isHeritage && (
+            {Boolean(pandal.isBonediBari || pandal.category === 'Bonedi Bari') && (
+              <span className="rounded-full bg-[#800020] text-amber-200 border border-amber-300/40 px-2.5 py-1 text-xs font-black shadow-xs">
+                {isBn ? 'বনেদি বাড়ি' : 'Bonedi Bari'}
+              </span>
+            )}
+            {pandal.isHeritage && !pandal.isBonediBari && (
               <span className="rounded-full bg-amber-500 px-2.5 py-1 text-xs font-bold text-white shadow-xs">
                 {isBn ? 'সাবেকি' : 'Heritage'}
               </span>
             )}
           </div>
+
 
           {/* Bottom Title in Image */}
           <div className="absolute bottom-3 left-3.5 right-3.5">
@@ -148,8 +154,27 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
               </span>
             </div>
           )}
+
+          {pandal.bonediBariInfo && (
+            <div className="pt-1 flex items-center justify-between gap-1 text-[11px]">
+              <span className="font-semibold text-amber-900 dark:text-amber-200 truncate">
+                {isBn ? (pandal.bonediBariInfo.ancestralHouseNameBn || pandal.bonediBariInfo.ancestralHouseName) : pandal.bonediBariInfo.ancestralHouseName}
+              </span>
+              <span
+                className={cn(
+                  'px-2 py-0.5 rounded-full font-bold text-[10px] shrink-0',
+                  pandal.bonediBariInfo.visitorAccessStatus === 'Visitor access confirmed'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                    : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                )}
+              >
+                {isBn ? pandal.bonediBariInfo.visitorAccessStatusBn : pandal.bonediBariInfo.visitorAccessStatus}
+              </span>
+            </div>
+          )}
         </div>
       </div>
+
 
       {/* Footer Actions Aligned at Bottom */}
       <div className="mt-2 flex items-center justify-between gap-2 border-t border-[#eee8e1] dark:border-[#2f2720] p-4 pt-3">
