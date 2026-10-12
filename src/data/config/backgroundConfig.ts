@@ -2,12 +2,15 @@
  * PujoPath — Subtle Ghibli-Inspired Durga Puja Background Configuration
  *
  * Defines the 6 original AI-generated Ghibli-style illustrations capturing
- * authentic Bengali Durga Puja atmosphere, along with rotation timings,
- * opacity profiles, and random selection algorithms.
+ * authentic Bengali Durga Puja atmosphere, providing both Landscape (16:9)
+ * and Portrait (3:4) assets for desktop and mobile devices.
  */
 
 export interface GhibliBackground {
   id: string;
+  srcLandscape: string;
+  srcPortrait: string;
+  /** Legacy alias for backwards compatibility */
   src: string;
   titleEn: string;
   titleBn: string;
@@ -18,6 +21,8 @@ export interface GhibliBackground {
 export const GHIBLI_BACKGROUNDS: GhibliBackground[] = [
   {
     id: 'pandal-illumination',
+    srcLandscape: '/images/backgrounds/ghibli-pandal-illumination-landscape.webp',
+    srcPortrait: '/images/backgrounds/ghibli-pandal-illumination-portrait.webp',
     src: '/images/backgrounds/ghibli-pandal-illumination.webp',
     titleEn: 'Illuminated Pandal Night',
     titleBn: 'আলোকোজ্জ্বল মণ্ডপ সন্ধ্যা',
@@ -26,6 +31,8 @@ export const GHIBLI_BACKGROUNDS: GhibliBackground[] = [
   },
   {
     id: 'devotees-praying',
+    srcLandscape: '/images/backgrounds/ghibli-devotees-praying-landscape.webp',
+    srcPortrait: '/images/backgrounds/ghibli-devotees-praying-portrait.webp',
     src: '/images/backgrounds/ghibli-devotees-praying.webp',
     titleEn: 'Devotees in Anjali Prayer',
     titleBn: 'করজোড়ে অঞ্জলি ও প্রার্থনা',
@@ -34,6 +41,8 @@ export const GHIBLI_BACKGROUNDS: GhibliBackground[] = [
   },
   {
     id: 'priest-aarti',
+    srcLandscape: '/images/backgrounds/ghibli-priest-aarti-landscape.webp',
+    srcPortrait: '/images/backgrounds/ghibli-priest-aarti-portrait.webp',
     src: '/images/backgrounds/ghibli-priest-aarti.webp',
     titleEn: 'Sacred Sandhya Aarti',
     titleBn: 'পবিত্র সন্ধ্যা আরতি',
@@ -42,6 +51,8 @@ export const GHIBLI_BACKGROUNDS: GhibliBackground[] = [
   },
   {
     id: 'durga-idol-flowers',
+    srcLandscape: '/images/backgrounds/ghibli-durga-idol-flowers-landscape.webp',
+    srcPortrait: '/images/backgrounds/ghibli-durga-idol-flowers-portrait.webp',
     src: '/images/backgrounds/ghibli-durga-idol-flowers.webp',
     titleEn: 'Ekchala Protima & Kash Phool',
     titleBn: 'একচালা প্রতিমা ও শুভ্র কাশফুল',
@@ -50,6 +61,8 @@ export const GHIBLI_BACKGROUNDS: GhibliBackground[] = [
   },
   {
     id: 'evening-pandal-crowd',
+    srcLandscape: '/images/backgrounds/ghibli-evening-pandal-crowd-landscape.webp',
+    srcPortrait: '/images/backgrounds/ghibli-evening-pandal-crowd-portrait.webp',
     src: '/images/backgrounds/ghibli-evening-pandal-crowd.webp',
     titleEn: 'Festive Pandal & Dhakis',
     titleBn: 'আনন্দমুখর মণ্ডপ ও ঢাকির বোল',
@@ -58,6 +71,8 @@ export const GHIBLI_BACKGROUNDS: GhibliBackground[] = [
   },
   {
     id: 'traditional-diyas-incense',
+    srcLandscape: '/images/backgrounds/ghibli-traditional-diyas-incense-landscape.webp',
+    srcPortrait: '/images/backgrounds/ghibli-traditional-diyas-incense-portrait.webp',
     src: '/images/backgrounds/ghibli-traditional-diyas-incense.webp',
     titleEn: 'Alpana, Diyas & Dhunuchi',
     titleBn: 'আলপনা, প্রদীপ ও ধুনুচি',
@@ -71,19 +86,19 @@ export interface BackgroundRotationSettings {
   intervalMs: number;
   /** Crossfade transition duration in milliseconds (approx 1.5–2.5s, default 2s) */
   transitionDurationMs: number;
-  /** Subtle image opacity for Light Mode (default 0.11) */
+  /** Visible yet subtle image opacity for Light Mode (default 0.32) */
   lightModeOpacity: number;
-  /** Subtle image opacity for Dark Mode (default 0.18) */
+  /** Visible yet subtle image opacity for Dark Mode (default 0.38) */
   darkModeOpacity: number;
-  /** Subtle blur in pixels (optional, 0 for crisp painterly background) */
+  /** Subtle blur in pixels (0 for crisp painterly background) */
   blurPx: number;
 }
 
 export const BACKGROUND_SETTINGS: BackgroundRotationSettings = {
   intervalMs: 28000,          // 28 seconds
   transitionDurationMs: 2000,  // 2.0 seconds smooth crossfade
-  lightModeOpacity: 0.11,      // 11% opacity in light mode preserves perfect card readability
-  darkModeOpacity: 0.18,       // 18% opacity in dark mode gives warm glowing festival night
+  lightModeOpacity: 0.32,      // 32% opacity ensures artwork is visibly recognizable in light mode
+  darkModeOpacity: 0.38,       // 38% opacity provides warm glowing festive night in dark mode
   blurPx: 0,
 };
 

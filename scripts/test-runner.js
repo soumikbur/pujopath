@@ -1428,27 +1428,34 @@ console.log('================================================================');
 (() => {
   console.log('\n--- Running Test Suite 30: Ghibli-Inspired Durga Puja Background System ---');
 
-  // 1. File Integrity: All 6 Ghibli illustration assets exist in public/images/backgrounds/
+  // 1. File Integrity: All 6 Landscape (16:9) & 6 Portrait (3:4) Ghibli illustration assets exist
   const bgDir = path.join(__dirname, '..', 'public', 'images', 'backgrounds');
   assert.strictEqual(fs.existsSync(bgDir), true, 'public/images/backgrounds must exist');
 
-  const expectedImages = [
-    'ghibli-pandal-illumination.webp',
-    'ghibli-devotees-praying.webp',
-    'ghibli-priest-aarti.webp',
-    'ghibli-durga-idol-flowers.webp',
-    'ghibli-evening-pandal-crowd.webp',
-    'ghibli-traditional-diyas-incense.webp',
+  const baseNames = [
+    'ghibli-pandal-illumination',
+    'ghibli-devotees-praying',
+    'ghibli-priest-aarti',
+    'ghibli-durga-idol-flowers',
+    'ghibli-evening-pandal-crowd',
+    'ghibli-traditional-diyas-incense',
   ];
 
-  for (const imgName of expectedImages) {
-    const fullPath = path.join(bgDir, imgName);
-    assert.strictEqual(fs.existsSync(fullPath), true, `Background asset ${imgName} must exist`);
-    const stats = fs.statSync(fullPath);
-    assert.ok(stats.size > 50000, `Asset ${imgName} must be a valid non-empty WebP image (>50KB)`);
-    assert.ok(stats.size < 800000, `Asset ${imgName} must be optimized for web (<800KB)`);
+  for (const base of baseNames) {
+    const landscapePath = path.join(bgDir, `${base}-landscape.webp`);
+    const portraitPath = path.join(bgDir, `${base}-portrait.webp`);
+    const legacyPath = path.join(bgDir, `${base}.webp`);
+
+    assert.strictEqual(fs.existsSync(landscapePath), true, `Landscape asset ${base}-landscape.webp must exist`);
+    assert.strictEqual(fs.existsSync(portraitPath), true, `Portrait asset ${base}-portrait.webp must exist`);
+    assert.strictEqual(fs.existsSync(legacyPath), true, `Legacy alias asset ${base}.webp must exist`);
+
+    const statsL = fs.statSync(landscapePath);
+    const statsP = fs.statSync(portraitPath);
+    assert.ok(statsL.size > 50000 && statsL.size < 800000, `Landscape ${base} must be between 50KB and 800KB`);
+    assert.ok(statsP.size > 50000 && statsP.size < 800000, `Portrait ${base} must be between 50KB and 800KB`);
   }
-  console.log(`✓ Asset Integrity: All 6 original Ghibli illustrations verified locally in WebP format (${expectedImages.length}/6)`);
+  console.log(`✓ Asset Integrity: All 12 original Ghibli illustrations verified (6 Landscape 16:9 + 6 Portrait 3:4)`);
 
   // 2. Configuration & Metadata Verification
   const bgConfigPath = path.join(__dirname, '..', 'src', 'data', 'config', 'backgroundConfig.ts');
@@ -1456,8 +1463,14 @@ console.log('================================================================');
   const bgConfigContent = fs.readFileSync(bgConfigPath, 'utf8');
 
   assert.ok(bgConfigContent.includes('GHIBLI_BACKGROUNDS'), 'Must export GHIBLI_BACKGROUNDS');
+  assert.ok(bgConfigContent.includes('srcLandscape'), 'Must configure srcLandscape for desktop');
+  assert.ok(bgConfigContent.includes('srcPortrait'), 'Must configure srcPortrait for mobile');
   assert.ok(bgConfigContent.includes('BACKGROUND_SETTINGS'), 'Must export BACKGROUND_SETTINGS');
   assert.ok(bgConfigContent.includes('getNextRandomIndex'), 'Must export getNextRandomIndex');
+
+  // Visible yet subtle opacity settings (lightModeOpacity >= 0.25 and darkModeOpacity >= 0.30)
+  assert.ok(bgConfigContent.includes('lightModeOpacity: 0.32'), 'Must set visible light mode opacity (0.32)');
+  assert.ok(bgConfigContent.includes('darkModeOpacity: 0.38'), 'Must set visible dark mode opacity (0.38)');
 
   // Rotation interval between 20-35 seconds (20000ms - 35000ms)
   const intervalMatch = bgConfigContent.match(/intervalMs:\s*(\d+)/);
@@ -1470,7 +1483,7 @@ console.log('================================================================');
   assert.ok(durationMatch, 'transitionDurationMs must be declared');
   const durationVal = parseInt(durationMatch[1], 10);
   assert.ok(durationVal >= 1500 && durationVal <= 2500, `Transition duration ${durationVal}ms must be between 1.5s and 2.5s`);
-  console.log(`✓ Timing Parameters: Rotation interval (${intervalVal / 1000}s) & crossfade duration (${durationVal / 1000}s) verified`);
+  console.log(`✓ Timing & Contrast: Rotation (${intervalVal / 1000}s), crossfade (${durationVal / 1000}s), and visible opacities (32%/38%) verified`);
 
   // 3. Consecutive Repeat Prevention Algorithm
   const { getNextRandomIndex } = require(path.join(__dirname, '..', 'src', 'data', 'config', 'backgroundConfig.ts'));
@@ -1494,17 +1507,18 @@ console.log('================================================================');
   assert.ok(bgContextContent.includes('clearInterval'), 'Must clean up interval timer on unmount');
   console.log('✓ Lifecycle & Accessibility: Preloading, reduced-motion, and timer cleanup verified');
 
-  // 5. PujoBackground UI Layer & Stacking Safety
+  // 5. PujoBackground UI Layer & Responsive Selection
   const bgComponentPath = path.join(__dirname, '..', 'src', 'components', 'ui', 'PujoBackground.tsx');
   assert.strictEqual(fs.existsSync(bgComponentPath), true, 'PujoBackground.tsx must exist');
   const bgComponentContent = fs.readFileSync(bgComponentPath, 'utf8');
 
+  assert.ok(bgComponentContent.includes('hidden md:block'), 'Must select landscape 16:9 for desktop screens');
+  assert.ok(bgComponentContent.includes('block md:hidden'), 'Must select portrait 3:4 for mobile screens');
   assert.ok(bgComponentContent.includes('pointer-events-none'), 'Must include pointer-events-none so it never blocks clicks');
   assert.ok(bgComponentContent.includes('aria-hidden="true"'), 'Must include aria-hidden="true" for screen reader purity');
   assert.ok(bgComponentContent.includes('z-0'), 'Must remain strictly behind interactive page content (z-0)');
   assert.ok(bgComponentContent.includes('object-cover'), 'Must use object-cover for responsive viewports');
-  assert.ok(bgComponentContent.includes('dark:opacity-'), 'Must provide distinct light and dark mode opacity overlays');
-  console.log('✓ UI & Stacking Safety: pointer-events-none, z-0, aria-hidden, and dual-theme overlays verified');
+  console.log('✓ Responsive Selection: Desktop landscape (hidden md:block) & mobile portrait (block md:hidden) verified');
 
   // 6. Application Shell & Footer Integration
   const layoutPath = path.join(__dirname, '..', 'src', 'app', 'layout.tsx');

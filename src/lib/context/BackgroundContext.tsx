@@ -84,9 +84,12 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
       const targetBg = GHIBLI_BACKGROUNDS[targetIndex];
       if (!targetBg) return;
 
-      // Preload image before initiating crossfade to prevent blank flashes
+      // Preload next image before initiating crossfade to prevent blank flashes
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+      const targetSrc = isMobile ? (targetBg.srcPortrait || targetBg.src) : (targetBg.srcLandscape || targetBg.src);
+      
       const preloadImg = new Image();
-      preloadImg.src = getAssetPath(targetBg.src);
+      preloadImg.src = getAssetPath(targetSrc);
 
       const startFade = () => {
         setIncomingIndex(targetIndex);
@@ -109,7 +112,7 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
         preloadImg.onload = startFade;
         preloadImg.onerror = () => {
           // If the image fails to load, gracefully skip without breaking rotation
-          console.warn(`[PujoPath Background] Failed to load ${targetBg.src}; skipping.`);
+          console.warn(`[PujoPath Background] Failed to load ${targetSrc}; skipping.`);
           const fallbackIndex = getNextRandomIndex(targetIndex);
           if (fallbackIndex !== currentIndex) {
             triggerTransitionTo(fallbackIndex);

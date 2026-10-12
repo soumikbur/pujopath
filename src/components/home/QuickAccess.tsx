@@ -76,7 +76,7 @@ export function QuickAccess() {
             <Link
               key={item.href}
               href={item.href}
-              className="group flex flex-col justify-between rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] p-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#b42323]/50 hover:shadow-md active:scale-95"
+              className="group flex flex-col justify-between rounded-2xl border border-[#eee8e1]/90 dark:border-[#2f2720]/90 bg-white/85 dark:bg-[#1a1613]/85 backdrop-blur-md p-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#b42323]/50 hover:shadow-md active:scale-95"
             >
               <div
                 className="grid h-10 w-10 place-items-center rounded-xl transition-transform duration-200 group-hover:scale-110"

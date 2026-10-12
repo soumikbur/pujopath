@@ -64,7 +64,7 @@ export function PujaHighlights() {
           <Link
             key={idx}
             href={item.href}
-            className="group flex items-center gap-3.5 p-3 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] hover:border-[#b42323]/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-98 shadow-xs"
+            className="group flex items-center gap-3.5 p-3 rounded-2xl border border-[#eee8e1]/90 dark:border-[#2f2720]/90 bg-white/85 dark:bg-[#1a1613]/85 backdrop-blur-md hover:border-[#b42323]/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-98 shadow-xs"
           >
             {/* Left Image */}
             <div className="relative w-24 h-20 sm:w-[110px] sm:h-[80px] rounded-xl overflow-hidden shrink-0 border border-black/5 dark:border-white/10">

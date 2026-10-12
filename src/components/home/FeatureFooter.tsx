@@ -75,7 +75,7 @@ export function FeatureFooter() {
               onClick={f.onClick}
               className={cn(
                 'flex items-center gap-2 p-2.5 rounded-2xl border text-left transition-all duration-150',
-                'bg-white/80 dark:bg-[#1a1613]/80 border-[#eadcce] dark:border-[#2f2720] shadow-xs',
+                'bg-white/80 dark:bg-[#1a1613]/80 backdrop-blur-md border-[#eadcce] dark:border-[#2f2720] shadow-xs',
                 f.isAction && 'hover:border-[#d52f2f] hover:bg-[#fff9f8] dark:hover:bg-[#251e18] cursor-pointer active:scale-95'
               )}
             >

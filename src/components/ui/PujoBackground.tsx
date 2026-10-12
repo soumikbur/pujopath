@@ -11,18 +11,28 @@ import { BACKGROUND_SETTINGS } from '@/data/config/backgroundConfig';
  *
  * Rotates randomly between 6 original Ghibli illustrations depicting authentic
  * Bengali Durga Puja moments. Features:
+ * - Responsive 16:9 Landscape for desktop/laptops & 3:4 Portrait for mobile devices
  * - 2-second smooth crossfade without flashing or blank gaps
- * - Low opacity & soft radial gradient preserving 100% card & text readability
+ * - Balanced, visible opacity & soft radial framing vignette
+ * - 100% card & text readability across light and dark modes
  * - Zero interference with maps, buttons, or navigation (pointer-events-none, z-0)
- * - Full light & dark mode optimization
  * - Culturally authentic alpana and kash flower vector line accents
  * - Respects prefers-reduced-motion
  */
 export function PujoBackground() {
   const { currentBackground, incomingBackground, isTransitioning } = useBackground();
 
-  const currentSrc = getAssetPath(currentBackground.src);
-  const incomingSrc = incomingBackground ? getAssetPath(incomingBackground.src) : null;
+  // Current assets
+  const currentLandscape = getAssetPath(currentBackground.srcLandscape || currentBackground.src);
+  const currentPortrait = getAssetPath(currentBackground.srcPortrait || currentBackground.src);
+
+  // Incoming assets for crossfade
+  const incomingLandscape = incomingBackground
+    ? getAssetPath(incomingBackground.srcLandscape || incomingBackground.src)
+    : null;
+  const incomingPortrait = incomingBackground
+    ? getAssetPath(incomingBackground.srcPortrait || incomingBackground.src)
+    : null;
 
   return (
     <div
@@ -37,21 +47,39 @@ export function PujoBackground() {
           opacity: isTransitioning ? 0 : 1,
         }}
       >
-        {currentSrc && (
-          <Image
-            src={currentSrc}
-            alt=""
-            fill
-            priority
-            unoptimized
-            sizes="100vw"
-            className="object-cover object-center dark:opacity-[0.18] opacity-[0.11] transition-opacity duration-500"
-          />
+        {/* Desktop / Laptop: 16:9 Landscape */}
+        {currentLandscape && (
+          <div className="hidden md:block absolute inset-0">
+            <Image
+              src={currentLandscape}
+              alt=""
+              fill
+              priority
+              unoptimized
+              sizes="100vw"
+              className="object-cover object-center opacity-[0.30] dark:opacity-[0.36] transition-opacity duration-500"
+            />
+          </div>
+        )}
+
+        {/* Mobile / Tablet Portrait: 3:4 Portrait */}
+        {currentPortrait && (
+          <div className="block md:hidden absolute inset-0">
+            <Image
+              src={currentPortrait}
+              alt=""
+              fill
+              priority
+              unoptimized
+              sizes="100vw"
+              className="object-cover object-center opacity-[0.32] dark:opacity-[0.38] transition-opacity duration-500"
+            />
+          </div>
         )}
       </div>
 
       {/* 2. Incoming Ghibli Illustration Layer (Crossfading In) */}
-      {incomingSrc && (
+      {incomingBackground && (
         <div
           className="absolute inset-0 transition-opacity ease-in-out"
           style={{
@@ -59,14 +87,33 @@ export function PujoBackground() {
             opacity: isTransitioning ? 1 : 0,
           }}
         >
-          <Image
-            src={incomingSrc}
-            alt=""
-            fill
-            unoptimized
-            sizes="100vw"
-            className="object-cover object-center dark:opacity-[0.18] opacity-[0.11] transition-opacity duration-500"
-          />
+          {/* Desktop / Laptop: 16:9 Landscape */}
+          {incomingLandscape && (
+            <div className="hidden md:block absolute inset-0">
+              <Image
+                src={incomingLandscape}
+                alt=""
+                fill
+                unoptimized
+                sizes="100vw"
+                className="object-cover object-center opacity-[0.30] dark:opacity-[0.36] transition-opacity duration-500"
+              />
+            </div>
+          )}
+
+          {/* Mobile / Tablet Portrait: 3:4 Portrait */}
+          {incomingPortrait && (
+            <div className="block md:hidden absolute inset-0">
+              <Image
+                src={incomingPortrait}
+                alt=""
+                fill
+                unoptimized
+                sizes="100vw"
+                className="object-cover object-center opacity-[0.32] dark:opacity-[0.38] transition-opacity duration-500"
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -75,7 +122,7 @@ export function PujoBackground() {
         className="absolute inset-0 dark:opacity-0 transition-opacity duration-500"
         style={{
           background:
-            'radial-gradient(ellipse 95% 65% at 50% 15%, rgba(254, 245, 235, 0.6) 0%, rgba(252, 250, 247, 0.85) 55%, rgba(252, 250, 247, 0.96) 100%)',
+            'radial-gradient(ellipse 95% 70% at 50% 25%, rgba(254, 248, 240, 0.22) 0%, rgba(252, 250, 247, 0.55) 55%, rgba(252, 250, 247, 0.85) 100%)',
         }}
       />
 
@@ -84,13 +131,13 @@ export function PujoBackground() {
         className="absolute inset-0 opacity-0 dark:opacity-100 transition-opacity duration-500"
         style={{
           background:
-            'radial-gradient(ellipse 95% 65% at 50% 15%, rgba(40, 26, 18, 0.4) 0%, rgba(20, 17, 14, 0.78) 55%, rgba(20, 17, 14, 0.95) 100%)',
+            'radial-gradient(ellipse 95% 70% at 50% 25%, rgba(20, 17, 14, 0.2) 0%, rgba(20, 17, 14, 0.58) 55%, rgba(20, 17, 14, 0.88) 100%)',
         }}
       />
 
       {/* 5. Delicate Cultural Alpana Vector Motifs (Top-Left) */}
       <svg
-        className="absolute -top-16 -left-16 w-80 h-80 sm:w-96 sm:h-96 text-[#B42323] opacity-[0.032] dark:opacity-[0.045] transition-opacity duration-300"
+        className="absolute -top-16 -left-16 w-80 h-80 sm:w-96 sm:h-96 text-[#B42323] opacity-[0.038] dark:opacity-[0.05] transition-opacity duration-300"
         viewBox="0 0 200 200"
         fill="none"
         stroke="currentColor"
@@ -123,7 +170,7 @@ export function PujoBackground() {
 
       {/* 6. Delicate Cultural Alpana Vector Motifs (Top-Right) */}
       <svg
-        className="absolute -top-20 -right-20 w-88 h-88 sm:w-[420px] sm:h-[420px] text-[#B42323] opacity-[0.03] dark:opacity-[0.045] transition-opacity duration-300"
+        className="absolute -top-20 -right-20 w-88 h-88 sm:w-[420px] sm:h-[420px] text-[#B42323] opacity-[0.035] dark:opacity-[0.05] transition-opacity duration-300"
         viewBox="0 0 200 200"
         fill="none"
         stroke="currentColor"
@@ -144,7 +191,7 @@ export function PujoBackground() {
 
       {/* 7. Autumn Kash Flower (কাশফুল) Graceful Swirl Accent — Center-Right */}
       <svg
-        className="hidden md:block absolute top-1/3 -right-12 w-64 h-96 text-[#B42323] opacity-[0.022] dark:opacity-[0.035]"
+        className="hidden md:block absolute top-1/3 -right-12 w-64 h-96 text-[#B42323] opacity-[0.028] dark:opacity-[0.04]"
         viewBox="0 0 100 200"
         fill="none"
         stroke="currentColor"
