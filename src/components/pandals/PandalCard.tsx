@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, Train, Star, Navigation, Check, Heart } from 'lucide-react';
+import { MapPin, Train, Star, Navigation, Check, Heart, Camera, CameraOff, Landmark } from 'lucide-react';
 import { Pandal } from '@/types';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useFavorites } from '@/lib/context/FavoritesContext';
@@ -20,10 +20,14 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
   const isBn = locale === 'bn';
   const { isPandalInRoute, addPandalToRoute, removePandalFromRoute, isPandalSaved, toggleSavePandal } = useFavorites();
 
-  const [imgSrc, setImgSrc] = useState(() => getAssetPath(pandal.imageUrl || '/images/pandals/pandal-fallback.webp'));
+  const [imgError, setImgError] = useState(false);
+  const hasPhotoUrl = Boolean(pandal.imageUrl && pandal.imageUrl.trim() !== '');
+  const hasVerifiedPhoto = Boolean(pandal.hasVerifiedPhoto && hasPhotoUrl && !imgError);
+
+  const imgSrc = hasPhotoUrl ? getAssetPath(pandal.imageUrl) : '';
 
   React.useEffect(() => {
-    setImgSrc(getAssetPath(pandal.imageUrl || '/images/pandals/pandal-fallback.webp'));
+    setImgError(false);
   }, [pandal.imageUrl]);
 
   const inRoute = isPandalInRoute(pandal.id);
@@ -60,15 +64,19 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
         href={`/pandals/${pandal.slug}`}
         className="group flex items-center gap-3 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] p-3 transition-all hover:bg-[#fcfaf7] dark:hover:bg-[#251e18] shadow-xs active:scale-98"
       >
-        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
-          <Image
-            src={imgSrc}
-            alt={displayName}
-            fill
-            onError={() => setImgSrc(getAssetPath('/images/pandals/pandal-fallback.webp'))}
-            className="object-cover"
-            sizes="56px"
-          />
+        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-[#f5efe8] dark:bg-[#241d17] border border-[#e8ded2] dark:border-[#382d23] flex items-center justify-center">
+          {hasVerifiedPhoto ? (
+            <Image
+              src={imgSrc}
+              alt={displayName}
+              fill
+              onError={() => setImgError(true)}
+              className="object-cover"
+              sizes="56px"
+            />
+          ) : (
+            <CameraOff className="w-5 h-5 text-[#8c8075] dark:text-[#a09488]" />
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <h4 className="text-sm sm:text-base font-bold text-[#242424] dark:text-[#ede5dc] truncate">{displayName}</h4>
@@ -81,21 +89,51 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
   return (
     <div className="group flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-[#b42323]/40 shadow-xs">
       <div className="relative">
-        {/* Pandal Image (16:9 ratio, object-fit cover) */}
-        <Link href={`/pandals/${pandal.slug}`} className="block relative aspect-video w-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-          <Image
-            src={imgSrc}
-            alt={displayName}
-            fill
-            onError={() => setImgSrc(getAssetPath('/images/pandals/pandal-fallback.webp'))}
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+        {/* Pandal Thumbnail Header (16:9 ratio, object-fit cover or honest neutral unavailable placeholder) */}
+        <Link href={`/pandals/${pandal.slug}`} className="block relative aspect-video w-full overflow-hidden">
+          {hasVerifiedPhoto ? (
+            <>
+              <Image
+                src={imgSrc}
+                alt={displayName}
+                fill
+                onError={() => setImgError(true)}
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
 
-          {/* Top Badges */}
-          <div className="absolute left-3 top-3 flex items-center gap-1.5 flex-wrap max-w-[80%]">
-            <span className="rounded-full border border-white/60 bg-white/95 px-2.5 py-1 text-xs font-bold text-[#242424] backdrop-blur-md shadow-xs">
+              {/* Verified 2025 Photo Badge */}
+              <div className="absolute left-3 bottom-10 z-10">
+                <span className="rounded-full border border-emerald-400/40 bg-emerald-800/80 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-md shadow-xs flex items-center gap-1">
+                  <Camera className="w-2.5 h-2.5" />
+                  {isBn ? '২০২৫ ছবি' : '2025 Photo'}
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="absolute inset-0 bg-[#f7f2eb] dark:bg-[#201a14] border-b border-[#eee8e1] dark:border-[#2f2720] flex flex-col items-center justify-center p-4 text-center">
+              <div className="absolute inset-0 opacity-[0.035] dark:opacity-[0.06] pointer-events-none flex items-center justify-center">
+                <Landmark className="w-44 h-44" />
+              </div>
+
+              <div className="relative z-10 flex flex-col items-center gap-1">
+                <div className="w-8 h-8 rounded-full bg-[#e8ded2] dark:bg-[#2d241c] text-[#7d7165] dark:text-[#a5998d] flex items-center justify-center mb-0.5">
+                  <CameraOff className="w-4 h-4" />
+                </div>
+                <span className="text-[11px] font-black uppercase tracking-wider text-[#63574c] dark:text-[#b3a699]">
+                  {isBn ? '২০২৫ ছবি অপ্রাপ্য' : '2025 Photo Unavailable'}
+                </span>
+                <span className="text-[10px] text-[#85796f] dark:text-[#8f8275] max-w-[90%] truncate">
+                  {isBn ? 'যাচাইকৃত তালিকা • গবেষণা চলছে' : 'Verified Listing • Research Ongoing'}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Top Left Badges */}
+          <div className="absolute left-3 top-3 flex items-center gap-1.5 flex-wrap max-w-[80%] z-20">
+            <span className="rounded-full border border-white/60 dark:border-black/40 bg-white/95 dark:bg-[#1a1613]/90 px-2.5 py-1 text-xs font-bold text-[#242424] dark:text-[#ede5dc] backdrop-blur-md shadow-xs">
               {pandal.zone}
             </span>
             {Boolean(pandal.isBonediBari || pandal.category === 'Bonedi Bari') && (
@@ -110,10 +148,12 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
             )}
           </div>
 
-
-          {/* Bottom Title in Image */}
-          <div className="absolute bottom-3 left-3.5 right-3.5">
-            <h3 className="text-base sm:text-lg font-black text-white truncate drop-shadow-md">
+          {/* Bottom Title on Header */}
+          <div className="absolute bottom-2.5 left-3.5 right-3.5 z-20">
+            <h3 className={cn(
+              'text-base sm:text-lg font-black truncate',
+              hasVerifiedPhoto ? 'text-white drop-shadow-md' : 'text-[#242424] dark:text-[#ede5dc]'
+            )}>
               {displayName}
             </h3>
           </div>
@@ -123,7 +163,7 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
         <button
           onClick={handleSaveToggle}
           className={cn(
-            'absolute right-3 top-3 rounded-xl p-2 backdrop-blur-md transition-all active:scale-90 shadow-xs',
+            'absolute right-3 top-3 z-30 rounded-xl p-2 backdrop-blur-md transition-all active:scale-90 shadow-xs',
             isSaved
               ? 'bg-[#b42323] text-white'
               : 'bg-white/90 dark:bg-black/60 text-[#625b55] dark:text-gray-300 hover:text-[#b42323]'

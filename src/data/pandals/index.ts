@@ -4,6 +4,9 @@ import { EXPANDED_COMMUNITY_PANDALS } from './communityPandals';
 import { NEIGHBORHOOD_PANDALS } from './neighborhoodPandals';
 import { REGISTERED_CLUBS_PART1 } from './registeredClubsPart1';
 import { REGISTERED_CLUBS_PART2 } from './registeredClubsPart2';
+import { getPandalPhotoRecord, VERIFIED_2025_PHOTOS, validatePhotoUniqueness } from './photoRegistry';
+
+export { VERIFIED_2025_PHOTOS, getPandalPhotoRecord, validatePhotoUniqueness } from './photoRegistry';
 
 export const FOUNDATION_PANDALS: Pandal[] = [
   {
@@ -1322,7 +1325,7 @@ export { NEIGHBORHOOD_PANDALS } from './neighborhoodPandals';
 export { REGISTERED_CLUBS_PART1 } from './registeredClubsPart1';
 export { REGISTERED_CLUBS_PART2 } from './registeredClubsPart2';
 
-export const PANDALS_DATA: Pandal[] = [
+const RAW_PANDALS_DATA: Pandal[] = [
   ...FOUNDATION_PANDALS,
   ...BONEDI_BARI_PANDALS,
   ...EXPANDED_COMMUNITY_PANDALS,
@@ -1330,5 +1333,16 @@ export const PANDALS_DATA: Pandal[] = [
   ...REGISTERED_CLUBS_PART1,
   ...REGISTERED_CLUBS_PART2,
 ];
+
+export const PANDALS_DATA: Pandal[] = RAW_PANDALS_DATA.map((pandal) => {
+  const photo = getPandalPhotoRecord(pandal.id);
+  return {
+    ...pandal,
+    imageUrl: photo.isAvailable ? photo.imageUrl : '',
+    hasVerifiedPhoto: photo.isAvailable,
+    photoMetadata: photo,
+    galleryImages: photo.isAvailable ? [photo.imageUrl] : [],
+  };
+});
 
 

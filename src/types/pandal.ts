@@ -57,6 +57,20 @@ export interface BonediBariDetails {
   confidence: 'Verified' | 'High' | 'Moderate';
 }
 
+export interface PandalPhotoMetadata {
+  pandalId: string;
+  imageUrl: string;
+  isAvailable: boolean;
+  photoYear: number | null;
+  verificationStatus: 'Verified 2025' | 'Photo Unavailable';
+  photographer?: string;
+  sourceName: string;
+  sourceUrl?: string;
+  license?: string;
+  verifiedDate: string;
+  notes?: string;
+}
+
 export interface Pandal {
   id: string;
   slug: string;
@@ -84,6 +98,8 @@ export interface Pandal {
   rating: number;
   reviewCount: number;
   imageUrl: string;
+  hasVerifiedPhoto?: boolean;
+  photoMetadata?: PandalPhotoMetadata;
   galleryImages: string[];
   isFeatured: boolean;
   isHeritage: boolean;

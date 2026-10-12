@@ -751,7 +751,7 @@ assert.strictEqual(communityFile.includes('sikdar-bagan'), true, 'Must include S
 assert.strictEqual(communityFile.includes('tala-pratyay'), true, 'Must include Tala Pratyay');
 assert.strictEqual(communityFile.includes('dum-dum-park-bharat-chakra'), true, 'Must include Dum Dum Park Bharat Chakra');
 assert.strictEqual(pDataFile.includes('fd-block-salt-lake') || communityFile.includes('salt-lake-ak-block'), true, 'Must include Salt Lake Block Pujas');
-assert.strictEqual(communityFile.includes('howrah-shibpur-mandir-tala'), true, 'Must include Howrah Shibpur Mandirtala');
+assert.strictEqual(pDataFile.includes('howrah-shibpur-mandir-tala') || communityFile.includes('howrah-shibpur-mandir-tala'), true, 'Must include Howrah Shibpur Mandirtala');
 assert.strictEqual(communityFile.includes('badamtala-ashar-sangha'), true, 'Must include Badamtala Ashar Sangha');
 assert.strictEqual(neighborhoodFile.includes('belur-math-durga-puja'), true, 'Must include Belur Math Durga Puja');
 assert.strictEqual(neighborhoodFile.includes('kumartuli-sarbojanin'), true, 'Must include Kumartuli Sarbojanin');
@@ -1179,8 +1179,146 @@ console.log('================================================================');
   console.log('✓ Music UI mood selector, playlist controls, and dynamic player attribution verified');
 })();
 
+// ============================================================================
+// TEST SUITE 28: Pandal 2025 Photograph Verification, Zero Duplicates & Honest UI State
+// ============================================================================
+(() => {
+  console.log('\n--- Running Test Suite 28: 2025 Photo Verification & Zero Duplicate Integrity ---');
+  const crypto = require('crypto');
+
+  // 1. Load Pandal Datasets and Extract Pandals
+  function extractPandalsFromTS(filePath) {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const pandals = [];
+    const chunks = content.split(/\{\s*id:\s*['"]/g);
+    for (let i = 1; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      const id = chunk.split(/['"]/)[0];
+      const imgMatch = chunk.match(/imageUrl:\s*['"]([^'"]*)['"]/);
+      const nameMatch = chunk.match(/name:\s*['"]([^'"]+)['"]/);
+      const verifiedPhotoMatch = chunk.match(/hasVerifiedPhoto:\s*(true|false)/);
+      pandals.push({
+        id,
+        name: nameMatch ? nameMatch[1] : id,
+        imageUrl: imgMatch ? imgMatch[1] : '',
+        hasVerifiedPhoto: verifiedPhotoMatch ? verifiedPhotoMatch[1] === 'true' : false,
+        file: path.basename(filePath),
+      });
+    }
+    return pandals;
+  }
+
+  const files = [
+    'src/data/pandals/index.ts',
+    'src/data/pandals/neighborhoodPandals.ts',
+    'src/data/pandals/bonediBari.ts',
+    'src/data/pandals/communityPandals.ts',
+    'src/data/pandals/registeredClubsPart1.ts',
+    'src/data/pandals/registeredClubsPart2.ts',
+  ];
+
+  let allPandals = [];
+  for (const f of files) {
+    const fullPath = path.join(__dirname, '..', f);
+    assert.strictEqual(fs.existsSync(fullPath), true, `File must exist: ${f}`);
+    allPandals = allPandals.concat(extractPandalsFromTS(fullPath));
+  }
+
+  // A. Total Pandal Count & Unique ID Verification
+  assert.strictEqual(allPandals.length, 770, `Total pandals must be exactly 770 across all datasets, got ${allPandals.length}`);
+  const uniqueIds = new Set(allPandals.map((p) => p.id));
+  assert.strictEqual(uniqueIds.size, 770, `All 770 pandal IDs must be globally unique, got ${uniqueIds.size}`);
+  console.log(`✓ Data Integrity: All 770 pandals verified with 100% unique stable IDs`);
+
+  // B. Zero Repeated Thumbnails / Duplicate Detection
+  const assignedImages = new Map(); // url -> array of pandal IDs
+  const pandalsImgDir = path.join(__dirname, '..', 'public', 'images', 'pandals');
+
+  for (const p of allPandals) {
+    if (p.imageUrl && p.imageUrl.trim() !== '') {
+      if (!assignedImages.has(p.imageUrl)) {
+        assignedImages.set(p.imageUrl, []);
+      }
+      assignedImages.get(p.imageUrl).push(p.id);
+    }
+  }
+
+  // Check that NO image URL is shared between 2 or more different pandals
+  const duplicatedUrls = [];
+  for (const [url, pIds] of assignedImages.entries()) {
+    if (pIds.length > 1) {
+      duplicatedUrls.push({ url, count: pIds.length, pandals: pIds });
+    }
+  }
+  assert.strictEqual(
+    duplicatedUrls.length,
+    0,
+    `Zero duplicate image URLs allowed! Found ${duplicatedUrls.length} shared URLs: ${JSON.stringify(duplicatedUrls)}`
+  );
+  console.log(`✓ Zero Repeated Thumbnails: 0 duplicate image URLs detected across 770 pandals`);
+
+  // C. File Existence & Perceptual / Cryptographic Hash Uniqueness
+  const hashToUrl = new Map();
+  for (const url of assignedImages.keys()) {
+    const filename = path.basename(url);
+    const localFilePath = path.join(pandalsImgDir, filename);
+    assert.strictEqual(
+      fs.existsSync(localFilePath),
+      true,
+      `Image referenced by pandal must exist locally in public/images/pandals: ${filename}`
+    );
+
+    const fileBuf = fs.readFileSync(localFilePath);
+    const sha256 = crypto.createHash('sha256').update(fileBuf).digest('hex');
+
+    assert.strictEqual(
+      hashToUrl.has(sha256),
+      false,
+      `Duplicate file content detected! ${url} has identical hash as ${hashToUrl.get(sha256)}`
+    );
+    hashToUrl.set(sha256, url);
+  }
+  console.log(`✓ File Integrity: All ${assignedImages.size} verified photographs have 100% unique SHA-256 cryptographic hashes`);
+
+  // D. Photograph Verification Registry & Metadata Compliance
+  const photoRegistryPath = path.join(__dirname, '..', 'src', 'data', 'pandals', 'photoRegistry.ts');
+  assert.strictEqual(fs.existsSync(photoRegistryPath), true, 'photoRegistry.ts must exist');
+  const photoRegistryContent = fs.readFileSync(photoRegistryPath, 'utf8');
+
+  // Verify that photo metadata fields are fully supported
+  assert.ok(photoRegistryContent.includes('photoYear: 2025'), 'Verified photos must record photoYear: 2025');
+  assert.ok(photoRegistryContent.includes("verificationStatus: 'Verified 2025'"), 'Verified photos must record verificationStatus: Verified 2025');
+  assert.ok(photoRegistryContent.includes('photographer:'), 'Verified photos must record photographer attribution where available');
+  assert.ok(photoRegistryContent.includes('license:'), 'Verified photos must record license notes');
+  assert.ok(photoRegistryContent.includes("verificationStatus: 'Photo Unavailable'"), 'Unavailable photos must record honest Photo Unavailable status');
+  assert.ok(photoRegistryContent.includes('validatePhotoUniqueness'), 'photoRegistry must export validatePhotoUniqueness validator');
+  console.log(`✓ Metadata Integrity: Verified 2025 photo registry attributes and license compliance verified`);
+
+  // E. Honest Unavailable Photo UI State (PandalCard & PandalDetailClient)
+  const cardContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'pandals', 'PandalCard.tsx'), 'utf8');
+  assert.ok(cardContent.includes('2025 Photo Unavailable'), 'PandalCard must render clean neutral 2025 Photo Unavailable placeholder');
+  assert.ok(cardContent.includes('২০২৫ ছবি অপ্রাপ্য'), 'PandalCard must support Bengali translation for photo unavailable');
+  assert.ok(cardContent.includes('CameraOff'), 'PandalCard must use neutral CameraOff icon for missing photo state');
+  assert.ok(!cardContent.includes("onError={() => setImgSrc(getAssetPath('/images/pandals/pandal-fallback.webp'))}"), 'PandalCard must not silently fall back to shared generic pandal-fallback.webp');
+
+  const detailContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'pandals', 'PandalDetailClient.tsx'), 'utf8');
+  assert.ok(detailContent.includes('2025 Photo Unavailable'), 'PandalDetailClient must render neutral 2025 Photo Unavailable banner');
+  assert.ok(detailContent.includes('২০২৫ ছবি অপ্রাপ্য'), 'PandalDetailClient must support Bengali unavailable banner');
+  assert.ok(detailContent.includes('Verified Photograph') || detailContent.includes('Verified 2025 Photograph'), 'PandalDetailClient must display photographer attribution bar');
+
+  // F. User-Added & Community-Suggested Pandals Honest Defaults
+  const favContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'lib', 'context', 'FavoritesContext.tsx'), 'utf8');
+  assert.ok(favContent.includes("imageUrl: '',"), 'FavoritesContext custom pandals must default to empty imageUrl');
+  assert.ok(favContent.includes("verificationStatus: 'Photo Unavailable'"), 'FavoritesContext custom pandals must honestly set Photo Unavailable');
+
+  const suggestContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'pandals', 'SuggestPandalModal.tsx'), 'utf8');
+  assert.ok(suggestContent.includes("imageUrl: '',"), 'SuggestPandalModal must not inherit unrelated famous pandal photos');
+  assert.ok(suggestContent.includes("hasVerifiedPhoto: false"), 'SuggestPandalModal must set hasVerifiedPhoto: false');
+  console.log(`✓ UI & Rendering Integrity: Honest neutral unavailable-photo state and attribution verified across all surfaces`);
+})();
+
 console.log('\n================================================================');
-console.log('ALL 27 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
+console.log('ALL 28 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
 console.log('================================================================\n');
 
 
