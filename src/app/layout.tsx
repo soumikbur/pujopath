@@ -4,6 +4,7 @@ import { I18nProvider } from '@/lib/i18n/I18nContext';
 import { ThemeProvider } from '@/lib/context/ThemeContext';
 import { AudioProvider } from '@/lib/context/AudioContext';
 import { FavoritesProvider } from '@/lib/context/FavoritesContext';
+import { BackgroundProvider } from '@/lib/context/BackgroundContext';
 import { AppShell } from '@/components/navigation/AppShell';
 import { PwaRegister } from '@/components/pwa/PwaRegister';
 
@@ -62,8 +63,10 @@ export default function RootLayout({
           <I18nProvider>
             <AudioProvider>
               <FavoritesProvider>
-                <AppShell>{children}</AppShell>
-                <PwaRegister />
+                <BackgroundProvider>
+                  <AppShell>{children}</AppShell>
+                  <PwaRegister />
+                </BackgroundProvider>
               </FavoritesProvider>
             </AudioProvider>
           </I18nProvider>

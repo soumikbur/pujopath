@@ -1,40 +1,96 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
+import { useBackground } from '@/lib/context/BackgroundContext';
+import { getAssetPath } from '@/lib/utils/asset';
+import { BACKGROUND_SETTINGS } from '@/data/config/backgroundConfig';
 
 /**
- * PujoBackground — Minimalistic, culturally authentic background layer
- * featuring soft radial lighting, subtle festive geometric alpana / mandala line work,
- * and delicate ornamental curves inspired by Bengal's autumn festival.
- * Zero external asset requests, hardware-accelerated, non-blocking (pointer-events-none).
+ * PujoBackground — Subtle, cinematic Ghibli-inspired Durga Puja background.
+ *
+ * Rotates randomly between 6 original Ghibli illustrations depicting authentic
+ * Bengali Durga Puja moments. Features:
+ * - 2-second smooth crossfade without flashing or blank gaps
+ * - Low opacity & soft radial gradient preserving 100% card & text readability
+ * - Zero interference with maps, buttons, or navigation (pointer-events-none, z-0)
+ * - Full light & dark mode optimization
+ * - Culturally authentic alpana and kash flower vector line accents
+ * - Respects prefers-reduced-motion
  */
 export function PujoBackground() {
+  const { currentBackground, incomingBackground, isTransitioning } = useBackground();
+
+  const currentSrc = getAssetPath(currentBackground.src);
+  const incomingSrc = incomingBackground ? getAssetPath(incomingBackground.src) : null;
+
   return (
     <div
       aria-hidden="true"
-      className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none transition-colors duration-500"
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none"
     >
-      {/* 1. Base Ambient Radial Warmth (Light Mode) */}
+      {/* 1. Underlying Ghibli Illustration Layer (Current) */}
+      <div
+        className="absolute inset-0 transition-opacity ease-in-out"
+        style={{
+          transitionDuration: `${BACKGROUND_SETTINGS.transitionDurationMs}ms`,
+          opacity: isTransitioning ? 0 : 1,
+        }}
+      >
+        {currentSrc && (
+          <Image
+            src={currentSrc}
+            alt=""
+            fill
+            priority
+            unoptimized
+            sizes="100vw"
+            className="object-cover object-center dark:opacity-[0.18] opacity-[0.11] transition-opacity duration-500"
+          />
+        )}
+      </div>
+
+      {/* 2. Incoming Ghibli Illustration Layer (Crossfading In) */}
+      {incomingSrc && (
+        <div
+          className="absolute inset-0 transition-opacity ease-in-out"
+          style={{
+            transitionDuration: `${BACKGROUND_SETTINGS.transitionDurationMs}ms`,
+            opacity: isTransitioning ? 1 : 0,
+          }}
+        >
+          <Image
+            src={incomingSrc}
+            alt=""
+            fill
+            unoptimized
+            sizes="100vw"
+            className="object-cover object-center dark:opacity-[0.18] opacity-[0.11] transition-opacity duration-500"
+          />
+        </div>
+      )}
+
+      {/* 3. Soft Radial Vignette Overlay (Light Mode) */}
       <div
         className="absolute inset-0 dark:opacity-0 transition-opacity duration-500"
         style={{
           background:
-            'radial-gradient(ellipse 90% 60% at 50% 0%, rgba(254, 245, 235, 0.85) 0%, rgba(250, 242, 232, 0.5) 55%, rgba(244, 233, 220, 0.4) 100%)',
+            'radial-gradient(ellipse 95% 65% at 50% 15%, rgba(254, 245, 235, 0.6) 0%, rgba(252, 250, 247, 0.85) 55%, rgba(252, 250, 247, 0.96) 100%)',
         }}
       />
 
-      {/* Base Ambient Radial Warmth (Dark Mode) */}
+      {/* 4. Soft Radial Vignette Overlay (Dark Mode) */}
       <div
         className="absolute inset-0 opacity-0 dark:opacity-100 transition-opacity duration-500"
         style={{
           background:
-            'radial-gradient(ellipse 90% 60% at 50% 0%, rgba(45, 30, 22, 0.45) 0%, rgba(25, 20, 16, 0.25) 55%, rgba(20, 17, 14, 0.05) 100%)',
+            'radial-gradient(ellipse 95% 65% at 50% 15%, rgba(40, 26, 18, 0.4) 0%, rgba(20, 17, 14, 0.78) 55%, rgba(20, 17, 14, 0.95) 100%)',
         }}
       />
 
-      {/* 2. Top-Left Traditional Alpana Motif (Subtle sacred concentric petals & rays) */}
+      {/* 5. Delicate Cultural Alpana Vector Motifs (Top-Left) */}
       <svg
-        className="absolute -top-16 -left-16 w-80 h-80 sm:w-96 sm:h-96 text-[#B42323] opacity-[0.038] dark:opacity-[0.05] transition-opacity duration-300"
+        className="absolute -top-16 -left-16 w-80 h-80 sm:w-96 sm:h-96 text-[#B42323] opacity-[0.032] dark:opacity-[0.045] transition-opacity duration-300"
         viewBox="0 0 200 200"
         fill="none"
         stroke="currentColor"
@@ -46,7 +102,6 @@ export function PujoBackground() {
         <circle cx="100" cy="100" r="44" />
         <circle cx="100" cy="100" r="28" />
         <circle cx="100" cy="100" r="12" fill="currentColor" fillOpacity="0.2" />
-        {/* 12 Radiating Lotus Petals */}
         {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
           <path
             key={deg}
@@ -54,7 +109,6 @@ export function PujoBackground() {
             transform={`rotate(${deg} 100 100)`}
           />
         ))}
-        {/* Outer Fine Dots */}
         {[15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345].map((deg) => (
           <circle
             key={deg}
@@ -67,9 +121,9 @@ export function PujoBackground() {
         ))}
       </svg>
 
-      {/* 3. Top-Right Traditional Alpana Motif (Mirrored mandala accent) */}
+      {/* 6. Delicate Cultural Alpana Vector Motifs (Top-Right) */}
       <svg
-        className="absolute -top-20 -right-20 w-88 h-88 sm:w-[420px] sm:h-[420px] text-[#B42323] opacity-[0.035] dark:opacity-[0.05] transition-opacity duration-300"
+        className="absolute -top-20 -right-20 w-88 h-88 sm:w-[420px] sm:h-[420px] text-[#B42323] opacity-[0.03] dark:opacity-[0.045] transition-opacity duration-300"
         viewBox="0 0 200 200"
         fill="none"
         stroke="currentColor"
@@ -88,9 +142,9 @@ export function PujoBackground() {
         ))}
       </svg>
 
-      {/* 4. Delicate Autumn Kash Flower (কাশফুল) Graceful Swirl Accent — Center-Right */}
+      {/* 7. Autumn Kash Flower (কাশফুল) Graceful Swirl Accent — Center-Right */}
       <svg
-        className="hidden md:block absolute top-1/3 -right-12 w-64 h-96 text-[#B42323] opacity-[0.025] dark:opacity-[0.04]"
+        className="hidden md:block absolute top-1/3 -right-12 w-64 h-96 text-[#B42323] opacity-[0.022] dark:opacity-[0.035]"
         viewBox="0 0 100 200"
         fill="none"
         stroke="currentColor"
@@ -101,22 +155,6 @@ export function PujoBackground() {
         <path d="M30,80 C48,70 65,74 76,68" />
         <path d="M22,115 C40,105 58,110 68,102" />
         <path d="M18,150 C34,142 50,146 58,138" />
-      </svg>
-
-      {/* 5. Bottom Delicate Geometric Border Accent */}
-      <svg
-        className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-[700px] h-36 text-[#B42323] opacity-[0.03] dark:opacity-[0.04]"
-        viewBox="0 0 600 80"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1"
-      >
-        <path d="M0,40 Q150,20 300,40 Q450,60 600,40" />
-        <path d="M0,48 Q150,28 300,48 Q450,68 600,48" strokeDasharray="3 3" />
-        <circle cx="300" cy="40" r="14" />
-        <circle cx="300" cy="40" r="6" fill="currentColor" fillOpacity="0.3" />
-        <circle cx="150" cy="30" r="4" fill="currentColor" fillOpacity="0.2" />
-        <circle cx="450" cy="50" r="4" fill="currentColor" fillOpacity="0.2" />
       </svg>
     </div>
   );

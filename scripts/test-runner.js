@@ -1422,8 +1422,108 @@ console.log('================================================================');
   console.log('✓ Scheduled Automation: GitHub Actions periodic refresh workflow and artifact archiving verified');
 })();
 
+// ============================================================================
+// TEST SUITE 30: Subtle, Randomly Changing Ghibli-Inspired Background System
+// ============================================================================
+(() => {
+  console.log('\n--- Running Test Suite 30: Ghibli-Inspired Durga Puja Background System ---');
+
+  // 1. File Integrity: All 6 Ghibli illustration assets exist in public/images/backgrounds/
+  const bgDir = path.join(__dirname, '..', 'public', 'images', 'backgrounds');
+  assert.strictEqual(fs.existsSync(bgDir), true, 'public/images/backgrounds must exist');
+
+  const expectedImages = [
+    'ghibli-pandal-illumination.webp',
+    'ghibli-devotees-praying.webp',
+    'ghibli-priest-aarti.webp',
+    'ghibli-durga-idol-flowers.webp',
+    'ghibli-evening-pandal-crowd.webp',
+    'ghibli-traditional-diyas-incense.webp',
+  ];
+
+  for (const imgName of expectedImages) {
+    const fullPath = path.join(bgDir, imgName);
+    assert.strictEqual(fs.existsSync(fullPath), true, `Background asset ${imgName} must exist`);
+    const stats = fs.statSync(fullPath);
+    assert.ok(stats.size > 50000, `Asset ${imgName} must be a valid non-empty WebP image (>50KB)`);
+    assert.ok(stats.size < 800000, `Asset ${imgName} must be optimized for web (<800KB)`);
+  }
+  console.log(`✓ Asset Integrity: All 6 original Ghibli illustrations verified locally in WebP format (${expectedImages.length}/6)`);
+
+  // 2. Configuration & Metadata Verification
+  const bgConfigPath = path.join(__dirname, '..', 'src', 'data', 'config', 'backgroundConfig.ts');
+  assert.strictEqual(fs.existsSync(bgConfigPath), true, 'backgroundConfig.ts must exist');
+  const bgConfigContent = fs.readFileSync(bgConfigPath, 'utf8');
+
+  assert.ok(bgConfigContent.includes('GHIBLI_BACKGROUNDS'), 'Must export GHIBLI_BACKGROUNDS');
+  assert.ok(bgConfigContent.includes('BACKGROUND_SETTINGS'), 'Must export BACKGROUND_SETTINGS');
+  assert.ok(bgConfigContent.includes('getNextRandomIndex'), 'Must export getNextRandomIndex');
+
+  // Rotation interval between 20-35 seconds (20000ms - 35000ms)
+  const intervalMatch = bgConfigContent.match(/intervalMs:\s*(\d+)/);
+  assert.ok(intervalMatch, 'intervalMs must be declared');
+  const intervalVal = parseInt(intervalMatch[1], 10);
+  assert.ok(intervalVal >= 20000 && intervalVal <= 35000, `Interval ${intervalVal}ms must be between 20s and 35s`);
+
+  // Crossfade transition duration between 1.5-2.5 seconds (1500ms - 2500ms)
+  const durationMatch = bgConfigContent.match(/transitionDurationMs:\s*(\d+)/);
+  assert.ok(durationMatch, 'transitionDurationMs must be declared');
+  const durationVal = parseInt(durationMatch[1], 10);
+  assert.ok(durationVal >= 1500 && durationVal <= 2500, `Transition duration ${durationVal}ms must be between 1.5s and 2.5s`);
+  console.log(`✓ Timing Parameters: Rotation interval (${intervalVal / 1000}s) & crossfade duration (${durationVal / 1000}s) verified`);
+
+  // 3. Consecutive Repeat Prevention Algorithm
+  const { getNextRandomIndex } = require(path.join(__dirname, '..', 'src', 'data', 'config', 'backgroundConfig.ts'));
+  for (let current = 0; current < 6; current++) {
+    for (let testRun = 0; testRun < 50; testRun++) {
+      const next = getNextRandomIndex(current, 6);
+      assert.notStrictEqual(next, current, `getNextRandomIndex must never return the same index (${current}) consecutively`);
+      assert.ok(next >= 0 && next < 6, `Next index ${next} must be within bounds [0..5]`);
+    }
+  }
+  console.log('✓ Randomization Rigor: Consecutive repetition strictly prevented across 300 simulation cycles');
+
+  // 4. Background Context & Lifecycle Integrity
+  const bgContextPath = path.join(__dirname, '..', 'src', 'lib', 'context', 'BackgroundContext.tsx');
+  assert.strictEqual(fs.existsSync(bgContextPath), true, 'BackgroundContext.tsx must exist');
+  const bgContextContent = fs.readFileSync(bgContextPath, 'utf8');
+
+  assert.ok(bgContextContent.includes('prefers-reduced-motion'), 'Must detect and respect prefers-reduced-motion');
+  assert.ok(bgContextContent.includes('new Image()'), 'Must preload images before transition to prevent blank flashes');
+  assert.ok(bgContextContent.includes('togglePause'), 'Must expose togglePause for accessibility');
+  assert.ok(bgContextContent.includes('clearInterval'), 'Must clean up interval timer on unmount');
+  console.log('✓ Lifecycle & Accessibility: Preloading, reduced-motion, and timer cleanup verified');
+
+  // 5. PujoBackground UI Layer & Stacking Safety
+  const bgComponentPath = path.join(__dirname, '..', 'src', 'components', 'ui', 'PujoBackground.tsx');
+  assert.strictEqual(fs.existsSync(bgComponentPath), true, 'PujoBackground.tsx must exist');
+  const bgComponentContent = fs.readFileSync(bgComponentPath, 'utf8');
+
+  assert.ok(bgComponentContent.includes('pointer-events-none'), 'Must include pointer-events-none so it never blocks clicks');
+  assert.ok(bgComponentContent.includes('aria-hidden="true"'), 'Must include aria-hidden="true" for screen reader purity');
+  assert.ok(bgComponentContent.includes('z-0'), 'Must remain strictly behind interactive page content (z-0)');
+  assert.ok(bgComponentContent.includes('object-cover'), 'Must use object-cover for responsive viewports');
+  assert.ok(bgComponentContent.includes('dark:opacity-'), 'Must provide distinct light and dark mode opacity overlays');
+  console.log('✓ UI & Stacking Safety: pointer-events-none, z-0, aria-hidden, and dual-theme overlays verified');
+
+  // 6. Application Shell & Footer Integration
+  const layoutPath = path.join(__dirname, '..', 'src', 'app', 'layout.tsx');
+  const layoutContent = fs.readFileSync(layoutPath, 'utf8');
+  assert.ok(layoutContent.includes('BackgroundProvider'), 'Root layout must wrap app with BackgroundProvider');
+
+  const appShellPath = path.join(__dirname, '..', 'src', 'components', 'navigation', 'AppShell.tsx');
+  const appShellContent = fs.readFileSync(appShellPath, 'utf8');
+  assert.ok(appShellContent.includes('PujoBackground'), 'AppShell must render PujoBackground component');
+
+  const footerPath = path.join(__dirname, '..', 'src', 'components', 'navigation', 'Footer.tsx');
+  const footerContent = fs.readFileSync(footerPath, 'utf8');
+  assert.ok(footerContent.includes('useBackground'), 'Footer must consume useBackground for scene info & pause control');
+  assert.ok(footerContent.includes('togglePause'), 'Footer must provide accessible pause control');
+  console.log('✓ Shell Integration: Persistent application-shell background and subtle footer controls verified');
+})();
+
 console.log('\n================================================================');
-console.log('ALL 29 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
+console.log('ALL 30 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
 console.log('================================================================\n');
 
 
