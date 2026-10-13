@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Search, RotateCcw, X, SlidersHorizontal } from 'lucide-react';
+import { Search, RotateCcw, X, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { FilterOptions, LocalityZone } from '@/types';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { toBengaliDigits } from '@/lib/geo';
@@ -69,6 +69,7 @@ function ToggleSwitch({
 export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersProps) {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
+  const [isFeatureFiltersOpen, setIsFeatureFiltersOpen] = React.useState(true);
 
   const zoneOptions: { value: LocalityZone | 'All'; label: string }[] = [
     { value: 'All', label: isBn ? 'সব এলাকা' : 'All Zones' },
@@ -162,49 +163,92 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
 
       {/* Interactive Feature Switches Grid */}
       <div className="pt-2 border-t border-[#eee8e1] dark:border-[#2f2720]">
-        <div className="text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95] mb-2.5">
-          {isBn ? 'সুবিধা ও বৈশিষ্ট্য সুইচ' : 'Feature Filters'}
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-          <ToggleSwitch
-            id="switch-bonedi-bari"
-            checked={Boolean(filters.bonediBariOnly)}
-            onChange={(val) =>
-              update({
-                bonediBariOnly: val,
-                category: val ? 'Bonedi Bari' : (filters.category === 'Bonedi Bari' ? 'All' : filters.category),
-              })
-            }
-            label={isBn ? 'বনেদি বাড়ির পুজো' : 'Bonedi Bari'}
-          />
+        <button
+          id="feature-filters-heading"
+          type="button"
+          onClick={() => setIsFeatureFiltersOpen((prev) => !prev)}
+          aria-expanded={isFeatureFiltersOpen}
+          aria-controls="feature-filters-content"
+          aria-label={
+            isBn
+              ? isFeatureFiltersOpen
+                ? 'সুবিধা ও বৈশিষ্ট্য ফিল্টার সংকুচিত করুন'
+                : 'সুবিধা ও বৈশিষ্ট্য ফিল্টার প্রসারিত করুন'
+              : isFeatureFiltersOpen
+                ? 'Collapse feature filters'
+                : 'Expand feature filters'
+          }
+          className={cn(
+            'flex items-center justify-between w-full text-left py-1 rounded-lg group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42323] cursor-pointer select-none transition-all',
+            isFeatureFiltersOpen ? 'mb-2.5' : 'mb-1.5'
+          )}
+        >
+          <span className="text-xs font-bold uppercase tracking-wider text-[#776d65] dark:text-[#a89e95] group-hover:text-[#242424] dark:group-hover:text-[#ede5dc] transition-colors">
+            {isBn ? 'সুবিধা ও বৈশিষ্ট্য সুইচ' : 'Feature Filters'}
+          </span>
+          <span className="inline-flex items-center justify-center p-1 rounded-md bg-[#f2ece4] dark:bg-[#251e18] text-[#524942] dark:text-[#c4b9ae] group-hover:text-[#b42323] dark:group-hover:text-white group-hover:bg-[#ebe3d9] dark:group-hover:bg-[#342b23] border border-[#ded5cb] dark:border-[#382f26] group-hover:border-[#b42323]/40 dark:group-hover:border-[#b42323]/60 transition-all shadow-2xs">
+            <ChevronDown
+              className={cn(
+                'w-4 h-4 transition-transform duration-200 text-current',
+                !isFeatureFiltersOpen && '-rotate-90'
+              )}
+              aria-hidden="true"
+            />
+          </span>
+        </button>
 
-          <ToggleSwitch
-            id="switch-metro"
-            checked={filters.metroAccessibleOnly}
-            onChange={(val) => update({ metroAccessibleOnly: val })}
-            label={isBn ? 'মেট্রোর কাছে' : 'Near Metro'}
-          />
+        <div
+          id="feature-filters-content"
+          role="region"
+          aria-labelledby="feature-filters-heading"
+          className={cn(
+            'transition-all duration-200 ease-in-out overflow-hidden',
+            isFeatureFiltersOpen
+              ? 'max-h-96 opacity-100'
+              : 'max-h-0 opacity-0 invisible'
+          )}
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 pb-0.5">
+            <ToggleSwitch
+              id="switch-bonedi-bari"
+              checked={Boolean(filters.bonediBariOnly)}
+              onChange={(val) =>
+                update({
+                  bonediBariOnly: val,
+                  category: val ? 'Bonedi Bari' : (filters.category === 'Bonedi Bari' ? 'All' : filters.category),
+                })
+              }
+              label={isBn ? 'বনেদি বাড়ির পুজো' : 'Bonedi Bari'}
+            />
 
-          <ToggleSwitch
-            id="switch-heritage"
-            checked={filters.heritageOnly}
-            onChange={(val) => update({ heritageOnly: val })}
-            label={isBn ? 'ঐতিহ্যবাহী সাবেকি' : 'Heritage Sabeki'}
-          />
+            <ToggleSwitch
+              id="switch-metro"
+              checked={filters.metroAccessibleOnly}
+              onChange={(val) => update({ metroAccessibleOnly: val })}
+              label={isBn ? 'মেট্রোর কাছে' : 'Near Metro'}
+            />
 
-          <ToggleSwitch
-            id="switch-wheelchair"
-            checked={filters.wheelchairAccessibleOnly}
-            onChange={(val) => update({ wheelchairAccessibleOnly: val })}
-            label={isBn ? 'হুইলচেয়ার সুবিধা' : 'Wheelchair Access'}
-          />
+            <ToggleSwitch
+              id="switch-heritage"
+              checked={filters.heritageOnly}
+              onChange={(val) => update({ heritageOnly: val })}
+              label={isBn ? 'ঐতিহ্যবাহী সাবেকি' : 'Heritage Sabeki'}
+            />
 
-          <ToggleSwitch
-            id="switch-featured"
-            checked={filters.featuredOnly}
-            onChange={(val) => update({ featuredOnly: val })}
-            label={isBn ? 'বিশেষ সেরা মণ্ডপ' : 'Featured Only'}
-          />
+            <ToggleSwitch
+              id="switch-wheelchair"
+              checked={filters.wheelchairAccessibleOnly}
+              onChange={(val) => update({ wheelchairAccessibleOnly: val })}
+              label={isBn ? 'হুইলচেয়ার সুবিধা' : 'Wheelchair Access'}
+            />
+
+            <ToggleSwitch
+              id="switch-featured"
+              checked={filters.featuredOnly}
+              onChange={(val) => update({ featuredOnly: val })}
+              label={isBn ? 'বিশেষ সেরা মণ্ডপ' : 'Featured Only'}
+            />
+          </div>
         </div>
       </div>
 

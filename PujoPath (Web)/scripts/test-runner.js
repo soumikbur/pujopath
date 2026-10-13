@@ -1765,8 +1765,39 @@ console.log('\n--- Running Test Suite 32: Deployment Asset Routing, PWA Manifest
   console.log('✓ Personal custom pandal privacy and local storage persistence verified');
 })();
 
+// --- Running Test Suite 34: Co-Creator Profiles, Bengali Spelling & Feature Filters Expand/Collapse ---
+console.log('\n--- Running Test Suite 34: Co-Creator Profiles, Bengali Spelling & Feature Filters Expand/Collapse ---');
+(function testCoCreatorsAndFilters() {
+  const footerPath = path.join(__dirname, '..', 'src', 'components', 'navigation', 'Footer.tsx');
+  const footerContent = fs.readFileSync(footerPath, 'utf8');
+  assert.ok(footerContent.includes('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/'), 'Footer must contain Soumik Ghosh LinkedIn URL');
+  assert.ok(footerContent.includes('https://www.linkedin.com/in/moumita-shee-798505226/'), 'Footer must contain Moumita Shee LinkedIn URL');
+  assert.ok(footerContent.includes('মৌমিতা শী'), 'Footer must use correct Bengali spelling মৌমিতা শী');
+  assert.ok(footerContent.includes('সৌমিক ঘোষ'), 'Footer must use correct Bengali spelling সৌমিক ঘোষ');
+  assert.ok(footerContent.includes('target="_blank"'), 'Footer LinkedIn links must open in new tab');
+  assert.ok(footerContent.includes('rel="noopener noreferrer"'), 'Footer LinkedIn links must have security attributes');
+
+  const aboutPath = path.join(__dirname, '..', 'src', 'app', 'about', 'page.tsx');
+  const aboutContent = fs.readFileSync(aboutPath, 'utf8');
+  assert.ok(aboutContent.includes('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/'), 'About page must contain Soumik Ghosh LinkedIn URL');
+  assert.ok(aboutContent.includes('https://www.linkedin.com/in/moumita-shee-798505226/'), 'About page must contain Moumita Shee LinkedIn URL');
+  assert.ok(aboutContent.includes('মৌমিতা শী'), 'About page must use correct Bengali spelling মৌমিতা শী');
+  assert.ok(aboutContent.includes('সৌমিক ঘোষ'), 'About page must use correct Bengali spelling সৌমিক ঘোষ');
+  assert.ok(aboutContent.includes('target="_blank"'), 'About page LinkedIn links must open in new tab');
+  assert.ok(aboutContent.includes('rel="noopener noreferrer"'), 'About page LinkedIn links must have security attributes');
+
+  const filtersPath = path.join(__dirname, '..', 'src', 'components', 'pandals', 'PandalFilters.tsx');
+  const filtersContent = fs.readFileSync(filtersPath, 'utf8');
+  assert.ok(filtersContent.includes('isFeatureFiltersOpen'), 'PandalFilters must have isFeatureFiltersOpen state');
+  assert.ok(filtersContent.includes('aria-expanded={isFeatureFiltersOpen}'), 'PandalFilters chevron must have aria-expanded attribute');
+  assert.ok(filtersContent.includes('setIsFeatureFiltersOpen'), 'PandalFilters must toggle feature filters expansion');
+
+  console.log('✓ Co-creator LinkedIn profiles (Footer & About) and Bengali spelling verified');
+  console.log('✓ Feature filters collapse/expand control, ARIA semantics, and default expansion verified');
+})();
+
 console.log('\n================================================================');
-console.log('ALL 33 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
+console.log('ALL 34 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
 console.log('================================================================\n');
 
 

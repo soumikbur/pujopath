@@ -6,7 +6,7 @@ import { useI18n } from '@/lib/i18n/I18nContext';
 import { useBackground } from '@/lib/context/BackgroundContext';
 import { useAudio } from '@/lib/context/AudioContext';
 import { cn } from '@/lib/utils/cn';
-import { Pause, Play } from 'lucide-react';
+import { Pause, Play, Linkedin } from 'lucide-react';
 
 export function Footer() {
   const { locale } = useI18n();
@@ -93,13 +93,29 @@ export function Footer() {
             aria-label="Made with care by Co-Creators Soumik Ghosh and Moumita Shee"
           >
             <span>{isBn ? 'সহ-নির্মাতা: ' : 'Co-Creators: '}</span>
-            <span className="font-semibold text-[#b42323] dark:text-[#e05656]">
-              {isBn ? 'সৌমিক ঘোষ' : 'Soumik Ghosh'}
-            </span>
-            <span> &amp; </span>
-            <span className="font-semibold text-[#b42323] dark:text-[#e05656]">
-              {isBn ? 'মৌমিতা শী' : 'Moumita Shee'}
-            </span>
+            <a
+              href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 font-semibold text-[#b42323] dark:text-[#e05656] hover:underline hover:text-[#961b1b] dark:hover:text-[#ff8080] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#b42323] rounded"
+              title={isBn ? 'সৌমিক ঘোষ — লিঙ্কডইন প্রোফাইল' : 'Soumik Ghosh — LinkedIn Profile'}
+              aria-label={isBn ? 'সৌমিক ঘোষ — লিঙ্কডইন প্রোফাইল' : 'Soumik Ghosh — LinkedIn Profile'}
+            >
+              <span>{isBn ? 'সৌমিক ঘোষ' : 'Soumik Ghosh'}</span>
+              <Linkedin className="w-3 h-3 text-[#0a66c2] dark:text-[#70b5f9] inline-block shrink-0" aria-hidden="true" />
+            </a>
+            <span>{isBn ? ' ও ' : ' & '}</span>
+            <a
+              href="https://www.linkedin.com/in/moumita-shee-798505226/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 font-semibold text-[#b42323] dark:text-[#e05656] hover:underline hover:text-[#961b1b] dark:hover:text-[#ff8080] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#b42323] rounded"
+              title={isBn ? 'মৌমিতা শী — লিঙ্কডইন প্রোফাইল' : 'Moumita Shee — LinkedIn Profile'}
+              aria-label={isBn ? 'মৌমিতা শী — লিঙ্কডইন প্রোফাইল' : 'Moumita Shee — LinkedIn Profile'}
+            >
+              <span>{isBn ? 'মৌমিতা শী' : 'Moumita Shee'}</span>
+              <Linkedin className="w-3 h-3 text-[#0a66c2] dark:text-[#70b5f9] inline-block shrink-0" aria-hidden="true" />
+            </a>
             <span className="ml-1 text-[#e02424] inline-block text-sm" role="img" aria-label="heart">❤️</span>
           </div>
         </div>

@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { PhoneCall, ShieldCheck, Info, Users } from 'lucide-react';
+import { PhoneCall, ShieldCheck, Info, Users, Linkedin } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
 
 export default function AboutPage() {
@@ -93,34 +92,50 @@ export default function AboutPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
           {/* Soumik Ghosh */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3">
+          <a
+            href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3 hover:border-[#0a66c2]/40 dark:hover:border-[#0a66c2]/50 hover:shadow-sm transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42323]"
+            title={isBn ? 'সৌমিক ঘোষ — লিঙ্কডইন প্রোফাইল' : 'Soumik Ghosh — LinkedIn Profile'}
+            aria-label={isBn ? 'সৌমিক ঘোষ — লিঙ্কডইন প্রোফাইল' : 'Soumik Ghosh — LinkedIn Profile'}
+          >
             <div className="space-y-0.5">
-              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc]">
-                {isBn ? 'সৌমিক ঘোষ' : 'Soumik Ghosh'}
+              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc] group-hover:text-[#0a66c2] dark:group-hover:text-[#70b5f9] transition-colors flex items-center gap-1.5">
+                <span>{isBn ? 'সৌমিক ঘোষ' : 'Soumik Ghosh'}</span>
+                <Linkedin className="w-3.5 h-3.5 text-[#0a66c2] dark:text-[#70b5f9] shrink-0" aria-hidden="true" />
               </div>
               <div className="text-xs font-semibold text-[#b42323] dark:text-[#e05656]">
                 {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
               </div>
             </div>
-            <span className="px-3 py-1 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a]">
+            <span className="px-3 py-1 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a] group-hover:border-[#0a66c2]/30 transition-colors">
               {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
             </span>
-          </div>
+          </a>
 
           {/* Moumita Shee */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3">
+          <a
+            href="https://www.linkedin.com/in/moumita-shee-798505226/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3 hover:border-[#0a66c2]/40 dark:hover:border-[#0a66c2]/50 hover:shadow-sm transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42323]"
+            title={isBn ? 'মৌমিতা শী — লিঙ্কডইন প্রোফাইল' : 'Moumita Shee — LinkedIn Profile'}
+            aria-label={isBn ? 'মৌমিতা শী — লিঙ্কডইন প্রোফাইল' : 'Moumita Shee — LinkedIn Profile'}
+          >
             <div className="space-y-0.5">
-              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc]">
-                {isBn ? 'মৌমিতা শী' : 'Moumita Shee'}
+              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc] group-hover:text-[#0a66c2] dark:group-hover:text-[#70b5f9] transition-colors flex items-center gap-1.5">
+                <span>{isBn ? 'মৌমিতা শী' : 'Moumita Shee'}</span>
+                <Linkedin className="w-3.5 h-3.5 text-[#0a66c2] dark:text-[#70b5f9] shrink-0" aria-hidden="true" />
               </div>
               <div className="text-xs font-semibold text-[#b42323] dark:text-[#e05656]">
                 {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
               </div>
             </div>
-            <span className="px-3 py-1 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a]">
+            <span className="px-3 py-1 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a] group-hover:border-[#0a66c2]/30 transition-colors">
               {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
             </span>
-          </div>
+          </a>
         </div>
       </div>
     </div>
