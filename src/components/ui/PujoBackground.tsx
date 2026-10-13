@@ -53,7 +53,7 @@ export function PujoBackground() {
   return (
     <div
       aria-hidden="true"
-      className="pujopath-fixed-background pointer-events-none z-0 overflow-hidden select-none transition-colors duration-500"
+      className="home-background pujopath-fixed-background pointer-events-none z-0 overflow-hidden select-none transition-colors duration-500"
     >
       {/* ============================================================== */}
       {/* 1. HOMEPAGE-ONLY: Original Visible Ghibli Durga Puja Artwork   */}

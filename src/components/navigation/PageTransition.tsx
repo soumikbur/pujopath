@@ -8,18 +8,19 @@ interface PageTransitionProps {
 }
 
 /**
- * PageTransition — Shared routing transition wrapper (Phases 2 & 3).
+ * PageTransition — Shared routing transition wrapper.
  *
  * Implements a restrained, polished navigation transition:
- * - 190ms duration with natural ease-out curve.
- * - Subtle 5px vertical translation + opacity fade for standard pages.
- * - Safe transform-free opacity fade for Leaflet interactive map pages (/map, /planner).
- * - Full compliance with prefers-reduced-motion (Phase 5).
+ * - 180ms duration with subtle opacity fade.
+ * - Zero CSS transforms, ensuring uninhibited, natural vertical scrolling.
+ * - Auto-clearing animation state on completion.
+ * - Full compliance with prefers-reduced-motion.
  * - Persistent audio playback & background timer isolation.
  */
 export function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [animating, setAnimating] = useState(true);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -36,6 +37,11 @@ export function PageTransition({ children }: PageTransitionProps) {
     }
   }, []);
 
+  // Reset animation state whenever route changes
+  useEffect(() => {
+    setAnimating(true);
+  }, [pathname]);
+
   const isMapRoute = pathname === '/map' || pathname === '/planner';
 
   // Ensure Leaflet map canvas smoothly recalculates dimensions on route entry
@@ -48,14 +54,19 @@ export function PageTransition({ children }: PageTransitionProps) {
     }
   }, [pathname, isMapRoute]);
 
-  const animationClass = reducedMotion
-    ? ''
-    : isMapRoute
-    ? 'page-transition-enter-map'
-    : 'page-transition-enter';
+  const animationClass =
+    !reducedMotion && animating
+      ? isMapRoute
+        ? 'page-transition-enter-map'
+        : 'page-transition-enter'
+      : '';
 
   return (
-    <div key={pathname} className={`w-full ${animationClass}`}>
+    <div
+      key={pathname}
+      className={`w-full ${animationClass}`}
+      onAnimationEnd={() => setAnimating(false)}
+    >
       {children}
     </div>
   );
