@@ -110,7 +110,7 @@ export default function MusicPage() {
   };
 
   return (
-    <div className={cn('space-y-6 max-w-6xl mx-auto transition-all duration-200', isPlayerActive ? 'pb-44 md:pb-28' : 'pb-24 md:pb-16')}>
+    <div className={cn('space-y-6 max-w-6xl mx-auto transition-all duration-200', isPlayerActive ? 'pb-48 md:pb-32' : 'pb-32 md:pb-20')}>
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
