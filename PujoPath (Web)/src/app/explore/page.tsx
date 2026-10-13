@@ -153,6 +153,10 @@ function ExploreContent() {
     window.history.replaceState({ ...window.history.state }, '', newUrl);
   };
 
+  const allPandals = React.useMemo(() => {
+    return PandalService.getAllPandals(undefined, undefined, customPandals);
+  }, [customPandals]);
+
   const filteredPandals = PandalService.filterPandals(
     filters,
     undefined,
@@ -184,6 +188,7 @@ function ExploreContent() {
         filters={filters}
         onChange={handleFiltersChange}
         totalCount={filteredPandals.length}
+        allPandals={allPandals}
       />
 
       <PandalGrid pandals={filteredPandals} />

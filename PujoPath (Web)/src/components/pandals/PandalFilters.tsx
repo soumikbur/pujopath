@@ -1,16 +1,18 @@
 'use client';
 
-import React from 'react';
-import { Search, RotateCcw, X, SlidersHorizontal, ChevronDown } from 'lucide-react';
-import { FilterOptions, LocalityZone } from '@/types';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Search, RotateCcw, X, SlidersHorizontal, ChevronDown, MapPin, Train } from 'lucide-react';
+import { FilterOptions, LocalityZone, Pandal } from '@/types';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { toBengaliDigits } from '@/lib/geo';
 import { cn } from '@/lib/utils/cn';
+import { PandalService } from '@/lib/services/PandalService';
 
 interface PandalFiltersProps {
   filters: FilterOptions;
   onChange: (filters: FilterOptions) => void;
   totalCount: number;
+  allPandals?: Pandal[];
 }
 
 /**
@@ -66,10 +68,209 @@ function ToggleSwitch({
   );
 }
 
-export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersProps) {
+export function PandalFilters({ filters, onChange, totalCount, allPandals }: PandalFiltersProps) {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
-  const [isFeatureFiltersOpen, setIsFeatureFiltersOpen] = React.useState(true);
+  const [isFeatureFiltersOpen, setIsFeatureFiltersOpen] = useState(true);
+
+  // Live Search Autocomplete State
+  const [isOpen, setIsOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const candidatePandals = useMemo(() => {
+    return allPandals || PandalService.getAllPandals();
+  }, [allPandals]);
+
+  const queryTrimmed = filters.searchQuery.trim().toLowerCase();
+
+  // Multi-field ranked suggestions matching Google Search autocomplete
+  const suggestions = useMemo(() => {
+    if (!queryTrimmed) return [];
+
+    const matches: { pandal: Pandal; score: number }[] = [];
+
+    for (const p of candidatePandals) {
+      let score = 0;
+      const nameEn = p.name.toLowerCase();
+      const nameBn = (p.nameBn || '').toLowerCase();
+      const localityEn = (p.locality || '').toLowerCase();
+      const localityBn = (p.localityBn || '').toLowerCase();
+      const neighborhoodEn = (p.neighborhood || '').toLowerCase();
+      const neighborhoodBn = (p.neighborhoodBn || '').toLowerCase();
+      const addressEn = (p.address || '').toLowerCase();
+      const addressBn = (p.addressBn || '').toLowerCase();
+      const committeeEn = (p.committeeName || '').toLowerCase();
+      const committeeBn = (p.committeeNameBn || '').toLowerCase();
+      const zoneEn = (p.zone || '').toLowerCase();
+      const themeEn = (p.theme || '').toLowerCase();
+      const themeBn = (p.themeBn || '').toLowerCase();
+
+      // 1. Exact name match (highest precedence)
+      if (nameEn === queryTrimmed || nameBn === queryTrimmed) {
+        score += 300;
+      }
+      // 2. Name prefix match
+      else if (nameEn.startsWith(queryTrimmed) || nameBn.startsWith(queryTrimmed)) {
+        score += 200;
+      }
+      // 3. Word in name starts with query
+      else if (
+        nameEn.split(/[\s,.-]+/).some((w) => w.startsWith(queryTrimmed)) ||
+        nameBn.split(/[\s,.-]+/).some((w) => w.startsWith(queryTrimmed))
+      ) {
+        score += 150;
+      }
+      // 4. Name contains substring
+      else if (nameEn.includes(queryTrimmed) || nameBn.includes(queryTrimmed)) {
+        score += 100;
+      }
+
+      // 5. Locality matching
+      if (localityEn.startsWith(queryTrimmed) || localityBn.startsWith(queryTrimmed)) {
+        score += 85;
+      } else if (localityEn.includes(queryTrimmed) || localityBn.includes(queryTrimmed)) {
+        score += 50;
+      }
+
+      // 6. Neighborhood matching
+      if (neighborhoodEn.startsWith(queryTrimmed) || neighborhoodBn.startsWith(queryTrimmed)) {
+        score += 75;
+      } else if (neighborhoodEn.includes(queryTrimmed) || neighborhoodBn.includes(queryTrimmed)) {
+        score += 45;
+      }
+
+      // 7. Committee name / verified alias matching
+      if (committeeEn.includes(queryTrimmed) || committeeBn.includes(queryTrimmed)) {
+        score += 65;
+      }
+
+      // 8. Zone matching (e.g. "new town" -> New Town pandals)
+      if (zoneEn === queryTrimmed || zoneEn.startsWith(queryTrimmed)) {
+        score += 70;
+      }
+
+      // 9. Address matching
+      if (addressEn.includes(queryTrimmed) || addressBn.includes(queryTrimmed)) {
+        score += 40;
+      }
+
+      // 10. Metro station matching
+      if (
+        p.metroLinks &&
+        p.metroLinks.some(
+          (m) =>
+            m.stationName.toLowerCase().includes(queryTrimmed) ||
+            Boolean(m.stationNameBn && m.stationNameBn.includes(queryTrimmed))
+        )
+      ) {
+        score += 40;
+      }
+
+      // 11. Theme / Bonedi Bari info matching
+      if (themeEn.includes(queryTrimmed) || themeBn.includes(queryTrimmed)) {
+        score += 25;
+      }
+      if (
+        p.bonediBariInfo &&
+        (p.bonediBariInfo.ancestralHouseName.toLowerCase().includes(queryTrimmed) ||
+          p.bonediBariInfo.familyLineage.toLowerCase().includes(queryTrimmed))
+      ) {
+        score += 60;
+      }
+
+      if (score > 0) {
+        // Tie-breaker based on popularity score
+        score += (p.popularityScore || 50) / 100;
+        matches.push({ pandal: p, score });
+      }
+    }
+
+    matches.sort((a, b) => b.score - a.score);
+
+    // Deduplicate by ID and limit to 7 suggestions
+    const seen = new Set<string>();
+    const uniqueMatches: Pandal[] = [];
+    for (const m of matches) {
+      if (!seen.has(m.pandal.id)) {
+        seen.add(m.pandal.id);
+        uniqueMatches.push(m.pandal);
+        if (uniqueMatches.length >= 7) break;
+      }
+    }
+
+    return uniqueMatches;
+  }, [candidatePandals, queryTrimmed]);
+
+  // Close suggestions when clicking or tapping outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+        setHighlightedIndex(-1);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
+
+  const update = (partial: Partial<FilterOptions>) => {
+    onChange({ ...filters, ...partial });
+  };
+
+  const handleSelectSuggestion = (pandal: Pandal) => {
+    const selectedText = isBn && pandal.nameBn ? pandal.nameBn : pandal.name;
+    update({ searchQuery: selectedText });
+    setIsOpen(false);
+    setHighlightedIndex(-1);
+  };
+
+  const handleClearSearch = () => {
+    update({ searchQuery: '' });
+    setIsOpen(false);
+    setHighlightedIndex(-1);
+    inputRef.current?.focus();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isOpen || suggestions.length === 0) {
+      if (e.key === 'ArrowDown' && filters.searchQuery.trim().length >= 1) {
+        setIsOpen(true);
+      }
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
+    } else if (e.key === 'Enter') {
+      if (highlightedIndex >= 0 && suggestions[highlightedIndex]) {
+        e.preventDefault();
+        handleSelectSuggestion(suggestions[highlightedIndex]);
+      } else {
+        setIsOpen(false);
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      setIsOpen(false);
+      setHighlightedIndex(-1);
+    } else if (e.key === 'Tab') {
+      setIsOpen(false);
+      setHighlightedIndex(-1);
+    }
+  };
 
   const zoneOptions: { value: LocalityZone | 'All'; label: string }[] = [
     { value: 'All', label: isBn ? 'সব এলাকা' : 'All Zones' },
@@ -81,10 +282,6 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
     { value: 'Behala', label: isBn ? 'বেহালা' : 'Behala' },
     { value: 'Howrah', label: isBn ? 'হাওড়া' : 'Howrah' },
   ];
-
-  const update = (partial: Partial<FilterOptions>) => {
-    onChange({ ...filters, ...partial });
-  };
 
   const handleReset = () => {
     onChange({
@@ -99,6 +296,8 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
       bonediBariOnly: false,
       sortBy: 'recommended',
     });
+    setIsOpen(false);
+    setHighlightedIndex(-1);
   };
 
   const isFiltered =
@@ -113,13 +312,41 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
 
   return (
     <div className="space-y-4 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] p-4 sm:p-5 shadow-xs transition-colors">
-      {/* Search Bar + Clear button */}
-      <div className="relative flex items-center">
+      {/* Search Bar + Combobox Autocomplete Suggestions */}
+      <div
+        ref={searchContainerRef}
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        aria-controls="pandal-search-suggestions"
+        aria-label={isBn ? 'প্যান্ডেল অনুসন্ধান' : 'Search pandals'}
+        className="relative flex items-center"
+      >
         <Search className="absolute left-4 w-4 h-4 text-[#8a8179] pointer-events-none" />
         <input
+          ref={inputRef}
           type="text"
+          role="searchbox"
+          aria-autocomplete="list"
+          aria-controls="pandal-search-suggestions"
+          aria-activedescendant={
+            highlightedIndex >= 0 && suggestions[highlightedIndex]
+              ? `pandal-suggestion-${suggestions[highlightedIndex].id}`
+              : undefined
+          }
+          aria-label={isBn ? 'প্যান্ডেল অনুসন্ধান' : 'Search pandals'}
           value={filters.searchQuery}
-          onChange={(e) => update({ searchQuery: e.target.value })}
+          onFocus={() => {
+            if (filters.searchQuery.trim().length >= 1) {
+              setIsOpen(true);
+            }
+          }}
+          onChange={(e) => {
+            update({ searchQuery: e.target.value });
+            setIsOpen(e.target.value.trim().length >= 1);
+            setHighlightedIndex(-1);
+          }}
+          onKeyDown={handleKeyDown}
           placeholder={
             isBn
               ? 'প্যান্ডেলের নাম, বনেদি বাড়ি, এলাকা, থিম বা মেট্রো স্টেশন দিয়ে খুঁজুন...'
@@ -129,12 +356,97 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
         />
         {filters.searchQuery && (
           <button
-            onClick={() => update({ searchQuery: '' })}
-            aria-label="Clear search"
+            type="button"
+            onClick={handleClearSearch}
+            aria-label={isBn ? 'অনুসন্ধান মুছুন' : 'Clear search'}
             className="absolute right-3 p-1 rounded-lg text-[#8a8179] hover:text-[#b42323] hover:bg-[#f5f1ec] dark:hover:bg-[#251e18] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
+        )}
+
+        {/* Live Search Suggestions Dropdown */}
+        {isOpen && queryTrimmed.length >= 1 && (
+          <div
+            id="pandal-search-suggestions"
+            role="listbox"
+            aria-label={isBn ? 'প্যান্ডেল সাজেশন' : 'Pandal suggestions'}
+            className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-80 overflow-y-auto rounded-xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] shadow-xl backdrop-blur-md transition-all"
+          >
+            {suggestions.length > 0 ? (
+              <ul className="divide-y divide-[#f2ece4] dark:divide-[#26201a]">
+                {suggestions.map((p, index) => {
+                  const isHighlighted = index === highlightedIndex;
+                  const primaryName = isBn && p.nameBn ? p.nameBn : p.name;
+                  const secondaryDetail = [p.locality || p.neighborhood, p.zone]
+                    .filter(Boolean)
+                    .join(' • ');
+                  const nearestMetro =
+                    p.metroLinks && p.metroLinks[0]
+                      ? isBn && p.metroLinks[0].stationNameBn
+                        ? p.metroLinks[0].stationNameBn
+                        : p.metroLinks[0].stationName
+                      : null;
+
+                  return (
+                    <li
+                      key={p.id}
+                      id={`pandal-suggestion-${p.id}`}
+                      role="option"
+                      aria-selected={isHighlighted}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleSelectSuggestion(p);
+                      }}
+                      onMouseEnter={() => setHighlightedIndex(index)}
+                      className={cn(
+                        'flex items-center justify-between gap-3 px-3.5 py-2.5 cursor-pointer text-left transition-colors select-none',
+                        isHighlighted
+                          ? 'bg-[#fbf2ed] dark:bg-[#2b1f1a] text-[#b42323] dark:text-[#ff9494]'
+                          : 'text-[#242424] dark:text-[#ede5dc] hover:bg-[#faf6f2] dark:hover:bg-[#221c17]'
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <MapPin
+                          className={cn(
+                            'w-4 h-4 shrink-0 transition-colors',
+                            isHighlighted ? 'text-[#b42323] dark:text-[#ff9494]' : 'text-[#8a8179]'
+                          )}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-bold truncate">
+                            {primaryName}
+                          </div>
+                          <div className="text-xs text-[#776d65] dark:text-[#a89e95] truncate">
+                            {secondaryDetail}
+                          </div>
+                        </div>
+                      </div>
+
+                      {nearestMetro && (
+                        <div className="shrink-0 flex items-center gap-1 text-[11px] font-medium text-[#776d65] dark:text-[#a89e95] bg-[#f5f0eb] dark:bg-[#262019] px-2 py-0.5 rounded-md">
+                          <Train className="w-3 h-3 text-[#b42323]" />
+                          <span className="truncate max-w-[110px]">{nearestMetro}</span>
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : queryTrimmed.length >= 2 ? (
+              <div className="px-4 py-3.5 text-center text-xs sm:text-sm text-[#776d65] dark:text-[#a89e95]">
+                {isBn ? (
+                  <>
+                    <span className="font-bold text-[#b42323]">&ldquo;{filters.searchQuery}&rdquo;</span> দিয়ে কোনো প্যান্ডেল পাওয়া যায়নি
+                  </>
+                ) : (
+                  <>
+                    No matching pandals found for <span className="font-bold text-[#b42323]">&ldquo;{filters.searchQuery}&rdquo;</span>
+                  </>
+                )}
+              </div>
+            ) : null}
+          </div>
         )}
       </div>
 

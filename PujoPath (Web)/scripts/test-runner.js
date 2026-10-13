@@ -1026,7 +1026,7 @@ console.log('================================================================');
   console.log(`- Registered Clubs Part 2: ${registeredPart2Ids.length}`);
 
   assert.strictEqual(foundationIds.length, 23, 'Foundation pandals must contain 23 entries');
-  assert.strictEqual(neighborhoodIds.length, 61, 'Neighborhood pandals must contain 61 entries');
+  assert.strictEqual(neighborhoodIds.length, 65, 'Neighborhood pandals must contain 65 entries');
   assert.strictEqual(bonediBariIds.length, 23, 'Bonedi Bari pandals must contain 23 entries');
   assert.strictEqual(communityIds.length, 26, 'Community pandals must contain 26 entries');
   assert.strictEqual(registeredPart1Ids.length, 319, 'Registered clubs part 1 must contain 319 entries');
@@ -1040,12 +1040,12 @@ console.log('================================================================');
     ...registeredPart1Ids,
     ...registeredPart2Ids,
   ];
-  assert.strictEqual(allIds.length, 770, 'Total dataset must contain exactly 770 pandal records');
+  assert.strictEqual(allIds.length, 774, 'Total dataset must contain exactly 774 pandal records');
 
   // Verify 100% ID uniqueness (zero duplicates)
   const uniqueIds = new Set(allIds);
-  assert.strictEqual(uniqueIds.size, 770, `Zero duplicates allowed. Found ${uniqueIds.size} unique IDs out of ${allIds.length}`);
-  console.log('✓ Complete ID uniqueness verified across all 770 pandals (0 duplicates)');
+  assert.strictEqual(uniqueIds.size, 774, `Zero duplicates allowed. Found ${uniqueIds.size} unique IDs out of ${allIds.length}`);
+  console.log('✓ Complete ID uniqueness verified across all 774 pandals (0 duplicates)');
 
   // 3. Geographic Zone Coverage Verification
   const expectedZones = [
@@ -1081,15 +1081,15 @@ console.log('================================================================');
   const allLats = [...allContentCombined.matchAll(/latitude:\s*([0-9.]+)/g)].map(m => parseFloat(m[1]));
   const allLngs = [...allContentCombined.matchAll(/longitude:\s*([0-9.]+)/g)].map(m => parseFloat(m[1]));
 
-  assert.strictEqual(allLats.length, 770, 'Every single pandal must have defined latitude');
-  assert.strictEqual(allLngs.length, 770, 'Every single pandal must have defined longitude');
+  assert.strictEqual(allLats.length, 774, 'Every single pandal must have defined latitude');
+  assert.strictEqual(allLngs.length, 774, 'Every single pandal must have defined longitude');
   for (const lat of allLats) {
     assert.ok(lat >= 22.35 && lat <= 22.75, `Latitude ${lat} must be within Greater Kolkata bounds (22.35 - 22.75)`);
   }
   for (const lng of allLngs) {
     assert.ok(lng >= 88.15 && lng <= 88.55, `Longitude ${lng} must be within Greater Kolkata bounds (88.15 - 88.55)`);
   }
-  console.log('✓ Coordinate boundary validation passed for all 770 pandals (22.35 <= lat <= 22.75, 88.15 <= lng <= 88.55)');
+  console.log('✓ Coordinate boundary validation passed for all 774 pandals (22.35 <= lat <= 22.75, 88.15 <= lng <= 88.55)');
 
   // 5. PandalService search enhancement
   assert.ok(pandalServiceContent.includes('p.address.toLowerCase().includes(q)'), 'PandalService must search within pandal address');
@@ -1223,10 +1223,10 @@ console.log('================================================================');
   }
 
   // A. Total Pandal Count & Unique ID Verification
-  assert.strictEqual(allPandals.length, 770, `Total pandals must be exactly 770 across all datasets, got ${allPandals.length}`);
+  assert.strictEqual(allPandals.length, 774, `Total pandals must be exactly 774 across all datasets, got ${allPandals.length}`);
   const uniqueIds = new Set(allPandals.map((p) => p.id));
-  assert.strictEqual(uniqueIds.size, 770, `All 770 pandal IDs must be globally unique, got ${uniqueIds.size}`);
-  console.log(`✓ Data Integrity: All 770 pandals verified with 100% unique stable IDs`);
+  assert.strictEqual(uniqueIds.size, 774, `All 774 pandal IDs must be globally unique, got ${uniqueIds.size}`);
+  console.log(`✓ Data Integrity: All 774 pandals verified with 100% unique stable IDs`);
 
   // B. Zero Repeated Thumbnails / Duplicate Detection
   const assignedImages = new Map(); // url -> array of pandal IDs
@@ -1253,7 +1253,7 @@ console.log('================================================================');
     0,
     `Zero duplicate image URLs allowed! Found ${duplicatedUrls.length} shared URLs: ${JSON.stringify(duplicatedUrls)}`
   );
-  console.log(`✓ Zero Repeated Thumbnails: 0 duplicate image URLs detected across 770 pandals`);
+  console.log(`✓ Zero Repeated Thumbnails: 0 duplicate image URLs detected across 774 pandals`);
 
   // C. File Existence & Perceptual / Cryptographic Hash Uniqueness
   const hashToUrl = new Map();
@@ -1807,8 +1807,69 @@ console.log('\n--- Running Test Suite 34: Co-Creator Profiles, Bengali Spelling 
   console.log('✓ Feature filters collapse/expand control, ARIA semantics, and default expansion verified');
 })();
 
+// ============================================================================
+// TEST SUITE 35: Live Search Autocomplete, New Town Pandals & Chorebagan Verification
+// ============================================================================
+(() => {
+  console.log('\n--- Running Test Suite 35: Live Search Autocomplete & Verified Pandal Entries ---');
+  const filtersPath = path.join(__dirname, '..', 'src', 'components', 'pandals', 'PandalFilters.tsx');
+  const explorePagePath = path.join(__dirname, '..', 'src', 'app', 'explore', 'page.tsx');
+  const neighborhoodPath = path.join(__dirname, '..', 'src', 'data', 'pandals', 'neighborhoodPandals.ts');
+  const registeredPart1Path = path.join(__dirname, '..', 'src', 'data', 'pandals', 'registeredClubsPart1.ts');
+
+  const filtersContent = fs.readFileSync(filtersPath, 'utf8');
+  const exploreContent = fs.readFileSync(explorePagePath, 'utf8');
+  const neighborhoodContent = fs.readFileSync(neighborhoodPath, 'utf8');
+  const registeredPart1Content = fs.readFileSync(registeredPart1Path, 'utf8');
+
+  // 1. PandalFilters Live Search Autocomplete Semantics & Controls
+  assert.ok(filtersContent.includes('role="combobox"'), 'PandalFilters must provide accessible role="combobox"');
+  assert.ok(filtersContent.includes('aria-expanded={isOpen}'), 'PandalFilters must bind aria-expanded to dropdown open state');
+  assert.ok(filtersContent.includes('aria-haspopup="listbox"'), 'PandalFilters combobox must declare aria-haspopup="listbox"');
+  assert.ok(filtersContent.includes('aria-autocomplete="list"'), 'PandalFilters input must declare aria-autocomplete="list"');
+  assert.ok(filtersContent.includes('aria-controls="pandal-search-suggestions"'), 'PandalFilters input must control suggestions list');
+  assert.ok(filtersContent.includes('role="listbox"'), 'PandalFilters suggestions panel must have role="listbox"');
+  assert.ok(filtersContent.includes('role="option"'), 'PandalFilters suggestion items must have role="option"');
+  assert.ok(filtersContent.includes('handleKeyDown'), 'PandalFilters must handle keyboard navigation');
+  assert.ok(filtersContent.includes('ArrowDown') && filtersContent.includes('ArrowUp'), 'PandalFilters must support ArrowDown and ArrowUp navigation');
+  assert.ok(filtersContent.includes('Escape') && filtersContent.includes('Tab'), 'PandalFilters must support Escape and Tab dismiss');
+  assert.ok(filtersContent.includes('handleClearSearch'), 'PandalFilters must support clear search button');
+  assert.ok(filtersContent.includes('allPandals?: Pandal[]'), 'PandalFiltersProps must accept optional allPandals array');
+
+  // 2. Explore Page Integration
+  assert.ok(exploreContent.includes('allPandals={allPandals}'), 'Explore page must pass allPandals to PandalFilters');
+  console.log('✓ Live Search Autocomplete combobox semantics, keyboard handlers, and Explore integration verified');
+
+  // 3. Verified New Town Pandals
+  const requiredNewTownIds = [
+    'new-town-ca-block-sarbojanin',
+    'new-town-cb-block-sarbojanin',
+    'new-town-cd-block-cultural-association',
+    'sukhobrishti-spandan-durgotsav',
+  ];
+  for (const id of requiredNewTownIds) {
+    assert.ok(neighborhoodContent.includes(`id: '${id}'`), `neighborhoodPandals.ts must contain New Town pandal: ${id}`);
+  }
+  assert.ok(neighborhoodContent.includes('নিউ টাউন সিএ ব্লক সর্বজনীন দুর্গোৎসব'), 'CA Block must have verified Bengali name');
+  assert.ok(neighborhoodContent.includes('নিউ টাউন সিবি ব্লক সর্বজনীন দুর্গোৎসব'), 'CB Block must have verified Bengali name');
+  assert.ok(neighborhoodContent.includes('নিউ টাউন সিডি ব্লক কালচারাল অ্যাসোসিয়েশন'), 'CD Block must have verified Bengali name');
+  assert.ok(neighborhoodContent.includes('সুখবৃষ্টি স্পন্দন দুর্গোৎসব'), 'Sukhobrishti must have verified Bengali name');
+  assert.ok(neighborhoodContent.includes('Action Area 1, New Town'), 'Action Area 1 locality must be present');
+  assert.ok(neighborhoodContent.includes('Action Area 3, New Town'), 'Action Area 3 locality must be present');
+  console.log('✓ 4 verified New Town Durga Puja pandals present in neighborhoodPandals.ts with complete metadata');
+
+  // 4. Chorebagan Sarbojanin Durgotsab Samity
+  assert.ok(registeredPart1Content.includes("id: 'chorebagan-sarbojanin-durgotsab-samity'"), 'Chorebagan must exist in registeredClubsPart1.ts');
+  assert.ok(registeredPart1Content.includes("nameBn: 'চোরবাগান সর্বজনীন দুর্গোৎসব সমিতি'"), 'Chorebagan must have authentic Bengali name চোরবাগান সর্বজনীন দুর্গোৎসব সমিতি');
+  assert.ok(registeredPart1Content.includes('Radha Madhab Saha Lane'), 'Chorebagan address must specify Radha Madhab Saha Lane');
+  assert.ok(registeredPart1Content.includes('রাধামাধব সাহা লেন'), 'Chorebagan Bengali address must specify রাধামাধব সাহা লেন');
+  assert.ok(registeredPart1Content.includes("vipPassEntry: false"), 'Chorebagan must not treat invitation card as public VIP access');
+  assert.ok(registeredPart1Content.includes("verificationStatus: 'Verified'"), 'Chorebagan must be marked Verified');
+  console.log('✓ Chorebagan Sarbojanin Durgotsab Samity verified with Radha Madhab Saha Lane and Bengali name');
+})();
+
 console.log('\n================================================================');
-console.log('ALL 34 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
+console.log('ALL 35 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
 console.log('================================================================\n');
 
 
