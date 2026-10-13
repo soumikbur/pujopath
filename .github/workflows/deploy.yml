@@ -28,17 +28,21 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
+        working-directory: PujoPath (Web)
         run: npm ci
 
       - name: Run automated test suite
+        working-directory: PujoPath (Web)
         run: npm test
 
       - name: Build Next.js static export
+        working-directory: PujoPath (Web)
         run: npm run build
         env:
           GITHUB_ACTIONS: 'true'
 
       - name: Setup client-side SPA routing fallback
+        working-directory: PujoPath (Web)
         run: |
           cp out/index.html out/404.html || true
           cp out/index.html out/200.html || true
@@ -46,7 +50,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./out
+          path: ./PujoPath (Web)/out
 
   deploy:
     environment:

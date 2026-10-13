@@ -1,0 +1,103 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowRight } from 'lucide-react';
+import { useI18n } from '@/lib/i18n/I18nContext';
+import { getAssetPath } from '@/lib/utils';
+
+export function PujaHighlights() {
+  const { locale } = useI18n();
+  const isBn = locale === 'bn';
+
+  const highlights = [
+    {
+      title: isBn ? 'ঐতিহ্য ও মণ্ডপ শিল্পকলা' : 'Traditions & Pandal Art',
+      desc: isBn
+        ? 'শতবর্ষের বনেদি বাড়ির পুজো ও কলকাতার সেরা সৃজনশীল শিল্পকর্ম।'
+        : "Discover Bengal's timeless heritage celebrations and creative installations.",
+      image: getAssetPath('/images/pandals/sovabazar-rajbari.webp'),
+      href: '/explore',
+      badge: isBn ? 'ঐতিহ্য ও শিল্প' : 'Traditions & Art',
+    },
+    {
+      title: isBn ? 'পুজোর নির্ঘণ্ট ও পঞ্জিকা' : 'Sacred Almanac & Timings',
+      desc: isBn
+        ? 'মহাষ্টমীর সন্ধিপূজা, পুষ্পাঞ্জলি ও তিথির সঠিক সময়সূচি।'
+        : 'Accurate Ashtami Sandhi Puja, Pushpanjali, and tithi timings.',
+      image: getAssetPath('/images/pandals/bagbazar-sarbojanin.webp'),
+      href: '/calendar',
+      badge: isBn ? 'পঞ্জিকা' : 'Almanac',
+    },
+    {
+      title: isBn ? 'সন্ধ্যায় পুজো পরিক্রমা' : 'Pujo Evenings & Routes',
+      desc: isBn
+        ? 'আলোকসজ্জা ও রাতের মণ্ডপ দর্শন সহজে পরিকল্পনা করুন।'
+        : 'Plan your route for the best evening hopping and illumination.',
+      image: getAssetPath('/images/pandals/college-square.webp'),
+      href: '/planner',
+      badge: isBn ? 'পরিক্রমা' : 'Routes',
+    },
+  ];
+
+  return (
+    <section className="space-y-3 pt-1">
+      {/* Heading */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-base sm:text-lg font-bold text-[#242424] dark:text-[#ede5dc] tracking-tight flex items-center gap-1.5">
+            <span className="text-[#b42323] font-black text-lg">✣</span>
+            <span>{isBn ? 'পূজার বিশেষ আকর্ষণ' : 'Puja Highlights'}</span>
+          </h2>
+          <p className="text-xs sm:text-sm text-[#776d65] dark:text-[#a89e95] mt-0.5 font-medium">
+            {isBn ? 'বাংলার দুর্গাপূজা সংস্কৃতির একটি ঝলক' : "A glimpse of Bengal's Durga Puja culture"}
+          </p>
+        </div>
+
+        <Link
+          href="/explore"
+          className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-[#b42323] hover:text-[#971c1c] transition-colors"
+        >
+          <span>{isBn ? 'সব দেখুন' : 'View all'}</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+
+      {/* 3 Horizontal Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+        {highlights.map((item, idx) => (
+          <Link
+            key={idx}
+            href={item.href}
+            className="group flex items-center gap-3.5 p-3 rounded-2xl border border-[#eee8e1]/90 dark:border-[#2f2720]/90 bg-white/85 dark:bg-[#1a1613]/85 backdrop-blur-md hover:border-[#b42323]/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-98 shadow-xs"
+          >
+            {/* Left Image */}
+            <div className="relative w-24 h-20 sm:w-[110px] sm:h-[80px] rounded-xl overflow-hidden shrink-0 border border-black/5 dark:border-white/10">
+              <Image
+                src={item.image}
+                alt={item.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                sizes="110px"
+              />
+              <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded-md text-[9px] font-bold text-white bg-black/60 backdrop-blur-md">
+                {item.badge}
+              </span>
+            </div>
+
+            {/* Content */}
+            <div className="min-w-0 flex-1 space-y-0.5">
+              <h3 className="text-sm sm:text-[15px] font-bold text-[#242424] dark:text-[#ede5dc] group-hover:text-[#b42323] transition-colors truncate">
+                {item.title}
+              </h3>
+              <p className="text-xs text-[#776d65] dark:text-[#a89e95] line-clamp-2 leading-relaxed">
+                {item.desc}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}

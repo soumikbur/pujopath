@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "PujoPath",
+    "slug": "pujopath",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#7c1d1d"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.pujopath.mobile",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "PujoPath needs your location to guide you to nearby pandals and calculate walking routes."
+      }
+    },
+    "android": {
+      "package": "app.pujopath.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#7c1d1d",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

@@ -1,196 +1,246 @@
-# PujoPath (পুজোপথ) — Digital Durga Puja Companion
+# PujoPath (পুজোপথ)
 
 > **Discover. Plan. Experience Pujo.**  
-> A high-performance, responsive Progressive Web Application (PWA) and digital guide for Kolkata Durga Puja.
-
-Live Production URL: **[https://soumikbur.github.io/pujopath/](https://soumikbur.github.io/pujopath/)**
+> The comprehensive digital Durga Puja companion and intelligent pandal hopper guide for Kolkata.
 
 ---
 
 ## 🌟 Overview
 
-**PujoPath** is designed for pandal hoppers across Bengal and the global diaspora. It offers curated pandal discovery, real-time sacred countdowns, transit guidance, intelligent walking route optimization, and authentic festive music in an elegant light-first interface with a synchronized charcoal dark mode.
+**PujoPath** is a modern festival discovery, walking navigation, and transit companion designed for Durga Puja hoppers across Bengal and the worldwide diaspora. Built to celebrate the UNESCO Intangible Cultural Heritage of Durga Puja, PujoPath combines curated pandal directories, sacred festival calendars, geodesic route optimization, and live transit mapping into a high-performance, festive user experience.
+
+### Key Capabilities:
+- **770 Verified Pandals:** Complete coverage across 8 Greater Kolkata zones (North, South, Central, Salt Lake, Behala, Dum Dum, Howrah, New Town) with multi-faceted filtering (Bonedi Bari, Near Metro, Heritage Sabeki, Wheelchair Access, Featured Only).
+- **Intelligent Walking Route Optimizer:** Solves the Traveling Salesperson Problem (TSP) using Haversine geodesic calculations to minimize pedestrian fatigue, complete with seamless export to Google Maps and Apple Maps.
+- **Interactive Map & Metro Layers:** Custom Leaflet map with pandal markers and comprehensive Kolkata Metro station guides (Blue Line and Green Line normal & overnight Puja timetables).
+- **Sacred Puja Almanac & Sandhi Puja:** Multi-year tithi calculation with real-time countdown to the sacred 48-minute Sandhi Puja juncture.
+- **Sharodiya Soundscapes:** Authentic traditional Dhak rhythms, Shankha calls, and historical archival broadcasts (including the 1931 Birendra Krishna Bhadra *Mahishasura Mardini* recital).
+- **Dual-Language & Contrast:** Full English and Bengali (বাংলা) interface with an ivory light theme and high-contrast charcoal dark mode.
 
 ---
 
-## ✨ Features
+## 📁 Project Structure
 
-- **Iconic Pandal Exploration (`/explore`):**
-  - Directory of 23 iconic Kolkata community and heritage Rajbari pandals.
-  - Multi-faceted filters: **Zone** (North, South, Central, Salt Lake, Behala, Dum Dum, Howrah), **Heritage Sabeki**, **Near Metro**, **Wheelchair Accessible**, and **Featured**.
-  - Instant debounced search by pandal name, locality, theme, or nearest metro station.
-  - Authentic, high-resolution photographs with Creative Commons licensing attribution.
+The PujoPath repository is organized into three distinct, independent application tracks:
 
-- **Intelligent Geodesic Route Planner (`/planner`):**
-  - Sequential great-circle distance calculation using the **Haversine formula**.
-  - Realistic pedestrian walking time estimation (~4.5 km/h walking pace).
-  - One-click **TSP (Traveling Salesperson) Route Optimizer** to re-order stops efficiently.
-  - One-click export to **Google Maps Directions** with multiple waypoints.
-  - Saved custom itineraries with local persistence.
-
-- **Kolkata Metro Transit Guide (`/metro`):**
-  - Station-by-station transit mapping across the **Blue Line (North-South)** and **Green Line (East-West)**.
-  - Direct walking proximity linkages to iconic pandals.
-
-- **Sacred Puja Almanac (`/calendar`):**
-  - Exact tithi timings from Mahalaya and Sasthi to Dashami.
-  - Auspicious hours for Pushpanjali, Sandhi Puja, and Bhog Prasad.
-
-- **Sharodiya Soundscape & Chandi Path (`/music` & `/mahalaya`):**
-  - Timeless dawn broadcast tribute to Birendra Krishna Bhadra's *Mahishasura Mardini*.
-  - Procedural Dhak rhythms synthesized with Web Audio API.
-  - Wide translucent glassmorphism floating media player.
-
-- **Dual-Language Support (English / বাংলা):**
-  - Seamless toggle across all UI strings, headings, descriptions, and Bengali numerals (`০-৯`).
-
-- **Centralized Design Token Theme System:**
-  - Strict **Light Mode default** for all first-time visitors (`#FCFAF7` background, `#242424` text, `#B42323` accents).
-  - Unified **Dark Mode** (`#14110E` background, `#1A1613` surfaces, `#EDE5DC` text, `#2F2720` borders) across mobile navigation, drawers, modals, cards, audio player, and map popups.
-  - Persistent theme switching via `localStorage` with zero flash of wrong theme (anti-FOUC script) and mobile address bar chrome synchronization (`<meta name="theme-color">`).
-  - Lightweight vector SVG background layer featuring symmetrical Bengali *Alpana* mandalas, lotus petal curves, and autumn *Kash* flower motifs at 3–5% opacity with responsive day/night illumination.
-
-- **Universal Responsiveness:**
-  - Fully tested across small mobile (320px), standard mobile (375px/390px/430px), tablet (768px/1024px), laptop (1366px), and wide desktop (1920px).
-
-- **Creator Watermark Signature:**
-  - Subtly integrated in the global footer: *"Made with care by Soumik & Moumita with ❤️"* with direct links to both co-creators' verified GitHub profiles.
-
----
-
-## 🛠 Tech Stack
-
-- **Framework:** [Next.js 14](https://nextjs.org/) (App Router, Static HTML Export)
-- **Language:** TypeScript 5
-- **UI & Styling:** [Tailwind CSS 3](https://tailwindcss.com/) + CSS Design Tokens
-- **Icons:** [Lucide React](https://lucide.dev/)
-- **Mapping:** [Google Maps Platform JavaScript API](https://developers.google.com/maps/documentation/javascript?utm_campaign=gmp_git_agentskills_v1) via [`@vis.gl/react-google-maps`](https://visgl.github.io/react-google-maps/) with Advanced Markers and dark-mode isolation
-- **Image Pipeline:** [Sharp](https://sharp.pixelplumbing.com/) (WebP 1200×675 entropy-optimized)
-- **State Management:** React Context API with persistent `localStorage` synchronization
-
----
-
-## 🗺️ Google Maps Platform Configuration
-
-PujoPath uses the official **Google Maps Platform JavaScript API** to provide an authentic, high-quality interactive map experience of Kolkata Durga Puja pandals with custom `AdvancedMarkerElement` pins and crowd-level indicators.
-
-### 1. API Key Provisioning & Enablement
-1. Open the [Google Cloud Console](https://console.cloud.google.com/google/maps-apis/credentials?utm_campaign=gmp_git_agentskills_v1).
-2. Create or select your Google Cloud Project with billing enabled.
-3. Enable the **Maps JavaScript API**.
-4. Create an **API Key** and configure the recommended restrictions:
-   - **Application restrictions:** Set to **HTTP referrers (websites)** and add your authorized origins (e.g. `http://localhost:3000/*` and `https://soumikbur.github.io/pujopath/*`).
-   - **API restrictions:** Restrict the key to only authorize the **Maps JavaScript API**.
-   - See [Google Cloud API Key Restrictions Documentation](https://docs.cloud.google.com/api-keys/docs/add-restrictions-api-keys) for security best practices.
-
-### 2. Prototyping with the Maps Demo Key
-For zero-cost local prototyping without configuring a Google Cloud billing account:
-1. Visit the [Maps Demo Key Portal](https://mapsplatform.google.com/maps-demo-key?utm_campaign=gmp_git_agentskills_v1).
-2. Sign in with any Google account (no billing card required).
-3. Generate your prototyping key and copy it into `.env.local` or paste it directly into the in-app key tester in the Map section.
-
-### 3. Environment Variables
-Add the following variables to `.env.local`:
-```bash
-# Required to render the interactive embedded Google Map
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
-
-# Optional Map ID for AdvancedMarker styling (defaults to DEMO_MAP_ID)
-NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=DEMO_MAP_ID
+```text
+pujopath/
+│
+├── README.md                          # Root repository documentation (this file)
+├── LICENSE                            # License & terms of evaluation
+│
+├── .github/
+│   └── workflows/
+│       ├── deploy.yml                 # Automated GitHub Pages static deployment
+│       └── photo-refresh.yml          # Scheduled yearly photo discovery and validation
+│
+├── PujoPath (Web)/                    # Active, production-ready website & PWA
+│   ├── README.md                      # Web application documentation & guide
+│   ├── package.json                   # Web dependencies & scripts
+│   ├── package-lock.json              # Web lockfile
+│   ├── next.config.js                 # Next.js configuration & basePath logic
+│   ├── tsconfig.json                  # TypeScript configuration
+│   ├── tailwind.config.ts             # Tailwind CSS tokens & color system
+│   ├── src/                           # Application source code (App Router, components, data)
+│   ├── public/                        # Static assets, WebP pandal photos, audio files
+│   └── scripts/                       # 31-suite automated test runner & photo tools
+│
+├── PujoPath (Capacitor)/              # Active Capacitor-powered Android mobile app
+│   ├── README.md                      # Mobile application setup, build & APK guide
+│   ├── package.json                   # Mobile dependencies & Capacitor scripts
+│   ├── package-lock.json              # Capacitor lockfile
+│   ├── capacitor.config.ts            # Capacitor runtime & plugin configuration
+│   ├── next.config.js                 # Next.js configuration for mobile export
+│   ├── tsconfig.json                  # TypeScript configuration
+│   ├── android/                       # Native Android Gradle project & wrapper
+│   │   ├── app/                       # Android application module, manifests, resources
+│   │   ├── gradlew                    # Gradle wrapper script (Unix)
+│   │   └── gradlew.bat                # Gradle wrapper script (Windows)
+│   ├── src/                           # Application source code
+│   └── public/                        # Static assets & bundled resources
+│
+└── PujoPath (Native)/                 # Reserved dedicated native mobile app track
+    ├── README.md                      # Native track architecture & status notice
+    ├── package.json                   # React Native & Expo dependencies
+    ├── package-lock.json              # Native lockfile
+    ├── app.json                       # Expo application configuration
+    ├── App.tsx                        # Native root component
+    ├── index.ts                       # Expo entry point
+    ├── assets/                        # Native icon and splash assets
+    └── src/                           # Native components, navigation, and screens
 ```
 
-### 4. Dark Mode Architecture
-The embedded Google Map is visually isolated from the website's dark mode theme. In both light and dark website themes, Google Maps renders with its clear, familiar native light appearance by default, ensuring road labels, transit lines, and pandal pins remain readable without distortion or artificial CSS brightness inversion filters. An optional in-map style switch allows users to explicitly toggle Night View if desired.
+---
+
+## 📱 Applications
+
+### 1. [PujoPath (Web)](./PujoPath%20%28Web%29/README.md)
+The core web application and installable Progressive Web App (PWA). Developed with Next.js 14 App Router, TypeScript, and Tailwind CSS. It is deployed as a high-performance static site on GitHub Pages.
+- **Detailed Documentation:** [PujoPath (Web) README](./PujoPath%20%28Web%29/README.md)
+- **Live URL:** [https://soumikbur.github.io/pujopath/](https://soumikbur.github.io/pujopath/)
+
+### 2. [PujoPath (Capacitor)](./PujoPath%20%28Capacitor%29/README.md)
+The active mobile application track packaging the responsive web platform into an installable Android APK using Capacitor 8. It provides native status bar tinting, custom splash screens, hardware back-button integration, and offline-first performance.
+- **Detailed Documentation:** [PujoPath (Capacitor) README](./PujoPath%20%28Capacitor%29/README.md)
+- **Application ID:** `app.pujopath.mobile`
+
+### 3. [PujoPath (Native)](./PujoPath%20%28Native%29/README.md)
+A dedicated, standalone React Native / Expo mobile application track. Its development is currently paused to focus resources on the Capacitor track, with its complete Expo SDK baseline preserved for future standalone mobile engineering.
+- **Detailed Documentation:** [PujoPath (Native) README](./PujoPath%20%28Native%29/README.md)
+- **Current Status:** Paused (Preserved Baseline)
 
 ---
 
-## 🚀 Getting Started & Local Development
+## 🛠️ Technology Stack
+
+| Capability | PujoPath (Web) | PujoPath (Capacitor) | PujoPath (Native) |
+| :--- | :--- | :--- | :--- |
+| **Framework** | Next.js 14.2 (App Router) | Next.js 14.2 + Capacitor 8.5 | React Native 0.86.3 |
+| **Runtime / Tooling**| Node.js / React 18.3 | Android Gradle Plugin / Java 17+ | Expo SDK ~57.0.28 |
+| **Language** | TypeScript 5.6 | TypeScript 5.6 | TypeScript ~6.0.3 |
+| **Styling** | Tailwind CSS 3.4 | Tailwind CSS 3.4 | React Native StyleSheet |
+| **Navigation** | Next.js App Router | Next.js App Router | React Navigation 7 |
+| **Mapping** | Leaflet 1.9 | Leaflet 1.9 | *Pending Native Maps* |
+| **Audio** | HTML5 Audio API | HTML5 Audio API | `expo-av` 16.0 |
+| **Target Platform** | Web / PWA (Universal) | Android (API 24+) | iOS / Android (Expo Go) |
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- **Node.js:** `18.17+` or `20+`
-- **npm:** `9+`
+- **Node.js:** v20.x LTS (Recommended)
+- **Package Manager:** npm v9+ or v10+
+- **For Android Development (Capacitor Track):**
+  - JDK 17 or JDK 21
+  - Android Studio with Android SDK Build-Tools (API 34+)
+  - Android Platform-Tools (`adb`)
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/soumikbur/pujopath.git
-cd pujopath
-```
+---
 
-### 2. Install Dependencies
+### Setup Instructions
+
+#### A. Web Application (`PujoPath (Web)`)
 ```bash
+cd "PujoPath (Web)"
 npm install
-```
-
-### 3. Configure Local Environment
-Copy the environment template and configure your local settings:
-```bash
-cp .env.example .env.local
-```
-Key configuration parameters:
-- `NEXT_PUBLIC_APP_URL`: Local URL (`http://localhost:3000`)
-- `NEXT_PUBLIC_BASE_PATH`: Leave empty for root domain, or `/pujopath` for GitHub Pages preview
-- `NEXT_PUBLIC_MAP_PROVIDER`: Map provider (`google`)
-- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`: Your Google Maps JavaScript API key
-
-
-### 4. Run Development Server
-```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) to view the development server.
 
----
-
-## 🧪 Automated Testing
-
-Run the automated test suite verifying geometry, algorithms, removal of legacy watch UI, theme tokens, and routing integrity:
+#### B. Capacitor Mobile Application (`PujoPath (Capacitor)`)
 ```bash
-npm test
+cd "PujoPath (Capacitor)"
+npm install
+npm run cap:build
 ```
-The test runner validates:
-1. Haversine great-circle distance calculation
-2. Distance formatting in English and Bengali
-3. Traveling Salesperson (TSP) route heuristic optimizer
-4. Cumulative multi-stop itinerary calculation
-5. Filter switch toggle state integrity
-6. Complete Watch UI eradication across components and styles
-7. Strict Light Mode default initialization (no unwanted OS theme override)
-8. Core route graph and 404 handler presence
-9. Authentic pandal photograph presence (23/23) & `getAssetPath` resolution
-10. Creator watermark signature in global shared layout
-11. Centralized CSS design tokens and mobile dark mode classes
-12. Environment configuration validation & LICENSE presence
+To open the native Android project in Android Studio:
+```bash
+npm run cap:open:android
+```
+
+#### C. Native Application (`PujoPath (Native)`)
+```bash
+cd "PujoPath (Native)"
+npm install
+npx expo start
+```
 
 ---
 
-## 🏗 Production Build & Static Deployment
+## 🔨 Building and Testing
 
-PujoPath is configured for automated static HTML export:
+### Web Track
 ```bash
+cd "PujoPath (Web)"
+
+# Run all 31 automated regression test suites
+npm test
+
+# Build production static export (outputs to ./out)
 npm run build
 ```
-Generates 64 pre-rendered static HTML routes and assets in the `out/` directory.
 
-### Continuous Deployment
-The project deploys automatically to **GitHub Pages** via the GitHub Actions workflow in `.github/workflows/deploy.yml` upon push to `main`. The live site is served with basePath `/pujopath`.
+### Capacitor Track
+```bash
+cd "PujoPath (Capacitor)"
+
+# Run unit tests
+npm test
+
+# Compile static assets and synchronize Capacitor Android project
+npm run cap:build
+
+# Build Debug APK via command line (Windows)
+cd android && .\gradlew.bat assembleDebug
+
+# Build Debug APK via command line (macOS/Linux)
+cd android && ./gradlew assembleDebug
+```
+*Generated APK output location:*  
+`PujoPath (Capacitor)/android/app/build/outputs/apk/debug/app-debug.apk`
 
 ---
 
-## 👥 Project Creators
+## 🌐 Deployment
 
-PujoPath is a collaborative project created by Soumik Ghosh and Moumita Shee to help people discover Kolkata's Durga Puja pandals and plan their Puja experiences.
+### Web Deployment (Live)
+- **Host:** GitHub Pages
+- **URL:** [https://soumikbur.github.io/pujopath/](https://soumikbur.github.io/pujopath/)
+- **Mechanism:** Continuous integration via `.github/workflows/deploy.yml`. When changes are pushed to `main`, GitHub Actions automatically runs `npm ci`, verifies all 31 test suites via `npm test`, executes static export `npm run build`, and deploys `./PujoPath (Web)/out` to GitHub Pages.
 
-- Soumik Ghosh — Co-Creator
-- Moumita Shee — Co-Creator
+### Android Distribution
+- The Capacitor project generates an installable debug APK for local device installation and testing (`adb install -r app-debug.apk`).
+- Release builds for the Google Play Store can be produced by generating a signed release bundle (`gradlew bundleRelease`) with application keystore credentials.
 
 ---
 
-## 📄 License & Intellectual Property
+## 🏗️ Repository Organization
 
-Copyright © 2024–2026 Soumik & Moumita. All rights reserved.
+The repository maintains strict separation between the three project tracks:
 
-The PujoPath application, including its source code, visual user interface, branding, custom graphics, editorial content, and curated data architecture, is the proprietary work of the authors.
+1. **Independent Lifecycle:** Web, Capacitor, and Native projects have independent package manifests, lockfiles, and configuration files, preventing dependency version conflicts (e.g. Next.js 14 web dependencies vs. Expo SDK React 19 dependencies).
+2. **Specialized Toolchains:** The Web track focuses on static export and web performance; Capacitor addresses native Android runtime wrappers; Native preserves dedicated mobile primitives.
+3. **Preserved History:** Git history and file integrity are preserved without cross-contamination.
 
-- **Source Code & Brand:** Subject to the [PujoPath Proprietary & Limited Evaluation License](LICENSE). Personal, non-commercial evaluation and study is permitted. Public cloning, unauthorized commercial hosting, and trademark redistribution are strictly prohibited.
-- **Third-Party Libraries:** Next.js, React, Tailwind CSS, Leaflet, and Lucide React remain governed by their respective open-source licenses (MIT / ISC / Apache 2.0).
-- **Photographic Assets:** Authentic pandal photographs from Wikimedia Commons are credited with source URLs and Creative Commons licenses (CC BY-SA / CC BY / Public Domain) in [PANDAL_IMAGE_ATTRIBUTION.md](PANDAL_IMAGE_ATTRIBUTION.md).
+---
+
+## 📊 Development Status
+
+| Project | Status | Details |
+| :--- | :--- | :--- |
+| **PujoPath (Web)** | **Production Ready** | All 770 pandals, interactive route planner, music streaming, calendar, high-contrast dark theme, and mobile UI verified and live on GitHub Pages. |
+| **PujoPath (Capacitor)** | **Active Development** | Web functionality synchronized into Android Capacitor 8 project; native splash screen, status bar, and Gradle build functional. |
+| **PujoPath (Native)** | **Paused** | Baseline architecture in Expo SDK 57 preserved intact for future dedicated React Native expansion. |
+
+---
+
+## 🤝 Contributing and Maintenance
+
+1. **Code Standards:** Maintain strict TypeScript types, avoid runtime `any`, and preserve accessibility attributes (`role="switch"`, `aria-checked`, semantic headings).
+2. **Dataset Updates:** Pandal data additions should be made directly in `src/data/pandals/` with unique stable IDs and verified coordinates (`22.35 <= lat <= 22.75`, `88.15 <= lng <= 88.55`).
+3. **Testing Requirement:** Always run `npm test` before submitting changes. All 31 automated test suites must pass with zero errors.
+4. **Clean Commits:** Do not commit local build artifacts (`.next/`, `out/`, `build/`), machine-specific SDK paths (`local.properties`), or secrets.
+
+---
+
+## 📄 License
+
+PujoPath is governed by the proprietary and limited evaluation license specified in [LICENSE](./LICENSE):
+
+```text
+Copyright (c) 2024-2026 Soumik & Moumita. All rights reserved.
+PUJOPATH PROPRIETARY & LIMITED EVALUATION LICENSE
+```
+
+*Personal, non-commercial evaluation and local study are permitted. Commercial deployment, mirroring, or public redistribution requires express written authorization from the authors.*
+
+---
+
+## 🙏 Acknowledgements
+
+- **Festival Traditions:** Dedicated to the artisans, dhakis, committees, and communities of Kolkata Durga Puja.
+- **Open-Source Foundations:** Built with gratitude upon [Next.js](https://nextjs.org/), [React](https://react.dev/), [Capacitor](https://capacitorjs.com/), [Tailwind CSS](https://tailwindcss.com/), [Leaflet](https://leafletjs.com/), [Lucide Icons](https://lucide.dev/), and [Expo](https://expo.dev/).
+- **Audio Assets:** Traditional recordings streamed under Creative Commons licenses from [Wikimedia Commons](https://commons.wikimedia.org/) (credited in `PujoPath (Web)/src/data/music/index.ts`).
+- **Photographs:** Authentic community photographs credited under Creative Commons licenses in [PujoPath (Web)/PANDAL_IMAGE_ATTRIBUTION.md](./PujoPath%20%28Web%29/PANDAL_IMAGE_ATTRIBUTION.md).
+- **Typography:** [Google Fonts](https://fonts.google.com/) — *Hind Siliguri*, *Inter*, and *Plus Jakarta Sans*.

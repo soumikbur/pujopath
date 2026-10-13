@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PujoPath</string>
+    <string name="title_activity_main">PujoPath</string>
+    <string name="package_name">app.pujopath.mobile</string>
+    <string name="custom_url_scheme">app.pujopath.mobile</string>
+</resources>

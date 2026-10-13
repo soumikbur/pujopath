@@ -1,36 +1,48 @@
-# dependencies
-/node_modules
-/.pnp
+# Dependencies
+node_modules/
+.pnp
 .pnp.js
 
-# testing
-/coverage
+# Testing
+coverage/
 
-# next.js
-/.next/
-/out/
+# Next.js & Web builds
+.next/
+out/
+build/
+dist/
 
-# production
-/build
+# Android & Gradle (Capacitor)
+.gradle/
+**/android/.gradle/
+**/android/build/
+**/android/app/build/
+**/android/local.properties
+*.apk
+*.aab
 
-# misc
-.DS_Store
-*.pem
+# React Native & Expo (Native)
+.expo/
+.expo-shared/
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env and deployment state
+# Environment, secrets, and deployment state
 .env*.local
 .env
 .netlify/
 .vercel/
+*.pem
 
-# typescript
+# TypeScript
 *.tsbuildinfo
 next-env.d.ts
 
-# scratch work
-/scratch/
+# OS & Logs
+.DS_Store
+Thumbs.db
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Scratch & Temporary
+scratch/
+

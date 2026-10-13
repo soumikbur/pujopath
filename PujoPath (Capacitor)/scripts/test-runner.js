@@ -1413,7 +1413,9 @@ console.log('================================================================');
   console.log('✓ Cryptographic Uniqueness: SHA-256 duplicate collision rejected before dataset mutation');
 
   // 5. Automated Review Workflow & Reversibility
-  const reviewWorkflowPath = path.join(__dirname, '..', '.github', 'workflows', 'photo-refresh.yml');
+  const reviewWorkflowPath = fs.existsSync(path.join(__dirname, '..', '.github', 'workflows', 'photo-refresh.yml'))
+    ? path.join(__dirname, '..', '.github', 'workflows', 'photo-refresh.yml')
+    : path.join(__dirname, '..', '..', '.github', 'workflows', 'photo-refresh.yml');
   assert.strictEqual(fs.existsSync(reviewWorkflowPath), true, 'photo-refresh.yml workflow must exist');
   const reviewWorkflowContent = fs.readFileSync(reviewWorkflowPath, 'utf8');
   assert.ok(reviewWorkflowContent.includes('cron:'), 'photo-refresh.yml must define periodic cron schedule');

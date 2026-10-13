@@ -1,0 +1,438 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Inter', sans-serif;
+    --font-bengali: 'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif;
+
+    /* Theme Design Tokens - Light Mode Default */
+    --bg-main: #FCFAF7;
+    --surface: #FFFFFF;
+    --surface-secondary: #F5F1EB;
+    --surface-hover: #F2EDE6;
+    --surface-hero: rgba(255, 248, 241, 0.88);
+    --surface-card: #FFFFFF;
+
+    --text-primary: #242424;
+    --text-secondary: #5C524A;
+    --text-muted: #7E7268;
+
+    --border: #E8E1D9;
+    --border-subtle: #F0EAE2;
+    --border-strong: #D5C9BD;
+
+    --accent-red: #D52F2F;
+    --accent-red-hover: #BD2424;
+    --accent-red-soft: #FDEEEB;
+    --accent-red-border: #F6CECA;
+    --accent-gold: #D5A247;
+    --focus-ring: #D52F2F;
+  }
+
+  .dark {
+    color-scheme: dark;
+
+    /* Theme Design Tokens - Calibrated High-Contrast Warm Charcoal Dark Mode */
+    --bg-main: #14110E;
+    --surface: #1E1915;
+    --surface-secondary: #27201A;
+    --surface-hover: #332B23;
+    --surface-hero: rgba(30, 25, 21, 0.92);
+    --surface-card: #1E1915;
+
+    --text-primary: #F8F3EC;
+    --text-secondary: #D4C7BA;
+    --text-muted: #A39486;
+
+    --border: #3D3227;
+    --border-subtle: #2C231B;
+    --border-strong: #544536;
+
+    --accent-red: #E23C3C;
+    --accent-red-hover: #F24E4E;
+    --accent-red-soft: #381916;
+    --accent-red-border: #5A2722;
+    --accent-gold: #E8B860;
+    --focus-ring: #FF6666;
+  }
+
+  /* Universal Dark Theme Contrast & Surface Mappings */
+  .dark .dark\:bg-\[\#1a1613\] {
+    background-color: var(--surface-card) !important;
+  }
+  .dark .dark\:bg-\[\#14110e\] {
+    background-color: var(--bg-main) !important;
+  }
+  .dark .dark\:bg-\[\#251e18\],
+  .dark .dark\:bg-\[\#201b17\],
+  .dark .dark\:bg-\[\#241f1a\] {
+    background-color: var(--surface-secondary) !important;
+  }
+  .dark .dark\:border-\[\#2f2720\],
+  .dark .dark\:border-\[\#2a241f\],
+  .dark .dark\:border-\[\#3c342c\] {
+    border-color: var(--border) !important;
+  }
+  .dark .dark\:text-\[\#ede5dc\],
+  .dark .dark\:text-\[\#faf6f0\] {
+    color: var(--text-primary) !important;
+  }
+  .dark .dark\:text-\[\#a89e95\],
+  .dark .dark\:text-\[\#cdc1b5\],
+  .dark .dark\:text-\[\#c4b9ae\],
+  .dark .dark\:text-\[\#9c9186\] {
+    color: var(--text-secondary) !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  /* Responsive sticky footer layout architecture */
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .page-content {
+    flex: 1 0 auto;
+  }
+
+  .app-shell footer {
+    flex-shrink: 0;
+    margin-top: auto;
+  }
+
+  /* Accessible focus indicators */
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF4ED;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D9D0C7;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C4B9AD;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1C1814;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #3B332B;
+}
+
+/* Embedded Map Isolation: Ensure map tiles are never inverted, dimmed, or distorted by website dark mode */
+.google-map-container,
+.gm-style,
+.gm-style-iw-c,
+.gm-style-iw-d,
+.leaflet-container,
+.leaflet-tile-pane,
+.leaflet-tile {
+  filter: none !important;
+}
+
+/* Map Popup Dark Mode Styling: Sleek dark popup surface without darkening map tiles */
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip {
+  background-color: #1A1613 !important;
+  color: #EDE5DC !important;
+  border: 1px solid #2F2720 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dark .leaflet-popup-content {
+  color: #EDE5DC !important;
+}
+
+
+
+/* Safe area padding for mobile bottom nav */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Subtle Bengali Alpana & Geometric Background Animations */
+@keyframes alpanaRotateSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes alpanaRotateReverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes alpanaDrift {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(6px, -12px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes alpanaPulse {
+  0%, 100% {
+    opacity: 0.03;
+  }
+  50% {
+    opacity: 0.055;
+  }
+}
+
+.animate-alpana-spin {
+  animation: alpanaRotateSlow 75s linear infinite;
+  transform-origin: center;
+}
+
+.animate-alpana-spin-reverse {
+  animation: alpanaRotateReverse 90s linear infinite;
+  transform-origin: center;
+}
+
+.animate-alpana-drift {
+  animation: alpanaDrift 28s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.animate-alpana-pulse {
+  animation: alpanaPulse 18s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   Dedicated Viewport-Fixed Background Layer
+   Stationary relative to mobile viewport; content scrolls freely over it.
+   Hardware accelerated with translate3d & backface-visibility to eliminate
+   mobile browser compositing glitches, flicker, and stutter.
+   ========================================================================== */
+.home-background,
+.pujopath-fixed-background {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+  contain: strict;
+}
+
+.home-background img,
+.pujopath-fixed-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+/* On mobile viewports, keep decorative background SVGs static so the compositor
+   does not invalidate backing textures during vertical touch scrolling */
+@media (max-width: 768px) {
+  .animate-alpana-spin,
+  .animate-alpana-spin-reverse,
+  .animate-alpana-drift,
+  .animate-alpana-pulse {
+    animation: none !important;
+  }
+}
+
+.home-page-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   Smooth Entry & Slide Animations (Restores animate-in across all components)
+   ========================================================================== */
+@keyframes pujoFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pujoSlideFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pujoSlideFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pujoSpinIn180 {
+  from {
+    transform: rotate(-180deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-in {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+}
+
+.animate-in.fade-in {
+  animation-name: pujoFadeIn;
+}
+
+.animate-in.slide-in-from-bottom,
+.animate-in.slide-in-from-bottom-2,
+.animate-in.slide-in-from-bottom-3,
+.animate-in.slide-in-from-bottom-4 {
+  animation-name: pujoSlideFromBottom;
+}
+
+.animate-in.slide-in-from-right-4 {
+  animation-name: pujoSlideFromRight;
+}
+
+.animate-in.spin-in-180 {
+  animation-name: pujoSpinIn180;
+}
+
+/* ==========================================================================
+   Subtle Page Navigation Transitions (Phases 2 & 3)
+   Restrained, polished 180ms opacity fade between application pages.
+   Zero CSS transforms applied to page content, ensuring 100% smooth,
+   unrestricted native scrolling and zero containing-block side effects.
+   ========================================================================== */
+@keyframes pujoPageEnter {
+  0% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.page-transition-enter {
+  animation: pujoPageEnter 180ms ease-out both;
+}
+
+.page-transition-enter-map {
+  animation: pujoPageEnter 180ms ease-out both;
+}
+
+/* Respect user's motion preference (Phase 5) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .animate-alpana-spin,
+  .animate-alpana-spin-reverse,
+  .animate-alpana-drift,
+  .animate-alpana-pulse {
+    animation: none !important;
+  }
+  .page-transition-enter,
+  .page-transition-enter-map {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+

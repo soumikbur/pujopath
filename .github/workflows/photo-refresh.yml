@@ -34,20 +34,24 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
+        working-directory: PujoPath (Web)
         run: npm ci
 
       - name: Run automated test suite
+        working-directory: PujoPath (Web)
         run: npm test
 
       - name: Execute photo discovery and verification engine
+        working-directory: PujoPath (Web)
         run: node scripts/photo-system/simulate-season-test.js
 
       - name: Verify zero duplicate photographs
+        working-directory: PujoPath (Web)
         run: node -e "const { validatePhotoUniqueness } = require('./dist/data/pandals' || './src/data/pandals'); const res = validatePhotoUniqueness ? validatePhotoUniqueness() : { valid: true }; if (!res.valid) process.exit(1);" || node scripts/test-runner.js
 
       - name: Upload review report artifact
         uses: actions/upload-artifact@v4
         with:
           name: photo-review-report
-          path: reports/
+          path: PujoPath (Web)/reports/
           retention-days: 30
