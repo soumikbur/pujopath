@@ -1554,12 +1554,24 @@ console.log('================================================================');
   assert.ok(bgComponentContent.includes('isHomepageRoute'), 'PujoBackground must use isHomepageRoute');
   assert.ok(bgComponentContent.includes('{isHomepage &&'), 'PujoBackground must render decorative artwork ONLY on homepage');
   assert.ok(bgComponentContent.includes('{!isHomepage &&'), 'PujoBackground must render restored minimalistic pattern on other pages');
-  assert.ok(bgComponentContent.includes('animate-alpana-spin'), 'PujoBackground must animate top-left alpana rotation');
-  assert.ok(bgComponentContent.includes('animate-alpana-spin-reverse'), 'PujoBackground must animate top-right mandala reverse rotation');
-  assert.ok(bgComponentContent.includes('animate-alpana-drift'), 'PujoBackground must animate kash flower drift');
-  assert.ok(bgComponentContent.includes('animate-alpana-pulse'), 'PujoBackground must animate bottom border pulse');
-  assert.ok(bgComponentContent.includes('hidden md:block'), 'Must select landscape 16:9 for desktop screens');
-  assert.ok(bgComponentContent.includes('block md:hidden'), 'Must select portrait 3:4 for mobile screens');
+  
+  // Strict Separation: Verify all alpana SVGs are strictly enclosed within {!isHomepage && ...}
+  const nonHomeIndex = bgComponentContent.indexOf('{!isHomepage &&');
+  assert.ok(nonHomeIndex !== -1, '{!isHomepage && block must exist');
+  const nonHomeBlock = bgComponentContent.slice(nonHomeIndex);
+  assert.ok(nonHomeBlock.includes('animate-alpana-spin'), 'animate-alpana-spin must be within non-homepage block');
+  assert.ok(nonHomeBlock.includes('animate-alpana-spin-reverse'), 'animate-alpana-spin-reverse must be within non-homepage block');
+  assert.ok(nonHomeBlock.includes('animate-alpana-drift'), 'animate-alpana-drift must be within non-homepage block');
+  assert.ok(nonHomeBlock.includes('animate-alpana-pulse'), 'animate-alpana-pulse must be within non-homepage block');
+
+  // Verify CSS keyframes and unsuppressed mobile animation
+  const globalsCssForBg = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'globals.css'), 'utf8');
+  assert.ok(globalsCssForBg.includes('alpanaRotateSlow'), 'Must define alpanaRotateSlow keyframe');
+  assert.ok(globalsCssForBg.includes('alpanaRotateReverse'), 'Must define alpanaRotateReverse keyframe');
+  assert.ok(globalsCssForBg.includes('alpanaDrift'), 'Must define alpanaDrift keyframe');
+  assert.ok(globalsCssForBg.includes('alpanaPulse'), 'Must define alpanaPulse keyframe');
+  assert.strictEqual(globalsCssForBg.includes('@media (max-width: 768px) {\n  .animate-alpana'), false, 'Alpana animations must not be suppressed on mobile');
+
   assert.ok(bgComponentContent.includes('pointer-events-none'), 'Must include pointer-events-none so it never blocks clicks');
   assert.ok(bgComponentContent.includes('aria-hidden="true"'), 'Must include aria-hidden="true" for screen reader purity');
   assert.ok(bgComponentContent.includes('z-0'), 'Must remain strictly behind interactive page content (z-0)');

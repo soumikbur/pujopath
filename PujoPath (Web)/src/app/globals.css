@@ -244,27 +244,31 @@
     opacity: 0.03;
   }
   50% {
-    opacity: 0.055;
+    opacity: 0.085;
   }
 }
 
 .animate-alpana-spin {
   animation: alpanaRotateSlow 75s linear infinite;
-  transform-origin: center;
+  transform-origin: 50% 50%;
+  will-change: transform;
 }
 
 .animate-alpana-spin-reverse {
   animation: alpanaRotateReverse 90s linear infinite;
-  transform-origin: center;
+  transform-origin: 50% 50%;
+  will-change: transform;
 }
 
 .animate-alpana-drift {
-  animation: alpanaDrift 28s ease-in-out infinite;
-  transform-origin: center;
+  animation: alpanaDrift 32s ease-in-out infinite;
+  transform-origin: 50% 50%;
+  will-change: transform;
 }
 
 .animate-alpana-pulse {
   animation: alpanaPulse 18s ease-in-out infinite;
+  will-change: opacity;
 }
 
 /* ==========================================================================
@@ -301,14 +305,11 @@
   transform: translateZ(0);
 }
 
-/* On mobile viewports, keep decorative background SVGs static so the compositor
-   does not invalidate backing textures during vertical touch scrolling */
+/* Mobile viewport compositing optimization */
 @media (max-width: 768px) {
-  .animate-alpana-spin,
-  .animate-alpana-spin-reverse,
-  .animate-alpana-drift,
-  .animate-alpana-pulse {
-    animation: none !important;
+  .home-background,
+  .pujopath-fixed-background {
+    -webkit-overflow-scrolling: touch;
   }
 }
 
