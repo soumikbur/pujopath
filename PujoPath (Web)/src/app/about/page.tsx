@@ -109,7 +109,7 @@ export default function AboutPage() {
               title={isBn ? 'সৌমিকের লিঙ্কডইন প্রোফাইল দেখুন' : "View Soumik's LinkedIn profile"}
               aria-label={isBn ? 'সৌমিকের লিঙ্কডইন প্রোফাইল দেখুন' : "View Soumik's LinkedIn profile"}
             >
-              {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
+              {isBn ? 'লিঙ্কডইন' : 'LinkedIn'}
             </a>
           </div>
 
@@ -131,7 +131,7 @@ export default function AboutPage() {
               title={isBn ? 'মৌমিতার লিঙ্কডইন প্রোফাইল দেখুন' : "View Moumita's LinkedIn profile"}
               aria-label={isBn ? 'মৌমিতার লিঙ্কডইন প্রোফাইল দেখুন' : "View Moumita's LinkedIn profile"}
             >
-              {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
+              {isBn ? 'লিঙ্কডইন' : 'LinkedIn'}
             </a>
           </div>
         </div>

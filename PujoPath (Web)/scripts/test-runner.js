@@ -1788,6 +1788,8 @@ console.log('\n--- Running Test Suite 34: Co-Creator Profiles, Bengali Spelling 
   assert.ok(aboutContent.includes('rel="noopener noreferrer"'), 'About page LinkedIn badge must have security attributes');
   assert.ok(aboutContent.includes("View Soumik's LinkedIn profile"), 'About page Soumik badge must have accessible name');
   assert.ok(aboutContent.includes("View Moumita's LinkedIn profile"), 'About page Moumita badge must have accessible name');
+  assert.ok(aboutContent.includes("LinkedIn"), 'About page co-creator button must display "LinkedIn"');
+  assert.ok(aboutContent.includes("লিঙ্কডইন"), 'About page co-creator button must display "লিঙ্কডইন" in Bengali');
   assert.ok(aboutContent.includes('মৌমিতা'), 'About page must use shortened Bengali name মৌমিতা');
   assert.ok(aboutContent.includes('সৌমিক'), 'About page must use shortened Bengali name সৌমিক');
   assert.ok(!aboutContent.includes('Soumik Ghosh'), 'About page must not contain full name Soumik Ghosh');
