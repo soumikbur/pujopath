@@ -118,6 +118,26 @@ This log records every modification applied to `PujoPath (Web)` during the compl
 
 ---
 
+### 7. Permanent Floating Player Positioning, Zero Edge Overflow & Footer Clearance
+- **Files Modified:**
+  - `src/components/music/BottomMusicPlayer.tsx`
+  - `src/components/navigation/Footer.tsx`
+  - `src/app/music/page.tsx`
+  - `public/sw.js`
+  - `src/components/pwa/PwaRegister.tsx`
+  - `scripts/test-runner.js`
+- **Root Causes Diagnosed & Confirmed via Live DOM Inspection:**
+  1. **Transform Keyframe Collision (Horizontal Edge Overflow):** `BottomMusicPlayer.tsx` previously utilized Tailwind's `left-1/2 -translate-x-1/2` in combination with `.animate-in.slide-in-from-bottom-3`. CSS keyframe `@keyframes pujoSlideFromBottom` defined `to { transform: translateY(0); }` with `animation-fill-mode: both`. Because CSS `transform` is a singular property, the keyframe completely replaced Tailwind's `translateX(-50%)` with `translateY(0)`. As a result, the player was stranded at `left: 50%` with `translateX: 0`, starting at the horizontal midpoint of the viewport and extending 163.5px past the right edge of the screen, clipping the controls off-screen.
+  2. **Footer Creator Signature Overlap:** When scrolled to the bottom of the document, `Footer.tsx` had only `pb-20` (80px), whereas the active floating player sat at `bottom: 76px` with a height of `72px` (occupying up to 148px from viewport bottom). The creator watermark signature ("সহ-নির্মাতা: সৌমিক ঘোষ & মৌমিতা শীল ❤️") was positioned directly behind the floating mini-player.
+  3. **Sticky Header Inset Buffer:** Track cards lacked an explicit `scroll-mt` anchor buffer, causing any direct hash jump or focus shift to rest right beneath the 64px sticky header.
+- **Architectural Corrections Implemented:**
+  1. **Transform-Independent Horizontal Centering:** Rebuilt `<aside aria-label="Media Player">` with CSS safe-area boundaries: `left: max(12px, env(safe-area-inset-left, 0px))`, `right: max(12px, env(safe-area-inset-right, 0px))`, `width: auto`, `maxWidth: 640px`, and `margin-inline: auto`. Completely removed `left-1/2 -translate-x-1/2`, making it immune to any keyframe transform conflicts. Measured live on 375px: `rect.left = 12px`, `rect.right = 363px`, `overflow = 0px`.
+  2. **Dynamic Footer Clearance:** Integrated `useAudio()` into `Footer.tsx`. When `isPlayerActive` is true, the footer automatically expands its bottom clearance to `pb-44 sm:pb-44 md:pb-28` (176px on mobile, clearing the 148px player with 28px of breathing room). When dismissed, it smoothly reclaims the space with `pb-20 sm:pb-20 md:pb-7`. Creator credits now sit completely above the player with 0px overlap.
+  3. **Sticky Header Buffer:** Added `scroll-mt-24` to each track card, preventing any card from becoming trapped under the sticky header.
+  4. **PWA Service Worker Cache Purge:** Bumped cache version in `public/sw.js` to `pujopath-v3` and added `reg.update()` in `PwaRegister.tsx`, ensuring client browsers immediately invalidate stale bundles and activate the updated responsive layout.
+
+---
+
 ## 3. Regression & Build Validation Summary
 
 | Step | Command | Result | Notes |
@@ -125,5 +145,5 @@ This log records every modification applied to `PujoPath (Web)` during the compl
 | **Automated Test Suites** | `node scripts/test-runner.js` | **PASS (33/33)** | All 33 suites passed with zero errors |
 | **Type Check & Lint** | `npm run build` | **PASS** | Strict TypeScript and Next.js lint validation passed |
 | **Static HTML Export** | `next build` | **PASS** | 1,558 static HTML pages exported to `out/` |
-| **Asset Resolution** | Subpath `./` checks | **PASS** | Service Worker, manifest, and icons portable |
+| **Asset Resolution** | Subpath `./` checks | **PASS** | Service Worker v3, manifest, and icons portable |
 | **Git Working Tree** | `git status` | **CLEAN** | Tracked and verified |
