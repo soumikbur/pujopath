@@ -76,8 +76,18 @@ export function BottomMusicPlayer() {
       {/* ── Compact Floating Frosted Glass Audio Player ── */}
       <aside
         aria-label="Media Player"
-        className="fixed z-[1150] left-1/2 -translate-x-1/2 bottom-[calc(76px+env(safe-area-inset-bottom,0px))] md:bottom-5 pointer-events-auto
-                   w-[calc(100%-24px)] max-w-lg md:max-w-2xl lg:w-[840px] transition-all duration-300 animate-in slide-in-from-bottom-3"
+        className="fixed z-[1150] pointer-events-auto
+                   bottom-[calc(76px+env(safe-area-inset-bottom,0px))] md:bottom-6
+                   transition-all duration-300 animate-in fade-in"
+        style={{
+          boxSizing: 'border-box',
+          left: 'max(12px, env(safe-area-inset-left, 0px))',
+          right: 'max(12px, env(safe-area-inset-right, 0px))',
+          width: 'auto',
+          maxWidth: '640px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+        }}
       >
         {/* Playback Error Alert Banner */}
         {playbackError && (

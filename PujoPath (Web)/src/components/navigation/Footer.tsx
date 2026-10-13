@@ -4,16 +4,26 @@ import React from 'react';
 import Link from 'next/link';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useBackground } from '@/lib/context/BackgroundContext';
+import { useAudio } from '@/lib/context/AudioContext';
+import { cn } from '@/lib/utils/cn';
 import { Pause, Play } from 'lucide-react';
 
 export function Footer() {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
   const { currentBackground, isPaused, togglePause, prefersReducedMotion, isHomepage } = useBackground();
+  const { isPlayerActive } = useAudio();
 
   return (
     <footer className="mt-auto shrink-0 w-full border-t border-[#eee8e1] dark:border-[#2a221b] bg-white/60 dark:bg-[#181411]/60 backdrop-blur-md">
-      <div className="mx-auto max-w-6xl px-4 pt-6 pb-20 sm:px-6 sm:pt-7 sm:pb-20 md:pb-7">
+      <div
+        className={cn(
+          'mx-auto max-w-6xl px-4 pt-6 sm:px-6 sm:pt-7 transition-all duration-300',
+          isPlayerActive
+            ? 'pb-44 sm:pb-44 md:pb-28'
+            : 'pb-20 sm:pb-20 md:pb-7'
+        )}
+      >
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row text-center sm:text-left">
           {/* Brand & Cultural Tagline */}
           <div className="space-y-1">

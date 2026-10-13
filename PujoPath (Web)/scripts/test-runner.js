@@ -1731,14 +1731,20 @@ console.log('\n--- Running Test Suite 32: Deployment Asset Routing, PWA Manifest
   assert.ok(bottomPlayerFile.includes('closePlayer'), 'Bottom player must support clean close & dismissal');
   assert.ok(bottomPlayerFile.includes('z-[1150]'), 'Bottom player must float at z-[1150] above navigation');
   assert.ok(bottomPlayerFile.includes('bottom-[calc(76px+env(safe-area-inset-bottom,0px))]'), 'Bottom player must maintain 76px clearance above mobile nav');
-  console.log('✓ Compact audio control bar height (72px), thumbnail (44px), and 76px nav clearance verified');
+  assert.ok(bottomPlayerFile.includes("left: 'max(12px, env(safe-area-inset-left, 0px))'"), 'Bottom player must use safe-area left constraint');
+  assert.ok(bottomPlayerFile.includes("right: 'max(12px, env(safe-area-inset-right, 0px))'"), 'Bottom player must use safe-area right constraint');
+  assert.ok(!bottomPlayerFile.includes('-translate-x-1/2'), 'Bottom player must not rely on translate transforms that can be overridden by CSS keyframes');
+  console.log('✓ Compact audio control bar height (72px), thumbnail (44px), 76px nav clearance, and safe-area horizontal boundaries verified');
 
   // 2. Clean Compact Track Cards & Single Player Architecture (Phase 2 & 3)
   assert.ok(!musicPageFile.includes('<iframe'), 'Track cards must not contain video or media iframe embed');
   assert.ok(!musicPageFile.includes('Featured Now Playing Showcase'), 'Music library must not render duplicate showcase player');
   assert.ok(musicPageFile.includes('w-12 h-12 rounded-xl'), 'Track thumbnail must be strictly constrained to 48x48px (w-12 h-12)');
   assert.ok(musicPageFile.includes('isPlayerActive'), 'Music page must coordinate dynamic bottom scroll clearance with isPlayerActive');
-  console.log('✓ Zero video iframes in track cards, 48px constrained thumbnails, and single player architecture verified');
+  assert.ok(musicPageFile.includes('scroll-mt-24'), 'Track cards must define scroll-mt-24 buffer for sticky header protection');
+  const footerFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'navigation', 'Footer.tsx'), 'utf8');
+  assert.ok(footerFile.includes('isPlayerActive'), 'Footer must coordinate dynamic bottom clearance with isPlayerActive');
+  console.log('✓ Zero video iframes in track cards, 48px constrained thumbnails, sticky-header scroll buffers, and footer clearance verified');
 
   // 3. Strict Background Separation & Alpana Motion (Phase 4)
   assert.ok(bgConfigFile.includes('isHomepageRoute'), 'backgroundConfig must provide isHomepageRoute normalizer');

@@ -110,7 +110,7 @@ export default function MusicPage() {
   };
 
   return (
-    <div className={cn('space-y-6 max-w-6xl mx-auto transition-all duration-200', isPlayerActive ? 'pb-48 md:pb-32' : 'pb-32 md:pb-20')}>
+    <div className={cn('space-y-6 max-w-6xl mx-auto transition-all duration-200', isPlayerActive ? 'pb-16 md:pb-12' : 'pb-10 md:pb-8')}>
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
@@ -338,7 +338,7 @@ export default function MusicPage() {
                   key={track.id}
                   onClick={() => (isSelected ? togglePlay() : playTrack(track))}
                   className={cn(
-                    'p-4 sm:p-5 rounded-2xl border flex flex-col justify-between gap-3.5 cursor-pointer transition-all duration-150 shadow-2xs relative group',
+                    'scroll-mt-24 p-4 sm:p-5 rounded-2xl border flex flex-col justify-between gap-3.5 cursor-pointer transition-all duration-150 shadow-2xs relative group',
                     isSelected && isPlaying
                       ? 'bg-[#fdeeee]/60 dark:bg-[#341b18]/60 border-[#f6ceca] dark:border-[#4a2420]'
                       : isSelected
