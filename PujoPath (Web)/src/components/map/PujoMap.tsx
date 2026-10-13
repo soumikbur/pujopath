@@ -19,6 +19,7 @@ import { useI18n } from '@/lib/i18n/I18nContext';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { config } from '@/lib/config';
 import { cn } from '@/lib/utils/cn';
+import { getAssetPath } from '@/lib/utils/asset';
 import { Sun, Moon, Train, Plus, Check } from 'lucide-react';
 
 interface PujoMapProps {
@@ -237,7 +238,7 @@ function LeafletMapEngine({
             <span style="font-size: 10px; color: #78716c;">${pandal.category}</span>
           </div>
           <div style="display: flex; gap: 4px; padding-top: 4px; border-top: 1px solid #e7e5e4;">
-            <a href="pandals/${pandal.slug}" style="flex: 1; text-align: center; font-size: 11px; font-weight: 700; background: #b42323; color: white; padding: 5px 8px; border-radius: 6px; text-decoration: none;">
+            <a href="${getAssetPath(`/pandals/${pandal.slug}/`)}" style="flex: 1; text-align: center; font-size: 11px; font-weight: 700; background: #b42323; color: white; padding: 5px 8px; border-radius: 6px; text-decoration: none;">
               ${isBn ? 'বিস্তারিত' : 'View Pandal'}
             </a>
           </div>

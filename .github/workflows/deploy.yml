@@ -45,7 +45,7 @@ jobs:
       - name: Setup client-side SPA routing fallback
         working-directory: PujoPath (Web)
         run: |
-          cp out/index.html out/404.html || true
+          test -f out/404.html || cp out/index.html out/404.html
           cp out/index.html out/200.html || true
 
       - name: Upload Pages artifact

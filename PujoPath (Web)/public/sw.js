@@ -1,11 +1,23 @@
 const CACHE_NAME = 'pujopath-v2';
 
+// Dynamically resolve base path from registration scope (e.g. '/pujopath/' on GitHub Pages or '/' locally)
+const getScopePath = () => {
+  try {
+    const scopeUrl = new URL(self.registration.scope);
+    return scopeUrl.pathname.endsWith('/') ? scopeUrl.pathname : `${scopeUrl.pathname}/`;
+  } catch {
+    return '/';
+  }
+};
+
+const basePath = getScopePath();
+
 const STATIC_ASSETS = [
-  '/',
-  '/manifest.json',
-  '/favicon.ico',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
+  basePath,
+  `${basePath}manifest.json`,
+  `${basePath}favicon.ico`,
+  `${basePath}icons/icon-192.png`,
+  `${basePath}icons/icon-512.png`,
 ];
 
 self.addEventListener('install', (event) => {
@@ -39,7 +51,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   // For Next.js dynamic chunks or API routes, always use Network Only / Network First
-  if (url.pathname.startsWith('/_next/') || url.pathname.startsWith('/api/')) {
+  if (url.pathname.includes('/_next/') || url.pathname.includes('/api/')) {
     event.respondWith(
       fetch(event.request).catch(() => caches.match(event.request))
     );
@@ -59,7 +71,7 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         })
-        .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/')))
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match(basePath)))
     );
     return;
   }

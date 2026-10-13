@@ -1413,9 +1413,9 @@ console.log('================================================================');
   console.log('✓ Cryptographic Uniqueness: SHA-256 duplicate collision rejected before dataset mutation');
 
   // 5. Automated Review Workflow & Reversibility
-  const reviewWorkflowPath = fs.existsSync(path.join(__dirname, '..', '.github', 'workflows', 'photo-refresh.yml'))
-    ? path.join(__dirname, '..', '.github', 'workflows', 'photo-refresh.yml')
-    : path.join(__dirname, '..', '..', '.github', 'workflows', 'photo-refresh.yml');
+  const reviewWorkflowPath1 = path.join(__dirname, '..', '.github', 'workflows', 'photo-refresh.yml');
+  const reviewWorkflowPath2 = path.join(__dirname, '..', '..', '.github', 'workflows', 'photo-refresh.yml');
+  const reviewWorkflowPath = fs.existsSync(reviewWorkflowPath1) ? reviewWorkflowPath1 : reviewWorkflowPath2;
   assert.strictEqual(fs.existsSync(reviewWorkflowPath), true, 'photo-refresh.yml workflow must exist');
   const reviewWorkflowContent = fs.readFileSync(reviewWorkflowPath, 'utf8');
   assert.ok(reviewWorkflowContent.includes('cron:'), 'photo-refresh.yml must define periodic cron schedule');
@@ -1666,8 +1666,42 @@ console.log('================================================================');
   console.log('✓ Background scrolling GPU acceleration and mobile compositing stability verified');
 })();
 
+// ============================================================================
+console.log('\n--- Running Test Suite 32: Deployment Asset Routing, PWA Manifest & Service Worker Isolation ---');
+(() => {
+  // 1. PujoMap Popup Link Validation
+  const pujoMapContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'map', 'PujoMap.tsx'), 'utf8');
+  assert.strictEqual(pujoMapContent.includes('href="pandals/'), false, 'PujoMap must not use relative pandals/ links that 404 under /map/');
+  assert.ok(pujoMapContent.includes('getAssetPath(`/pandals/${pandal.slug}/`)') || pujoMapContent.includes('getAssetPath(`/pandals/${pandal.slug}`)'), 'PujoMap must resolve pandal detail URLs via getAssetPath with leading slash');
+  console.log('✓ PujoMap Leaflet popup detail URL resolution and 404 prevention verified');
+
+  // 2. Service Worker Scope and Registration
+  const pwaRegisterContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'pwa', 'PwaRegister.tsx'), 'utf8');
+  assert.ok(pwaRegisterContent.includes("getAssetPath('/sw.js')"), 'PwaRegister must register sw.js using getAssetPath');
+  assert.ok(pwaRegisterContent.includes("getAssetPath('/')"), 'PwaRegister must set registration scope using getAssetPath');
+  console.log('✓ Service Worker registration URL and subpath scope resolution verified');
+
+  // 3. Service Worker Script Integrity
+  const swContent = fs.readFileSync(path.join(__dirname, '..', 'public', 'sw.js'), 'utf8');
+  assert.ok(swContent.includes('self.registration.scope'), 'sw.js must dynamically resolve base path from registration scope');
+  assert.ok(swContent.includes('STATIC_ASSETS'), 'sw.js must define cache assets');
+  console.log('✓ Service Worker scope-aware pre-caching and network fallbacks verified');
+
+  // 4. Manifest Configuration & Relative Scope
+  const manifestContent = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'public', 'manifest.json'), 'utf8'));
+  assert.strictEqual(manifestContent.start_url, './', 'manifest.json start_url must be relative ./ for subpath portability');
+  assert.strictEqual(manifestContent.scope, './', 'manifest.json scope must be relative ./ for subpath portability');
+  assert.ok(!manifestContent.icons[0].src.startsWith('/'), 'manifest.json icon paths must not be root-relative');
+  console.log('✓ Manifest relative scoping and portable icon resolution verified');
+
+  // 5. Layout Metadata Manifest and Icon BasePath
+  const layoutContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'layout.tsx'), 'utf8');
+  assert.ok(layoutContent.includes('manifest: `${basePath}/manifest.json`') || layoutContent.includes("manifest: `${basePath || ''}/manifest.json`"), 'layout.tsx must prefix manifest with basePath');
+  console.log('✓ Root layout metadata manifest and icon basePath integration verified');
+})();
+
 console.log('\n================================================================');
-console.log('ALL 31 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
+console.log('ALL 32 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
 console.log('================================================================\n');
 
 
