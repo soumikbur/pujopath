@@ -85,24 +85,24 @@ export default function AboutPage() {
           </h2>
           <p className="text-sm sm:text-base text-[#665a54] dark:text-[#a89e95] mt-1.5 leading-relaxed">
             {isBn
-              ? 'পুজোপথ হলো সৌমিক ঘোষ এবং মৌমিতা শী-র একটি যৌথ সৃষ্টি, যা মানুষকে কলকাতার দুর্গোৎসবের মণ্ডপ আবিষ্কার ও সুষ্ঠু পরিকল্পনা করতে সাহায্য করে।'
-              : 'PujoPath is a collaborative project co-created by Soumik Ghosh and Moumita Shee to help people discover Kolkata\'s Durga Puja pandals and plan their festive experiences.'}
+              ? 'পুজোপথ হলো সৌমিক ও মৌমিতার একটি যৌথ সৃষ্টি, যা মানুষকে কলকাতার দুর্গোৎসবের মণ্ডপ আবিষ্কার ও সুষ্ঠু পরিকল্পনা করতে সাহায্য করে।'
+              : 'PujoPath is a collaborative project co-created by Soumik and Moumita to help people discover Kolkata\'s Durga Puja pandals and plan their festive experiences.'}
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-          {/* Soumik Ghosh */}
+          {/* Soumik */}
           <a
             href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
             target="_blank"
             rel="noopener noreferrer"
             className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3 hover:border-[#0a66c2]/40 dark:hover:border-[#0a66c2]/50 hover:shadow-sm transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42323]"
-            title={isBn ? 'সৌমিক ঘোষ — লিঙ্কডইন প্রোফাইল' : 'Soumik Ghosh — LinkedIn Profile'}
-            aria-label={isBn ? 'সৌমিক ঘোষ — লিঙ্কডইন প্রোফাইল' : 'Soumik Ghosh — LinkedIn Profile'}
+            title={isBn ? 'সৌমিক — লিঙ্কডইন প্রোফাইল' : 'Soumik — LinkedIn Profile'}
+            aria-label={isBn ? 'সৌমিক — লিঙ্কডইন প্রোফাইল' : 'Soumik — LinkedIn Profile'}
           >
             <div className="space-y-0.5">
               <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc] group-hover:text-[#0a66c2] dark:group-hover:text-[#70b5f9] transition-colors flex items-center gap-1.5">
-                <span>{isBn ? 'সৌমিক ঘোষ' : 'Soumik Ghosh'}</span>
+                <span>{isBn ? 'সৌমিক' : 'Soumik'}</span>
                 <Linkedin className="w-3.5 h-3.5 text-[#0a66c2] dark:text-[#70b5f9] shrink-0" aria-hidden="true" />
               </div>
               <div className="text-xs font-semibold text-[#b42323] dark:text-[#e05656]">
@@ -114,18 +114,18 @@ export default function AboutPage() {
             </span>
           </a>
 
-          {/* Moumita Shee */}
+          {/* Moumita */}
           <a
             href="https://www.linkedin.com/in/moumita-shee-798505226/"
             target="_blank"
             rel="noopener noreferrer"
             className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3 hover:border-[#0a66c2]/40 dark:hover:border-[#0a66c2]/50 hover:shadow-sm transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42323]"
-            title={isBn ? 'মৌমিতা শী — লিঙ্কডইন প্রোফাইল' : 'Moumita Shee — LinkedIn Profile'}
-            aria-label={isBn ? 'মৌমিতা শী — লিঙ্কডইন প্রোফাইল' : 'Moumita Shee — LinkedIn Profile'}
+            title={isBn ? 'মৌমিতা — লিঙ্কডইন প্রোফাইল' : 'Moumita — LinkedIn Profile'}
+            aria-label={isBn ? 'মৌমিতা — লিঙ্কডইন প্রোফাইল' : 'Moumita — LinkedIn Profile'}
           >
             <div className="space-y-0.5">
               <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc] group-hover:text-[#0a66c2] dark:group-hover:text-[#70b5f9] transition-colors flex items-center gap-1.5">
-                <span>{isBn ? 'মৌমিতা শী' : 'Moumita Shee'}</span>
+                <span>{isBn ? 'মৌমিতা' : 'Moumita'}</span>
                 <Linkedin className="w-3.5 h-3.5 text-[#0a66c2] dark:text-[#70b5f9] shrink-0" aria-hidden="true" />
               </div>
               <div className="text-xs font-semibold text-[#b42323] dark:text-[#e05656]">

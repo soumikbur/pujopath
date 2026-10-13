@@ -90,18 +90,18 @@ export function Footer() {
 
           <div
             className="order-1 sm:order-2 font-medium tracking-wide text-xs sm:text-[13px] select-text text-[#776d65] dark:text-[#a89e95]"
-            aria-label="Made with care by Co-Creators Soumik Ghosh and Moumita Shee"
+            aria-label={isBn ? 'নির্মাণে সৌমিক ও মৌমিতা' : 'Made by Soumik & Moumita'}
           >
-            <span>{isBn ? 'সহ-নির্মাতা: ' : 'Co-Creators: '}</span>
+            <span>{isBn ? 'নির্মাণে ' : 'Made by '}</span>
             <a
               href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 font-semibold text-[#b42323] dark:text-[#e05656] hover:underline hover:text-[#961b1b] dark:hover:text-[#ff8080] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#b42323] rounded"
-              title={isBn ? 'সৌমিক ঘোষ — লিঙ্কডইন প্রোফাইল' : 'Soumik Ghosh — LinkedIn Profile'}
-              aria-label={isBn ? 'সৌমিক ঘোষ — লিঙ্কডইন প্রোফাইল' : 'Soumik Ghosh — LinkedIn Profile'}
+              title={isBn ? 'সৌমিক — লিঙ্কডইন প্রোফাইল' : 'Soumik — LinkedIn Profile'}
+              aria-label={isBn ? 'সৌমিক — লিঙ্কডইন প্রোফাইল' : 'Soumik — LinkedIn Profile'}
             >
-              <span>{isBn ? 'সৌমিক ঘোষ' : 'Soumik Ghosh'}</span>
+              <span>{isBn ? 'সৌমিক' : 'Soumik'}</span>
               <Linkedin className="w-3 h-3 text-[#0a66c2] dark:text-[#70b5f9] inline-block shrink-0" aria-hidden="true" />
             </a>
             <span>{isBn ? ' ও ' : ' & '}</span>
@@ -110,10 +110,10 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 font-semibold text-[#b42323] dark:text-[#e05656] hover:underline hover:text-[#961b1b] dark:hover:text-[#ff8080] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#b42323] rounded"
-              title={isBn ? 'মৌমিতা শী — লিঙ্কডইন প্রোফাইল' : 'Moumita Shee — LinkedIn Profile'}
-              aria-label={isBn ? 'মৌমিতা শী — লিঙ্কডইন প্রোফাইল' : 'Moumita Shee — LinkedIn Profile'}
+              title={isBn ? 'মৌমিতা — লিঙ্কডইন প্রোফাইল' : 'Moumita — LinkedIn Profile'}
+              aria-label={isBn ? 'মৌমিতা — লিঙ্কডইন প্রোফাইল' : 'Moumita — LinkedIn Profile'}
             >
-              <span>{isBn ? 'মৌমিতা শী' : 'Moumita Shee'}</span>
+              <span>{isBn ? 'মৌমিতা' : 'Moumita'}</span>
               <Linkedin className="w-3 h-3 text-[#0a66c2] dark:text-[#70b5f9] inline-block shrink-0" aria-hidden="true" />
             </a>
             <span className="ml-1 text-[#e02424] inline-block text-sm" role="img" aria-label="heart">❤️</span>
