@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pujopath-v2';
+const CACHE_NAME = 'pujopath-v3';
 
 // Dynamically resolve base path from registration scope (e.g. '/pujopath/' on GitHub Pages or '/' locally)
 const getScopePath = () => {

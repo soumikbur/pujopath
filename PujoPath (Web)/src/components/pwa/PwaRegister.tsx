@@ -13,6 +13,7 @@ export function PwaRegister() {
           .register(swUrl, { scope: scopeUrl })
           .then((reg) => {
             console.log('PujoPath ServiceWorker registration successful:', reg.scope);
+            reg.update().catch(() => {});
           })
           .catch((err) => {
             console.warn('PujoPath ServiceWorker registration failed:', err);
