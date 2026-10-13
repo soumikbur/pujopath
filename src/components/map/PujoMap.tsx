@@ -140,10 +140,11 @@ function LeafletMapEngine({
 
   // Initialize Map
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    const container = mapContainerRef.current;
+    if (!container) return;
 
     if (!mapInstanceRef.current) {
-      const map = L.map(mapContainerRef.current, {
+      const map = L.map(container, {
         center,
         zoom,
         zoomControl: interactive,
@@ -163,7 +164,35 @@ function LeafletMapEngine({
       mapInstanceRef.current = map;
     }
 
+    // Ensure map tiles recalculate when container is sized or after transition
+    const timer1 = setTimeout(() => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    }, 150);
+
+    const timer2 = setTimeout(() => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    }, 450);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      });
+      resizeObserver.observe(container);
+    }
+
     return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
@@ -284,7 +313,7 @@ function LeafletMapEngine({
 
   return (
     <div className={cn('relative w-full h-full rounded-2xl overflow-hidden border border-[#eee8e1] dark:border-[#2f2720] shadow-inner', className)}>
-      <div ref={mapContainerRef} className="w-full h-full min-h-[450px]" />
+      <div ref={mapContainerRef} className="w-full h-full min-h-[280px] sm:min-h-[450px]" />
     </div>
   );
 }

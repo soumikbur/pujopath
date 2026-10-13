@@ -16,6 +16,7 @@ import {
   Landmark,
   Info,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Pandal } from '@/types';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useFavorites } from '@/lib/context/FavoritesContext';
@@ -28,6 +29,7 @@ interface PandalDetailClientProps {
 }
 
 export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
+  const router = useRouter();
   const { locale } = useI18n();
   const isBn = locale === 'bn';
   const { isPandalInRoute, addPandalToRoute, removePandalFromRoute, isPandalSaved, toggleSavePandal } = useFavorites();
@@ -56,13 +58,20 @@ export function PandalDetailClient({ pandal }: PandalDetailClientProps) {
     <div className="space-y-6 max-w-5xl mx-auto pb-12">
       {/* Back Link & Save */}
       <div className="flex items-center justify-between">
-        <Link
-          href="/explore"
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== 'undefined' && window.history.length > 1) {
+              window.history.back();
+            } else {
+              router.push('/explore');
+            }
+          }}
           className="inline-flex items-center gap-1.5 text-sm font-bold text-[#625b55] dark:text-[#a89e95] hover:text-[#b42323] transition-colors active:scale-95"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>{isBn ? 'প্যান্ডেল তালিকায় ফিরুন' : 'Back to Explore'}</span>
-        </Link>
+        </button>
 
         <button
           onClick={() => toggleSavePandal(pandal.id)}

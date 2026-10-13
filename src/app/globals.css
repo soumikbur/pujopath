@@ -37,28 +37,56 @@
   .dark {
     color-scheme: dark;
 
-    /* Theme Design Tokens - Consistent Charcoal Dark Mode */
+    /* Theme Design Tokens - Calibrated High-Contrast Warm Charcoal Dark Mode */
     --bg-main: #14110E;
-    --surface: #1A1613;
-    --surface-secondary: #241F1A;
-    --surface-hover: #29231D;
-    --surface-hero: rgba(26, 22, 19, 0.85);
-    --surface-card: #1A1613;
+    --surface: #1E1915;
+    --surface-secondary: #27201A;
+    --surface-hover: #332B23;
+    --surface-hero: rgba(30, 25, 21, 0.92);
+    --surface-card: #1E1915;
 
-    --text-primary: #EDE5DC;
-    --text-secondary: #C7BCB1;
-    --text-muted: #9C9186;
+    --text-primary: #F8F3EC;
+    --text-secondary: #D4C7BA;
+    --text-muted: #A39486;
 
-    --border: #2F2720;
-    --border-subtle: #241E18;
-    --border-strong: #3D332A;
+    --border: #3D3227;
+    --border-subtle: #2C231B;
+    --border-strong: #544536;
 
-    --accent-red: #E05656;
-    --accent-red-hover: #F06A6A;
-    --accent-red-soft: #341B18;
-    --accent-red-border: #4A2420;
-    --accent-gold: #E5B45E;
-    --focus-ring: #FF7777;
+    --accent-red: #E23C3C;
+    --accent-red-hover: #F24E4E;
+    --accent-red-soft: #381916;
+    --accent-red-border: #5A2722;
+    --accent-gold: #E8B860;
+    --focus-ring: #FF6666;
+  }
+
+  /* Universal Dark Theme Contrast & Surface Mappings */
+  .dark .dark\:bg-\[\#1a1613\] {
+    background-color: var(--surface-card) !important;
+  }
+  .dark .dark\:bg-\[\#14110e\] {
+    background-color: var(--bg-main) !important;
+  }
+  .dark .dark\:bg-\[\#251e18\],
+  .dark .dark\:bg-\[\#201b17\],
+  .dark .dark\:bg-\[\#241f1a\] {
+    background-color: var(--surface-secondary) !important;
+  }
+  .dark .dark\:border-\[\#2f2720\],
+  .dark .dark\:border-\[\#2a241f\],
+  .dark .dark\:border-\[\#3c342c\] {
+    border-color: var(--border) !important;
+  }
+  .dark .dark\:text-\[\#ede5dc\],
+  .dark .dark\:text-\[\#faf6f0\] {
+    color: var(--text-primary) !important;
+  }
+  .dark .dark\:text-\[\#a89e95\],
+  .dark .dark\:text-\[\#cdc1b5\],
+  .dark .dark\:text-\[\#c4b9ae\],
+  .dark .dark\:text-\[\#9c9186\] {
+    color: var(--text-secondary) !important;
   }
 
   *,
@@ -242,6 +270,8 @@
 /* ==========================================================================
    Dedicated Viewport-Fixed Background Layer
    Stationary relative to mobile viewport; content scrolls freely over it.
+   Hardware accelerated with translate3d & backface-visibility to eliminate
+   mobile browser compositing glitches, flicker, and stutter.
    ========================================================================== */
 .home-background,
 .pujopath-fixed-background {
@@ -254,6 +284,12 @@
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+  contain: strict;
 }
 
 .home-background img,
@@ -262,11 +298,91 @@
   height: 100%;
   object-fit: cover;
   pointer-events: none;
+  transform: translateZ(0);
+}
+
+/* On mobile viewports, keep decorative background SVGs static so the compositor
+   does not invalidate backing textures during vertical touch scrolling */
+@media (max-width: 768px) {
+  .animate-alpana-spin,
+  .animate-alpana-spin-reverse,
+  .animate-alpana-drift,
+  .animate-alpana-pulse {
+    animation: none !important;
+  }
 }
 
 .home-page-content {
   position: relative;
   z-index: 1;
+}
+
+/* ==========================================================================
+   Smooth Entry & Slide Animations (Restores animate-in across all components)
+   ========================================================================== */
+@keyframes pujoFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pujoSlideFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pujoSlideFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pujoSpinIn180 {
+  from {
+    transform: rotate(-180deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-in {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+}
+
+.animate-in.fade-in {
+  animation-name: pujoFadeIn;
+}
+
+.animate-in.slide-in-from-bottom,
+.animate-in.slide-in-from-bottom-2,
+.animate-in.slide-in-from-bottom-3,
+.animate-in.slide-in-from-bottom-4 {
+  animation-name: pujoSlideFromBottom;
+}
+
+.animate-in.slide-in-from-right-4 {
+  animation-name: pujoSlideFromRight;
+}
+
+.animate-in.spin-in-180 {
+  animation-name: pujoSpinIn180;
 }
 
 /* ==========================================================================
@@ -301,6 +417,11 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  .animate-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
   .animate-alpana-spin,
   .animate-alpana-spin-reverse,

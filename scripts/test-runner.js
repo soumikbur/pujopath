@@ -1580,8 +1580,92 @@ console.log('================================================================');
   console.log('✓ Shell & Footer Integration: Centralized layout and homepage-only footer controls verified');
 })();
 
+// ============================================================================
+// TEST SUITE 31: End-to-End User Regression & Mobile UX Quality Verification
+// ============================================================================
+(() => {
+  console.log('\n--- Running Test Suite 31: End-to-End Regression & Mobile UX Verification ---');
+
+  // 1. Toggle Switch Component & State Synchronization
+  const filterComponentContent = fs.readFileSync(
+    path.join(__dirname, '..', 'src', 'components', 'pandals', 'PandalFilters.tsx'),
+    'utf8'
+  );
+  assert.ok(filterComponentContent.includes('role="switch"'), 'ToggleSwitch must declare accessible role="switch"');
+  assert.ok(filterComponentContent.includes('aria-checked={checked}'), 'ToggleSwitch must bind aria-checked to checked state');
+  assert.ok(filterComponentContent.includes("checked ? 'translate-x-[22px]' : 'translate-x-[2px]'"), 'Knob must slide exactly 22px when active');
+  assert.ok(filterComponentContent.includes('bonediBariOnly: val'), 'Must update bonediBariOnly filter');
+  assert.ok(
+    filterComponentContent.includes("category: val ? 'Bonedi Bari' : (filters.category === 'Bonedi Bari' ? 'All' : filters.category)"),
+    'Must reset category to All when bonediBariOnly is toggled off'
+  );
+  console.log('✓ Toggle Switch component mechanics, accessible role, and bidirectional Bonedi Bari reset verified');
+
+  // 2. Navigation State Persistence & Hydration
+  const explorePageContent = fs.readFileSync(
+    path.join(__dirname, '..', 'src', 'app', 'explore', 'page.tsx'),
+    'utf8'
+  );
+  assert.ok(explorePageContent.includes('EXPLORE_STORAGE_KEY'), 'Explore page must define persistence storage key');
+  assert.ok(explorePageContent.includes('parseFiltersFromSearchParams'), 'Explore page must parse URL search parameters');
+  assert.ok(explorePageContent.includes('sessionStorage.getItem(EXPLORE_STORAGE_KEY)'), 'Explore page must restore state from sessionStorage');
+  assert.ok(explorePageContent.includes('window.history.replaceState'), 'Explore page must synchronize filter state with URL');
+  assert.ok(explorePageContent.includes('wheelchairAccessibleOnly'), 'Explore page must support wheelchairAccessibleOnly parameter');
+
+  const detailPageContent = fs.readFileSync(
+    path.join(__dirname, '..', 'src', 'components', 'pandals', 'PandalDetailClient.tsx'),
+    'utf8'
+  );
+  assert.ok(detailPageContent.includes('window.history.back()'), 'Pandal detail page must use window.history.back() to preserve explore state');
+  console.log('✓ Navigation state hydration, URL query synchronization, and detail back navigation verified');
+
+  // 3. Audio Lifecycle & Playback Error Resilience
+  const audioContextContent = fs.readFileSync(
+    path.join(__dirname, '..', 'src', 'lib', 'context', 'AudioContext.tsx'),
+    'utf8'
+  );
+  assert.ok(!audioContextContent.includes('}, [currentTrack?.id,'), 'AudioProvider must NOT destroy HTMLAudioElement on currentTrack change');
+  assert.ok(audioContextContent.includes("err.name === 'AbortError'"), 'AudioContext must ignore harmless AbortError from interrupted play()');
+  assert.ok(audioContextContent.includes('audio.load()'), 'AudioContext must invoke audio.load() on track load and retry');
+  console.log('✓ Audio playback singleton lifecycle, AbortError silencing, and retry mechanism verified');
+
+  // 4. Dark Theme Elevated Contrast Tokens
+  const globalsCss = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'globals.css'), 'utf8');
+  assert.ok(globalsCss.includes('--bg-main: #14110E;'), 'Dark theme must define base canvas --bg-main: #14110E');
+  assert.ok(globalsCss.includes('--surface: #1E1915;'), 'Dark theme must define elevated --surface: #1E1915');
+  assert.ok(globalsCss.includes('--border: #3D3227;'), 'Dark theme must define readable --border: #3D3227');
+  assert.ok(globalsCss.includes('--text-primary: #F8F3EC;'), 'Dark theme must define high-contrast text --text-primary: #F8F3EC');
+  console.log('✓ Calibrated warm charcoal dark theme contrast tokens verified');
+
+  // 5. Hardware-Accelerated CSS Keyframes & Accessibility
+  assert.ok(globalsCss.includes('@keyframes pujoFadeIn'), 'globals.css must define pujoFadeIn keyframe');
+  assert.ok(globalsCss.includes('@keyframes pujoSlideFromBottom'), 'globals.css must define pujoSlideFromBottom keyframe');
+  assert.ok(globalsCss.includes('@keyframes pujoSlideFromRight'), 'globals.css must define pujoSlideFromRight keyframe');
+  assert.ok(globalsCss.includes('.animate-in {'), 'globals.css must define .animate-in utility');
+  assert.ok(globalsCss.includes('@media (prefers-reduced-motion: reduce)'), 'globals.css must define prefers-reduced-motion reset');
+  console.log('✓ Hardware-accelerated CSS animations and reduced-motion compliance verified');
+
+  // 6. Mobile Map Responsive Sizing & Stacking Hierarchy
+  const mapPageContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'map', 'page.tsx'), 'utf8');
+  assert.ok(mapPageContent.includes('h-[calc(100dvh-13.5rem)]'), 'Map page must use dynamic viewport units for mobile height');
+  assert.ok(mapPageContent.includes('z-[1050]'), 'Mobile floating pandal card must have z-[1050] elevation above bottom nav');
+  assert.ok(mapPageContent.includes('{!selectedPandal && <SelectedPandalsBar />}'), 'SelectedPandalsBar must yield when single pandal preview is active');
+
+  const pujoMapContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'map', 'PujoMap.tsx'), 'utf8');
+  assert.ok(pujoMapContent.includes('ResizeObserver'), 'PujoMap must use ResizeObserver to trigger map.invalidateSize() on viewport changes');
+  console.log('✓ Mobile map responsive sizing, ResizeObserver invalidation, and stacking hierarchy verified');
+
+  // 7. Background Scrolling Composite Stability
+  assert.ok(globalsCss.includes('transform: translate3d(0, 0, 0);'), 'Background layer must use translate3d(0,0,0) GPU compositing');
+  assert.ok(globalsCss.includes('backface-visibility: hidden;'), 'Background layer must use backface-visibility: hidden');
+  assert.ok(globalsCss.includes('will-change: transform;'), 'Background layer must declare will-change: transform');
+  assert.ok(globalsCss.includes('contain: strict;'), 'Background layer must declare contain: strict to isolate layout');
+  assert.ok(globalsCss.includes('@media (max-width: 768px)'), 'globals.css must contain mobile media query');
+  console.log('✓ Background scrolling GPU acceleration and mobile compositing stability verified');
+})();
+
 console.log('\n================================================================');
-console.log('ALL 30 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
+console.log('ALL 31 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
 console.log('================================================================\n');
 
 

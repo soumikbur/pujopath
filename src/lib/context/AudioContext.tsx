@@ -82,7 +82,29 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Initialize single HTML5 Audio element on client mount
+  const currentTrackRef = useRef<MusicTrack | null>(PUJA_MUSIC_DATA[0]);
+  const queueRef = useRef<MusicTrack[]>(PUJA_MUSIC_DATA);
+
+  useEffect(() => {
+    currentTrackRef.current = currentTrack;
+  }, [currentTrack]);
+
+  useEffect(() => {
+    queueRef.current = queue;
+  }, [queue]);
+
+  // Forward declaration for ended listener
+  const playNextTrack = useCallback(() => {
+    const current = currentTrackRef.current;
+    const q = queueRef.current;
+    const currentIndex = q.findIndex((t) => t.id === current?.id);
+    if (currentIndex !== -1 && currentIndex < q.length - 1) {
+      const next = q[currentIndex + 1];
+      playTrackInternal(next);
+    }
+  }, []);
+
+  // Initialize single HTML5 Audio element on client mount ONCE. Never tear down on track change!
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -114,6 +136,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       setIsPlaying(true);
       setIsLoading(false);
       setPlaybackState('PLAYING');
+      setPlaybackError(null);
     };
 
     const handlePause = () => {
@@ -124,21 +147,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const handleEnded = () => {
       setIsPlaying(false);
       setPlaybackState('ENDED');
-      // Auto-advance to next track in queue
-      const currentIndex = queue.findIndex((t) => t.id === currentTrack?.id);
-      if (currentIndex !== -1 && currentIndex < queue.length - 1) {
-        const next = queue[currentIndex + 1];
-        playTrackInternal(next);
-      }
+      playNextTrack();
     };
 
     const handleError = () => {
       setIsLoading(false);
       setIsPlaying(false);
       setPlaybackState('ERROR');
-      if (audio.src && audio.src !== window.location.href) {
+      if (audio.src && audio.src !== window.location.href && audio.src !== '') {
         setPlaybackError(
-          'Audio stream could not be loaded directly. Please check your connection and retry.'
+          'Could not load audio. Check your connection and tap play to retry.'
         );
       }
     };
@@ -165,7 +183,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       audio.removeEventListener('error', handleError);
       audioRef.current = null;
     };
-  }, [currentTrack?.id, queue]);
+  }, [playNextTrack]);
 
   // Update MediaSession on supported devices
   useEffect(() => {
@@ -200,6 +218,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       setIsPlayerDismissed(false);
       setPlaybackError(null);
       setCurrentTrack(track);
+      currentTrackRef.current = track;
       setCurrentTime(0);
       setDuration(track.durationSeconds || 60);
 
@@ -211,12 +230,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         setIsStreamExpanded(false);
 
         if (audio) {
-          audio.pause();
+          try {
+            audio.pause();
+          } catch {}
+
           setIsLoading(true);
           setPlaybackState('LOADING');
           audio.src = track.audioUrl;
           audio.volume = isMuted ? 0 : volume;
           audio.currentTime = 0;
+          audio.load();
 
           const playPromise = audio.play();
           if (playPromise !== undefined) {
@@ -225,15 +248,19 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
                 setIsPlaying(true);
                 setIsLoading(false);
                 setPlaybackState('PLAYING');
+                setPlaybackError(null);
               })
-              .catch((err) => {
+              .catch((err: Error) => {
+                // If play() was aborted by user pausing or switching tracks, ignore silently
+                if (err.name === 'AbortError') return;
+
                 setIsLoading(false);
                 setIsPlaying(false);
                 setPlaybackState('ERROR');
                 if (err.name === 'NotAllowedError') {
-                  setPlaybackError('Browser autoplay blocked. Click play to listen.');
+                  setPlaybackError('Browser autoplay blocked. Tap play to listen.');
                 } else {
-                  setPlaybackError('Could not load audio. Click play to retry.');
+                  setPlaybackError('Could not load audio. Check your connection and tap play to retry.');
                 }
               });
           }
@@ -245,8 +272,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       if (track.playbackMethod === 'authorized_stream' || track.embedUrl) {
         // STRICT ENFORCEMENT: Stop any currently playing HTML5 direct audio immediately!
         if (audio) {
-          audio.pause();
-          audio.src = '';
+          try {
+            audio.pause();
+            audio.src = '';
+          } catch {}
         }
 
         setPlaybackType('embed');
@@ -312,9 +341,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         setPlaybackState('PAUSED');
       } else {
         setIsPlayerDismissed(false);
+        const hadError = Boolean(playbackError);
         setPlaybackError(null);
-        if (!audio.src || audio.src === window.location.href) {
+        if (!audio.src || audio.src === window.location.href || hadError) {
           audio.src = currentTrack.audioUrl || '';
+          audio.load();
         }
         audio.volume = isMuted ? 0 : volume;
         audio
@@ -322,10 +353,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
           .then(() => {
             setIsPlaying(true);
             setPlaybackState('PLAYING');
+            setPlaybackError(null);
           })
           .catch((err) => {
             if (err.name !== 'AbortError') {
-              setPlaybackError('Playback blocked by browser. Click play to start.');
+              setPlaybackError('Could not load audio. Check your connection and tap play to retry.');
             }
           });
       }

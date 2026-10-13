@@ -36,13 +36,14 @@ export function SelectedPandalsBar({
   } = useFavorites();
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
 
   // If already on the planner page, the full interactive planner is rendered on screen.
   const isPlannerPage = pathname === '/planner';
 
   const stopCount = currentRouteStops.length;
 
-  if (isPlannerPage) {
+  if (isPlannerPage || (stopCount === 0 && isDismissed)) {
     return null;
   }
 
@@ -188,13 +189,23 @@ export function SelectedPandalsBar({
                   <span>{isBn ? 'পুজো পরিক্রমা সাজান →' : 'Plan My Navigation →'}</span>
                 </Link>
               ) : (
-                <Link
-                  href="/planner"
-                  className="flex-1 sm:flex-none px-3.5 py-2 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] text-[#776d65] dark:text-[#a89e95] text-xs font-bold hover:text-[#242424] flex items-center justify-center gap-1.5"
-                >
-                  <Route className="w-3.5 h-3.5" />
-                  <span>{isBn ? 'প্ল্যানার খুলুন' : 'Open Planner'}</span>
-                </Link>
+                <div className="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+                  <Link
+                    href="/planner"
+                    className="flex-1 sm:flex-none px-3.5 py-2 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] text-[#776d65] dark:text-[#a89e95] text-xs font-bold hover:text-[#242424] flex items-center justify-center gap-1.5"
+                  >
+                    <Route className="w-3.5 h-3.5" />
+                    <span>{isBn ? 'প্ল্যানার খুলুন' : 'Open Planner'}</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setIsDismissed(true)}
+                    aria-label="Dismiss empty bar"
+                    className="p-2 rounded-xl border border-[#eee8e1] dark:border-[#2f2720] text-[#776d65] dark:text-[#a89e95] hover:text-[#b42323] hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               )}
             </div>
           </div>

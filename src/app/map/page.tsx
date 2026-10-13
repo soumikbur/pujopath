@@ -55,7 +55,7 @@ export default function MapPage() {
       : allAvailablePandals.filter((p) => p.zone === selectedFilter);
 
   return (
-    <div className="space-y-4 max-w-7xl mx-auto h-[calc(100vh-12rem)] flex flex-col pb-4">
+    <div className="space-y-3 sm:space-y-4 max-w-7xl mx-auto h-[calc(100dvh-13.5rem)] sm:h-[calc(100vh-12rem)] min-h-[380px] flex flex-col pb-2 sm:pb-4">
       {/* Zone Switcher & Metro Toggle Bar */}
       <div className="flex items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
@@ -125,14 +125,14 @@ export default function MapPage() {
           </div>
         )}
 
-        {/* Mobile / Tablet Floating Bottom Card */}
+        {/* Mobile / Tablet Floating Card (Positioned safely above bottom nav without overlapping) */}
         {selectedPandal && (
-          <div className="lg:hidden absolute bottom-3 inset-x-3 z-30 animate-in slide-in-from-bottom-4 duration-200">
-            <div className="relative rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] p-3 shadow-xl">
+          <div className="lg:hidden fixed bottom-20 md:bottom-24 inset-x-3 sm:inset-x-6 z-[1050] max-w-lg mx-auto animate-in slide-in-from-bottom-4 duration-200">
+            <div className="relative rounded-2xl border border-[#eee8e1] dark:border-[#3d3227] bg-white dark:bg-[#1e1915] p-3 shadow-2xl">
               <button
                 onClick={() => setSelectedPandal(null)}
                 aria-label="Close details"
-                className="absolute top-2 right-2 p-1.5 rounded-full bg-[#f5f1ec] dark:bg-[#251e18] text-[#776d65] hover:text-[#b42323] z-10"
+                className="absolute top-2 right-2 p-1.5 rounded-full bg-[#f5f1ec] dark:bg-[#27201a] text-[#776d65] dark:text-[#a39486] hover:text-[#b42323] z-10"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -142,8 +142,8 @@ export default function MapPage() {
         )}
       </div>
 
-      {/* Floating Selected-Pandal Summary & Plan My Navigation Bar */}
-      <SelectedPandalsBar />
+      {/* Floating Selected-Pandal Summary & Plan My Navigation Bar (hidden on mobile when a single pandal is open) */}
+      {!selectedPandal && <SelectedPandalsBar />}
     </div>
   );
 }

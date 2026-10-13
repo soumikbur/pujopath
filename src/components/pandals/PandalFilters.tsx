@@ -34,22 +34,32 @@ function ToggleSwitch({
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="inline-flex items-center gap-2 cursor-pointer select-none group text-left"
+      className="inline-flex items-center gap-2.5 cursor-pointer select-none group text-left py-1 px-1 -mx-1 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42323]"
     >
       <span
+        aria-hidden="true"
         className={cn(
-          'relative inline-block h-5 w-9 shrink-0 rounded-full transition-colors duration-200 ease-in-out',
-          checked ? 'bg-[#b42323]' : 'bg-[#ded6ce] dark:bg-[#3f3833]'
+          'relative inline-flex h-6 w-11 shrink-0 rounded-full transition-colors duration-200 ease-in-out border items-center',
+          checked
+            ? 'bg-[#b42323] border-[#961b1b]'
+            : 'bg-[#ded6ce] dark:bg-[#3d332a] border-[#c7bcaf] dark:border-[#524438]'
         )}
       >
         <span
           className={cn(
-            'inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out mt-0.5',
-            checked ? 'translate-x-4.5 ml-0.5' : 'translate-x-0.5'
+            'inline-block h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out',
+            checked ? 'translate-x-[22px]' : 'translate-x-[2px]'
           )}
         />
       </span>
-      <span className="text-xs sm:text-sm font-semibold text-[#4a423d] dark:text-[#c4b9ae] group-hover:text-[#242424] dark:group-hover:text-white transition-colors">
+      <span
+        className={cn(
+          'text-xs sm:text-sm font-semibold transition-colors duration-150',
+          checked
+            ? 'text-[#b42323] dark:text-[#ff8080] font-bold'
+            : 'text-[#4a423d] dark:text-[#c4b9ae] group-hover:text-[#242424] dark:group-hover:text-white'
+        )}
+      >
         {label}
       </span>
     </button>
@@ -159,7 +169,12 @@ export function PandalFilters({ filters, onChange, totalCount }: PandalFiltersPr
           <ToggleSwitch
             id="switch-bonedi-bari"
             checked={Boolean(filters.bonediBariOnly)}
-            onChange={(val) => update({ bonediBariOnly: val })}
+            onChange={(val) =>
+              update({
+                bonediBariOnly: val,
+                category: val ? 'Bonedi Bari' : (filters.category === 'Bonedi Bari' ? 'All' : filters.category),
+              })
+            }
             label={isBn ? 'বনেদি বাড়ির পুজো' : 'Bonedi Bari'}
           />
 

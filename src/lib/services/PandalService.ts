@@ -94,11 +94,11 @@ export class PandalService {
     }
 
     if (options.metroAccessibleOnly) {
-      list = list.filter((p) => p.metroLinks.some((m) => m.walkingDistanceMeters <= 1000));
+      list = list.filter((p) => Boolean(p.metroLinks && p.metroLinks.some((m) => m.walkingDistanceMeters <= 1000)));
     }
 
     if (options.wheelchairAccessibleOnly) {
-      list = list.filter((p) => p.facilities.wheelchairAccessible);
+      list = list.filter((p) => Boolean(p.facilities && p.facilities.wheelchairAccessible));
     }
 
     if (options.featuredOnly) {
