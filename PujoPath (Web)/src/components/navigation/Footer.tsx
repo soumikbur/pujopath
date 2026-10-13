@@ -6,7 +6,7 @@ import { useI18n } from '@/lib/i18n/I18nContext';
 import { useBackground } from '@/lib/context/BackgroundContext';
 import { useAudio } from '@/lib/context/AudioContext';
 import { cn } from '@/lib/utils/cn';
-import { Pause, Play, Linkedin } from 'lucide-react';
+import { Pause, Play } from 'lucide-react';
 
 export function Footer() {
   const { locale } = useI18n();
@@ -90,32 +90,9 @@ export function Footer() {
 
           <div
             className="order-1 sm:order-2 font-medium tracking-wide text-xs sm:text-[13px] select-text text-[#776d65] dark:text-[#a89e95]"
-            aria-label={isBn ? 'নির্মাণে সৌমিক ও মৌমিতা' : 'Made by Soumik & Moumita'}
+            aria-label={isBn ? 'নির্মাণে সৌমিক ও মৌমিতা ❤️' : 'Made by Soumik & Moumita ❤️'}
           >
-            <span>{isBn ? 'নির্মাণে ' : 'Made by '}</span>
-            <a
-              href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-semibold text-[#b42323] dark:text-[#e05656] hover:underline hover:text-[#961b1b] dark:hover:text-[#ff8080] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#b42323] rounded"
-              title={isBn ? 'সৌমিক — লিঙ্কডইন প্রোফাইল' : 'Soumik — LinkedIn Profile'}
-              aria-label={isBn ? 'সৌমিক — লিঙ্কডইন প্রোফাইল' : 'Soumik — LinkedIn Profile'}
-            >
-              <span>{isBn ? 'সৌমিক' : 'Soumik'}</span>
-              <Linkedin className="w-3 h-3 text-[#0a66c2] dark:text-[#70b5f9] inline-block shrink-0" aria-hidden="true" />
-            </a>
-            <span>{isBn ? ' ও ' : ' & '}</span>
-            <a
-              href="https://www.linkedin.com/in/moumita-shee-798505226/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-semibold text-[#b42323] dark:text-[#e05656] hover:underline hover:text-[#961b1b] dark:hover:text-[#ff8080] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#b42323] rounded"
-              title={isBn ? 'মৌমিতা — লিঙ্কডইন প্রোফাইল' : 'Moumita — LinkedIn Profile'}
-              aria-label={isBn ? 'মৌমিতা — লিঙ্কডইন প্রোফাইল' : 'Moumita — LinkedIn Profile'}
-            >
-              <span>{isBn ? 'মৌমিতা' : 'Moumita'}</span>
-              <Linkedin className="w-3 h-3 text-[#0a66c2] dark:text-[#70b5f9] inline-block shrink-0" aria-hidden="true" />
-            </a>
+            <span>{isBn ? 'নির্মাণে সৌমিক ও মৌমিতা' : 'Made by Soumik & Moumita'}</span>
             <span className="ml-1 text-[#e02424] inline-block text-sm" role="img" aria-label="heart">❤️</span>
           </div>
         </div>

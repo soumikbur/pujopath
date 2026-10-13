@@ -1769,31 +1769,31 @@ console.log('\n--- Running Test Suite 34: Co-Creator Profiles, Bengali Spelling 
 (function testCoCreatorsAndFilters() {
   const footerPath = path.join(__dirname, '..', 'src', 'components', 'navigation', 'Footer.tsx');
   const footerContent = fs.readFileSync(footerPath, 'utf8');
-  assert.ok(footerContent.includes('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/'), 'Footer must contain Soumik LinkedIn URL');
-  assert.ok(footerContent.includes('https://www.linkedin.com/in/moumita-shee-798505226/'), 'Footer must contain Moumita LinkedIn URL');
-  assert.ok(footerContent.includes('Made by '), 'Footer must contain "Made by "');
-  assert.ok(footerContent.includes('নির্মাণে '), 'Footer must contain "নির্মাণে "');
-  assert.ok(footerContent.includes('মৌমিতা'), 'Footer must use shortened Bengali name মৌমিতা');
-  assert.ok(footerContent.includes('সৌমিক'), 'Footer must use shortened Bengali name সৌমিক');
+  assert.ok(!footerContent.includes('https://www.linkedin.com/'), 'Footer must not contain LinkedIn URLs');
+  assert.ok(!footerContent.includes('Linkedin'), 'Footer must not contain LinkedIn icon');
+  assert.ok(footerContent.includes('Made by Soumik & Moumita'), 'Footer must contain exact plain text "Made by Soumik & Moumita"');
+  assert.ok(footerContent.includes('নির্মাণে সৌমিক ও মৌমিতা'), 'Footer must contain exact plain text "নির্মাণে সৌমিক ও মৌমিতা"');
+  assert.ok(footerContent.includes('❤️'), 'Footer must contain heart emoji ❤️');
   assert.ok(!footerContent.includes('Soumik Ghosh'), 'Footer must not contain full name Soumik Ghosh');
   assert.ok(!footerContent.includes('Moumita Shee'), 'Footer must not contain full name Moumita Shee');
   assert.ok(!footerContent.includes('সৌমিক ঘোষ'), 'Footer must not contain full name সৌমিক ঘোষ');
   assert.ok(!footerContent.includes('মৌমিতা শী'), 'Footer must not contain full name মৌমিতা শী');
-  assert.ok(footerContent.includes('target="_blank"'), 'Footer LinkedIn links must open in new tab');
-  assert.ok(footerContent.includes('rel="noopener noreferrer"'), 'Footer LinkedIn links must have security attributes');
 
   const aboutPath = path.join(__dirname, '..', 'src', 'app', 'about', 'page.tsx');
   const aboutContent = fs.readFileSync(aboutPath, 'utf8');
   assert.ok(aboutContent.includes('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/'), 'About page must contain Soumik LinkedIn URL');
   assert.ok(aboutContent.includes('https://www.linkedin.com/in/moumita-shee-798505226/'), 'About page must contain Moumita LinkedIn URL');
+  assert.ok(!aboutContent.includes('<Linkedin'), 'About page must not contain inline LinkedIn icon beside names');
+  assert.ok(aboutContent.includes('target="_blank"'), 'About page LinkedIn badge must open in new tab');
+  assert.ok(aboutContent.includes('rel="noopener noreferrer"'), 'About page LinkedIn badge must have security attributes');
+  assert.ok(aboutContent.includes("View Soumik's LinkedIn profile"), 'About page Soumik badge must have accessible name');
+  assert.ok(aboutContent.includes("View Moumita's LinkedIn profile"), 'About page Moumita badge must have accessible name');
   assert.ok(aboutContent.includes('মৌমিতা'), 'About page must use shortened Bengali name মৌমিতা');
   assert.ok(aboutContent.includes('সৌমিক'), 'About page must use shortened Bengali name সৌমিক');
   assert.ok(!aboutContent.includes('Soumik Ghosh'), 'About page must not contain full name Soumik Ghosh');
   assert.ok(!aboutContent.includes('Moumita Shee'), 'About page must not contain full name Moumita Shee');
   assert.ok(!aboutContent.includes('সৌমিক ঘোষ'), 'About page must not contain full name সৌমিক ঘোষ');
   assert.ok(!aboutContent.includes('মৌমিতা শী'), 'About page must not contain full name মৌমিতা শী');
-  assert.ok(aboutContent.includes('target="_blank"'), 'About page LinkedIn links must open in new tab');
-  assert.ok(aboutContent.includes('rel="noopener noreferrer"'), 'About page LinkedIn links must have security attributes');
 
   const filtersPath = path.join(__dirname, '..', 'src', 'components', 'pandals', 'PandalFilters.tsx');
   const filtersContent = fs.readFileSync(filtersPath, 'utf8');
@@ -1801,7 +1801,7 @@ console.log('\n--- Running Test Suite 34: Co-Creator Profiles, Bengali Spelling 
   assert.ok(filtersContent.includes('aria-expanded={isFeatureFiltersOpen}'), 'PandalFilters chevron must have aria-expanded attribute');
   assert.ok(filtersContent.includes('setIsFeatureFiltersOpen'), 'PandalFilters must toggle feature filters expansion');
 
-  console.log('✓ Shortened co-creator profiles (Footer & About) and Bengali spelling verified');
+  console.log('✓ Finalized Co-Creator LinkedIn badges, simplified footer credits, and Bengali spelling verified');
   console.log('✓ Feature filters collapse/expand control, ARIA semantics, and default expansion verified');
 })();
 

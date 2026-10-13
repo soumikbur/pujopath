@@ -1,6 +1,6 @@
 'use client';
 
-import { PhoneCall, ShieldCheck, Info, Users, Linkedin } from 'lucide-react';
+import { PhoneCall, ShieldCheck, Info, Users } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
 
 export default function AboutPage() {
@@ -92,50 +92,48 @@ export default function AboutPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
           {/* Soumik */}
-          <a
-            href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3 hover:border-[#0a66c2]/40 dark:hover:border-[#0a66c2]/50 hover:shadow-sm transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42323]"
-            title={isBn ? 'সৌমিক — লিঙ্কডইন প্রোফাইল' : 'Soumik — LinkedIn Profile'}
-            aria-label={isBn ? 'সৌমিক — লিঙ্কডইন প্রোফাইল' : 'Soumik — LinkedIn Profile'}
-          >
+          <div className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3 transition-colors">
             <div className="space-y-0.5">
-              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc] group-hover:text-[#0a66c2] dark:group-hover:text-[#70b5f9] transition-colors flex items-center gap-1.5">
-                <span>{isBn ? 'সৌমিক' : 'Soumik'}</span>
-                <Linkedin className="w-3.5 h-3.5 text-[#0a66c2] dark:text-[#70b5f9] shrink-0" aria-hidden="true" />
+              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc]">
+                {isBn ? 'সৌমিক' : 'Soumik'}
               </div>
               <div className="text-xs font-semibold text-[#b42323] dark:text-[#e05656]">
                 {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
               </div>
             </div>
-            <span className="px-3 py-1 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a] group-hover:border-[#0a66c2]/30 transition-colors">
+            <a
+              href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a] hover:text-[#0a66c2] dark:hover:text-[#70b5f9] hover:border-[#0a66c2]/40 dark:hover:border-[#0a66c2]/50 hover:bg-[#f0f7ff] dark:hover:bg-[#1a2634] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42323] shrink-0 select-none inline-flex items-center justify-center min-h-[32px]"
+              title={isBn ? 'সৌমিকের লিঙ্কডইন প্রোফাইল দেখুন' : "View Soumik's LinkedIn profile"}
+              aria-label={isBn ? 'সৌমিকের লিঙ্কডইন প্রোফাইল দেখুন' : "View Soumik's LinkedIn profile"}
+            >
               {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
-            </span>
-          </a>
+            </a>
+          </div>
 
           {/* Moumita */}
-          <a
-            href="https://www.linkedin.com/in/moumita-shee-798505226/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3 hover:border-[#0a66c2]/40 dark:hover:border-[#0a66c2]/50 hover:shadow-sm transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42323]"
-            title={isBn ? 'মৌমিতা — লিঙ্কডইন প্রোফাইল' : 'Moumita — LinkedIn Profile'}
-            aria-label={isBn ? 'মৌমিতা — লিঙ্কডইন প্রোফাইল' : 'Moumita — LinkedIn Profile'}
-          >
+          <div className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3 transition-colors">
             <div className="space-y-0.5">
-              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc] group-hover:text-[#0a66c2] dark:group-hover:text-[#70b5f9] transition-colors flex items-center gap-1.5">
-                <span>{isBn ? 'মৌমিতা' : 'Moumita'}</span>
-                <Linkedin className="w-3.5 h-3.5 text-[#0a66c2] dark:text-[#70b5f9] shrink-0" aria-hidden="true" />
+              <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc]">
+                {isBn ? 'মৌমিতা' : 'Moumita'}
               </div>
               <div className="text-xs font-semibold text-[#b42323] dark:text-[#e05656]">
                 {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
               </div>
             </div>
-            <span className="px-3 py-1 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a] group-hover:border-[#0a66c2]/30 transition-colors">
+            <a
+              href="https://www.linkedin.com/in/moumita-shee-798505226/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a] hover:text-[#0a66c2] dark:hover:text-[#70b5f9] hover:border-[#0a66c2]/40 dark:hover:border-[#0a66c2]/50 hover:bg-[#f0f7ff] dark:hover:bg-[#1a2634] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42323] shrink-0 select-none inline-flex items-center justify-center min-h-[32px]"
+              title={isBn ? 'মৌমিতার লিঙ্কডইন প্রোফাইল দেখুন' : "View Moumita's LinkedIn profile"}
+              aria-label={isBn ? 'মৌমিতার লিঙ্কডইন প্রোফাইল দেখুন' : "View Moumita's LinkedIn profile"}
+            >
               {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
-            </span>
-          </a>
+            </a>
+          </div>
         </div>
       </div>
     </div>
