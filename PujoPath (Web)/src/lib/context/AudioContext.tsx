@@ -44,6 +44,11 @@ interface AudioContextType {
   isPlayerActive: boolean;
   closePlayer: () => void;
   resumePlayer: () => void;
+  isPlaylistOpen: boolean;
+  openPlaylist: () => void;
+  closePlaylist: () => void;
+  togglePlaylist: () => void;
+  queueMode: 'single' | 'playlist';
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
@@ -66,6 +71,13 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [isStreamExpanded, setIsStreamExpanded] = useState<boolean>(false);
   const [userPlaylistIds, setUserPlaylistIds] = useState<string[]>([]);
   const [isPlayerDismissed, setIsPlayerDismissed] = useState<boolean>(false);
+  const [isPlaylistOpen, setIsPlaylistOpen] = useState<boolean>(false);
+  const [queueMode, setQueueMode] = useState<'single' | 'playlist'>('single');
+  const queueModeRef = useRef<'single' | 'playlist'>('single');
+
+  useEffect(() => {
+    queueModeRef.current = queueMode;
+  }, [queueMode]);
 
   const isPlayerActive = !isPlayerDismissed && Boolean(currentTrack && (isPlaying || currentTime > 0 || playbackError));
 
@@ -150,7 +162,9 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const handleEnded = () => {
       setIsPlaying(false);
       setPlaybackState('ENDED');
-      playNextTrack();
+      if (queueModeRef.current === 'playlist') {
+        playNextTrack();
+      }
     };
 
     const handleError = () => {
@@ -219,84 +233,67 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const playTrackInternal = useCallback(
     (track: MusicTrack) => {
       setIsPlayerDismissed(false);
+      const audio = audioRef.current;
+
+      // 1. Validate that the track has a usable direct playback source
+      const hasDirectAudio = Boolean(
+        track.playbackMethod === 'direct_audio' && track.audioUrl && track.audioUrl.trim().length > 0
+      );
+
+      if (!hasDirectAudio) {
+        // Track cannot be played via direct HTML5 Audio (e.g. authorized external stream only)
+        setIsLoading(false);
+        setPlaybackError(
+          `"${track.title}" is an authorized stream. Tap the "Source" link to listen externally, or choose a direct audio soundscape.`
+        );
+        return;
+      }
+
+      // 2. Playable source confirmed
       setPlaybackError(null);
       setCurrentTrack(track);
       currentTrackRef.current = track;
       setCurrentTime(0);
       setDuration(track.durationSeconds || 60);
+      setPlaybackType('direct');
+      setIsStreamExpanded(false);
 
-      const audio = audioRef.current;
-
-      // Handle Direct HTML5 Audio playback
-      if (track.playbackMethod === 'direct_audio' && track.audioUrl) {
-        setPlaybackType('direct');
-        setIsStreamExpanded(false);
-
-        if (audio) {
-          try {
-            audio.pause();
-          } catch {}
-
-          setIsLoading(true);
-          setPlaybackState('LOADING');
-          audio.src = track.audioUrl;
-          audio.volume = isMuted ? 0 : volume;
-          audio.currentTime = 0;
-          audio.load();
-
-          const playPromise = audio.play();
-          if (playPromise !== undefined) {
-            playPromise
-              .then(() => {
-                setIsPlaying(true);
-                setIsLoading(false);
-                setPlaybackState('PLAYING');
-                setPlaybackError(null);
-              })
-              .catch((err: Error) => {
-                // If play() was aborted by user pausing or switching tracks, ignore silently
-                if (err.name === 'AbortError') return;
-
-                setIsLoading(false);
-                setIsPlaying(false);
-                setPlaybackState('ERROR');
-                if (err.name === 'NotAllowedError') {
-                  setPlaybackError('Browser autoplay blocked. Tap play to listen.');
-                } else {
-                  setPlaybackError('Could not load audio. Check your connection and tap play to retry.');
-                }
-              });
-          }
-        }
-        return;
-      }
-
-      // Handle Authorized In-Page Stream (e.g. YouTube oEmbed/iFrame)
-      if (track.playbackMethod === 'authorized_stream' || track.embedUrl) {
-        // STRICT ENFORCEMENT: Stop any currently playing HTML5 direct audio immediately!
-        if (audio) {
-          try {
-            audio.pause();
-            audio.src = '';
-          } catch {}
-        }
-
-        setPlaybackType('embed');
-        setIsStreamExpanded(true);
-        setIsLoading(false);
-        setIsPlaying(true);
-        setPlaybackState('PLAYING');
-        return;
-      }
-
-      // Fallback for non-direct or external link tracks
       if (audio) {
-        audio.pause();
-        audio.src = '';
+        try {
+          audio.pause();
+        } catch {}
+
+        setIsLoading(true);
+        setPlaybackState('LOADING');
+        audio.src = track.audioUrl!;
+        audio.volume = isMuted ? 0 : volume;
+        audio.currentTime = 0;
+        audio.load();
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setIsPlaying(true);
+              setIsLoading(false);
+              setPlaybackState('PLAYING');
+              setPlaybackError(null);
+            })
+            .catch((err: Error) => {
+              // If play() was aborted by user pausing or switching tracks, ignore silently
+              if (err.name === 'AbortError') return;
+
+              setIsLoading(false);
+              setIsPlaying(false);
+              setPlaybackState('ERROR');
+              if (err.name === 'NotAllowedError') {
+                setPlaybackError('Browser autoplay blocked. Tap play to listen.');
+              } else {
+                setPlaybackError('Could not load audio. Check your connection and tap play to retry.');
+              }
+            });
+        }
       }
-      setIsPlaying(false);
-      setIsLoading(false);
-      setPlaybackState('IDLE');
     },
     [isMuted, volume]
   );
@@ -329,8 +326,33 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }, [playbackType, isPlaying, duration]);
 
   const playTrack = (track: MusicTrack) => {
+    setIsPlaylistOpen(false);
+    setQueueMode('single');
+    queueModeRef.current = 'single';
+    setQueue([track]);
     playTrackInternal(track);
   };
+
+  const playQueue = (tracks: MusicTrack[]) => {
+    if (tracks.length === 0) return;
+    setIsPlaylistOpen(false);
+    setQueueMode('playlist');
+    queueModeRef.current = 'playlist';
+    setQueue(tracks);
+    playTrackInternal(tracks[0]);
+  };
+
+  const openPlaylist = useCallback(() => {
+    setIsPlaylistOpen(true);
+  }, []);
+
+  const closePlaylist = useCallback(() => {
+    setIsPlaylistOpen(false);
+  }, []);
+
+  const togglePlaylist = useCallback(() => {
+    setIsPlaylistOpen((prev) => !prev);
+  }, []);
 
   const togglePlay = () => {
     if (!currentTrack) return;
@@ -507,12 +529,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     setQueue((prev) => prev.filter((t) => t.id !== trackId));
   };
 
-  const playQueue = (tracks: MusicTrack[]) => {
-    if (tracks.length === 0) return;
-    setQueue(tracks);
-    playTrackInternal(tracks[0]);
-  };
-
   const addToPlaylist = (trackId: string) => {
     setUserPlaylistIds((prev) => {
       if (prev.includes(trackId)) return prev;
@@ -593,6 +609,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         isPlayerActive,
         closePlayer,
         resumePlayer,
+        isPlaylistOpen,
+        openPlaylist,
+        closePlaylist,
+        togglePlaylist,
+        queueMode,
       }}
     >
       {children}

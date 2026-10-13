@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import {
   Play,
@@ -14,10 +14,12 @@ import {
   Loader2,
   AlertCircle,
   RotateCcw,
+  Bookmark,
 } from 'lucide-react';
 import { useAudio } from '@/lib/context/AudioContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useTheme } from '@/lib/context/ThemeContext';
+import { PUJA_MUSIC_DATA } from '@/data/music';
 import { toBengaliDigits } from '@/lib/geo';
 import { cn, getAssetPath } from '@/lib/utils';
 
@@ -43,6 +45,10 @@ export function BottomMusicPlayer() {
     isPlayerDismissed,
     closePlayer,
     clearError,
+    userPlaylistIds,
+    isPlaylistOpen,
+    closePlaylist,
+    togglePlaylist,
   } = useAudio();
 
   const { locale } = useI18n();
@@ -50,7 +56,19 @@ export function BottomMusicPlayer() {
   const isDark = theme === 'dark';
   const isBn = locale === 'bn';
 
-  const [playlistDrawerOpen, setPlaylistDrawerOpen] = useState(false);
+  const [playlistTab, setPlaylistTab] = useState<'my-playlist' | 'curated'>('my-playlist');
+
+  const userPlaylistTracks = useMemo(
+    () => PUJA_MUSIC_DATA.filter((t) => userPlaylistIds.includes(t.id)),
+    [userPlaylistIds]
+  );
+
+  const displayedPlaylistTracks = useMemo(() => {
+    if (playlistTab === 'my-playlist') {
+      return userPlaylistTracks;
+    }
+    return PUJA_MUSIC_DATA;
+  }, [playlistTab, userPlaylistTracks]);
 
   // Keep the interface quiet until the visitor chooses to play something, or if explicitly closed
   if (isPlayerDismissed || !currentTrack || (!isPlaying && currentTime === 0 && !playbackError)) return null;
@@ -324,13 +342,17 @@ export function BottomMusicPlayer() {
               />
             </div>
 
-            {/* 6. Queue button */}
+            {/* 6. Queue / Playlist button */}
             <button
               type="button"
-              onClick={() => setPlaylistDrawerOpen(!playlistDrawerOpen)}
+              onClick={(e) => {
+                e.stopPropagation();
+                togglePlaylist();
+              }}
               className="p-1.5 shrink-0 transition-opacity hover:opacity-70 active:scale-95 cursor-pointer"
               style={{ color: isDark ? '#EDE5DC' : '#292525' }}
               aria-label="Sharodiya Playlist"
+              title="Sharodiya Playlist"
             >
               <ListMusic className="w-4 h-4" />
             </button>
@@ -338,7 +360,10 @@ export function BottomMusicPlayer() {
             {/* 7. Close button */}
             <button
               type="button"
-              onClick={closePlayer}
+              onClick={(e) => {
+                e.stopPropagation();
+                closePlayer();
+              }}
               className="p-1.5 shrink-0 transition-opacity hover:opacity-70 active:scale-95 rounded-full hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer"
               style={{ color: isDark ? '#EDE5DC' : '#292525' }}
               aria-label="Close music player"
@@ -394,11 +419,14 @@ export function BottomMusicPlayer() {
             </div>
 
             {/* 3. Mobile Action Buttons */}
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               {/* Play / Pause button */}
               <button
                 type="button"
-                onClick={togglePlay}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePlay();
+                }}
                 aria-label={isPlaying ? 'Pause' : 'Play'}
                 className="flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
                 style={{
@@ -422,10 +450,14 @@ export function BottomMusicPlayer() {
               {/* Playlist drawer toggle button */}
               <button
                 type="button"
-                onClick={() => setPlaylistDrawerOpen(!playlistDrawerOpen)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePlaylist();
+                }}
                 className="p-1.5 shrink-0 transition-opacity hover:opacity-70 active:scale-95 cursor-pointer"
                 style={{ color: isDark ? '#EDE5DC' : 'rgba(41,37,37,0.60)' }}
                 aria-label="Sharodiya Playlist"
+                title="Sharodiya Playlist"
               >
                 <ListMusic className="w-4 h-4" />
               </button>
@@ -433,7 +465,10 @@ export function BottomMusicPlayer() {
               {/* Close button */}
               <button
                 type="button"
-                onClick={closePlayer}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closePlayer();
+                }}
                 className="p-1.5 shrink-0 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-opacity hover:opacity-70 active:scale-95 cursor-pointer"
                 style={{ color: isDark ? '#EDE5DC' : 'rgba(41,37,37,0.60)' }}
                 aria-label="Close music player"
@@ -447,19 +482,26 @@ export function BottomMusicPlayer() {
       </aside>
 
       {/* ── Playlist Drawer Modal ── */}
-      {playlistDrawerOpen && (
-        <div className="fixed inset-0 z-[1300] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+      {isPlaylistOpen && (
+        <div
+          className="fixed inset-0 z-[1300] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in"
+          onClick={closePlaylist}
+        >
           <div
             className="w-full max-w-md p-4 space-y-3 rounded-3xl border border-[#eadcce] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
           >
+            {/* Modal Header */}
             <div className="flex items-center justify-between border-b pb-2.5 border-[#eadcce] dark:border-[#2f2720]">
-              <h3 className="font-bold text-sm flex items-center gap-2 text-[#242424] dark:text-[#ede5dc]">
+              <div className="flex items-center gap-2">
                 <ListMusic className="w-4 h-4 text-[#D52F2F]" />
-                <span>{isBn ? 'শারদীয়া গানের তালিকা' : 'Sharodiya Playlist'}</span>
-              </h3>
+                <h3 className="font-bold text-sm text-[#242424] dark:text-[#ede5dc]">
+                  {isBn ? 'শারদীয়া প্লেলিস্ট' : 'Sharodiya Playlist'}
+                </h3>
+              </div>
               <button
                 type="button"
-                onClick={() => setPlaylistDrawerOpen(false)}
+                onClick={closePlaylist}
                 className="p-1 rounded-lg text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white cursor-pointer"
                 aria-label="Close playlist"
               >
@@ -467,36 +509,124 @@ export function BottomMusicPlayer() {
               </button>
             </div>
 
-            <div className="space-y-1.5 max-h-60 overflow-y-auto pr-1">
-              {queue.map((track) => {
-                const isSelected = track.id === currentTrack.id;
-                const tTitle = isBn ? track.titleBn || track.title : track.title;
-                const tArtist = isBn ? track.artistBn || track.artist : track.artist;
+            {/* Playlist Tabs: My Playlist vs Curated Tracks */}
+            <div className="flex items-center gap-1.5 bg-[#f4ede4] dark:bg-[#201c18] p-1 rounded-xl text-xs font-bold border border-[#eee8e1] dark:border-[#2f2720]">
+              <button
+                type="button"
+                onClick={() => setPlaylistTab('my-playlist')}
+                className={cn(
+                  'flex-1 py-1.5 px-2 rounded-lg text-center transition-all cursor-pointer',
+                  playlistTab === 'my-playlist'
+                    ? 'bg-white dark:bg-[#1a1613] text-[#b42323] shadow-xs'
+                    : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424]'
+                )}
+              >
+                <span>{isBn ? 'আমার প্লেলিস্ট' : 'My Playlist'}</span>
+                {userPlaylistTracks.length > 0 && (
+                  <span className="ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] bg-[#b42323]/10 text-[#b42323]">
+                    {userPlaylistTracks.length}
+                  </span>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setPlaylistTab('curated')}
+                className={cn(
+                  'flex-1 py-1.5 px-2 rounded-lg text-center transition-all cursor-pointer',
+                  playlistTab === 'curated'
+                    ? 'bg-white dark:bg-[#1a1613] text-[#b42323] shadow-xs'
+                    : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424]'
+                )}
+              >
+                <span>{isBn ? 'শারদীয়া সংগ্রহ' : 'Curated Library'}</span>
+              </button>
+            </div>
 
-                return (
-                  <div
-                    key={track.id}
-                    onClick={() => {
-                      playTrack(track);
-                      setPlaylistDrawerOpen(false);
-                    }}
-                    className={cn(
-                      'p-2.5 rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-98',
-                      isSelected
-                        ? 'bg-[#fdeeee] dark:bg-[#341b18] border border-[#f6ceca] dark:border-[#4a2420] text-[#d52f2f] font-bold'
-                        : 'bg-[#f8f0e8] dark:bg-[#201c18] border border-[#eadcce] dark:border-[#2a241f] text-[#4a423d] dark:text-[#c4b9ae] hover:border-[#d52f2f]/40'
-                    )}
-                  >
-                    <div className="min-w-0">
-                      <h4 className="text-xs font-bold truncate">{tTitle}</h4>
-                      <p className="text-[10px] truncate text-[#665a54] dark:text-[#a89e95]">{tArtist}</p>
+            {/* Track List */}
+            <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+              {displayedPlaylistTracks.length === 0 ? (
+                <div className="py-8 text-center space-y-2">
+                  <p className="text-xs text-[#665a54] dark:text-[#a89e95]">
+                    {isBn
+                      ? 'আপনার প্লেলিস্টে কোনো গান নেই।'
+                      : 'No tracks in your playlist yet.'}
+                  </p>
+                  <p className="text-[11px] text-[#776d65] dark:text-[#a89e95]">
+                    {isBn
+                      ? 'যেকোনো গানের বুকমার্ক আইকনে ক্লিক করে প্লেলিস্টে যোগ করুন।'
+                      : 'Tap the bookmark icon on any song to add it here.'}
+                  </p>
+                </div>
+              ) : (
+                displayedPlaylistTracks.map((track) => {
+                  const isSelected = track.id === currentTrack?.id;
+                  const isTrackPlaying = isSelected && isPlaying;
+                  const tTitle = isBn ? track.titleBn || track.title : track.title;
+                  const tArtist = isBn ? track.artistBn || track.artist : track.artist;
+                  const hasDirectAudio = track.playbackMethod === 'direct_audio' && Boolean(track.audioUrl);
+
+                  return (
+                    <div
+                      key={track.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isSelected) {
+                          togglePlay();
+                        } else {
+                          playTrack(track);
+                        }
+                      }}
+                      className={cn(
+                        'p-2.5 rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-[0.99]',
+                        isSelected
+                          ? 'bg-[#fdeeee] dark:bg-[#341b18] border border-[#f6ceca] dark:border-[#4a2420] text-[#d52f2f]'
+                          : 'bg-[#f8f0e8] dark:bg-[#201c18] border border-[#eadcce] dark:border-[#2a241f] text-[#4a423d] dark:text-[#c4b9ae] hover:border-[#d52f2f]/40'
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (isSelected) {
+                              togglePlay();
+                            } else {
+                              playTrack(track);
+                            }
+                          }}
+                          className={cn(
+                            'w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white transition-transform active:scale-95 cursor-pointer',
+                            isSelected ? 'bg-[#d52f2f]' : 'bg-[#b42323]/80 hover:bg-[#d52f2f]'
+                          )}
+                          aria-label={isTrackPlaying ? 'Pause' : 'Play'}
+                        >
+                          {isSelected && isLoading ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : isTrackPlaying ? (
+                            <Pause className="w-3.5 h-3.5 fill-current" />
+                          ) : (
+                            <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+                          )}
+                        </button>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="text-xs font-bold truncate leading-tight">{tTitle}</h4>
+                          <p className="text-[10px] truncate mt-0.5 text-[#665a54] dark:text-[#a89e95]">{tArtist}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0 ml-2">
+                        {!hasDirectAudio && (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-[#b42323]/10 text-[#b42323] font-semibold">
+                            {isBn ? 'স্ট্রিম' : 'Stream'}
+                          </span>
+                        )}
+                        <span className="text-[11px] font-mono font-bold text-[#d52f2f]">
+                          {formatSeconds(track.durationSeconds)}
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-[11px] font-mono font-bold text-[#d52f2f]">
-                      {formatSeconds(track.durationSeconds)}
-                    </span>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
         </div>
