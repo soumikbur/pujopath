@@ -14,8 +14,6 @@ import {
   Loader2,
   AlertCircle,
   RotateCcw,
-  ChevronDown,
-  Tv,
 } from 'lucide-react';
 import { useAudio } from '@/lib/context/AudioContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
@@ -36,8 +34,6 @@ export function BottomMusicPlayer() {
     isMuted,
     toggleMute,
     setVolume,
-    isStreamExpanded,
-    setIsStreamExpanded,
     togglePlay,
     nextTrack,
     prevTrack,
@@ -77,15 +73,15 @@ export function BottomMusicPlayer() {
 
   return (
     <>
-      {/* ── Wide Floating Frosted Glass Media Player Container ── */}
+      {/* ── Compact Floating Frosted Glass Audio Player ── */}
       <aside
         aria-label="Media Player"
         className="fixed z-[1150] left-1/2 -translate-x-1/2 bottom-[calc(68px+env(safe-area-inset-bottom,0px))] sm:bottom-5 pointer-events-auto
-                   w-[calc(100%-20px)] md:w-[840px] transition-all duration-300 animate-in slide-in-from-bottom-3"
+                   w-[calc(100%-20px)] max-w-md sm:max-w-2xl md:w-[780px] lg:w-[840px] transition-all duration-300 animate-in slide-in-from-bottom-3"
       >
         {/* Playback Error Alert Banner */}
         {playbackError && (
-          <div className="mb-2 px-4 py-2 rounded-2xl bg-amber-50 dark:bg-amber-950/90 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs flex items-center justify-between gap-3 shadow-lg backdrop-blur-md">
+          <div className="mb-2 px-3.5 py-2 rounded-2xl bg-amber-50 dark:bg-amber-950/90 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs flex items-center justify-between gap-3 shadow-lg backdrop-blur-md">
             <div className="flex items-center gap-2 min-w-0">
               <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
               <span className="truncate">{playbackError}</span>
@@ -114,63 +110,38 @@ export function BottomMusicPlayer() {
           </div>
         )}
 
-        {/* Authorized In-Page Stream Player Box (Docked right above bottom bar) */}
-        {playbackType === 'embed' && isStreamExpanded && currentTrack.embedUrl && (
-          <div
-            className="mb-2 w-full max-w-sm sm:max-w-md mx-auto rounded-3xl overflow-hidden border shadow-2xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-2"
-            style={{
-              background: isDark ? 'rgba(26, 22, 19, 0.96)' : 'rgba(255, 250, 244, 0.96)',
-              backdropFilter: 'blur(24px)',
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.14)' : 'rgba(213, 47, 47, 0.25)',
-            }}
-          >
-            <div className="flex items-center justify-between px-3.5 py-2 border-b border-black/5 dark:border-white/5">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="w-2 h-2 rounded-full bg-[#D52F2F] animate-pulse" />
-                <span className="text-[11px] font-bold text-[#b42323] truncate">
-                  {isBn ? 'অনুমোদিত ইন-পেজ প্লেয়ার' : 'Authorized In-Page Player'}
-                </span>
-                <span className="text-[10px] text-[#776d65] dark:text-[#a89e95] truncate hidden xs:inline">
-                  • {displayTitle}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsStreamExpanded(false)}
-                className="p-1 rounded-lg text-xs font-semibold text-[#665a54] dark:text-[#a89e95] hover:text-[#b42323] flex items-center gap-1 cursor-pointer transition-colors"
-                aria-label="Minimize stream player"
-              >
-                <span>{isBn ? 'সংক্ষিপ্ত করুন' : 'Minimize'}</span>
-                <ChevronDown className="w-3.5 h-3.5" />
-              </button>
-            </div>
-            <div className="relative aspect-video w-full bg-black">
-              <iframe
-                src={`${currentTrack.embedUrl}?autoplay=1&enablejsapi=1`}
-                title={displayTitle}
-                className="absolute inset-0 w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Glass container bar */}
+        {/* Compact audio control bar: strictly between 68px and 84px height */}
         <div
-          className="relative overflow-hidden flex items-center transition-colors duration-300"
+          className="relative overflow-hidden flex items-center transition-colors duration-300 shadow-xl"
           style={{
-            height: '78px',
-            borderRadius: '24px',
-            background: isDark ? 'rgba(26, 22, 19, 0.88)' : 'rgba(255, 250, 244, 0.82)',
+            height: '72px',
+            borderRadius: '22px',
+            background: isDark ? 'rgba(26, 22, 19, 0.92)' : 'rgba(255, 250, 244, 0.90)',
             backdropFilter: 'blur(24px) saturate(130%)',
             WebkitBackdropFilter: 'blur(24px) saturate(130%)',
-            border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.65)',
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.70)',
             boxShadow: isDark
-              ? '0 12px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.08)'
-              : '0 12px 40px rgba(80, 50, 30, 0.12), inset 0 1px 0 rgba(255,255,255,0.70)',
+              ? '0 10px 32px rgba(0, 0, 0, 0.50), inset 0 1px 0 rgba(255,255,255,0.08)'
+              : '0 10px 32px rgba(80, 50, 30, 0.14), inset 0 1px 0 rgba(255,255,255,0.70)',
           }}
         >
+          {/* Top-edge integrated progress bar */}
+          <div className="absolute top-0 inset-x-0 h-[3px] bg-black/10 dark:bg-white/10 z-20">
+            <div
+              className="h-full transition-all duration-150 rounded-r-full"
+              style={{ width: `${progressPercent}%`, background: '#D52F2F' }}
+            />
+            <input
+              type="range"
+              min={0}
+              max={duration || 100}
+              value={currentTime}
+              onChange={(e) => seek(parseFloat(e.target.value))}
+              aria-label="Seek track position"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+          </div>
+
           {/* Glass top highlight */}
           <div
             className="absolute inset-0 pointer-events-none"
@@ -182,14 +153,14 @@ export function BottomMusicPlayer() {
             }}
           />
 
-          {/* ── Desktop layout ── */}
+          {/* ── Desktop & Tablet layout (sm+) ── */}
           <div className="hidden sm:flex items-center w-full h-full px-4 gap-3.5 relative z-10">
-            {/* 1. Album Artwork — 48×48 */}
+            {/* 1. Album Artwork — 44×44 */}
             <div
               className="relative shrink-0 rounded-xl overflow-hidden"
               style={{
-                width: 48,
-                height: 48,
+                width: 44,
+                height: 44,
                 border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.50)',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
               }}
@@ -199,36 +170,36 @@ export function BottomMusicPlayer() {
                 alt={displayTitle}
                 fill
                 className="object-cover"
-                sizes="48px"
+                sizes="44px"
               />
             </div>
 
             {/* 2. Track Info */}
-            <div className="min-w-0" style={{ width: 190, flexShrink: 0 }}>
+            <div className="min-w-0" style={{ width: 180, flexShrink: 0 }}>
               <h4
-                className="truncate leading-tight"
-                style={{ fontSize: 13, fontWeight: 700, color: isDark ? '#EDE5DC' : '#292525' }}
+                className="truncate leading-tight font-bold text-xs"
+                style={{ color: isDark ? '#EDE5DC' : '#292525' }}
               >
                 {displayTitle}
               </h4>
               <p
-                className="truncate mt-0.5"
-                style={{ fontSize: 10, fontWeight: 500, color: isDark ? 'rgba(237,229,220,0.60)' : 'rgba(41,37,37,0.58)' }}
+                className="truncate mt-0.5 text-[10px] font-medium"
+                style={{ color: isDark ? 'rgba(237,229,220,0.60)' : 'rgba(41,37,37,0.58)' }}
               >
                 {displaySubtitle}
               </p>
             </div>
 
             {/* 3. Playback Controls */}
-            <div className="flex items-center gap-2.5 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
                 onClick={prevTrack}
                 aria-label="Previous track"
-                className="p-1 transition-opacity hover:opacity-70 active:scale-95 cursor-pointer"
+                className="p-1.5 transition-opacity hover:opacity-70 active:scale-95 cursor-pointer"
                 style={{ color: isDark ? '#EDE5DC' : '#292525' }}
               >
-                <SkipBack className="w-[18px] h-[18px] fill-current" />
+                <SkipBack className="w-4 h-4 fill-current" />
               </button>
 
               {/* Red circular play button */}
@@ -238,8 +209,8 @@ export function BottomMusicPlayer() {
                 aria-label={isPlaying ? 'Pause' : 'Play'}
                 className="flex items-center justify-center transition-transform duration-150 active:scale-95 hover:scale-105 cursor-pointer"
                 style={{
-                  width: 44,
-                  height: 44,
+                  width: 40,
+                  height: 40,
                   borderRadius: '50%',
                   background: '#D52F2F',
                   color: '#fff',
@@ -247,11 +218,11 @@ export function BottomMusicPlayer() {
                 }}
               >
                 {isLoading ? (
-                  <Loader2 className="w-[18px] h-[18px] animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : isPlaying ? (
-                  <Pause className="w-[18px] h-[18px] fill-current" />
+                  <Pause className="w-4 h-4 fill-current" />
                 ) : (
-                  <Play className="w-[18px] h-[18px] fill-current ml-0.5" />
+                  <Play className="w-4 h-4 fill-current ml-0.5" />
                 )}
               </button>
 
@@ -259,10 +230,10 @@ export function BottomMusicPlayer() {
                 type="button"
                 onClick={nextTrack}
                 aria-label="Next track"
-                className="p-1 transition-opacity hover:opacity-70 active:scale-95 cursor-pointer"
+                className="p-1.5 transition-opacity hover:opacity-70 active:scale-95 cursor-pointer"
                 style={{ color: isDark ? '#EDE5DC' : '#292525' }}
               >
-                <SkipForward className="w-[18px] h-[18px] fill-current" />
+                <SkipForward className="w-4 h-4 fill-current" />
               </button>
             </div>
 
@@ -316,20 +287,7 @@ export function BottomMusicPlayer() {
               </span>
             </div>
 
-            {/* 5. In-Page Stream Toggle Button (when track has embed stream) */}
-            {playbackType === 'embed' && (
-              <button
-                type="button"
-                onClick={() => setIsStreamExpanded(!isStreamExpanded)}
-                className="p-1.5 shrink-0 transition-opacity hover:opacity-70 active:scale-95 text-[#D52F2F] cursor-pointer"
-                aria-label={isStreamExpanded ? 'Hide in-page stream video' : 'Show in-page stream video'}
-                title={isStreamExpanded ? (isBn ? 'ভিডিও বন্ধ করুন' : 'Hide video') : (isBn ? 'ভিডিও দেখুন' : 'View video')}
-              >
-                <Tv className="w-[18px] h-[18px]" />
-              </button>
-            )}
-
-            {/* 6. Volume Control Slider & Mute Toggle */}
+            {/* 5. Volume Control Slider & Mute Toggle */}
             <div className="hidden lg:flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
@@ -356,7 +314,7 @@ export function BottomMusicPlayer() {
               />
             </div>
 
-            {/* 7. Queue button */}
+            {/* 6. Queue button */}
             <button
               type="button"
               onClick={() => setPlaylistDrawerOpen(!playlistDrawerOpen)}
@@ -364,10 +322,10 @@ export function BottomMusicPlayer() {
               style={{ color: isDark ? '#EDE5DC' : '#292525' }}
               aria-label="Sharodiya Playlist"
             >
-              <ListMusic className="w-[18px] h-[18px]" />
+              <ListMusic className="w-4 h-4" />
             </button>
 
-            {/* 8. Close button */}
+            {/* 7. Close button */}
             <button
               type="button"
               onClick={closePlayer}
@@ -376,69 +334,70 @@ export function BottomMusicPlayer() {
               aria-label="Close music player"
               title="Close music player"
             >
-              <X className="w-[18px] h-[18px]" />
+              <X className="w-4 h-4" />
             </button>
           </div>
 
-          {/* ── Mobile layout ── */}
-          <div className="flex sm:hidden flex-col w-full h-full px-3 py-1.5 relative z-10 justify-center gap-1">
-            {/* Top row: artwork + info + play + close */}
-            <div className="flex items-center gap-2">
-              <div
-                className="relative shrink-0 rounded-lg overflow-hidden"
-                style={{
-                  width: 38,
-                  height: 38,
-                  border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.45)',
-                }}
+          {/* ── Ultra-Compact Mobile Layout (< 640px) ── */}
+          <div className="flex sm:hidden items-center w-full h-full px-3 gap-2.5 relative z-10">
+            {/* 1. Thumbnail — 44×44 */}
+            <div
+              className="relative shrink-0 rounded-xl overflow-hidden"
+              style={{
+                width: 44,
+                height: 44,
+                border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.45)',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.10)',
+              }}
+            >
+              <Image
+                src={getAssetPath(currentTrack.id === 'track-mahalaya-original' ? '/images/mahalaya-thumb.jpg' : currentTrack.coverUrl || '/images/mahalaya-thumb.jpg')}
+                alt={displayTitle}
+                fill
+                className="object-cover"
+                sizes="44px"
+              />
+            </div>
+
+            {/* 2. Track Title, Artist & Time */}
+            <div className="flex-1 min-w-0 pr-1">
+              <h4
+                className="truncate font-bold text-xs leading-tight"
+                style={{ color: isDark ? '#EDE5DC' : '#292525' }}
               >
-                <Image
-                  src={getAssetPath(currentTrack.id === 'track-mahalaya-original' ? '/images/mahalaya-thumb.jpg' : currentTrack.coverUrl || '/images/mahalaya-thumb.jpg')}
-                  alt={displayTitle}
-                  fill
-                  className="object-cover"
-                  sizes="38px"
-                />
+                {displayTitle}
+              </h4>
+              <p
+                className="truncate text-[10px] font-medium mt-0.5"
+                style={{ color: isDark ? 'rgba(237,229,220,0.60)' : 'rgba(41,37,37,0.58)' }}
+              >
+                {displaySubtitle}
+              </p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span
+                  className="font-mono tabular-nums text-[9px]"
+                  style={{ color: isDark ? 'rgba(237,229,220,0.50)' : 'rgba(41,37,37,0.48)' }}
+                >
+                  {formatSeconds(currentTime)} / {formatSeconds(duration || 100)}
+                </span>
               </div>
+            </div>
 
-              <div className="flex-1 min-w-0">
-                <h4
-                  className="truncate leading-tight text-xs font-bold"
-                  style={{ color: isDark ? '#EDE5DC' : '#292525' }}
-                >
-                  {displayTitle}
-                </h4>
-                <p
-                  className="truncate text-[10px]"
-                  style={{ color: isDark ? 'rgba(237,229,220,0.55)' : 'rgba(41,37,37,0.55)' }}
-                >
-                  {displaySubtitle}
-                </p>
-              </div>
-
-              {playbackType === 'embed' && (
-                <button
-                  type="button"
-                  onClick={() => setIsStreamExpanded(!isStreamExpanded)}
-                  className="p-1 shrink-0 text-[#D52F2F] active:scale-95"
-                  aria-label="Toggle in-page stream viewer"
-                >
-                  <Tv className="w-4 h-4" />
-                </button>
-              )}
-
+            {/* 3. Mobile Action Buttons */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {/* Play / Pause button */}
               <button
                 type="button"
                 onClick={togglePlay}
                 aria-label={isPlaying ? 'Pause' : 'Play'}
-                className="shrink-0 flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
+                className="flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 38,
+                  height: 38,
                   borderRadius: '50%',
                   background: '#D52F2F',
                   color: '#fff',
-                  boxShadow: '0 3px 10px rgba(213,47,47,0.25)',
+                  boxShadow: '0 3px 10px rgba(213,47,47,0.30)',
                 }}
               >
                 {isLoading ? (
@@ -450,54 +409,28 @@ export function BottomMusicPlayer() {
                 )}
               </button>
 
+              {/* Playlist drawer toggle button */}
               <button
                 type="button"
                 onClick={() => setPlaylistDrawerOpen(!playlistDrawerOpen)}
-                className="p-1 shrink-0 transition-opacity hover:opacity-70 active:scale-95 cursor-pointer"
-                style={{ color: isDark ? '#EDE5DC' : 'rgba(41,37,37,0.55)' }}
+                className="p-1.5 shrink-0 transition-opacity hover:opacity-70 active:scale-95 cursor-pointer"
+                style={{ color: isDark ? '#EDE5DC' : 'rgba(41,37,37,0.60)' }}
                 aria-label="Sharodiya Playlist"
               >
                 <ListMusic className="w-4 h-4" />
               </button>
 
+              {/* Close button */}
               <button
                 type="button"
                 onClick={closePlayer}
-                className="p-1 shrink-0 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-opacity hover:opacity-70 active:scale-95 cursor-pointer"
-                style={{ color: isDark ? '#EDE5DC' : 'rgba(41,37,37,0.55)' }}
+                className="p-1.5 shrink-0 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-opacity hover:opacity-70 active:scale-95 cursor-pointer"
+                style={{ color: isDark ? '#EDE5DC' : 'rgba(41,37,37,0.60)' }}
                 aria-label="Close music player"
                 title="Close music player"
               >
                 <X className="w-4 h-4" />
               </button>
-            </div>
-
-            {/* Bottom row: progress bar */}
-            <div className="flex items-center gap-1.5">
-              <span style={{ fontSize: 9, color: isDark ? 'rgba(237,229,220,0.50)' : 'rgba(41,37,37,0.45)' }} className="font-mono tabular-nums">
-                {formatSeconds(currentTime)}
-              </span>
-              <div
-                className="relative flex-1"
-                style={{ height: 3, borderRadius: 3, background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.07)' }}
-              >
-                <input
-                  type="range"
-                  min={0}
-                  max={duration || 100}
-                  value={currentTime}
-                  onChange={(e) => seek(parseFloat(e.target.value))}
-                  aria-label="Seek track position"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                />
-                <div
-                  className="absolute inset-y-0 left-0 rounded-full"
-                  style={{ width: `${progressPercent}%`, background: '#D52F2F' }}
-                />
-              </div>
-              <span style={{ fontSize: 9, color: isDark ? 'rgba(237,229,220,0.50)' : 'rgba(41,37,37,0.45)' }} className="font-mono tabular-nums">
-                {formatSeconds(duration || 100)}
-              </span>
             </div>
           </div>
         </div>
@@ -518,6 +451,7 @@ export function BottomMusicPlayer() {
                 type="button"
                 onClick={() => setPlaylistDrawerOpen(false)}
                 className="p-1 rounded-lg text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white cursor-pointer"
+                aria-label="Close playlist"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -560,4 +494,3 @@ export function BottomMusicPlayer() {
     </>
   );
 }
-

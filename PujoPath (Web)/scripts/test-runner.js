@@ -1712,9 +1712,55 @@ console.log('\n--- Running Test Suite 32: Deployment Asset Routing, PWA Manifest
   console.log('✓ Root layout metadata manifest and icon basePath integration verified');
 })();
 
+// ============================================================================
+// TEST SUITE 33: Complete Frontend Audit & UI Repair Regression Verification
+// ============================================================================
+(() => {
+  console.log('\n--- Running Test Suite 33: Frontend Audit & UI Repair Regression Verification ---');
+  const bottomPlayerFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'music', 'BottomMusicPlayer.tsx'), 'utf8');
+  const musicPageFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'music', 'page.tsx'), 'utf8');
+  const pujoBgFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'ui', 'PujoBackground.tsx'), 'utf8');
+  const globalsCssFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'globals.css'), 'utf8');
+  const bgConfigFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'data', 'config', 'backgroundConfig.ts'), 'utf8');
+
+  // 1. Compact Audio Player Constraints (Phase 3)
+  assert.ok(bottomPlayerFile.includes("height: '72px'"), 'Bottom player mobile height must be constrained to 72px (target 68-84px)');
+  assert.ok(bottomPlayerFile.includes("width: 44") && bottomPlayerFile.includes("height: 44"), 'Thumbnail must be 44x44px (target 40-48px)');
+  assert.ok(!bottomPlayerFile.includes('<iframe'), 'BottomMusicPlayer must not contain floating video iframe/embed');
+  assert.ok(!bottomPlayerFile.includes('isStreamExpanded'), 'BottomMusicPlayer must not render expandable video frame');
+  assert.ok(bottomPlayerFile.includes('closePlayer'), 'Bottom player must support clean close & dismissal');
+  assert.ok(bottomPlayerFile.includes('z-[1150]'), 'Bottom player must float at z-[1150] above navigation');
+  assert.ok(bottomPlayerFile.includes('bottom-[calc(68px+env(safe-area-inset-bottom,0px))]'), 'Bottom player must maintain safe-area clearance above mobile nav');
+  console.log('✓ Compact audio control bar height (72px), thumbnail (44px), and absence of floating video iframe verified');
+
+  // 2. In-Card Authorized Stream Containment (Phase 3)
+  assert.ok(musicPageFile.includes('<iframe'), 'Music page must contain authorized stream iframe inside track card');
+  assert.ok(musicPageFile.includes('pb-48'), 'Music page must provide pb-48 bottom scroll clearance');
+  console.log('✓ In-card authorized stream containment and bottom scroll clearance verified');
+
+  // 3. Strict Background Separation & Alpana Motion (Phase 4)
+  assert.ok(bgConfigFile.includes('isHomepageRoute'), 'backgroundConfig must provide isHomepageRoute normalizer');
+  assert.ok(pujoBgFile.includes('isHomepage && ('), 'PujoBackground must render photographic artwork ONLY on homepage');
+  assert.ok(pujoBgFile.includes('!isHomepage && ('), 'PujoBackground must render alpana motifs ONLY on non-homepage routes');
+  assert.ok(globalsCssFile.includes('alpanaRotateSlow 75s'), 'globals.css must define slow 75s rotation for alpana motifs');
+  assert.ok(globalsCssFile.includes('alpanaRotateReverse 90s'), 'globals.css must define 90s reverse rotation for mandala motifs');
+  assert.ok(globalsCssFile.includes('alpanaDrift 32s'), 'globals.css must define 32s drift animation for kash flower accent');
+  assert.ok(globalsCssFile.includes('alpanaPulse 18s'), 'globals.css must define 18s gentle pulse animation for border accent');
+  assert.ok(globalsCssFile.includes('.pujopath-fixed-background'), 'globals.css must preserve dedicated stationary background layer');
+  assert.ok(globalsCssFile.includes('pointer-events: none'), 'Stationary background must have pointer-events: none for 100% native scrolling');
+  console.log('✓ Strict background separation, stationary scrolling, and restored slow alpana animations verified');
+
+  // 4. Personal Pandal Privacy & State Isolation (Phase 9)
+  const favoritesContextFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'lib', 'context', 'FavoritesContext.tsx'), 'utf8');
+  assert.ok(favoritesContextFile.includes('pujopath_custom_pandals'), 'Custom pandals must be stored strictly in local client storage');
+  assert.ok(favoritesContextFile.includes('isUserAdded: true'), 'Custom pandals must be flagged with isUserAdded: true');
+  console.log('✓ Personal custom pandal privacy and local storage persistence verified');
+})();
+
 console.log('\n================================================================');
-console.log('ALL 32 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
+console.log('ALL 33 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
 console.log('================================================================\n');
+
 
 
 

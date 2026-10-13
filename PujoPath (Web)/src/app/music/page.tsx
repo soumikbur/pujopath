@@ -117,7 +117,7 @@ export default function MusicPage() {
   };
 
   return (
-    <div className="space-y-7 max-w-6xl mx-auto pb-36 sm:pb-28">
+    <div className="space-y-7 max-w-6xl mx-auto pb-48 sm:pb-36">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
@@ -278,6 +278,19 @@ export default function MusicPage() {
                 </a>
               )}
             </div>
+
+            {/* In-Card Authorized Stream Player for Featured Showcase */}
+            {isPlaying && currentTrack.embedUrl && (
+              <div className="w-full mt-3 rounded-2xl overflow-hidden aspect-video max-w-lg mx-auto md:mx-0 bg-black border border-[#eee8e1] dark:border-[#2f2720] shadow-md">
+                <iframe
+                  src={`${currentTrack.embedUrl}?autoplay=1&enablejsapi=1`}
+                  title={isBn ? currentTrack.titleBn || currentTrack.title : currentTrack.title}
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -503,6 +516,22 @@ export default function MusicPage() {
                       </button>
                     </div>
                   </div>
+
+                  {/* In-Card Authorized Stream Player when Selected and Playing */}
+                  {isSelected && isPlaying && track.embedUrl && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-full my-1 rounded-xl overflow-hidden aspect-video bg-black border border-black/10 dark:border-white/10 shadow-sm"
+                    >
+                      <iframe
+                        src={`${track.embedUrl}?autoplay=1&enablejsapi=1`}
+                        title={tTitle}
+                        className="w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  )}
 
                   {/* Cultural Context / License Details Footer */}
                   <div className="pt-2.5 border-t border-black/5 dark:border-white/5 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[#776d65] dark:text-[#a89e95]">
