@@ -80,34 +80,26 @@ function ExploreContent() {
   const { customPandals } = useFavorites();
   const isBn = locale === 'bn';
 
-  // Initialize filters from URL params first, then sessionStorage if returning
-  const [filters, setFilters] = useState<FilterOptions>(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const { hasUrlParams, filters: fromUrl } = parseFiltersFromSearchParams(urlParams);
-      if (hasUrlParams) {
-        return { ...DEFAULT_FILTERS, ...fromUrl };
-      }
-      try {
-        const stored = sessionStorage.getItem(EXPLORE_STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          return { ...DEFAULT_FILTERS, ...parsed };
-        }
-      } catch {
-        // Fallback to default
-      }
-    }
-    return DEFAULT_FILTERS;
-  });
+  // Initialize with DEFAULT_FILTERS to ensure SSR and initial client hydration HTML match 100%
+  const [filters, setFilters] = useState<FilterOptions>(DEFAULT_FILTERS);
 
-  // Re-sync if searchParams change externally (e.g. browser back/forward)
+  // Synchronize from URL params or sessionStorage on mount and when searchParams change
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const urlParams = new URLSearchParams(window.location.search);
     const { hasUrlParams, filters: fromUrl } = parseFiltersFromSearchParams(urlParams);
     if (hasUrlParams) {
       setFilters((prev) => ({ ...prev, ...fromUrl }));
+      return;
+    }
+    try {
+      const stored = sessionStorage.getItem(EXPLORE_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setFilters((prev) => ({ ...prev, ...parsed }));
+      }
+    } catch {
+      // Fallback to default
     }
   }, [searchParams]);
 
@@ -169,7 +161,7 @@ function ExploreContent() {
   );
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 pb-24">
+    <div className="mx-auto max-w-6xl space-y-6 pb-36 sm:pb-28">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 text-[#b42323] text-xs sm:text-sm font-bold uppercase tracking-wider">
