@@ -126,19 +126,6 @@ export default function MahalayaPage() {
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
-
-          {/* In-Page Stream Player Box when playing */}
-          {isSelected && isPlaying && mahalayaTrack.embedUrl && (
-            <div className="w-full mt-4 rounded-2xl overflow-hidden aspect-video max-w-lg bg-black border border-[#eee8e1] dark:border-[#2f2720] shadow-lg">
-              <iframe
-                src={`${mahalayaTrack.embedUrl}?autoplay=1&enablejsapi=1`}
-                title={mahalayaTrack.title}
-                className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-          )}
         </div>
       </div>
 

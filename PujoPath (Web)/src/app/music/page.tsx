@@ -13,15 +13,7 @@ import {
   Search,
   Bookmark,
   BookmarkCheck,
-  ListPlus,
-  Compass,
   Sparkles,
-  Waves,
-  HeartHandshake,
-  Drum,
-  Flame,
-  Radio,
-  Sun,
   X,
 } from 'lucide-react';
 import { useAudio } from '@/lib/context/AudioContext';
@@ -31,7 +23,7 @@ import {
   MUSIC_CATEGORIES_META,
   PUJA_MOODS_LIST,
 } from '@/data/music';
-import { MusicCategory, PujaMood, MusicTrack } from '@/types';
+import { MusicCategory, PujaMood } from '@/types';
 import { toBengaliDigits } from '@/lib/geo';
 import { cn, getAssetPath } from '@/lib/utils';
 
@@ -48,6 +40,7 @@ export default function MusicPage() {
     togglePlaylistTrack,
     isInPlaylist,
     playQueue,
+    isPlayerActive,
   } = useAudio();
 
   const { locale } = useI18n();
@@ -117,7 +110,7 @@ export default function MusicPage() {
   };
 
   return (
-    <div className="space-y-7 max-w-6xl mx-auto pb-48 sm:pb-36">
+    <div className={cn('space-y-6 max-w-6xl mx-auto transition-all duration-200', isPlayerActive ? 'pb-44 md:pb-28' : 'pb-24 md:pb-16')}>
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
@@ -181,117 +174,6 @@ export default function MusicPage() {
           >
             {isBn ? 'বাতিল' : 'Dismiss'}
           </button>
-        </div>
-      )}
-
-      {/* Featured Now Playing Showcase */}
-      {currentTrack && (
-        <div className="p-4 sm:p-6 md:p-8 rounded-3xl bg-linear-to-br from-white to-[#fbf8f4] dark:from-[#1a1613] dark:to-[#14100d] border border-[#eee8e1] dark:border-[#2f2720] shadow-card flex flex-col md:flex-row items-center gap-5 sm:gap-6">
-          <div className="relative w-28 h-28 sm:w-40 sm:h-40 rounded-3xl overflow-hidden shadow-card border border-[#eee8e1] dark:border-[#2f2720] shrink-0 bg-white dark:bg-[#14110e]">
-            <Image
-              src={getAssetPath('/images/mahalaya-thumb.jpg')}
-              alt={currentTrack.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 640px) 112px, 160px"
-            />
-          </div>
-
-          <div className="space-y-2.5 sm:space-y-3 flex-1 text-center md:text-left min-w-0 w-full">
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#b42323]">
-                {isPlaying ? (isBn ? 'বর্তমানে বাজছে' : 'Now Playing') : (isBn ? 'নির্বাচিত গান' : 'Selected Track')}
-              </span>
-              <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-bold flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3" />
-                <span>{currentTrack.licenseType}</span>
-              </span>
-              {currentTrack.mood && (
-                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-800 dark:text-amber-200 font-bold">
-                  {currentTrack.mood}
-                </span>
-              )}
-            </div>
-
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[#242424] dark:text-[#ede5dc] leading-tight break-words">
-              {isBn ? currentTrack.titleBn || currentTrack.title : currentTrack.title}
-            </h2>
-            <p className="text-xs sm:text-sm text-[#665a54] dark:text-[#a89e95]">
-              {isBn ? currentTrack.artistBn || currentTrack.artist : currentTrack.artist} •{' '}
-              <span className="font-semibold">{currentTrack.category}</span>
-            </p>
-            <p className="text-xs text-[#776d65] dark:text-[#998e84] line-clamp-2">
-              {isBn ? currentTrack.descriptionBn : currentTrack.description}
-            </p>
-
-            <div className="pt-1 flex flex-col xs:flex-row flex-wrap items-center justify-center md:justify-start gap-2.5 sm:gap-3 w-full">
-              <button
-                type="button"
-                onClick={togglePlay}
-                className="w-full xs:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3 rounded-2xl bg-[#b42323] hover:bg-[#971c1c] text-white font-bold text-sm shadow-sm transition-all active:scale-95 cursor-pointer"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : isPlaying ? (
-                  <Pause className="w-4 h-4 fill-current" />
-                ) : (
-                  <Play className="w-4 h-4 fill-current ml-0.5" />
-                )}
-                <span>
-                  {isLoading
-                    ? (isBn ? 'লোড হচ্ছে...' : 'Buffering...')
-                    : isPlaying
-                    ? (isBn ? 'থামান' : 'Pause Audio')
-                    : currentTrack.playbackMethod === 'authorized_stream'
-                    ? (isBn ? 'ইন-পেজ স্ট্রিম শুনুন' : 'Play In-Page Stream')
-                    : (isBn ? 'গান শুনুন' : 'Play Soundscape')}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => togglePlaylistTrack(currentTrack.id)}
-                className="w-full xs:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-xs font-semibold text-[#665a54] dark:text-[#a89e95] hover:text-[#b42323] transition-colors cursor-pointer"
-              >
-                {isInPlaylist(currentTrack.id) ? (
-                  <>
-                    <BookmarkCheck className="w-4 h-4 text-[#b42323]" />
-                    <span className="text-[#b42323] font-bold">{isBn ? 'প্লেলিস্টে সংরক্ষিত' : 'In My Playlist'}</span>
-                  </>
-                ) : (
-                  <>
-                    <Bookmark className="w-4 h-4" />
-                    <span>{isBn ? '+ প্লেলিস্টে যোগ করুন' : '+ Add to Playlist'}</span>
-                  </>
-                )}
-              </button>
-
-              {currentTrack.sourceUrl && (
-                <a
-                  href={currentTrack.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full xs:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-xs font-semibold text-[#665a54] dark:text-[#a89e95] hover:text-[#b42323] transition-colors"
-                >
-                  <span>{isBn ? 'লাইসেন্স ও সোর্স' : 'Source & License'}</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              )}
-            </div>
-
-            {/* In-Card Authorized Stream Player for Featured Showcase */}
-            {isPlaying && currentTrack.embedUrl && (
-              <div className="w-full mt-3 rounded-2xl overflow-hidden aspect-video max-w-lg mx-auto md:mx-0 bg-black border border-[#eee8e1] dark:border-[#2f2720] shadow-md">
-                <iframe
-                  src={`${currentTrack.embedUrl}?autoplay=1&enablejsapi=1`}
-                  title={isBn ? currentTrack.titleBn || currentTrack.title : currentTrack.title}
-                  className="w-full h-full border-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-            )}
-          </div>
         </div>
       )}
 
@@ -364,6 +246,7 @@ export default function MusicPage() {
                 type="button"
                 onClick={() => setSearchQuery('')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[#776d65] hover:text-[#242424] p-0.5 cursor-pointer"
+                aria-label="Clear search"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -455,20 +338,40 @@ export default function MusicPage() {
                   key={track.id}
                   onClick={() => (isSelected ? togglePlay() : playTrack(track))}
                   className={cn(
-                    'p-4 sm:p-5 rounded-2xl border flex flex-col justify-between gap-3 cursor-pointer transition-all duration-150 shadow-sm relative group',
-                    isSelected
-                      ? 'bg-[#fdeeee] dark:bg-[#341b18] border-[#f6ceca] dark:border-[#4a2420] text-[#d52f2f]'
-                      : 'bg-white dark:bg-[#1a1613] border-[#eee8e1] dark:border-[#2f2720] hover:bg-[#fcfaf7] dark:hover:bg-[#221c17] text-[#4a423d] dark:text-[#c4b9ae]'
+                    'p-4 sm:p-5 rounded-2xl border flex flex-col justify-between gap-3.5 cursor-pointer transition-all duration-150 shadow-2xs relative group',
+                    isSelected && isPlaying
+                      ? 'bg-[#fdeeee]/60 dark:bg-[#341b18]/60 border-[#f6ceca] dark:border-[#4a2420]'
+                      : isSelected
+                      ? 'bg-[#fbf7f3] dark:bg-[#1f1b17] border-[#eadcce] dark:border-[#382f27]'
+                      : 'bg-white dark:bg-[#1a1613] border-[#eee8e1] dark:border-[#2f2720] hover:bg-[#fcfaf7] dark:hover:bg-[#201c18]'
                   )}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3 min-w-0">
-                      <div
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      {/* Bounded 48px thumbnail */}
+                      <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-[#eee8e1] dark:border-[#2f2720] shadow-2xs bg-[#f8f0e8] dark:bg-[#201c18]">
+                        <Image
+                          src={getAssetPath(track.id === 'track-mahalaya-original' ? '/images/mahalaya-thumb.jpg' : track.coverUrl || '/images/mahalaya-thumb.jpg')}
+                          alt={tTitle}
+                          fill
+                          className="object-cover"
+                          sizes="48px"
+                        />
+                      </div>
+
+                      {/* Play/Pause Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          isSelected ? togglePlay() : playTrack(track);
+                        }}
+                        aria-label={isSelected && isPlaying ? 'Pause' : 'Play'}
                         className={cn(
-                          'w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border shadow-sm mt-0.5',
-                          isSelected
-                            ? 'bg-[#b42323] text-white border-[#b42323]'
-                            : 'bg-[#fcfaf7] dark:bg-[#201c18] text-[#b42323] border-[#eee8e1] dark:border-[#2f2720]'
+                          'w-10 h-10 rounded-full flex items-center justify-center shrink-0 border shadow-2xs transition-transform active:scale-95 cursor-pointer',
+                          isSelected && isPlaying
+                            ? 'bg-[#d52f2f] text-white border-[#d52f2f]'
+                            : 'bg-white dark:bg-[#201c18] text-[#d52f2f] border-[#eee8e1] dark:border-[#2f2720] hover:bg-[#fdeeee]'
                         )}
                       >
                         {isSelected && isLoading ? (
@@ -478,14 +381,13 @@ export default function MusicPage() {
                         ) : (
                           <Play className="w-4 h-4 fill-current ml-0.5" />
                         )}
-                      </div>
+                      </button>
 
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-sm sm:text-base font-bold truncate text-[#242424] dark:text-[#ede5dc]">
-                            {tTitle}
-                          </h4>
-                        </div>
+                      {/* Metadata */}
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-sm sm:text-base font-bold truncate text-[#242424] dark:text-[#ede5dc]">
+                          {tTitle}
+                        </h4>
                         <p className="text-xs text-[#776d65] dark:text-[#a89e95] truncate mt-0.5">
                           {tArtist} • <span className="font-semibold text-[#b42323]">{track.category}</span>
                         </p>
@@ -516,22 +418,6 @@ export default function MusicPage() {
                       </button>
                     </div>
                   </div>
-
-                  {/* In-Card Authorized Stream Player when Selected and Playing */}
-                  {isSelected && isPlaying && track.embedUrl && (
-                    <div
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-full my-1 rounded-xl overflow-hidden aspect-video bg-black border border-black/10 dark:border-white/10 shadow-sm"
-                    >
-                      <iframe
-                        src={`${track.embedUrl}?autoplay=1&enablejsapi=1`}
-                        title={tTitle}
-                        className="w-full h-full border-0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    </div>
-                  )}
 
                   {/* Cultural Context / License Details Footer */}
                   <div className="pt-2.5 border-t border-black/5 dark:border-white/5 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[#776d65] dark:text-[#a89e95]">

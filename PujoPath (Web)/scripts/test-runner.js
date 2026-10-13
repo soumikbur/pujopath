@@ -1723,20 +1723,22 @@ console.log('\n--- Running Test Suite 32: Deployment Asset Routing, PWA Manifest
   const globalsCssFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'globals.css'), 'utf8');
   const bgConfigFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'data', 'config', 'backgroundConfig.ts'), 'utf8');
 
-  // 1. Compact Audio Player Constraints (Phase 3)
+  // 1. Compact Single Global Mini-Player Constraints (Phase 2 & 4)
   assert.ok(bottomPlayerFile.includes("height: '72px'"), 'Bottom player mobile height must be constrained to 72px (target 68-84px)');
   assert.ok(bottomPlayerFile.includes("width: 44") && bottomPlayerFile.includes("height: 44"), 'Thumbnail must be 44x44px (target 40-48px)');
   assert.ok(!bottomPlayerFile.includes('<iframe'), 'BottomMusicPlayer must not contain floating video iframe/embed');
   assert.ok(!bottomPlayerFile.includes('isStreamExpanded'), 'BottomMusicPlayer must not render expandable video frame');
   assert.ok(bottomPlayerFile.includes('closePlayer'), 'Bottom player must support clean close & dismissal');
   assert.ok(bottomPlayerFile.includes('z-[1150]'), 'Bottom player must float at z-[1150] above navigation');
-  assert.ok(bottomPlayerFile.includes('bottom-[calc(68px+env(safe-area-inset-bottom,0px))]'), 'Bottom player must maintain safe-area clearance above mobile nav');
-  console.log('✓ Compact audio control bar height (72px), thumbnail (44px), and absence of floating video iframe verified');
+  assert.ok(bottomPlayerFile.includes('bottom-[calc(76px+env(safe-area-inset-bottom,0px))]'), 'Bottom player must maintain 76px clearance above mobile nav');
+  console.log('✓ Compact audio control bar height (72px), thumbnail (44px), and 76px nav clearance verified');
 
-  // 2. In-Card Authorized Stream Containment (Phase 3)
-  assert.ok(musicPageFile.includes('<iframe'), 'Music page must contain authorized stream iframe inside track card');
-  assert.ok(musicPageFile.includes('pb-48'), 'Music page must provide pb-48 bottom scroll clearance');
-  console.log('✓ In-card authorized stream containment and bottom scroll clearance verified');
+  // 2. Clean Compact Track Cards & Single Player Architecture (Phase 2 & 3)
+  assert.ok(!musicPageFile.includes('<iframe'), 'Track cards must not contain video or media iframe embed');
+  assert.ok(!musicPageFile.includes('Featured Now Playing Showcase'), 'Music library must not render duplicate showcase player');
+  assert.ok(musicPageFile.includes('w-12 h-12 rounded-xl'), 'Track thumbnail must be strictly constrained to 48x48px (w-12 h-12)');
+  assert.ok(musicPageFile.includes('isPlayerActive'), 'Music page must coordinate dynamic bottom scroll clearance with isPlayerActive');
+  console.log('✓ Zero video iframes in track cards, 48px constrained thumbnails, and single player architecture verified');
 
   // 3. Strict Background Separation & Alpana Motion (Phase 4)
   assert.ok(bgConfigFile.includes('isHomepageRoute'), 'backgroundConfig must provide isHomepageRoute normalizer');

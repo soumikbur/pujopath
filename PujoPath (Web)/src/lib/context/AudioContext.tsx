@@ -41,6 +41,7 @@ interface AudioContextType {
   isInPlaylist: (trackId: string) => boolean;
   clearError: () => void;
   isPlayerDismissed: boolean;
+  isPlayerActive: boolean;
   closePlayer: () => void;
   resumePlayer: () => void;
 }
@@ -65,6 +66,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [isStreamExpanded, setIsStreamExpanded] = useState<boolean>(false);
   const [userPlaylistIds, setUserPlaylistIds] = useState<string[]>([]);
   const [isPlayerDismissed, setIsPlayerDismissed] = useState<boolean>(false);
+
+  const isPlayerActive = !isPlayerDismissed && Boolean(currentTrack && (isPlaying || currentTime > 0 || playbackError));
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const embedTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -587,6 +590,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         isInPlaylist,
         clearError,
         isPlayerDismissed,
+        isPlayerActive,
         closePlayer,
         resumePlayer,
       }}

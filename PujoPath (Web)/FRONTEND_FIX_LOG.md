@@ -97,11 +97,32 @@ This log records every modification applied to `PujoPath (Web)` during the compl
 
 ---
 
+### 6. Single Authoritative Player Architecture & Track Card Cleanliness (Phase 1–9)
+- **Files Modified:**
+  - `src/lib/context/AudioContext.tsx`
+  - `src/components/music/BottomMusicPlayer.tsx`
+  - `src/app/music/page.tsx`
+  - `src/app/mahalaya/page.tsx`
+  - `scripts/test-runner.js`
+- **Root Causes Identified:**
+  1. `src/app/music/page.tsx` had retained an active in-card video `<iframe>` inside the currently playing track card, plus a duplicate `Featured Now Playing Showcase` player at the top of the music page, generating three competing visual players simultaneously.
+  2. The mobile mini-player bottom offset of `68px` was slightly shallow for `MobileBottomNav` (~70px height), resulting in edge clipping on smaller viewports.
+  3. The music page bottom clearance was hardcoded rather than dynamically reactive to the active/dismissed state of the global mini-player.
+- **Architectural Corrections Made:**
+  1. **Single Playback Session & Controller:** Centralized authoritative media session in `AudioContext.tsx`. Added `isPlayerActive: boolean` reactive state computed as `!isPlayerDismissed && Boolean(currentTrack && (isPlaying || currentTime > 0 || playbackError))`.
+  2. **Clean Compact Track Cards:** Completely eradicated the top `Featured Now Playing Showcase` and all in-card `<iframe>` video frames from `src/app/music/page.tsx`. Constrained every track card to a compact design with a bounded 48×48px thumbnail (`w-12 h-12 rounded-xl`), circular Play/Pause toggle, title, artist, category, description, duration, bookmark control, and separate license/source attribution.
+  3. **Mahalaya Audio Centralization:** Removed the embedded video player from `src/app/mahalaya/page.tsx`, routing Mahalaya playback exclusively through the single shared audio controller.
+  4. **Floating Mini-Player Clearance & Dimensions:** Configured `BottomMusicPlayer.tsx` with mobile bottom offset `bottom-[calc(76px+env(safe-area-inset-bottom,0px))] md:bottom-5` (preventing any overlap or clipping with the ~70px mobile navigation bar). Constrained mobile height strictly to `72px`, thumbnail strictly to `44×44px`, and flexible text containers with `min-w-0` and truncation.
+  5. **Dynamic Document Clearance:** Implemented reactive bottom clearance on the music library (`pb-44 md:pb-28` when `isPlayerActive` is true, shrinking to `pb-24 md:pb-16` when dismissed or closed), guaranteeing the last track card is reachable and never covered.
+  6. **Automated Regression Verification:** Updated Test Suite 33 in `scripts/test-runner.js` to assert zero iframes in track cards, no duplicate showcase cards, 48px constrained thumbnails, and 76px nav clearance.
+
+---
+
 ## 3. Regression & Build Validation Summary
 
 | Step | Command | Result | Notes |
 |---|---|:---:|---|
-| **Automated Test Suites** | `node scripts/test-runner.js` | **PASS (33/33)** | All 33 suites passed in 1.4s |
+| **Automated Test Suites** | `node scripts/test-runner.js` | **PASS (33/33)** | All 33 suites passed with zero errors |
 | **Type Check & Lint** | `npm run build` | **PASS** | Strict TypeScript and Next.js lint validation passed |
 | **Static HTML Export** | `next build` | **PASS** | 1,558 static HTML pages exported to `out/` |
 | **Asset Resolution** | Subpath `./` checks | **PASS** | Service Worker, manifest, and icons portable |
