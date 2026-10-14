@@ -5,6 +5,7 @@ const basePath = isGithubActions ? '/pujopath' : '';
 
 const nextConfig = {
   reactStrictMode: true,
+  productionBrowserSourceMaps: false,
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
   },

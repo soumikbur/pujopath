@@ -17,7 +17,7 @@ export interface AppConfig {
 }
 
 export const config: AppConfig = {
-  appUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://soumikbur.github.io/pujopath',
+  appUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://pujopath.vercel.app',
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
   mapProvider: (process.env.NEXT_PUBLIC_MAP_PROVIDER as AppConfig['mapProvider']) || 'google',
   googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
