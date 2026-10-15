@@ -169,6 +169,30 @@ export const HelplineScreen: React.FC<HelplineScreenProps> = () => {
               : '• Keep an ID card or contact number tag in children’s pockets in heavy pandal crowds.\n• Take advantage of early morning or midnight hopping to avoid rush hours.\n• Use Kolkata Metro’s dedicated overnight festive train network.'}
           </Text>
         </View>
+
+        {/* Feedback & Suggestions Card */}
+        <View style={[styles.safetyCard, { backgroundColor: colors.surface, borderColor: '#0A66C2', marginTop: 12 }]}>
+          <Text style={[styles.safetyTitle, { color: colors.text }]}>
+            {language === 'bn' ? 'মতামত ও পরামর্শ (Feedback)' : 'Feedback & Suggestions'}
+          </Text>
+          <Text style={[styles.safetyText, { color: colors.textSecondary, marginBottom: 12 }]}>
+            {language === 'bn'
+              ? 'পুজোপথকে আরও সমৃদ্ধ করতে আপনার মূল্যবান পরামর্শ বা প্রতিক্রিয়া সরাসরি লিঙ্কডইনে বার্তা পাঠিয়ে জানান।'
+              : 'Have suggestions, corrections, or new features to suggest? Send your feedback directly via LinkedIn messaging.'}
+          </Text>
+          <TouchableOpacity
+            style={[styles.callBtn, { backgroundColor: '#0A66C2', alignSelf: 'flex-start', paddingHorizontal: 16 }]}
+            onPress={() => Linking.openURL('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/')}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={language === 'bn' ? 'লিঙ্কডইনে মতামত পাঠান' : 'Send feedback on LinkedIn'}
+          >
+            <Ionicons name="chatbubbles" size={16} color="#FFFFFF" />
+            <Text style={styles.callNumberText}>
+              {language === 'bn' ? 'মতামত দিন (Feedback)' : 'Feedback'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );

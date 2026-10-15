@@ -1,6 +1,6 @@
 'use client';
 
-import { PhoneCall, ShieldCheck, Info, Users } from 'lucide-react';
+import { PhoneCall, ShieldCheck, Info, Users, MessageSquare } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
 
 export default function AboutPage() {
@@ -135,6 +135,36 @@ export default function AboutPage() {
             </a>
           </div>
         </div>
+      </div>
+
+      {/* Feedback & Suggestions Section */}
+      <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#1a1613] border border-[#eee8e1] dark:border-[#2f2720] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 transition-colors shadow-card">
+        <div className="space-y-1.5 max-w-xl">
+          <div className="flex items-center gap-2 text-[#0a66c2] dark:text-[#70b5f9] text-xs sm:text-sm font-bold uppercase tracking-wider">
+            <MessageSquare className="w-4 h-4" />
+            <span>{isBn ? 'মতামত ও পরামর্শ' : 'Feedback & Suggestions'}</span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-[#242424] dark:text-[#ede5dc]">
+            {isBn ? 'আপনার মূল্যবান মতামত জানান' : 'Share Your Feedback'}
+          </h2>
+          <p className="text-sm text-[#665a54] dark:text-[#a89e95] leading-relaxed">
+            {isBn
+              ? 'পুজোপথকে আরও সমৃদ্ধ ও নিখুঁত করতে আপনার যেকোনো পরামর্শ বা প্রতিক্রিয়া সরাসরি সৌমিকের লিঙ্কডইনে বার্তা পাঠিয়ে জানাতে পারেন।'
+              : 'Have suggestions, corrections, or new features to suggest? Send your feedback directly via LinkedIn messaging.'}
+          </p>
+        </div>
+
+        <a
+          href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-2xl bg-[#0a66c2] hover:bg-[#004182] text-white font-bold text-sm shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
+          title={isBn ? 'সৌমিকের লিঙ্কডইনে বার্তা পাঠান' : "Send a message on Soumik's LinkedIn"}
+          aria-label={isBn ? 'লিঙ্কডইনে মতামত দিন' : 'Send feedback on LinkedIn'}
+        >
+          <MessageSquare className="w-4 h-4" />
+          <span>{isBn ? 'মতামত দিন (Feedback)' : 'Feedback'}</span>
+        </a>
       </div>
     </div>
   );

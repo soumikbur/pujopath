@@ -16,6 +16,7 @@ import {
   Heart,
   Info,
   X,
+  MessageSquare,
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { cn } from '@/lib/utils/cn';
@@ -113,7 +114,12 @@ export function MobileBottomNav() {
 
       {/* More Drawer */}
       {moreOpen && (
-        <div className="fixed inset-0 z-[1300] flex flex-col justify-end md:hidden bg-black/50 backdrop-blur-sm animate-in fade-in">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={isBn ? 'অন্যান্য সুবিধাসমূহ' : 'More Features'}
+          className="fixed inset-0 z-[1300] flex flex-col justify-end md:hidden bg-black/50 backdrop-blur-sm animate-in fade-in"
+        >
           <div className="bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] rounded-t-3xl p-6 space-y-4 shadow-elevated max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-[#eee8e1] dark:border-[#2a241f] pb-3">
               <h3 className="font-bold text-base text-[#242424] dark:text-[#ede5dc]">
@@ -128,7 +134,7 @@ export function MobileBottomNav() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 pb-6">
+            <div className="grid grid-cols-2 gap-3 pb-2">
               {secondaryItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
@@ -149,6 +155,22 @@ export function MobileBottomNav() {
                   </Link>
                 );
               })}
+            </div>
+
+            {/* Feedback & Suggestion Link */}
+            <div className="pt-2 border-t border-[#eee8e1] dark:border-[#2a241f]">
+              <a
+                href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMoreOpen(false)}
+                className="flex items-center justify-center gap-2.5 w-full py-3 px-4 rounded-2xl bg-[#f0f7ff] dark:bg-[#1a2634] text-[#0a66c2] dark:text-[#70b5f9] border border-[#0a66c2]/30 dark:border-[#0a66c2]/40 font-bold text-xs hover:bg-[#0a66c2] hover:text-white transition-colors shadow-sm"
+                title={isBn ? 'সৌমিকের লিঙ্কডইনে মতামত পাঠান' : 'Send Feedback on LinkedIn'}
+                aria-label={isBn ? 'লিঙ্কডইনে মতামত দিন' : 'Send feedback on LinkedIn'}
+              >
+                <MessageSquare className="w-4 h-4 shrink-0" />
+                <span>{isBn ? 'মতামত দিন (Feedback)' : 'Feedback'}</span>
+              </a>
             </div>
           </div>
         </div>

@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { PhoneCall, ShieldCheck, Info, Users } from 'lucide-react';
+import { PhoneCall, ShieldCheck, Info, Users, MessageSquare } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
 
 export default function AboutPage() {
@@ -86,42 +85,86 @@ export default function AboutPage() {
           </h2>
           <p className="text-sm sm:text-base text-[#665a54] dark:text-[#a89e95] mt-1.5 leading-relaxed">
             {isBn
-              ? 'পুজোপথ হলো সৌমিক ঘোষ এবং মৌমিতা শী-র একটি যৌথ সৃষ্টি, যা মানুষকে কলকাতার দুর্গোৎসবের মণ্ডপ আবিষ্কার ও সুষ্ঠু পরিকল্পনা করতে সাহায্য করে।'
-              : 'PujoPath is a collaborative project co-created by Soumik Ghosh and Moumita Shee to help people discover Kolkata\'s Durga Puja pandals and plan their festive experiences.'}
+              ? 'পুজোপথ হলো সৌমিক ও মৌমিতার একটি যৌথ সৃষ্টি, যা মানুষকে কলকাতার দুর্গোৎসবের মণ্ডপ আবিষ্কার ও সুষ্ঠু পরিকল্পনা করতে সাহায্য করে।'
+              : 'PujoPath is a collaborative project co-created by Soumik and Moumita to help people discover Kolkata\'s Durga Puja pandals and plan their festive experiences.'}
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-          {/* Soumik Ghosh */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3">
+          {/* Soumik */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3 transition-colors">
             <div className="space-y-0.5">
               <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc]">
-                {isBn ? 'সৌমিক ঘোষ' : 'Soumik Ghosh'}
+                {isBn ? 'সৌমিক' : 'Soumik'}
               </div>
               <div className="text-xs font-semibold text-[#b42323] dark:text-[#e05656]">
                 {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
               </div>
             </div>
-            <span className="px-3 py-1 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a]">
-              {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
-            </span>
+            <a
+              href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a] hover:text-[#0a66c2] dark:hover:text-[#70b5f9] hover:border-[#0a66c2]/40 dark:hover:border-[#0a66c2]/50 hover:bg-[#f0f7ff] dark:hover:bg-[#1a2634] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42323] shrink-0 select-none inline-flex items-center justify-center min-h-[32px]"
+              title={isBn ? 'সৌমিকের লিঙ্কডইন প্রোফাইল দেখুন' : "View Soumik's LinkedIn profile"}
+              aria-label={isBn ? 'সৌমিকের লিঙ্কডইন প্রোফাইল দেখুন' : "View Soumik's LinkedIn profile"}
+            >
+              {isBn ? 'লিঙ্কডইন' : 'LinkedIn'}
+            </a>
           </div>
 
-          {/* Moumita Shee */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3">
+          {/* Moumita */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-[#faf7f2] dark:bg-[#201b17] border border-[#eee8e1] dark:border-[#2f2720] flex items-center justify-between gap-3 transition-colors">
             <div className="space-y-0.5">
               <div className="text-base font-bold text-[#242424] dark:text-[#ede5dc]">
-                {isBn ? 'মৌমিতা শী' : 'Moumita Shee'}
+                {isBn ? 'মৌমিতা' : 'Moumita'}
               </div>
               <div className="text-xs font-semibold text-[#b42323] dark:text-[#e05656]">
                 {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
               </div>
             </div>
-            <span className="px-3 py-1 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a]">
-              {isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}
-            </span>
+            <a
+              href="https://www.linkedin.com/in/moumita-shee-798505226/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-[#2a241f] text-[#665a54] dark:text-[#c4b9ae] border border-[#e5ded6] dark:border-[#3d332a] hover:text-[#0a66c2] dark:hover:text-[#70b5f9] hover:border-[#0a66c2]/40 dark:hover:border-[#0a66c2]/50 hover:bg-[#f0f7ff] dark:hover:bg-[#1a2634] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42323] shrink-0 select-none inline-flex items-center justify-center min-h-[32px]"
+              title={isBn ? 'মৌমিতার লিঙ্কডইন প্রোফাইল দেখুন' : "View Moumita's LinkedIn profile"}
+              aria-label={isBn ? 'মৌমিতার লিঙ্কডইন প্রোফাইল দেখুন' : "View Moumita's LinkedIn profile"}
+            >
+              {isBn ? 'লিঙ্কডইন' : 'LinkedIn'}
+            </a>
           </div>
         </div>
+      </div>
+
+      {/* Feedback & Suggestions Section */}
+      <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#1a1613] border border-[#eee8e1] dark:border-[#2f2720] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 transition-colors shadow-card">
+        <div className="space-y-1.5 max-w-xl">
+          <div className="flex items-center gap-2 text-[#0a66c2] dark:text-[#70b5f9] text-xs sm:text-sm font-bold uppercase tracking-wider">
+            <MessageSquare className="w-4 h-4" />
+            <span>{isBn ? 'মতামত ও পরামর্শ' : 'Feedback & Suggestions'}</span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-[#242424] dark:text-[#ede5dc]">
+            {isBn ? 'আপনার মূল্যবান মতামত জানান' : 'Share Your Feedback'}
+          </h2>
+          <p className="text-sm text-[#665a54] dark:text-[#a89e95] leading-relaxed">
+            {isBn
+              ? 'পুজোপথকে আরও সমৃদ্ধ ও নিখুঁত করতে আপনার যেকোনো পরামর্শ বা প্রতিক্রিয়া সরাসরি সৌমিকের লিঙ্কডইনে বার্তা পাঠিয়ে জানাতে পারেন।'
+              : 'Have suggestions, corrections, or new features to suggest? Send your feedback directly via LinkedIn messaging.'}
+          </p>
+        </div>
+
+        <a
+          href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-2xl bg-[#0a66c2] hover:bg-[#004182] text-white font-bold text-sm shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
+          title={isBn ? 'সৌমিকের লিঙ্কডইনে বার্তা পাঠান' : "Send a message on Soumik's LinkedIn"}
+          aria-label={isBn ? 'লিঙ্কডইনে মতামত দিন' : 'Send feedback on LinkedIn'}
+        >
+          <MessageSquare className="w-4 h-4" />
+          <span>{isBn ? 'মতামত দিন (Feedback)' : 'Feedback'}</span>
+        </a>
       </div>
     </div>
   );
