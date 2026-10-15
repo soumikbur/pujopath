@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   Calendar,
   ChevronDown,
+  Download,
   Heart,
   Info,
   MessageSquare,
@@ -16,6 +17,7 @@ import {
   Train,
   Users,
 } from 'lucide-react';
+import { APK_DOWNLOAD_URL } from '@/lib/config';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useTheme } from '@/lib/context/ThemeContext';
@@ -165,8 +167,27 @@ export function Header() {
           </div>
         </nav>
 
-        {/* Right Controls: Theme Switch + Language Switch + Saved Heart */}
+        {/* Right Controls: Install App + Theme Switch + Language Switch + Saved Heart */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Install Android App Button */}
+          <a
+            id="install-app-header-btn"
+            href={APK_DOWNLOAD_URL}
+            download="PujoPath-v1.0.0.apk"
+            target="_blank"
+            rel="noopener noreferrer"
+            title={
+              isBn
+                ? 'অ্যান্ড্রয়েড প্রিভিউ অ্যাপ ডাউনলোড করুন (APK)'
+                : 'Download Android Preview App (APK)'
+            }
+            aria-label={isBn ? 'অ্যান্ড্রয়েড অ্যাপ ইনস্টল করুন' : 'Install Android App'}
+            className="flex items-center gap-1 sm:gap-1.5 h-9 px-2 sm:px-3 rounded-xl bg-[#b42323] hover:bg-[#971e1e] text-white text-xs sm:text-sm font-bold shadow-sm transition-all duration-150 active:scale-95 shrink-0"
+          >
+            <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" aria-hidden="true" />
+            <span className="hidden sm:inline">{isBn ? 'অ্যাপ ইনস্টল' : 'Install App'}</span>
+            <span className="sm:hidden">{isBn ? 'অ্যাপ' : 'App'}</span>
+          </a>
 
           {/* Theme Switcher Toggle */}
           <button

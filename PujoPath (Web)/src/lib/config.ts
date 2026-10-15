@@ -28,6 +28,12 @@ export const config: AppConfig = {
 };
 
 /**
+ * Direct public download URL for the published Android APK release asset.
+ */
+export const APK_DOWNLOAD_URL =
+  'https://github.com/soumikbur/pujopath/releases/download/v1.0.0/PujoPath-v1.0.0.apk';
+
+/**
  * Validates the runtime development environment.
  * Warns if developers have cloned the repository without creating their local .env.local file.
  */
