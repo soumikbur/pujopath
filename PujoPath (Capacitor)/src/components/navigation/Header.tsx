@@ -32,37 +32,72 @@ export function Header() {
 
   // Scroll-responsive collapsible header for Capacitor mobile
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const isHeaderVisibleRef = useRef(true);
   const lastScrollY = useRef(0);
+  const accumulatedDelta = useRef(0);
+  const lastDirection = useRef<'up' | 'down' | null>(null);
   const ticking = useRef(false);
 
   useEffect(() => {
-    const threshold = 12; // Minimum scroll delta in px to avoid jitter
-    const topThreshold = 50; // Always visible near the top of the page
+    // Calibrated thresholds for natural, jitter-free scroll responsiveness
+    const downCollapseThreshold = 20; // 20px of continuous downward scroll to collapse
+    const upRevealThreshold = 14;     // 14px of continuous upward scroll to reveal
+    const topZone = 16;               // Guaranteed visibility near top of document
+
+    function updateVisibility(visible: boolean) {
+      if (visible !== isHeaderVisibleRef.current) {
+        isHeaderVisibleRef.current = visible;
+        setIsHeaderVisible(visible);
+      }
+    }
 
     function handleScroll() {
       if (!ticking.current) {
         window.requestAnimationFrame(() => {
           const currentScrollY = window.scrollY || document.documentElement.scrollTop || 0;
 
-          // If More dropdown menu is open, never collapse
+          // If More dropdown menu is open, keep header visible
           if (moreOpen) {
-            setIsHeaderVisible(true);
+            updateVisibility(true);
             lastScrollY.current = currentScrollY;
+            accumulatedDelta.current = 0;
+            lastDirection.current = null;
             ticking.current = false;
             return;
           }
 
-          // Always show when near the very top of the page
-          if (currentScrollY <= topThreshold) {
-            setIsHeaderVisible(true);
+          // Always reveal header near top of page
+          if (currentScrollY <= topZone) {
+            updateVisibility(true);
+            accumulatedDelta.current = 0;
+            lastDirection.current = null;
           } else {
             const delta = currentScrollY - lastScrollY.current;
-            if (delta > threshold) {
-              // Scrolling down -> smoothly collapse header
-              setIsHeaderVisible(false);
-            } else if (delta < -threshold) {
-              // Scrolling up -> smoothly reveal header
-              setIsHeaderVisible(true);
+
+            if (delta > 0) {
+              // Scrolling down
+              if (lastDirection.current !== 'down') {
+                lastDirection.current = 'down';
+                accumulatedDelta.current = 0;
+              }
+              accumulatedDelta.current += delta;
+
+              // Only collapse once past the header height and accumulated threshold reached
+              if (accumulatedDelta.current >= downCollapseThreshold && currentScrollY > 64) {
+                updateVisibility(false);
+              }
+            } else if (delta < 0) {
+              // Scrolling up
+              if (lastDirection.current !== 'up') {
+                lastDirection.current = 'up';
+                accumulatedDelta.current = 0;
+              }
+              accumulatedDelta.current += Math.abs(delta);
+
+              // Reveal smoothly as soon as intentional upward movement is detected
+              if (accumulatedDelta.current >= upRevealThreshold) {
+                updateVisibility(true);
+              }
             }
           }
 
@@ -127,7 +162,7 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-[1100] border-b border-[#eee8e1] dark:border-[#2a241f] bg-[#fcfaf7]/98 dark:bg-[#14110e]/98 backdrop-blur-md pt-[env(safe-area-inset-top,0px)] transition-transform duration-300 ease-in-out motion-reduce:transition-none",
+        "sticky top-0 z-[1100] border-b border-[#eee8e1] dark:border-[#2a241f] bg-[#fcfaf7]/98 dark:bg-[#14110e]/98 backdrop-blur-md pt-[env(safe-area-inset-top,0px)] transition-transform duration-260 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-transform transform-gpu",
         isHeaderVisible ? "translate-y-0 pointer-events-auto" : "-translate-y-full pointer-events-none"
       )}
     >

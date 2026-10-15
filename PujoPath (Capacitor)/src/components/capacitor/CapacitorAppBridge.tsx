@@ -41,16 +41,20 @@ export function CapacitorAppBridge() {
         const updateStatusBar = async () => {
           try {
             const isDark = document.documentElement.classList.contains('dark');
-            // Always overlay webview for true edge-to-edge immersion
-            await StatusBar.setOverlaysWebView({ overlay: true }).catch(() => {});
+            // Do NOT overlay webview so status bar never overlaps page content
+            await StatusBar.setOverlaysWebView({ overlay: false }).catch(() => {});
 
             if (isDark) {
               await StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
               await StatusBar.setBackgroundColor({ color: '#14110E' }).catch(() => {});
             } else {
-              // Light theme signature PujoPath maroon header
               await StatusBar.setStyle({ style: Style.Light }).catch(() => {});
-              await StatusBar.setBackgroundColor({ color: '#7c1d1d' }).catch(() => {});
+              await StatusBar.setBackgroundColor({ color: '#FCFAF7' }).catch(() => {});
+            }
+
+            // Sync with Android native theme bridge for edge-to-edge status bar background
+            if (typeof (window as any).AndroidThemeBridge?.setSystemBarTheme === 'function') {
+              (window as any).AndroidThemeBridge.setSystemBarTheme(isDark);
             }
           } catch {
             // Silently handle web/unsupported
