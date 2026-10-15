@@ -30,6 +30,55 @@ export function Header() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isBn = locale === 'bn';
 
+  // Scroll-responsive collapsible header for Capacitor mobile
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
+  const ticking = useRef(false);
+
+  useEffect(() => {
+    const threshold = 12; // Minimum scroll delta in px to avoid jitter
+    const topThreshold = 50; // Always visible near the top of the page
+
+    function handleScroll() {
+      if (!ticking.current) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+
+          // If More dropdown menu is open, never collapse
+          if (moreOpen) {
+            setIsHeaderVisible(true);
+            lastScrollY.current = currentScrollY;
+            ticking.current = false;
+            return;
+          }
+
+          // Always show when near the very top of the page
+          if (currentScrollY <= topThreshold) {
+            setIsHeaderVisible(true);
+          } else {
+            const delta = currentScrollY - lastScrollY.current;
+            if (delta > threshold) {
+              // Scrolling down -> smoothly collapse header
+              setIsHeaderVisible(false);
+            } else if (delta < -threshold) {
+              // Scrolling up -> smoothly reveal header
+              setIsHeaderVisible(true);
+            }
+          }
+
+          lastScrollY.current = currentScrollY;
+          ticking.current = false;
+        });
+        ticking.current = true;
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [moreOpen]);
+
   // Close dropdown when clicking outside or pressing Escape
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | TouchEvent) {
@@ -76,7 +125,12 @@ export function Header() {
   const isSecondaryActive = secondaryLinks.some((link) => pathname === link.href);
 
   return (
-    <header className="sticky top-0 z-[1100] border-b border-[#eee8e1] dark:border-[#2a241f] bg-[#fcfaf7]/98 dark:bg-[#14110e]/98 backdrop-blur-md transition-colors duration-200 pt-[env(safe-area-inset-top,0px)]">
+    <header
+      className={cn(
+        "sticky top-0 z-[1100] border-b border-[#eee8e1] dark:border-[#2a241f] bg-[#fcfaf7]/98 dark:bg-[#14110e]/98 backdrop-blur-md pt-[env(safe-area-inset-top,0px)] transition-transform duration-300 ease-in-out motion-reduce:transition-none",
+        isHeaderVisible ? "translate-y-0 pointer-events-auto" : "-translate-y-full pointer-events-none"
+      )}
+    >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
         {/* Brand Logo */}
         <Link
