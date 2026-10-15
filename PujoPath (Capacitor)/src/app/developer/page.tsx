@@ -73,88 +73,7 @@ export default function DeveloperPage() {
 
       {/* Developer Profile Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-        {/* Card 1: Soumik */}
-        <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#1a1613] border border-[#eee8e1] dark:border-[#2f2720] shadow-card flex flex-col justify-between gap-6 transition-all hover:border-[#b42323]/30">
-          <div className="space-y-4">
-            <div className="flex items-start gap-4 sm:gap-5">
-              {/* Profile Picture with Fallback */}
-              <div className="relative shrink-0">
-                {!soumikImgError ? (
-                  <img
-                    src={getAssetPath('/images/developers/soumik.jpg')}
-                    alt={isBn ? 'সৌমিক' : 'Soumik'}
-                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-[#b42323]/25 dark:border-[#e05656]/30 shadow-md"
-                    onError={() => setSoumikImgError(true)}
-                  />
-                ) : (
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-[#b42323] to-[#801414] text-white flex items-center justify-center font-black text-2xl sm:text-3xl border-2 border-[#b42323]/30 shadow-md">
-                    S
-                  </div>
-                )}
-                <span className="absolute -bottom-1.5 -right-1.5 p-1 rounded-full bg-[#faf7f2] dark:bg-[#251e18] border border-[#eee8e1] dark:border-[#3d332a] text-[#b42323] dark:text-[#e05656] shadow-xs">
-                  <Code2 className="w-3.5 h-3.5" />
-                </span>
-              </div>
-
-              {/* Title & Role */}
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#fdeeee] dark:bg-[#341b18] text-[#b42323] dark:text-[#e05656] text-[11px] font-bold">
-                  <Sparkles className="w-3 h-3" />
-                  <span>{isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}</span>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-black text-[#242424] dark:text-[#ede5dc] tracking-tight">
-                  {isBn ? 'সৌমিক' : 'Soumik'}
-                </h2>
-                <p className="text-xs sm:text-sm font-bold text-[#b42323] dark:text-[#e05656]">
-                  {isBn ? 'ব্যাকএন্ড ও সিস্টেমস লিড' : 'Backend & Systems Lead'}
-                </p>
-              </div>
-            </div>
-
-            <p className="text-xs sm:text-sm text-[#5a504a] dark:text-[#b5aaa0] leading-relaxed">
-              {isBn
-                ? 'পুজোপথের ব্যাকএন্ড আর্কিটেকচার, কোর অ্যাপ্লিকেশন লজিক, রুট অপ্টিমাইজেশন অ্যালগরিদম, অফলাইন-ফার্স্ট ট্রানজিট সিস্টেম, ব্যাকএন্ড ইন্টিগ্রেশন এবং অ্যাপ্লিকেশনের পারফরম্যান্স ও নির্ভরযোগ্যতা পরিচালনায় নেতৃত্ব দিচ্ছেন।'
-                : 'Directs backend & systems architecture, core application logic, route optimization algorithms, offline-first transit functionality, backend integrations, and platform performance & reliability.'}
-            </p>
-
-            {/* Responsibilities Chips */}
-            <div className="pt-1">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-[#8a7f76] dark:text-[#7f746b] mb-2">
-                {isBn ? 'দায়িত্বসমূহ' : 'Key Responsibilities'}
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {soumikResponsibilities.map((resp, idx) => (
-                  <span
-                    key={idx}
-                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[#f7f3ee] dark:bg-[#251e18] text-[#554b44] dark:text-[#c4b9ae] border border-[#e8dfd5] dark:border-[#382e25]"
-                  >
-                    {resp}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Action Link to LinkedIn */}
-          <div className="pt-3 border-t border-[#f2ece4] dark:border-[#27211c] flex items-center justify-between">
-            <span className="text-xs text-[#8a7f76] dark:text-[#7f746b]">
-              {isBn ? 'পেশাদার প্রোফাইল' : 'Professional Profile'}
-            </span>
-            <a
-              href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={isBn ? 'সৌমিকের লিঙ্কডইন প্রোফাইল দেখুন' : "View Soumik's LinkedIn profile"}
-              title={isBn ? 'সৌমিকের লিঙ্কডইন প্রোফাইল দেখুন' : "View Soumik's LinkedIn profile"}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-[#0a66c2] hover:bg-[#004182] text-white shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <span>{isBn ? 'লিঙ্কডইন' : 'LinkedIn'}</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-          </div>
-        </div>
-
-        {/* Card 2: Moumita */}
+        {/* Card 1: Moumita */}
         <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#1a1613] border border-[#eee8e1] dark:border-[#2f2720] shadow-card flex flex-col justify-between gap-6 transition-all hover:border-[#b42323]/30">
           <div className="space-y-4">
             <div className="flex items-start gap-4 sm:gap-5">
@@ -227,6 +146,87 @@ export default function DeveloperPage() {
               rel="noopener noreferrer"
               aria-label={isBn ? 'মৌমিতার লিঙ্কডইন প্রোফাইল দেখুন' : "View Moumita's LinkedIn profile"}
               title={isBn ? 'মৌমিতার লিঙ্কডইন প্রোফাইল দেখুন' : "View Moumita's LinkedIn profile"}
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-[#0a66c2] hover:bg-[#004182] text-white shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <span>{isBn ? 'লিঙ্কডইন' : 'LinkedIn'}</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        </div>
+
+        {/* Card 2: Soumik */}
+        <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#1a1613] border border-[#eee8e1] dark:border-[#2f2720] shadow-card flex flex-col justify-between gap-6 transition-all hover:border-[#b42323]/30">
+          <div className="space-y-4">
+            <div className="flex items-start gap-4 sm:gap-5">
+              {/* Profile Picture with Fallback */}
+              <div className="relative shrink-0">
+                {!soumikImgError ? (
+                  <img
+                    src={getAssetPath('/images/developers/soumik.jpg')}
+                    alt={isBn ? 'সৌমিক' : 'Soumik'}
+                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-[#b42323]/25 dark:border-[#e05656]/30 shadow-md"
+                    onError={() => setSoumikImgError(true)}
+                  />
+                ) : (
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-[#b42323] to-[#801414] text-white flex items-center justify-center font-black text-2xl sm:text-3xl border-2 border-[#b42323]/30 shadow-md">
+                    S
+                  </div>
+                )}
+                <span className="absolute -bottom-1.5 -right-1.5 p-1 rounded-full bg-[#faf7f2] dark:bg-[#251e18] border border-[#eee8e1] dark:border-[#3d332a] text-[#b42323] dark:text-[#e05656] shadow-xs">
+                  <Code2 className="w-3.5 h-3.5" />
+                </span>
+              </div>
+
+              {/* Title & Role */}
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#fdeeee] dark:bg-[#341b18] text-[#b42323] dark:text-[#e05656] text-[11px] font-bold">
+                  <Sparkles className="w-3 h-3" />
+                  <span>{isBn ? 'সহ-নির্মাতা' : 'Co-Creator'}</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-[#242424] dark:text-[#ede5dc] tracking-tight">
+                  {isBn ? 'সৌমিক' : 'Soumik'}
+                </h2>
+                <p className="text-xs sm:text-sm font-bold text-[#b42323] dark:text-[#e05656]">
+                  {isBn ? 'ব্যাকএন্ড ও সিস্টেমস লিড' : 'Backend & Systems Lead'}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs sm:text-sm text-[#5a504a] dark:text-[#b5aaa0] leading-relaxed">
+              {isBn
+                ? 'পুজোপথের ব্যাকএন্ড আর্কিটেকচার, কোর অ্যাপ্লিকেশন লজিক, রুট অপ্টিমাইজেশন অ্যালগরিদম, অফলাইন-ফার্স্ট ট্রানজিট সিস্টেম, ব্যাকএন্ড ইন্টিগ্রেশন এবং অ্যাপ্লিকেশনের পারফরম্যান্স ও নির্ভরযোগ্যতা পরিচালনায় নেতৃত্ব দিচ্ছেন।'
+                : 'Directs backend & systems architecture, core application logic, route optimization algorithms, offline-first transit functionality, backend integrations, and platform performance & reliability.'}
+            </p>
+
+            {/* Responsibilities Chips */}
+            <div className="pt-1">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-[#8a7f76] dark:text-[#7f746b] mb-2">
+                {isBn ? 'দায়িত্বসমূহ' : 'Key Responsibilities'}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {soumikResponsibilities.map((resp, idx) => (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[#f7f3ee] dark:bg-[#251e18] text-[#554b44] dark:text-[#c4b9ae] border border-[#e8dfd5] dark:border-[#382e25]"
+                  >
+                    {resp}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Action Link to LinkedIn */}
+          <div className="pt-3 border-t border-[#f2ece4] dark:border-[#27211c] flex items-center justify-between">
+            <span className="text-xs text-[#8a7f76] dark:text-[#7f746b]">
+              {isBn ? 'পেশাদার প্রোফাইল' : 'Professional Profile'}
+            </span>
+            <a
+              href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={isBn ? 'সৌমিকের লিঙ্কডইন প্রোফাইল দেখুন' : "View Soumik's LinkedIn profile"}
+              title={isBn ? 'সৌমিকের লিঙ্কডইন প্রোফাইল দেখুন' : "View Soumik's LinkedIn profile"}
               className="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-[#0a66c2] hover:bg-[#004182] text-white shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               <span>{isBn ? 'লিঙ্কডইন' : 'LinkedIn'}</span>
