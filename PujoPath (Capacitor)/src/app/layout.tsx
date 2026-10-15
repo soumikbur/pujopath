@@ -7,15 +7,19 @@ import { FavoritesProvider } from '@/lib/context/FavoritesContext';
 import { BackgroundProvider } from '@/lib/context/BackgroundContext';
 import { AppShell } from '@/components/navigation/AppShell';
 import { PwaRegister } from '@/components/pwa/PwaRegister';
+import { CapacitorAppBridge } from '@/components/capacitor/CapacitorAppBridge';
+import { LaunchIntroAnimation } from '@/components/intro/LaunchIntroAnimation';
+
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 export const metadata: Metadata = {
   title: 'PujoPath — Discover. Plan. Experience Pujo.',
   description:
     'A minimal, clean, modern Durga Puja 2026 digital companion with pandal discovery, route planner, metro guide, sacred calendar, and Sharodiya music.',
-  manifest: '/manifest.json',
+  manifest: `${basePath}/manifest.json`,
   icons: {
-    icon: '/icons/icon-192.png',
-    apple: '/icons/icon-192.png',
+    icon: `${basePath}/icons/icon-192.png`,
+    apple: `${basePath}/icons/icon-192.png`,
   },
 };
 
@@ -23,7 +27,11 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#FCFAF7',
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#FCFAF7' },
+    { media: '(prefers-color-scheme: dark)', color: '#14110E' },
+  ],
 };
 
 export default function RootLayout({
@@ -66,6 +74,8 @@ export default function RootLayout({
                 <BackgroundProvider>
                   <AppShell>{children}</AppShell>
                   <PwaRegister />
+                  <CapacitorAppBridge />
+                  <LaunchIntroAnimation />
                 </BackgroundProvider>
               </FavoritesProvider>
             </AudioProvider>

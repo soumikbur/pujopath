@@ -15,6 +15,7 @@ import {
   Bookmark,
   Info,
   MessageSquare,
+  Users,
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useFavorites } from '@/lib/context/FavoritesContext';
@@ -47,6 +48,8 @@ export function DesktopSidebar() {
       badge: savedPandalIds.length > 0 ? savedPandalIds.length : null,
     },
     { href: '/about', label: t('navAbout'), icon: Info },
+    { href: '/feedback', label: t('navFeedback'), icon: MessageSquare },
+    { href: '/developer', label: t('navDeveloper'), icon: Users },
   ];
 
   return (
@@ -94,17 +97,15 @@ export function DesktopSidebar() {
       </div>
 
       <div className="mt-4 pt-3 border-t border-[#eee8e1] dark:border-[#2f2720] space-y-3">
-        <a
-          href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href="/feedback"
           className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#0a66c2] dark:text-[#70b5f9] bg-[#f0f7ff] dark:bg-[#1a2634] border border-[#0a66c2]/20 hover:border-[#0a66c2]/50 hover:bg-[#0a66c2] hover:text-white dark:hover:text-white transition-all shadow-xs"
-          title={locale === 'bn' ? 'সৌমিকের লিঙ্কডইনে মতামত পাঠান' : 'Send feedback on LinkedIn'}
+          title={locale === 'bn' ? 'মতামত ও পরামর্শ দিন' : 'Send feedback'}
           aria-label={locale === 'bn' ? 'লিঙ্কডইনে মতামত দিন' : 'Send feedback on LinkedIn'}
         >
           <MessageSquare className="w-4 h-4 shrink-0" />
           <span>{locale === 'bn' ? 'মতামত দিন (Feedback)' : 'Feedback'}</span>
-        </a>
+        </Link>
 
         <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-500/10 via-rose-500/5 to-transparent border border-amber-500/20 text-xs">
           <div className="flex items-center gap-1.5 text-amber-700 dark:text-amber-400 font-bold mb-1">

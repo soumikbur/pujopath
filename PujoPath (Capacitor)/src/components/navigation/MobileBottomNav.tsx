@@ -17,6 +17,7 @@ import {
   Info,
   X,
   MessageSquare,
+  Users,
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { cn } from '@/lib/utils/cn';
@@ -54,15 +55,17 @@ export function MobileBottomNav() {
     { href: '/metro', label: isBn ? 'মেট্রো গাইড' : 'Metro Guide', icon: Train },
     { href: '/music', label: isBn ? 'পুজোর সঙ্গীত' : 'Puja Music', icon: Music2 },
     { href: '/mahalaya', label: isBn ? 'মহালয়া বিশেষ' : 'Mahalaya Special', icon: Sparkles },
+    { href: '/about', label: isBn ? 'সাহায্য ও তথ্য' : 'Help', icon: Info },
+    { href: '/feedback', label: isBn ? 'মতামত' : 'Feedback', icon: MessageSquare },
+    { href: '/developer', label: isBn ? 'ডেভেলপার' : 'Developer', icon: Users },
     { href: '/saved', label: isBn ? 'সংরক্ষিত প্যান্ডেল' : 'Saved Pandals', icon: Heart },
-    { href: '/about', label: isBn ? 'হেল্পলাইন' : 'Helpline', icon: Info },
   ];
 
   return (
     <>
       <nav
         aria-label="Mobile Bottom Navigation"
-        className="md:hidden fixed bottom-0 inset-x-0 z-[1100] bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] px-3 py-2 pb-safe shadow-elevated transition-colors duration-200"
+        className="md:hidden fixed bottom-0 inset-x-0 z-[1100] bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] px-3 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] shadow-elevated transition-colors duration-200"
       >
         <div className="flex items-center justify-around max-w-sm mx-auto">
           {mainItems.map((item) => {
@@ -120,7 +123,7 @@ export function MobileBottomNav() {
           aria-label={isBn ? 'অন্যান্য সুবিধাসমূহ' : 'More Features'}
           className="fixed inset-0 z-[1300] flex flex-col justify-end md:hidden bg-black/50 backdrop-blur-sm animate-in fade-in"
         >
-          <div className="bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] rounded-t-3xl p-6 space-y-4 shadow-elevated max-h-[80vh] overflow-y-auto">
+          <div className="bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] rounded-t-3xl p-6 space-y-4 shadow-elevated max-h-[80vh] overflow-y-auto pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
             <div className="flex items-center justify-between border-b border-[#eee8e1] dark:border-[#2a241f] pb-3">
               <h3 className="font-bold text-base text-[#242424] dark:text-[#ede5dc]">
                 {isBn ? 'অন্যান্য সুবিধাসমূহ' : 'More Features'}
@@ -157,20 +160,18 @@ export function MobileBottomNav() {
               })}
             </div>
 
-            {/* Feedback & Suggestion Link */}
+            {/* Feedback Quick Action */}
             <div className="pt-2 border-t border-[#eee8e1] dark:border-[#2a241f]">
-              <a
-                href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/feedback"
                 onClick={() => setMoreOpen(false)}
                 className="flex items-center justify-center gap-2.5 w-full py-3 px-4 rounded-2xl bg-[#f0f7ff] dark:bg-[#1a2634] text-[#0a66c2] dark:text-[#70b5f9] border border-[#0a66c2]/30 dark:border-[#0a66c2]/40 font-bold text-xs hover:bg-[#0a66c2] hover:text-white transition-colors shadow-sm"
-                title={isBn ? 'সৌমিকের লিঙ্কডইনে মতামত পাঠান' : 'Send Feedback on LinkedIn'}
-                aria-label={isBn ? 'লিঙ্কডইনে মতামত দিন' : 'Send feedback on LinkedIn'}
+                title={isBn ? 'মতামত ও পরামর্শ দিন' : 'Share Feedback & Suggestions'}
+                aria-label={isBn ? 'মতামত পেজে যান' : 'Go to feedback page'}
               >
                 <MessageSquare className="w-4 h-4 shrink-0" />
-                <span>{isBn ? 'মতামত দিন (Feedback)' : 'Feedback'}</span>
-              </a>
+                <span>{isBn ? 'মতামত জানান (Feedback)' : 'Share Feedback'}</span>
+              </Link>
             </div>
           </div>
         </div>

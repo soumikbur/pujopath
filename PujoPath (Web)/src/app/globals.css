@@ -108,6 +108,18 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-x: clip;
     transition: background-color 200ms ease, color 200ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :root:has(:target) {
+      scroll-behavior: smooth;
+    }
   }
 
   /* Responsive sticky footer layout architecture */

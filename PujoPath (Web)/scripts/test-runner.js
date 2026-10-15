@@ -1779,23 +1779,36 @@ console.log('\n--- Running Test Suite 34: Co-Creator Profiles, Bengali Spelling 
   assert.ok(!footerContent.includes('সৌমিক ঘোষ'), 'Footer must not contain full name সৌমিক ঘোষ');
   assert.ok(!footerContent.includes('মৌমিতা শী'), 'Footer must not contain full name মৌমিতা শী');
 
+  const devPath = path.join(__dirname, '..', 'src', 'app', 'developer', 'page.tsx');
+  const devContent = fs.readFileSync(devPath, 'utf8');
+  assert.ok(devContent.includes('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/'), 'Developer page must contain Soumik LinkedIn URL');
+  assert.ok(devContent.includes('https://www.linkedin.com/in/moumita-shee-798505226/'), 'Developer page must contain Moumita LinkedIn URL');
+  assert.ok(!devContent.includes('<Linkedin'), 'Developer page must not contain inline LinkedIn icon beside names');
+  assert.ok(devContent.includes('target="_blank"'), 'Developer page LinkedIn badge must open in new tab');
+  assert.ok(devContent.includes('rel="noopener noreferrer"'), 'Developer page LinkedIn badge must have security attributes');
+  assert.ok(devContent.includes("View Soumik's LinkedIn profile"), 'Developer page Soumik badge must have accessible name');
+  assert.ok(devContent.includes("View Moumita's LinkedIn profile"), 'Developer page Moumita badge must have accessible name');
+  assert.ok(devContent.includes("LinkedIn"), 'Developer page co-creator button must display "LinkedIn"');
+  assert.ok(devContent.includes("লিঙ্কডইন"), 'Developer page co-creator button must display "লিঙ্কডইন" in Bengali');
+  assert.ok(devContent.includes('মৌমিতা'), 'Developer page must use shortened Bengali name মৌমিতা');
+  assert.ok(devContent.includes('সৌমিক'), 'Developer page must use shortened Bengali name সৌমিক');
+  assert.ok(!devContent.includes('Soumik Ghosh'), 'Developer page must not contain full name Soumik Ghosh');
+  assert.ok(!devContent.includes('Moumita Shee'), 'Developer page must not contain full name Moumita Shee');
+  assert.ok(!devContent.includes('সৌমিক ঘোষ'), 'Developer page must not contain full name সৌমিক ঘোষ');
+  assert.ok(!devContent.includes('মৌমিতা শী'), 'Developer page must not contain full name মৌমিতা শী');
+
   const aboutPath = path.join(__dirname, '..', 'src', 'app', 'about', 'page.tsx');
   const aboutContent = fs.readFileSync(aboutPath, 'utf8');
-  assert.ok(aboutContent.includes('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/'), 'About page must contain Soumik LinkedIn URL');
-  assert.ok(aboutContent.includes('https://www.linkedin.com/in/moumita-shee-798505226/'), 'About page must contain Moumita LinkedIn URL');
-  assert.ok(!aboutContent.includes('<Linkedin'), 'About page must not contain inline LinkedIn icon beside names');
-  assert.ok(aboutContent.includes('target="_blank"'), 'About page LinkedIn badge must open in new tab');
-  assert.ok(aboutContent.includes('rel="noopener noreferrer"'), 'About page LinkedIn badge must have security attributes');
-  assert.ok(aboutContent.includes("View Soumik's LinkedIn profile"), 'About page Soumik badge must have accessible name');
-  assert.ok(aboutContent.includes("View Moumita's LinkedIn profile"), 'About page Moumita badge must have accessible name');
-  assert.ok(aboutContent.includes("LinkedIn"), 'About page co-creator button must display "LinkedIn"');
-  assert.ok(aboutContent.includes("লিঙ্কডইন"), 'About page co-creator button must display "লিঙ্কডইন" in Bengali');
-  assert.ok(aboutContent.includes('মৌমিতা'), 'About page must use shortened Bengali name মৌমিতা');
-  assert.ok(aboutContent.includes('সৌমিক'), 'About page must use shortened Bengali name সৌমিক');
-  assert.ok(!aboutContent.includes('Soumik Ghosh'), 'About page must not contain full name Soumik Ghosh');
-  assert.ok(!aboutContent.includes('Moumita Shee'), 'About page must not contain full name Moumita Shee');
-  assert.ok(!aboutContent.includes('সৌমিক ঘোষ'), 'About page must not contain full name সৌমিক ঘোষ');
-  assert.ok(!aboutContent.includes('মৌমিতা শী'), 'About page must not contain full name মৌমিতা শী');
+  assert.ok(aboutContent.includes('Emergency Helplines'), 'About page must contain Emergency Helplines');
+  assert.ok(aboutContent.includes('Essential Pandal Hopping Tips'), 'About page must contain Essential Pandal Hopping Tips');
+  assert.ok(aboutContent.includes('About PujoPath'), 'About page must retain About PujoPath description');
+  assert.ok(!aboutContent.includes("View Soumik's LinkedIn profile"), 'About page must not contain duplicate developer profile cards');
+  assert.ok(!aboutContent.includes('Share Your Feedback'), 'About page must not contain duplicate feedback section');
+
+  const feedbackPath = path.join(__dirname, '..', 'src', 'app', 'feedback', 'page.tsx');
+  const feedbackContent = fs.readFileSync(feedbackPath, 'utf8');
+  assert.ok(feedbackContent.includes('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/'), 'Feedback page must contain Soumik LinkedIn messaging URL');
+  assert.ok(feedbackContent.includes('Share Your Feedback'), 'Feedback page must contain heading "Share Your Feedback"');
 
   const filtersPath = path.join(__dirname, '..', 'src', 'components', 'pandals', 'PandalFilters.tsx');
   const filtersContent = fs.readFileSync(filtersPath, 'utf8');

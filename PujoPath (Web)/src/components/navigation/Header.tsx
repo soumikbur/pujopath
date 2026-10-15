@@ -8,11 +8,13 @@ import {
   ChevronDown,
   Heart,
   Info,
+  MessageSquare,
   Moon,
   Music2,
   Sparkles,
   Sun,
   Train,
+  Users,
 } from 'lucide-react';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
@@ -67,12 +69,14 @@ export function Header() {
     { href: '/music', label: isBn ? 'সঙ্গীত' : 'Music', icon: Music2 },
     { href: '/mahalaya', label: isBn ? 'মহালয়া' : 'Mahalaya', icon: Sparkles },
     { href: '/about', label: isBn ? 'সাহায্য' : 'Help', icon: Info },
+    { href: '/feedback', label: isBn ? 'মতামত' : 'Feedback', icon: MessageSquare },
+    { href: '/developer', label: isBn ? 'ডেভেলপার' : 'Developer', icon: Users },
   ];
 
   const isSecondaryActive = secondaryLinks.some((link) => pathname === link.href);
 
   return (
-    <header className="sticky top-0 z-[1100] border-b border-[#eee8e1] dark:border-[#2a241f] bg-[#fcfaf7]/98 dark:bg-[#14110e]/98 backdrop-blur-md transition-colors duration-200">
+    <header className="sticky top-0 z-[1100] border-b border-[#eee8e1] dark:border-[#2a241f] bg-[#fcfaf7]/98 dark:bg-[#14110e]/98 backdrop-blur-md transition-colors duration-200 pt-[env(safe-area-inset-top,0px)]">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
         {/* Brand Logo */}
         <Link

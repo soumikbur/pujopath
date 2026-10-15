@@ -17,6 +17,8 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     navCalendar: 'Puja Calendar',
     navSaved: 'Saved & Itineraries',
     navAbout: 'Helpline',
+    navFeedback: 'Feedback',
+    navDeveloper: 'Developer',
     navMore: 'More',
 
     // Hero & Status
@@ -176,6 +178,8 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     navCalendar: 'পুজোর নির্ঘণ্ট',
     navSaved: 'সংরক্ষিত ও রুট',
     navAbout: 'হেল্পলাইন',
+    navFeedback: 'মতামত',
+    navDeveloper: 'ডেভেলপার',
     navMore: 'অন্যান্য',
 
     // Hero & Status
