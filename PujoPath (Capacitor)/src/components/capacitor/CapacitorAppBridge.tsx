@@ -13,6 +13,25 @@ export function CapacitorAppBridge() {
   const routerRef = useRef(router);
   routerRef.current = router;
 
+  const routeHistoryRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    if (!pathname) return;
+    const stack = routeHistoryRef.current;
+    if (stack.length === 0) {
+      stack.push(pathname);
+      return;
+    }
+    const last = stack[stack.length - 1];
+    if (last !== pathname) {
+      if (stack.length > 1 && stack[stack.length - 2] === pathname) {
+        stack.pop();
+      } else {
+        stack.push(pathname);
+      }
+    }
+  }, [pathname]);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -74,14 +93,14 @@ export function CapacitorAppBridge() {
         });
         cleanupListeners.push(() => observer.disconnect());
 
-        // 3. Android Hardware Back Button Hierarchy with Debounce Protection
+        // 3. Android Hardware Back Button Hierarchy with Coordinated State Navigation
         const { App } = await import('@capacitor/app');
         let lastBackTime = 0;
 
         const backHandler = await App.addListener('backButton', () => {
           const now = Date.now();
-          // Prevent accidental fast double-tap / gesture bounce
-          if (now - lastBackTime < 300) return;
+          // Debounce rapid tap / gesture bounce
+          if (now - lastBackTime < 250) return;
           lastBackTime = now;
 
           // Priority 0: Skip intro animation if currently active
@@ -94,31 +113,62 @@ export function CapacitorAppBridge() {
             return;
           }
 
-          // Priority 1: Close any active modal, dialog, or drawer
+          // Priority 1: Full-screen Music Player
+          const fullPlayerCloseBtn = document.querySelector<HTMLButtonElement>(
+            '[data-close-fullscreen-player="true"]'
+          );
+          if (fullPlayerCloseBtn) {
+            fullPlayerCloseBtn.click();
+            return;
+          }
+
+          // Priority 2: Close active modal, dialog, or drawer
           const activeModal = document.querySelector(
             '[role="dialog"], .suggest-modal-overlay, .add-modal-overlay'
           );
-          const activeDropdown = document.querySelector('[aria-expanded="true"]');
-
-          if (activeModal || activeDropdown) {
-            // Dispatch Escape key event to trigger accessible close handlers
+          if (activeModal) {
+            const closeBtn = activeModal.querySelector<HTMLButtonElement>(
+              'button[aria-label*="Close" i], button[aria-label*="close" i], button[aria-label*="বন্ধ" i], [data-modal-close="true"]'
+            );
+            if (closeBtn) {
+              closeBtn.click();
+              return;
+            }
             window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
             return;
           }
 
-          // Priority 2: Navigate back if on a sub-route
+          // Priority 3: Desktop/Header dropdowns (if open)
+          const activeHeaderDropdown = document.querySelector('#desktop-more-menu-button[aria-expanded="true"]');
+          if (activeHeaderDropdown) {
+            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
+            return;
+          }
+
+          // Priority 4: In-app route navigation history
           const current = pathnameRef.current;
           const isHome = !current || current === '/' || current === '/index.html';
-          if (!isHome) {
+
+          if (routeHistoryRef.current.length > 1) {
+            routeHistoryRef.current.pop(); // Remove current
+            const target = routeHistoryRef.current[routeHistoryRef.current.length - 1];
             if (window.history.length > 1) {
               routerRef.current.back();
+            } else if (target) {
+              routerRef.current.push(target);
             } else {
               routerRef.current.push('/');
             }
             return;
           }
 
-          // Priority 3: Minimize/exit app if on home screen
+          // If history stack only has 1 or fewer entries:
+          if (!isHome) {
+            routerRef.current.push('/');
+            return;
+          }
+
+          // Priority 5: User is on Home screen with no prior route history -> minimize/exit app
           App.exitApp();
         });
 

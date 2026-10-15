@@ -21,6 +21,9 @@ const config: CapacitorConfig = {
       backgroundColor: '#14110E',
       overlaysWebView: false,
     },
+    SystemBars: {
+      insetsHandling: 'disable',
+    },
   },
 };
 

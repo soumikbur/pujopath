@@ -25,6 +25,17 @@ export function FullScreenPlayer() {
   } = useAudio();
   const { locale, t } = useI18n();
 
+  React.useEffect(() => {
+    if (!isFullScreenOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsFullScreenOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullScreenOpen, setIsFullScreenOpen]);
+
   if (!isFullScreenOpen || !currentTrack) return null;
 
   const formatSeconds = (sec: number) => {
@@ -39,7 +50,12 @@ export function FullScreenPlayer() {
   const lyrics = locale === 'bn' ? currentTrack.lyricsSnippetBn : currentTrack.lyricsSnippet;
 
   return (
-    <div className="fixed inset-0 z-[1400] bg-slate-950/98 backdrop-blur-2xl text-white flex flex-col justify-between p-6 sm:p-10 animate-in fade-in duration-300 overflow-y-auto">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Full screen music player"
+      className="fixed inset-0 z-[1400] bg-slate-950/98 backdrop-blur-2xl text-white flex flex-col justify-between p-6 sm:p-10 animate-in fade-in duration-300 overflow-y-auto"
+    >
       {/* Top Bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -51,6 +67,8 @@ export function FullScreenPlayer() {
 
         <button
           onClick={() => setIsFullScreenOpen(false)}
+          data-close-fullscreen-player="true"
+          aria-label="Close full player"
           className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
         >
           <X className="w-5 h-5 text-stone-200" />

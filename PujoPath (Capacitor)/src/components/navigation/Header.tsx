@@ -162,7 +162,7 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-[1100] border-b border-[#eee8e1] dark:border-[#2a241f] bg-[#fcfaf7]/98 dark:bg-[#14110e]/98 backdrop-blur-md pt-[env(safe-area-inset-top,0px)] transition-transform duration-260 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-transform transform-gpu",
+        "sticky top-0 z-[1100] border-b border-[#eee8e1] dark:border-[#2a241f] bg-[#fcfaf7]/98 dark:bg-[#14110e]/98 backdrop-blur-md transition-transform duration-260 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-transform transform-gpu",
         isHeaderVisible ? "translate-y-0 pointer-events-auto" : "-translate-y-full pointer-events-none"
       )}
     >

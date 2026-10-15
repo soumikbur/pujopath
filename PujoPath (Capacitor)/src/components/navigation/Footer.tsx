@@ -25,9 +25,9 @@ export function Footer() {
         {/* Capacitor Mobile: Only the credit line remains visible */}
         <div
           className="font-medium tracking-wide text-xs sm:text-[13px] select-text text-[#776d65] dark:text-[#a89e95]"
-          aria-label={isBn ? 'নির্মাণে সৌমিক ও মৌমিতা ❤️' : 'Made by Soumik & Moumita ❤️'}
+          aria-label={isBn ? 'নির্মাণে সৌমিক ও মৌমিতা with ❤️' : 'Made by Soumik & Moumita with ❤️'}
         >
-          <span>{isBn ? 'নির্মাণে সৌমিক ও মৌমিতা' : 'Made by Soumik & Moumita'}</span>
+          <span>{isBn ? 'নির্মাণে সৌমিক ও মৌমিতা with' : 'Made by Soumik & Moumita with'}</span>
           <span className="ml-1 text-[#e02424] inline-block text-sm" role="img" aria-label="heart">❤️</span>
         </div>
       </div>
