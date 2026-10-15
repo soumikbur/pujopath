@@ -124,6 +124,10 @@ export function CapacitorAppBridge() {
         const handleAnchorClick = (e: MouseEvent) => {
           const target = (e.target as HTMLElement)?.closest('a');
           if (target && target.href) {
+            if (target.href.startsWith('mailto:') || target.href.startsWith('tel:')) {
+              // Allow native Android Intent handling for mailto: and tel:
+              return;
+            }
             const url = new URL(target.href, window.location.href);
             const isExternal =
               url.origin !== window.location.origin &&

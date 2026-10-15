@@ -101,7 +101,7 @@ export function DesktopSidebar() {
           href="/feedback"
           className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#0a66c2] dark:text-[#70b5f9] bg-[#f0f7ff] dark:bg-[#1a2634] border border-[#0a66c2]/20 hover:border-[#0a66c2]/50 hover:bg-[#0a66c2] hover:text-white dark:hover:text-white transition-all shadow-xs"
           title={locale === 'bn' ? 'মতামত ও পরামর্শ দিন' : 'Send feedback'}
-          aria-label={locale === 'bn' ? 'লিঙ্কডইনে মতামত দিন' : 'Send feedback on LinkedIn'}
+          aria-label={locale === 'bn' ? 'মতামত জানান' : 'Send feedback'}
         >
           <MessageSquare className="w-4 h-4 shrink-0" />
           <span>{locale === 'bn' ? 'মতামত দিন (Feedback)' : 'Feedback'}</span>

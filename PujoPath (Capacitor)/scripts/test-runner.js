@@ -176,13 +176,12 @@ const footerPath = path.join(__dirname, '..', 'src', 'components', 'navigation',
 assert.strictEqual(fs.existsSync(footerPath), true, 'Footer.tsx must exist');
 const footerContent = fs.readFileSync(footerPath, 'utf-8');
 assert.strictEqual(
-  (footerContent.includes('Made with care by ') || footerContent.includes('Made by ')) &&
+  footerContent.includes('Made by ') &&
   footerContent.includes('Soumik') &&
   footerContent.includes('Moumita') &&
-  footerContent.includes('with') &&
   footerContent.includes('❤️'),
   true,
-  "Footer.tsx must contain 'Made with care by Soumik & Moumita with ❤️'"
+  "Footer.tsx must contain 'Made by Soumik & Moumita ❤️'"
 );
 
 const updatedAppShell = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'navigation', 'AppShell.tsx'), 'utf-8');
@@ -1027,7 +1026,7 @@ console.log('================================================================');
   console.log(`- Registered Clubs Part 2: ${registeredPart2Ids.length}`);
 
   assert.strictEqual(foundationIds.length, 23, 'Foundation pandals must contain 23 entries');
-  assert.strictEqual(neighborhoodIds.length, 61, 'Neighborhood pandals must contain 61 entries');
+  assert.strictEqual(neighborhoodIds.length, 65, 'Neighborhood pandals must contain 65 entries');
   assert.strictEqual(bonediBariIds.length, 23, 'Bonedi Bari pandals must contain 23 entries');
   assert.strictEqual(communityIds.length, 26, 'Community pandals must contain 26 entries');
   assert.strictEqual(registeredPart1Ids.length, 319, 'Registered clubs part 1 must contain 319 entries');
@@ -1041,12 +1040,12 @@ console.log('================================================================');
     ...registeredPart1Ids,
     ...registeredPart2Ids,
   ];
-  assert.strictEqual(allIds.length, 770, 'Total dataset must contain exactly 770 pandal records');
+  assert.strictEqual(allIds.length, 774, 'Total dataset must contain exactly 774 pandal records');
 
   // Verify 100% ID uniqueness (zero duplicates)
   const uniqueIds = new Set(allIds);
-  assert.strictEqual(uniqueIds.size, 770, `Zero duplicates allowed. Found ${uniqueIds.size} unique IDs out of ${allIds.length}`);
-  console.log('✓ Complete ID uniqueness verified across all 770 pandals (0 duplicates)');
+  assert.strictEqual(uniqueIds.size, 774, `Zero duplicates allowed. Found ${uniqueIds.size} unique IDs out of ${allIds.length}`);
+  console.log('✓ Complete ID uniqueness verified across all 774 pandals (0 duplicates)');
 
   // 3. Geographic Zone Coverage Verification
   const expectedZones = [
@@ -1082,15 +1081,15 @@ console.log('================================================================');
   const allLats = [...allContentCombined.matchAll(/latitude:\s*([0-9.]+)/g)].map(m => parseFloat(m[1]));
   const allLngs = [...allContentCombined.matchAll(/longitude:\s*([0-9.]+)/g)].map(m => parseFloat(m[1]));
 
-  assert.strictEqual(allLats.length, 770, 'Every single pandal must have defined latitude');
-  assert.strictEqual(allLngs.length, 770, 'Every single pandal must have defined longitude');
+  assert.strictEqual(allLats.length, 774, 'Every single pandal must have defined latitude');
+  assert.strictEqual(allLngs.length, 774, 'Every single pandal must have defined longitude');
   for (const lat of allLats) {
     assert.ok(lat >= 22.35 && lat <= 22.75, `Latitude ${lat} must be within Greater Kolkata bounds (22.35 - 22.75)`);
   }
   for (const lng of allLngs) {
     assert.ok(lng >= 88.15 && lng <= 88.55, `Longitude ${lng} must be within Greater Kolkata bounds (88.15 - 88.55)`);
   }
-  console.log('✓ Coordinate boundary validation passed for all 770 pandals (22.35 <= lat <= 22.75, 88.15 <= lng <= 88.55)');
+  console.log('✓ Coordinate boundary validation passed for all 774 pandals (22.35 <= lat <= 22.75, 88.15 <= lng <= 88.55)');
 
   // 5. PandalService search enhancement
   assert.ok(pandalServiceContent.includes('p.address.toLowerCase().includes(q)'), 'PandalService must search within pandal address');
@@ -1224,10 +1223,10 @@ console.log('================================================================');
   }
 
   // A. Total Pandal Count & Unique ID Verification
-  assert.strictEqual(allPandals.length, 770, `Total pandals must be exactly 770 across all datasets, got ${allPandals.length}`);
+  assert.strictEqual(allPandals.length, 774, `Total pandals must be exactly 774 across all datasets, got ${allPandals.length}`);
   const uniqueIds = new Set(allPandals.map((p) => p.id));
-  assert.strictEqual(uniqueIds.size, 770, `All 770 pandal IDs must be globally unique, got ${uniqueIds.size}`);
-  console.log(`✓ Data Integrity: All 770 pandals verified with 100% unique stable IDs`);
+  assert.strictEqual(uniqueIds.size, 774, `All 774 pandal IDs must be globally unique, got ${uniqueIds.size}`);
+  console.log(`✓ Data Integrity: All 774 pandals verified with 100% unique stable IDs`);
 
   // B. Zero Repeated Thumbnails / Duplicate Detection
   const assignedImages = new Map(); // url -> array of pandal IDs
@@ -1254,7 +1253,7 @@ console.log('================================================================');
     0,
     `Zero duplicate image URLs allowed! Found ${duplicatedUrls.length} shared URLs: ${JSON.stringify(duplicatedUrls)}`
   );
-  console.log(`✓ Zero Repeated Thumbnails: 0 duplicate image URLs detected across 770 pandals`);
+  console.log(`✓ Zero Repeated Thumbnails: 0 duplicate image URLs detected across 774 pandals`);
 
   // C. File Existence & Perceptual / Cryptographic Hash Uniqueness
   const hashToUrl = new Map();
@@ -1413,9 +1412,9 @@ console.log('================================================================');
   console.log('✓ Cryptographic Uniqueness: SHA-256 duplicate collision rejected before dataset mutation');
 
   // 5. Automated Review Workflow & Reversibility
-  const reviewWorkflowPath = fs.existsSync(path.join(__dirname, '..', '.github', 'workflows', 'photo-refresh.yml'))
-    ? path.join(__dirname, '..', '.github', 'workflows', 'photo-refresh.yml')
-    : path.join(__dirname, '..', '..', '.github', 'workflows', 'photo-refresh.yml');
+  const reviewWorkflowPath1 = path.join(__dirname, '..', '.github', 'workflows', 'photo-refresh.yml');
+  const reviewWorkflowPath2 = path.join(__dirname, '..', '..', '.github', 'workflows', 'photo-refresh.yml');
+  const reviewWorkflowPath = fs.existsSync(reviewWorkflowPath1) ? reviewWorkflowPath1 : reviewWorkflowPath2;
   assert.strictEqual(fs.existsSync(reviewWorkflowPath), true, 'photo-refresh.yml workflow must exist');
   const reviewWorkflowContent = fs.readFileSync(reviewWorkflowPath, 'utf8');
   assert.ok(reviewWorkflowContent.includes('cron:'), 'photo-refresh.yml must define periodic cron schedule');
@@ -1554,12 +1553,24 @@ console.log('================================================================');
   assert.ok(bgComponentContent.includes('isHomepageRoute'), 'PujoBackground must use isHomepageRoute');
   assert.ok(bgComponentContent.includes('{isHomepage &&'), 'PujoBackground must render decorative artwork ONLY on homepage');
   assert.ok(bgComponentContent.includes('{!isHomepage &&'), 'PujoBackground must render restored minimalistic pattern on other pages');
-  assert.ok(bgComponentContent.includes('animate-alpana-spin'), 'PujoBackground must animate top-left alpana rotation');
-  assert.ok(bgComponentContent.includes('animate-alpana-spin-reverse'), 'PujoBackground must animate top-right mandala reverse rotation');
-  assert.ok(bgComponentContent.includes('animate-alpana-drift'), 'PujoBackground must animate kash flower drift');
-  assert.ok(bgComponentContent.includes('animate-alpana-pulse'), 'PujoBackground must animate bottom border pulse');
-  assert.ok(bgComponentContent.includes('hidden md:block'), 'Must select landscape 16:9 for desktop screens');
-  assert.ok(bgComponentContent.includes('block md:hidden'), 'Must select portrait 3:4 for mobile screens');
+  
+  // Strict Separation: Verify all alpana SVGs are strictly enclosed within {!isHomepage && ...}
+  const nonHomeIndex = bgComponentContent.indexOf('{!isHomepage &&');
+  assert.ok(nonHomeIndex !== -1, '{!isHomepage && block must exist');
+  const nonHomeBlock = bgComponentContent.slice(nonHomeIndex);
+  assert.ok(nonHomeBlock.includes('animate-alpana-spin'), 'animate-alpana-spin must be within non-homepage block');
+  assert.ok(nonHomeBlock.includes('animate-alpana-spin-reverse'), 'animate-alpana-spin-reverse must be within non-homepage block');
+  assert.ok(nonHomeBlock.includes('animate-alpana-drift'), 'animate-alpana-drift must be within non-homepage block');
+  assert.ok(nonHomeBlock.includes('animate-alpana-pulse'), 'animate-alpana-pulse must be within non-homepage block');
+
+  // Verify CSS keyframes and unsuppressed mobile animation
+  const globalsCssForBg = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'globals.css'), 'utf8');
+  assert.ok(globalsCssForBg.includes('alpanaRotateSlow'), 'Must define alpanaRotateSlow keyframe');
+  assert.ok(globalsCssForBg.includes('alpanaRotateReverse'), 'Must define alpanaRotateReverse keyframe');
+  assert.ok(globalsCssForBg.includes('alpanaDrift'), 'Must define alpanaDrift keyframe');
+  assert.ok(globalsCssForBg.includes('alpanaPulse'), 'Must define alpanaPulse keyframe');
+  assert.strictEqual(globalsCssForBg.includes('@media (max-width: 768px) {\n  .animate-alpana'), false, 'Alpana animations must not be suppressed on mobile');
+
   assert.ok(bgComponentContent.includes('pointer-events-none'), 'Must include pointer-events-none so it never blocks clicks');
   assert.ok(bgComponentContent.includes('aria-hidden="true"'), 'Must include aria-hidden="true" for screen reader purity');
   assert.ok(bgComponentContent.includes('z-0'), 'Must remain strictly behind interactive page content (z-0)');
@@ -1666,9 +1677,215 @@ console.log('================================================================');
   console.log('✓ Background scrolling GPU acceleration and mobile compositing stability verified');
 })();
 
+// ============================================================================
+console.log('\n--- Running Test Suite 32: Deployment Asset Routing, PWA Manifest & Service Worker Isolation ---');
+(() => {
+  // 1. PujoMap Popup Link Validation
+  const pujoMapContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'map', 'PujoMap.tsx'), 'utf8');
+  assert.strictEqual(pujoMapContent.includes('href="pandals/'), false, 'PujoMap must not use relative pandals/ links that 404 under /map/');
+  assert.ok(pujoMapContent.includes('getAssetPath(`/pandals/${pandal.slug}/`)') || pujoMapContent.includes('getAssetPath(`/pandals/${pandal.slug}`)'), 'PujoMap must resolve pandal detail URLs via getAssetPath with leading slash');
+  console.log('✓ PujoMap Leaflet popup detail URL resolution and 404 prevention verified');
+
+  // 2. Service Worker Scope and Registration
+  const pwaRegisterContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'pwa', 'PwaRegister.tsx'), 'utf8');
+  assert.ok(pwaRegisterContent.includes("getAssetPath('/sw.js')"), 'PwaRegister must register sw.js using getAssetPath');
+  assert.ok(pwaRegisterContent.includes("getAssetPath('/')"), 'PwaRegister must set registration scope using getAssetPath');
+  console.log('✓ Service Worker registration URL and subpath scope resolution verified');
+
+  // 3. Service Worker Script Integrity
+  const swContent = fs.readFileSync(path.join(__dirname, '..', 'public', 'sw.js'), 'utf8');
+  assert.ok(swContent.includes('self.registration.scope'), 'sw.js must dynamically resolve base path from registration scope');
+  assert.ok(swContent.includes('STATIC_ASSETS'), 'sw.js must define cache assets');
+  console.log('✓ Service Worker scope-aware pre-caching and network fallbacks verified');
+
+  // 4. Manifest Configuration & Relative Scope
+  const manifestContent = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'public', 'manifest.json'), 'utf8'));
+  assert.strictEqual(manifestContent.start_url, './', 'manifest.json start_url must be relative ./ for subpath portability');
+  assert.strictEqual(manifestContent.scope, './', 'manifest.json scope must be relative ./ for subpath portability');
+  assert.ok(!manifestContent.icons[0].src.startsWith('/'), 'manifest.json icon paths must not be root-relative');
+  console.log('✓ Manifest relative scoping and portable icon resolution verified');
+
+  // 5. Layout Metadata Manifest and Icon BasePath
+  const layoutContent = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'layout.tsx'), 'utf8');
+  assert.ok(layoutContent.includes('manifest: `${basePath}/manifest.json`') || layoutContent.includes("manifest: `${basePath || ''}/manifest.json`"), 'layout.tsx must prefix manifest with basePath');
+  console.log('✓ Root layout metadata manifest and icon basePath integration verified');
+})();
+
+// ============================================================================
+// TEST SUITE 33: Complete Frontend Audit & UI Repair Regression Verification
+// ============================================================================
+(() => {
+  console.log('\n--- Running Test Suite 33: Frontend Audit & UI Repair Regression Verification ---');
+  const bottomPlayerFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'music', 'BottomMusicPlayer.tsx'), 'utf8');
+  const musicPageFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'music', 'page.tsx'), 'utf8');
+  const pujoBgFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'ui', 'PujoBackground.tsx'), 'utf8');
+  const globalsCssFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'app', 'globals.css'), 'utf8');
+  const bgConfigFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'data', 'config', 'backgroundConfig.ts'), 'utf8');
+
+  // 1. Compact Single Global Mini-Player Constraints (Phase 2 & 4)
+  assert.ok(bottomPlayerFile.includes("height: '72px'"), 'Bottom player mobile height must be constrained to 72px (target 68-84px)');
+  assert.ok(bottomPlayerFile.includes("width: 44") && bottomPlayerFile.includes("height: 44"), 'Thumbnail must be 44x44px (target 40-48px)');
+  assert.ok(!bottomPlayerFile.includes('<iframe'), 'BottomMusicPlayer must not contain floating video iframe/embed');
+  assert.ok(!bottomPlayerFile.includes('isStreamExpanded'), 'BottomMusicPlayer must not render expandable video frame');
+  assert.ok(bottomPlayerFile.includes('closePlayer'), 'Bottom player must support clean close & dismissal');
+  assert.ok(bottomPlayerFile.includes('z-[1150]'), 'Bottom player must float at z-[1150] above navigation');
+  assert.ok(bottomPlayerFile.includes('bottom-[calc(76px+env(safe-area-inset-bottom,0px))]'), 'Bottom player must maintain 76px clearance above mobile nav');
+  assert.ok(bottomPlayerFile.includes("left: 'max(12px, env(safe-area-inset-left, 0px))'"), 'Bottom player must use safe-area left constraint');
+  assert.ok(bottomPlayerFile.includes("right: 'max(12px, env(safe-area-inset-right, 0px))'"), 'Bottom player must use safe-area right constraint');
+  assert.ok(!bottomPlayerFile.includes('-translate-x-1/2'), 'Bottom player must not rely on translate transforms that can be overridden by CSS keyframes');
+  console.log('✓ Compact audio control bar height (72px), thumbnail (44px), 76px nav clearance, and safe-area horizontal boundaries verified');
+
+  // 2. Clean Compact Track Cards & Single Player Architecture (Phase 2 & 3)
+  assert.ok(!musicPageFile.includes('<iframe'), 'Track cards must not contain video or media iframe embed');
+  assert.ok(!musicPageFile.includes('Featured Now Playing Showcase'), 'Music library must not render duplicate showcase player');
+  assert.ok(musicPageFile.includes('w-12 h-12 rounded-xl'), 'Track thumbnail must be strictly constrained to 48x48px (w-12 h-12)');
+  assert.ok(musicPageFile.includes('isPlayerActive'), 'Music page must coordinate dynamic bottom scroll clearance with isPlayerActive');
+  assert.ok(musicPageFile.includes('scroll-mt-24'), 'Track cards must define scroll-mt-24 buffer for sticky header protection');
+  const footerFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'components', 'navigation', 'Footer.tsx'), 'utf8');
+  assert.ok(footerFile.includes('isPlayerActive'), 'Footer must coordinate dynamic bottom clearance with isPlayerActive');
+  console.log('✓ Zero video iframes in track cards, 48px constrained thumbnails, sticky-header scroll buffers, and footer clearance verified');
+
+  // 3. Strict Background Separation & Alpana Motion (Phase 4)
+  assert.ok(bgConfigFile.includes('isHomepageRoute'), 'backgroundConfig must provide isHomepageRoute normalizer');
+  assert.ok(pujoBgFile.includes('isHomepage && ('), 'PujoBackground must render photographic artwork ONLY on homepage');
+  assert.ok(pujoBgFile.includes('!isHomepage && ('), 'PujoBackground must render alpana motifs ONLY on non-homepage routes');
+  assert.ok(globalsCssFile.includes('alpanaRotateSlow 75s'), 'globals.css must define slow 75s rotation for alpana motifs');
+  assert.ok(globalsCssFile.includes('alpanaRotateReverse 90s'), 'globals.css must define 90s reverse rotation for mandala motifs');
+  assert.ok(globalsCssFile.includes('alpanaDrift 32s'), 'globals.css must define 32s drift animation for kash flower accent');
+  assert.ok(globalsCssFile.includes('alpanaPulse 18s'), 'globals.css must define 18s gentle pulse animation for border accent');
+  assert.ok(globalsCssFile.includes('.pujopath-fixed-background'), 'globals.css must preserve dedicated stationary background layer');
+  assert.ok(globalsCssFile.includes('pointer-events: none'), 'Stationary background must have pointer-events: none for 100% native scrolling');
+  console.log('✓ Strict background separation, stationary scrolling, and restored slow alpana animations verified');
+
+  // 4. Personal Pandal Privacy & State Isolation (Phase 9)
+  const favoritesContextFile = fs.readFileSync(path.join(__dirname, '..', 'src', 'lib', 'context', 'FavoritesContext.tsx'), 'utf8');
+  assert.ok(favoritesContextFile.includes('pujopath_custom_pandals'), 'Custom pandals must be stored strictly in local client storage');
+  assert.ok(favoritesContextFile.includes('isUserAdded: true'), 'Custom pandals must be flagged with isUserAdded: true');
+  console.log('✓ Personal custom pandal privacy and local storage persistence verified');
+})();
+
+// --- Running Test Suite 34: Co-Creator Profiles, Bengali Spelling & Feature Filters Expand/Collapse ---
+console.log('\n--- Running Test Suite 34: Co-Creator Profiles, Bengali Spelling & Feature Filters Expand/Collapse ---');
+(function testCoCreatorsAndFilters() {
+  const footerPath = path.join(__dirname, '..', 'src', 'components', 'navigation', 'Footer.tsx');
+  const footerContent = fs.readFileSync(footerPath, 'utf8');
+  assert.ok(!footerContent.includes('https://www.linkedin.com/'), 'Footer must not contain LinkedIn URLs');
+  assert.ok(!footerContent.includes('Linkedin'), 'Footer must not contain LinkedIn icon');
+  assert.ok(footerContent.includes('Made by Soumik & Moumita'), 'Footer must contain exact plain text "Made by Soumik & Moumita"');
+  assert.ok(footerContent.includes('নির্মাণে সৌমিক ও মৌমিতা'), 'Footer must contain exact plain text "নির্মাণে সৌমিক ও মৌমিতা"');
+  assert.ok(footerContent.includes('❤️'), 'Footer must contain heart emoji ❤️');
+  assert.ok(!footerContent.includes('Soumik Ghosh'), 'Footer must not contain full name Soumik Ghosh');
+  assert.ok(!footerContent.includes('Moumita Shee'), 'Footer must not contain full name Moumita Shee');
+  assert.ok(!footerContent.includes('সৌমিক ঘোষ'), 'Footer must not contain full name সৌমিক ঘোষ');
+  assert.ok(!footerContent.includes('মৌমিতা শী'), 'Footer must not contain full name মৌমিতা শী');
+
+  const devPath = path.join(__dirname, '..', 'src', 'app', 'developer', 'page.tsx');
+  const devContent = fs.readFileSync(devPath, 'utf8');
+  assert.ok(devContent.includes('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/'), 'Developer page must contain Soumik LinkedIn URL');
+  assert.ok(devContent.includes('https://www.linkedin.com/in/moumita-shee-798505226/'), 'Developer page must contain Moumita LinkedIn URL');
+  assert.ok(!devContent.includes('<Linkedin'), 'Developer page must not contain inline LinkedIn icon beside names');
+  assert.ok(devContent.includes('target="_blank"'), 'Developer page LinkedIn badge must open in new tab');
+  assert.ok(devContent.includes('rel="noopener noreferrer"'), 'Developer page LinkedIn badge must have security attributes');
+  assert.ok(devContent.includes("View Soumik's LinkedIn profile"), 'Developer page Soumik badge must have accessible name');
+  assert.ok(devContent.includes("View Moumita's LinkedIn profile"), 'Developer page Moumita badge must have accessible name');
+  assert.ok(devContent.includes("LinkedIn"), 'Developer page co-creator button must display "LinkedIn"');
+  assert.ok(devContent.includes("লিঙ্কডইন"), 'Developer page co-creator button must display "লিঙ্কডইন" in Bengali');
+  assert.ok(devContent.includes('মৌমিতা'), 'Developer page must use shortened Bengali name মৌমিতা');
+  assert.ok(devContent.includes('সৌমিক'), 'Developer page must use shortened Bengali name সৌমিক');
+  assert.ok(!devContent.includes('Soumik Ghosh'), 'Developer page must not contain full name Soumik Ghosh');
+  assert.ok(!devContent.includes('Moumita Shee'), 'Developer page must not contain full name Moumita Shee');
+  assert.ok(!devContent.includes('সৌমিক ঘোষ'), 'Developer page must not contain full name সৌমিক ঘোষ');
+  assert.ok(!devContent.includes('মৌমিতা শী'), 'Developer page must not contain full name মৌমিতা শী');
+
+  const aboutPath = path.join(__dirname, '..', 'src', 'app', 'about', 'page.tsx');
+  const aboutContent = fs.readFileSync(aboutPath, 'utf8');
+  assert.ok(aboutContent.includes('Emergency Helplines'), 'About page must contain Emergency Helplines');
+  assert.ok(aboutContent.includes('Essential Pandal Hopping Tips'), 'About page must contain Essential Pandal Hopping Tips');
+  assert.ok(aboutContent.includes('About PujoPath'), 'About page must retain About PujoPath description');
+  assert.ok(!aboutContent.includes("View Soumik's LinkedIn profile"), 'About page must not contain duplicate developer profile cards');
+  assert.ok(!aboutContent.includes('Share Your Feedback'), 'About page must not contain duplicate feedback section');
+
+  const feedbackPath = path.join(__dirname, '..', 'src', 'app', 'feedback', 'page.tsx');
+  const feedbackContent = fs.readFileSync(feedbackPath, 'utf8');
+  assert.ok(feedbackContent.includes('mailto:soumik.bur@gmail.com'), 'Feedback page must contain mailto:soumik.bur@gmail.com destination');
+  assert.ok(!feedbackContent.includes('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/'), 'Feedback page must not use LinkedIn messaging as feedback destination');
+  assert.ok(feedbackContent.includes('Share Your Feedback'), 'Feedback page must contain heading "Share Your Feedback"');
+
+  const filtersPath = path.join(__dirname, '..', 'src', 'components', 'pandals', 'PandalFilters.tsx');
+  const filtersContent = fs.readFileSync(filtersPath, 'utf8');
+  assert.ok(filtersContent.includes('isFeatureFiltersOpen'), 'PandalFilters must have isFeatureFiltersOpen state');
+  assert.ok(filtersContent.includes('aria-expanded={isFeatureFiltersOpen}'), 'PandalFilters chevron must have aria-expanded attribute');
+  assert.ok(filtersContent.includes('setIsFeatureFiltersOpen'), 'PandalFilters must toggle feature filters expansion');
+
+  console.log('✓ Finalized Co-Creator LinkedIn badges, simplified footer credits, and Bengali spelling verified');
+  console.log('✓ Feature filters collapse/expand control, ARIA semantics, and default expansion verified');
+})();
+
+// ============================================================================
+// TEST SUITE 35: Live Search Autocomplete, New Town Pandals & Chorebagan Verification
+// ============================================================================
+(() => {
+  console.log('\n--- Running Test Suite 35: Live Search Autocomplete & Verified Pandal Entries ---');
+  const filtersPath = path.join(__dirname, '..', 'src', 'components', 'pandals', 'PandalFilters.tsx');
+  const explorePagePath = path.join(__dirname, '..', 'src', 'app', 'explore', 'page.tsx');
+  const neighborhoodPath = path.join(__dirname, '..', 'src', 'data', 'pandals', 'neighborhoodPandals.ts');
+  const registeredPart1Path = path.join(__dirname, '..', 'src', 'data', 'pandals', 'registeredClubsPart1.ts');
+
+  const filtersContent = fs.readFileSync(filtersPath, 'utf8');
+  const exploreContent = fs.readFileSync(explorePagePath, 'utf8');
+  const neighborhoodContent = fs.readFileSync(neighborhoodPath, 'utf8');
+  const registeredPart1Content = fs.readFileSync(registeredPart1Path, 'utf8');
+
+  // 1. PandalFilters Live Search Autocomplete Semantics & Controls
+  assert.ok(filtersContent.includes('role="combobox"'), 'PandalFilters must provide accessible role="combobox"');
+  assert.ok(filtersContent.includes('aria-expanded={isOpen}'), 'PandalFilters must bind aria-expanded to dropdown open state');
+  assert.ok(filtersContent.includes('aria-haspopup="listbox"'), 'PandalFilters combobox must declare aria-haspopup="listbox"');
+  assert.ok(filtersContent.includes('aria-autocomplete="list"'), 'PandalFilters input must declare aria-autocomplete="list"');
+  assert.ok(filtersContent.includes('aria-controls="pandal-search-suggestions"'), 'PandalFilters input must control suggestions list');
+  assert.ok(filtersContent.includes('role="listbox"'), 'PandalFilters suggestions panel must have role="listbox"');
+  assert.ok(filtersContent.includes('role="option"'), 'PandalFilters suggestion items must have role="option"');
+  assert.ok(filtersContent.includes('handleKeyDown'), 'PandalFilters must handle keyboard navigation');
+  assert.ok(filtersContent.includes('ArrowDown') && filtersContent.includes('ArrowUp'), 'PandalFilters must support ArrowDown and ArrowUp navigation');
+  assert.ok(filtersContent.includes('Escape') && filtersContent.includes('Tab'), 'PandalFilters must support Escape and Tab dismiss');
+  assert.ok(filtersContent.includes('handleClearSearch'), 'PandalFilters must support clear search button');
+  assert.ok(filtersContent.includes('allPandals?: Pandal[]'), 'PandalFiltersProps must accept optional allPandals array');
+
+  // 2. Explore Page Integration
+  assert.ok(exploreContent.includes('allPandals={allPandals}'), 'Explore page must pass allPandals to PandalFilters');
+  console.log('✓ Live Search Autocomplete combobox semantics, keyboard handlers, and Explore integration verified');
+
+  // 3. Verified New Town Pandals
+  const requiredNewTownIds = [
+    'new-town-ca-block-sarbojanin',
+    'new-town-cb-block-sarbojanin',
+    'new-town-cd-block-cultural-association',
+    'sukhobrishti-spandan-durgotsav',
+  ];
+  for (const id of requiredNewTownIds) {
+    assert.ok(neighborhoodContent.includes(`id: '${id}'`), `neighborhoodPandals.ts must contain New Town pandal: ${id}`);
+  }
+  assert.ok(neighborhoodContent.includes('নিউ টাউন সিএ ব্লক সর্বজনীন দুর্গোৎসব'), 'CA Block must have verified Bengali name');
+  assert.ok(neighborhoodContent.includes('নিউ টাউন সিবি ব্লক সর্বজনীন দুর্গোৎসব'), 'CB Block must have verified Bengali name');
+  assert.ok(neighborhoodContent.includes('নিউ টাউন সিডি ব্লক কালচারাল অ্যাসোসিয়েশন'), 'CD Block must have verified Bengali name');
+  assert.ok(neighborhoodContent.includes('সুখবৃষ্টি স্পন্দন দুর্গোৎসব'), 'Sukhobrishti must have verified Bengali name');
+  assert.ok(neighborhoodContent.includes('Action Area 1, New Town'), 'Action Area 1 locality must be present');
+  assert.ok(neighborhoodContent.includes('Action Area 3, New Town'), 'Action Area 3 locality must be present');
+  console.log('✓ 4 verified New Town Durga Puja pandals present in neighborhoodPandals.ts with complete metadata');
+
+  // 4. Chorebagan Sarbojanin Durgotsab Samity
+  assert.ok(registeredPart1Content.includes("id: 'chorebagan-sarbojanin-durgotsab-samity'"), 'Chorebagan must exist in registeredClubsPart1.ts');
+  assert.ok(registeredPart1Content.includes("nameBn: 'চোরবাগান সর্বজনীন দুর্গোৎসব সমিতি'"), 'Chorebagan must have authentic Bengali name চোরবাগান সর্বজনীন দুর্গোৎসব সমিতি');
+  assert.ok(registeredPart1Content.includes('Radha Madhab Saha Lane'), 'Chorebagan address must specify Radha Madhab Saha Lane');
+  assert.ok(registeredPart1Content.includes('রাধামাধব সাহা লেন'), 'Chorebagan Bengali address must specify রাধামাধব সাহা লেন');
+  assert.ok(registeredPart1Content.includes("vipPassEntry: false"), 'Chorebagan must not treat invitation card as public VIP access');
+  assert.ok(registeredPart1Content.includes("verificationStatus: 'Verified'"), 'Chorebagan must be marked Verified');
+  console.log('✓ Chorebagan Sarbojanin Durgotsab Samity verified with Radha Madhab Saha Lane and Bengali name');
+})();
+
 console.log('\n================================================================');
-console.log('ALL 31 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
+console.log('ALL 35 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
 console.log('================================================================\n');
+
 
 
 

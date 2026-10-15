@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { MessageSquare, ExternalLink, Bug, Lightbulb, HeartHandshake, Users } from 'lucide-react';
+import { Mail, MessageSquare, ExternalLink, Bug, Lightbulb, HeartHandshake, Users } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
 
 export default function FeedbackPage() {
@@ -46,8 +46,8 @@ export default function FeedbackPage() {
         </h1>
         <p className="text-sm sm:text-base text-[#665a54] dark:text-[#a89e95] mt-1.5 leading-relaxed max-w-2xl">
           {isBn
-            ? 'পুজোপথকে আরও সমৃদ্ধ ও নিখুঁত করতে আপনার যেকোনো পরামর্শ বা প্রতিক্রিয়া সরাসরি সৌমিকের লিঙ্কডইনে বার্তা পাঠিয়ে জানাতে পারেন।'
-            : 'Have suggestions, corrections, or new features to suggest? Send your feedback directly via LinkedIn messaging.'}
+            ? 'পুজোপথকে আরও সমৃদ্ধ ও নিখুঁত করতে আপনার যেকোনো পরামর্শ বা প্রতিক্রিয়া সরাসরি ইমেলের মাধ্যমে আমাদের পাঠাতে পারেন।'
+            : 'Have suggestions, corrections, or new features to suggest? Send your feedback directly via email.'}
         </p>
       </div>
 
@@ -55,30 +55,28 @@ export default function FeedbackPage() {
       <div className="p-7 sm:p-9 rounded-3xl bg-gradient-to-br from-[#f0f7ff] via-white to-[#e8f2ff] dark:from-[#132233] dark:via-[#161d24] dark:to-[#101a24] border border-[#0a66c2]/30 dark:border-[#0a66c2]/40 shadow-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 transition-colors">
         <div className="space-y-2 max-w-xl">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0a66c2]/10 dark:bg-[#0a66c2]/25 text-[#0a66c2] dark:text-[#70b5f9] text-xs font-bold">
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>{isBn ? 'সরাসরি বার্তা' : 'Direct Message'}</span>
+            <Mail className="w-3.5 h-3.5" />
+            <span>{isBn ? 'সরাসরি ইমেল' : 'Direct Email'}</span>
           </span>
           <h2 className="text-xl sm:text-2xl font-black text-[#1a2b3c] dark:text-[#e4edf7] tracking-tight">
-            {isBn ? 'লিঙ্কডইন মেসেজিংয়ের মাধ্যমে যুক্ত হোন' : 'Connect via LinkedIn Messaging'}
+            {isBn ? 'ইমেলের মাধ্যমে মতামত পাঠান' : 'Send Feedback via Email'}
           </h2>
           <p className="text-xs sm:text-sm text-[#4d5e70] dark:text-[#a4b4c6] leading-relaxed">
             {isBn
-              ? 'আমরা নিয়মিত প্রতিটি বার্তা পর্যালোচনা করি। ক্লিক করলেই সরাসরি লিঙ্কডইন মেসেঞ্জারে চ্যাট খুলবে।'
-              : 'Messages go directly to project co-creator Soumik Ghosh on LinkedIn. We review all feedback, pandal updates, and community suggestions promptly.'}
+              ? 'আমরা নিয়মিত প্রতিটি ইমেল পর্যালোচনা করি। বোতামে চাপ দিলে আপনার ডিভাইসে সরাসরি soumik.bur@gmail.com ঠিকানায় ইমেল কম্পোজ উইন্ডো খুলবে।'
+              : 'Messages go directly to soumik.bur@gmail.com. We review all feedback, pandal updates, and community suggestions promptly.'}
           </p>
         </div>
 
         <a
-          id="linkedin-feedback-btn"
-          href="https://www.linkedin.com/in/soumik-ghosh-883a1a22b/"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={isBn ? 'লিঙ্কডইনে মতামত দিন' : 'Send feedback on LinkedIn'}
-          title={isBn ? 'সৌমিকের লিঙ্কডইনে বার্তা পাঠান' : "Send a message on Soumik's LinkedIn"}
+          id="feedback-btn"
+          href="mailto:soumik.bur@gmail.com?subject=PujoPath%20Feedback"
+          aria-label={isBn ? 'ইমেলে মতামত দিন' : 'Send feedback via email'}
+          title={isBn ? 'soumik.bur@gmail.com ঠিকানায় ইমেল পাঠান' : 'Send email to soumik.bur@gmail.com'}
           className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl bg-[#0a66c2] hover:bg-[#004182] text-white font-bold text-sm shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
         >
-          <MessageSquare className="w-4 h-4" />
-          <span>{isBn ? 'মতামত দিন (Feedback)' : 'Open LinkedIn Messaging'}</span>
+          <Mail className="w-4 h-4" />
+          <span>{isBn ? 'ইমেল পাঠান (Send Email)' : 'Send Feedback Email'}</span>
           <ExternalLink className="w-4 h-4 ml-0.5" />
         </a>
       </div>

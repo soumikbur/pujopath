@@ -1807,7 +1807,8 @@ console.log('\n--- Running Test Suite 34: Co-Creator Profiles, Bengali Spelling 
 
   const feedbackPath = path.join(__dirname, '..', 'src', 'app', 'feedback', 'page.tsx');
   const feedbackContent = fs.readFileSync(feedbackPath, 'utf8');
-  assert.ok(feedbackContent.includes('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/'), 'Feedback page must contain Soumik LinkedIn messaging URL');
+  assert.ok(feedbackContent.includes('mailto:soumik.bur@gmail.com'), 'Feedback page must contain mailto:soumik.bur@gmail.com destination');
+  assert.ok(!feedbackContent.includes('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/'), 'Feedback page must not use LinkedIn messaging as feedback destination');
   assert.ok(feedbackContent.includes('Share Your Feedback'), 'Feedback page must contain heading "Share Your Feedback"');
 
   const filtersPath = path.join(__dirname, '..', 'src', 'components', 'pandals', 'PandalFilters.tsx');
