@@ -122,8 +122,6 @@ export const PUJA_CALENDAR_DATA: PujaDay[] = [
     ],
     pushpanjaliTimings: '08:30 AM - 10:15 AM (Tithi till Sun 05:53 AM)',
     pushpanjaliTimingsBn: 'সকাল ৮:৩০ - সকাল ১০:১৫ (তিথি রবিবার সকাল ০৫:৫৩ পর্যন্ত)',
-    bhogTimings: '12:30 PM - 02:00 PM (Khichuri Bhog, Labra, Payesh)',
-    bhogTimingsBn: 'দুপুর ১২:৩০ - দুপুর ২:০০ (খিচুড়ি ভোগ, লাবড়া, পায়েস)',
     tithis: [
       {
         name: 'Saptami Tithi',
@@ -158,8 +156,6 @@ export const PUJA_CALENDAR_DATA: PujaDay[] = [
     ],
     pushpanjaliTimings: '06:30 AM - 07:45 AM (Must conclude before 07:50 AM)',
     pushpanjaliTimingsBn: 'সকাল ৬:৩০ - সকাল ৭:৪৫ (সকাল ৭:৫০ এর মধ্যে সমাপ্য)',
-    bhogTimings: '12:30 PM - 02:30 PM (Bhog Prasad & Chutney)',
-    bhogTimingsBn: 'দুপুর ১২:৩০ - দুপুর ২:৩০ (খিচুড়ি, বেগুনভাজা, পায়েস, চাটনি)',
     tithis: [
       {
         name: 'Maha Ashtami Tithi',
@@ -196,14 +192,12 @@ export const PUJA_CALENDAR_DATA: PujaDay[] = [
     ],
     ritualsBn: [
       'মহা নবমীর মহাযজ্ঞ ও হোম',
-      'প্রতীকী বলিদান ও ভোগ নিবেদন',
+      'প্রতীকী বলিদান',
       'মণ্ডপে মণ্ডপে উন্মাতাল ধুনুচি নাচ প্রতিযোগিতা',
       'রাতভর বাঁধভাঙা প্যান্ডেল হপিং ও উল্লাস',
     ],
     pushpanjaliTimings: '08:00 AM - 09:15 AM (Tithi ends at 09:31 AM)',
     pushpanjaliTimingsBn: 'সকাল ৮:০০ - সকাল ৯:১৫ (তিথি সকাল ০৯:৩১ পর্যন্ত)',
-    bhogTimings: '01:00 PM - 03:00 PM (Bhog distribution)',
-    bhogTimingsBn: 'দুপুর ১:০০ - দুপুর ৩:০০',
     tithis: [
       {
         name: 'Nabami Tithi',

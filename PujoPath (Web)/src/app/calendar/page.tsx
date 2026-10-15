@@ -197,54 +197,77 @@ export default function CalendarPage() {
       {/* Daily Puja Timeline Cards */}
       <div className="space-y-4">
 
-        {PUJA_CALENDAR_DATA.map((day) => (
-          <div
-            key={day.id}
-            className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#1a1613] border border-[#eee8e1] dark:border-[#2f2720] shadow-card space-y-3.5 transition-colors"
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#eee8e1] dark:border-[#2f2720] pb-3.5">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#b42323]">
-                  {day.tithis[0] ? (isBn ? day.tithis[0].nameBn : day.tithis[0].name) : day.dateString}
-                </span>
-                <h3 className="text-xl sm:text-2xl font-black text-[#242424] dark:text-[#ede5dc] mt-0.5">
-                  {isBn ? day.dayNameBn : day.dayName}
-                </h3>
-              </div>
-              <div className="text-xs sm:text-sm font-sans font-bold text-[#4a423d] dark:text-[#c4b9ae] px-3.5 py-1.5 rounded-full bg-[#fcfaf7] dark:bg-[#201c18] border border-[#eee8e1] dark:border-[#2f2720] self-start sm:self-auto shadow-sm">
-                {day.gregorianDate}
-              </div>
-            </div>
+        {PUJA_CALENDAR_DATA.map((day) => {
+          const isAshtami = day.id === 'maha-ashtami-2026' || day.slug === 'maha-ashtami';
 
-            <p className="text-sm sm:text-base text-[#4a423d] dark:text-[#c4b9ae] leading-relaxed font-medium">
-              {isBn ? day.significanceBn : day.significance}
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1 text-sm">
-              <div className="p-3.5 rounded-2xl bg-[#fcfaf7] dark:bg-[#201c18] border border-[#eee8e1] dark:border-[#2f2720] space-y-1">
-                <div className="font-bold text-[#242424] dark:text-[#ede5dc] flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-[#b42323]" />
-                  <span>{isBn ? 'পুষ্পাঞ্জলির শুভ সময়' : 'Pushpanjali Auspicious Timings'}</span>
+          return (
+            <div
+              key={day.id}
+              className={cn(
+                'p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#1a1613] border shadow-card space-y-3.5 transition-colors',
+                isAshtami
+                  ? 'border-amber-500/50 dark:border-amber-500/40 ring-1 ring-amber-500/20'
+                  : 'border-[#eee8e1] dark:border-[#2f2720]'
+              )}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#eee8e1] dark:border-[#2f2720] pb-3.5">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#b42323]">
+                      {day.tithis[0] ? (isBn ? day.tithis[0].nameBn : day.tithis[0].name) : day.dateString}
+                    </span>
+                    {isAshtami && (
+                      <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/15 dark:bg-amber-400/20 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                        {isBn ? 'বিশেষ অঞ্জলি লগ্ন' : 'Sacred Anjali'}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-[#242424] dark:text-[#ede5dc] mt-0.5">
+                    {isBn ? day.dayNameBn : day.dayName}
+                  </h3>
                 </div>
-                <p className="font-sans text-[#b42323] font-black text-base pl-6">
-                  {isBn ? day.pushpanjaliTimingsBn : day.pushpanjaliTimings}
-                </p>
+                <div className="text-xs sm:text-sm font-sans font-bold text-[#4a423d] dark:text-[#c4b9ae] px-3.5 py-1.5 rounded-full bg-[#fcfaf7] dark:bg-[#201c18] border border-[#eee8e1] dark:border-[#2f2720] self-start sm:self-auto shadow-sm">
+                  {day.gregorianDate}
+                </div>
               </div>
 
-              {day.bhogTimings && (
+              <p className="text-sm sm:text-base text-[#4a423d] dark:text-[#c4b9ae] leading-relaxed font-medium">
+                {isBn ? day.significanceBn : day.significance}
+              </p>
+
+              {isAshtami ? (
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 via-rose-500/10 to-amber-500/15 dark:from-amber-950/40 dark:via-[#2b1816] dark:to-amber-950/40 border-2 border-amber-500/60 dark:border-amber-500/50 shadow-md ring-2 ring-amber-500/20 space-y-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="font-extrabold text-[#961818] dark:text-amber-400 flex items-center gap-2 text-sm sm:text-base">
+                      <Sparkles className="w-5 h-5 text-amber-500 animate-pulse" />
+                      <span>
+                        {isBn
+                          ? 'মহাষ্টমীর প্রধান পুষ্পাঞ্জলি সময় (বিশেষ নির্ঘণ্ট)'
+                          : 'Maha Ashtami Sacred Pushpanjali (Special Highlight)'}
+                      </span>
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black tracking-wide uppercase bg-[#b42323] text-white shadow-xs">
+                      {isBn ? 'প্রধান অঞ্জলি' : 'Key Anjali Timing'}
+                    </span>
+                  </div>
+                  <p className="font-sans text-[#b42323] dark:text-[#fca5a5] font-black text-lg sm:text-xl pl-7">
+                    {isBn ? day.pushpanjaliTimingsBn : day.pushpanjaliTimings}
+                  </p>
+                </div>
+              ) : (
                 <div className="p-3.5 rounded-2xl bg-[#fcfaf7] dark:bg-[#201c18] border border-[#eee8e1] dark:border-[#2f2720] space-y-1">
                   <div className="font-bold text-[#242424] dark:text-[#ede5dc] flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-amber-500" />
-                    <span>{isBn ? 'ভোগ নিবেদন ও প্রসাদ' : 'Bhog Prasad Timings'}</span>
+                    <Clock className="w-4 h-4 text-[#b42323]" />
+                    <span>{isBn ? 'পুষ্পাঞ্জলির শুভ সময়' : 'Pushpanjali Auspicious Timings'}</span>
                   </div>
-                  <p className="font-sans text-amber-600 dark:text-amber-400 font-black text-base pl-6">
-                    {isBn ? day.bhogTimingsBn : day.bhogTimings}
+                  <p className="font-sans text-[#b42323] font-black text-base pl-6">
+                    {isBn ? day.pushpanjaliTimingsBn : day.pushpanjaliTimings}
                   </p>
                 </div>
               )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
