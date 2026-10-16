@@ -20,8 +20,8 @@ export function Footer() {
         className={cn(
           'mx-auto max-w-6xl px-4 pt-6 sm:px-6 sm:pt-7 transition-all duration-300',
           isPlayerActive
-            ? 'pb-44 sm:pb-44 md:pb-28'
-            : 'pb-20 sm:pb-20 md:pb-7'
+            ? 'pb-[calc(11.5rem+env(safe-area-inset-bottom,0px))] md:pb-28'
+            : 'pb-[calc(5.75rem+env(safe-area-inset-bottom,0px))] md:pb-7'
         )}
       >
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row text-center sm:text-left">
