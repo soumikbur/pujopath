@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Pandal, RouteStop } from '@/types';
-import { RouteOptimizer } from '@/lib/services/RouteOptimizer';
+import { Pandal, RouteStop, RouteItinerary } from '@/types';
+import { RouteOptimizer, RouteOptimizationResult } from '@/lib/services/RouteOptimizer';
+import { estimateWalkingMinutes, calculateHaversineDistance } from '@/lib/geo';
 
 interface RouteContextType {
   stops: RouteStop[];
@@ -9,7 +10,8 @@ interface RouteContextType {
   removeStop: (pandalId: string) => void;
   isPandalInRoute: (pandalId: string) => boolean;
   clearRoute: () => void;
-  optimizeRoute: () => { savingsKm: number; savingsPercent: number };
+  optimizeRoute: (origin?: { lat: number; lng: number } | null) => RouteOptimizationResult | null;
+  lastOptimizationResult: RouteOptimizationResult | null;
   reorderStops: (fromIndex: number, toIndex: number) => void;
   totalDistanceKm: number;
   favorites: string[];
@@ -17,6 +19,10 @@ interface RouteContextType {
   isFavorite: (pandalId: string) => boolean;
   customStops: Pandal[];
   addCustomStop: (stop: Pandal) => void;
+  savedRoutes: RouteItinerary[];
+  saveCurrentRoute: (name?: string) => RouteItinerary | null;
+  deleteSavedRoute: (id: string) => void;
+  loadSavedRoute: (route: RouteItinerary) => void;
 }
 
 const RouteContext = createContext<RouteContextType>({
@@ -25,7 +31,8 @@ const RouteContext = createContext<RouteContextType>({
   removeStop: () => {},
   isPandalInRoute: () => false,
   clearRoute: () => {},
-  optimizeRoute: () => ({ savingsKm: 0, savingsPercent: 0 }),
+  optimizeRoute: () => null,
+  lastOptimizationResult: null,
   reorderStops: () => {},
   totalDistanceKm: 0,
   favorites: [],
@@ -33,16 +40,23 @@ const RouteContext = createContext<RouteContextType>({
   isFavorite: () => false,
   customStops: [],
   addCustomStop: () => {},
+  savedRoutes: [],
+  saveCurrentRoute: () => null,
+  deleteSavedRoute: () => {},
+  loadSavedRoute: () => {},
 });
 
 const STORAGE_ROUTE_KEY = '@pujopath_app_route_stops';
 const STORAGE_FAVORITES_KEY = '@pujopath_app_favorites';
 const STORAGE_CUSTOM_STOPS_KEY = '@pujopath_app_custom_stops';
+const STORAGE_SAVED_ROUTES_KEY = '@pujopath_saved_routes';
 
 export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [stops, setStops] = useState<RouteStop[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [customStops, setCustomStops] = useState<Pandal[]>([]);
+  const [savedRoutes, setSavedRoutes] = useState<RouteItinerary[]>([]);
+  const [lastOptimizationResult, setLastOptimizationResult] = useState<RouteOptimizationResult | null>(null);
 
   // Load from AsyncStorage on mount
   useEffect(() => {
@@ -66,6 +80,14 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (data) {
         try {
           setCustomStops(JSON.parse(data));
+        } catch {}
+      }
+    });
+
+    AsyncStorage.getItem(STORAGE_SAVED_ROUTES_KEY).then((data) => {
+      if (data) {
+        try {
+          setSavedRoutes(JSON.parse(data));
         } catch {}
       }
     });
@@ -98,11 +120,12 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const clearRoute = () => {
+    setLastOptimizationResult(null);
     saveStops([]);
   };
 
   const reorderStops = (fromIndex: number, toIndex: number) => {
-    if (fromIndex === toIndex) return;
+    if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= stops.length || toIndex >= stops.length) return;
     const updated = [...stops];
     const [moved] = updated.splice(fromIndex, 1);
     updated.splice(toIndex, 0, moved);
@@ -110,16 +133,14 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     saveStops(reindexed);
   };
 
-  const optimizeRoute = () => {
-    if (stops.length < 3) {
-      return { savingsKm: 0, savingsPercent: 0 };
+  const optimizeRoute = (origin?: { lat: number; lng: number } | null) => {
+    if (stops.length <= 1) {
+      return null;
     }
-    const result = RouteOptimizer.optimizeStops(stops);
+    const result = RouteOptimizer.optimizeStops(stops, origin);
     saveStops(result.optimizedStops);
-    return {
-      savingsKm: result.savingsKm,
-      savingsPercent: result.savingsPercent,
-    };
+    setLastOptimizationResult(result);
+    return result;
   };
 
   const toggleFavorite = (pandalId: string) => {
@@ -141,6 +162,45 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     addStop(stop);
   };
 
+  const saveCurrentRoute = (name?: string): RouteItinerary | null => {
+    if (stops.length === 0) return null;
+    let totalDist = 0;
+    for (let i = 0; i < stops.length - 1; i++) {
+      totalDist += calculateHaversineDistance(
+        stops[i].pandal.latitude,
+        stops[i].pandal.longitude,
+        stops[i + 1].pandal.latitude,
+        stops[i + 1].pandal.longitude
+      );
+    }
+
+    const newRoute: RouteItinerary = {
+      id: `route-${Date.now()}`,
+      name: name || `Puja Trail ${savedRoutes.length + 1}`,
+      nameBn: `পুজো পরিক্রমা ${savedRoutes.length + 1}`,
+      stops: [...stops],
+      totalDistanceKm: totalDist,
+      estimatedDurationMinutes: Math.round(estimateWalkingMinutes(totalDist) + stops.length * 25),
+      suggestedTransitMode: totalDist > 3 ? 'Metro + Walking' : 'Walking',
+      createdAt: new Date().toISOString(),
+    };
+
+    const updatedRoutes = [...savedRoutes, newRoute];
+    setSavedRoutes(updatedRoutes);
+    AsyncStorage.setItem(STORAGE_SAVED_ROUTES_KEY, JSON.stringify(updatedRoutes));
+    return newRoute;
+  };
+
+  const deleteSavedRoute = (id: string) => {
+    const updated = savedRoutes.filter((r) => r.id !== id);
+    setSavedRoutes(updated);
+    AsyncStorage.setItem(STORAGE_SAVED_ROUTES_KEY, JSON.stringify(updated));
+  };
+
+  const loadSavedRoute = (route: RouteItinerary) => {
+    saveStops(route.stops);
+  };
+
   const totalDistanceKm = RouteOptimizer.calculateTotalDistance(stops);
 
   return (
@@ -152,6 +212,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         isPandalInRoute,
         clearRoute,
         optimizeRoute,
+        lastOptimizationResult,
         reorderStops,
         totalDistanceKm,
         favorites,
@@ -159,6 +220,10 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         isFavorite,
         customStops,
         addCustomStop,
+        savedRoutes,
+        saveCurrentRoute,
+        deleteSavedRoute,
+        loadSavedRoute,
       }}
     >
       {children}
@@ -167,3 +232,4 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 };
 
 export const useRoute = () => useContext(RouteContext);
+

@@ -1,0 +1,34 @@
+const http = require('http');
+
+async function run() {
+  const list = await new Promise((res, rej) => http.get('http://127.0.0.1:9222/json/list', r => {
+    let d = ''; r.on('data', c => d += c); r.on('end', () => res(JSON.parse(d)));
+  }));
+  const tab = list.find(t => t.url.includes('figma.com'));
+  const ws = new WebSocket(tab.webSocketDebuggerUrl);
+  ws.onopen = () => {
+    ws.send(JSON.stringify({
+      id: 1,
+      method: 'Runtime.evaluate',
+      params: {
+        expression: `(() => {
+          const btn = Array.from(document.querySelectorAll('button')).find(b => b.innerText.includes('Allow all cookies'));
+          if (btn) {
+            btn.click();
+            return 'Clicked Allow all cookies';
+          }
+          return 'Button not found';
+        })()`,
+        returnByValue: true
+      }
+    }));
+  };
+  ws.onmessage = e => {
+    const msg = JSON.parse(e.data);
+    if (msg.id === 1) {
+      console.log('Result:', msg.result.result.value);
+      ws.close();
+    }
+  };
+}
+run().catch(console.error);

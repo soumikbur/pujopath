@@ -21,12 +21,12 @@
 
 ## 📁 Project Structure
 
-The PujoPath repository is organized into three distinct, independent application tracks:
+The PujoPath repository is organized into four complementary tracks:
 
 ```text
 pujopath/
 │
-├── README.md                          # Root repository documentation (this file)
+├── README.md                          # Master repository documentation (this file)
 ├── LICENSE                            # License & terms of evaluation
 │
 ├── .github/
@@ -37,72 +37,76 @@ pujopath/
 ├── PujoPath (Web)/                    # Active, production-ready website & PWA
 │   ├── README.md                      # Web application documentation & guide
 │   ├── package.json                   # Web dependencies & scripts
-│   ├── package-lock.json              # Web lockfile
-│   ├── next.config.js                 # Next.js configuration & basePath logic
-│   ├── tsconfig.json                  # TypeScript configuration
-│   ├── tailwind.config.ts             # Tailwind CSS tokens & color system
 │   ├── src/                           # Application source code (App Router, components, data)
 │   ├── public/                        # Static assets, WebP pandal photos, audio files
-│   └── scripts/                       # 31-suite automated test runner & photo tools
+│   └── scripts/                       # Automated test runner & photo discovery tools
 │
-├── PujoPath (Capacitor)/              # Active Capacitor-powered Android mobile app
+├── PujoPath (Capacitor)/              # Capacitor-powered Android mobile hybrid app
 │   ├── README.md                      # Mobile application setup, build & APK guide
-│   ├── package.json                   # Mobile dependencies & Capacitor scripts
-│   ├── package-lock.json              # Capacitor lockfile
 │   ├── capacitor.config.ts            # Capacitor runtime & plugin configuration
-│   ├── next.config.js                 # Next.js configuration for mobile export
-│   ├── tsconfig.json                  # TypeScript configuration
 │   ├── android/                       # Native Android Gradle project & wrapper
-│   │   ├── app/                       # Android application module, manifests, resources
-│   │   ├── gradlew                    # Gradle wrapper script (Unix)
-│   │   └── gradlew.bat                # Gradle wrapper script (Windows)
-│   ├── src/                           # Application source code
-│   └── public/                        # Static assets & bundled resources
+│   └── src/                           # Hybrid mobile source code
 │
-└── PujoPath (Native)/                 # Reserved dedicated native mobile app track
-    ├── README.md                      # Native track architecture & status notice
-    ├── package.json                   # React Native & Expo dependencies
-    ├── package-lock.json              # Native lockfile
-    ├── app.json                       # Expo application configuration
-    ├── App.tsx                        # Native root component
-    ├── index.ts                       # Expo entry point
-    ├── assets/                        # Native icon and splash assets
-    └── src/                           # Native components, navigation, and screens
+├── PujoPath (Native)/                 # Genuine Native Android application (React Native & Expo)
+│   ├── README.md                      # Native Android architecture & build guide
+│   ├── package.json                   # React Native 0.86 & Expo SDK 57 dependencies
+│   ├── app.json                       # Application metadata & New Architecture config
+│   ├── android/                       # Native Android Gradle project, Java/Kotlin source & wrapper
+│   │   ├── app/                       # Native module, AndroidManifest, assets, Kotlin code
+│   │   ├── gradlew                    # Gradle build wrapper (Unix)
+│   │   └── gradlew.bat                # Gradle build wrapper (Windows)
+│   ├── assets/                        # Bundled native icons, splash, and audio assets
+│   └── src/                           # Native components, navigation, Leaflet engine, screens
+│
+└── PujoPath (Figma)/                  # UI/UX design tokens, vector exports & Figma import tools
+    ├── README.md                      # Design system documentation & Figma import guide
+    ├── design-tokens/                 # DTCG / Tokens Studio design tokens (tokens.json, tokens.ts)
+    ├── assets/                        # Brand vectors, backgrounds, and authentic pandal photos
+    ├── exports/                       # Editable vector SVG screens (Desktop, Mobile Web, Android)
+    ├── documentation/                 # Screen inventory & design system guidelines
+    ├── figma-import/                  # Figma manifest plugin & automated generation scripts
+    └── validation/                    # Design fidelity audit reports & live reference captures
 ```
 
 ---
 
-## 📱 Applications
+## 📱 Applications & Design Tracks
 
 ### 1. [PujoPath (Web)](./PujoPath%20%28Web%29/README.md)
-The core web application and installable Progressive Web App (PWA). Developed with Next.js 14 App Router, TypeScript, and Tailwind CSS. It is deployed as a high-performance static site on GitHub Pages.
+The core web application and installable Progressive Web App (PWA). Developed with Next.js 14 App Router, TypeScript, and Tailwind CSS.
 - **Detailed Documentation:** [PujoPath (Web) README](./PujoPath%20%28Web%29/README.md)
 - **Live URL:** [https://soumikbur.github.io/pujopath/](https://soumikbur.github.io/pujopath/)
 
 ### 2. [PujoPath (Capacitor)](./PujoPath%20%28Capacitor%29/README.md)
-The active mobile application track packaging the responsive web platform into an installable Android APK using Capacitor 8. It provides native status bar tinting, custom splash screens, hardware back-button integration, and offline-first performance.
+The Capacitor-powered mobile hybrid app packaging the web platform into an installable Android APK using Capacitor 8 with native status bar tinting, splash screen, and offline support.
 - **Detailed Documentation:** [PujoPath (Capacitor) README](./PujoPath%20%28Capacitor%29/README.md)
 - **Application ID:** `app.pujopath.mobile`
 
 ### 3. [PujoPath (Native)](./PujoPath%20%28Native%29/README.md)
-A dedicated, standalone React Native / Expo mobile application track. Its development is currently paused to focus resources on the Capacitor track, with its complete Expo SDK baseline preserved for future standalone mobile engineering.
+A genuine, standalone Native Android application built with React Native 0.86.3 and Expo SDK 57 (New Architecture enabled). Features full 774-pandal synchronization, interactive Leaflet & OpenStreetMap mapping, smooth slide tab transitions, native audio, edge-to-edge safe area layout, and hardware Back button navigation.
 - **Detailed Documentation:** [PujoPath (Native) README](./PujoPath%20%28Native%29/README.md)
-- **Current Status:** Paused (Preserved Baseline)
+- **Package ID:** `app.pujopath.mobile`
+- **Build Status:** Verified Native Debug APK Assembled with Gradle wrapper
+
+### 4. [PujoPath (Figma)](./PujoPath%20%28Figma%29/README.md)
+Complete, pixel-accurate design system and Figma replication of PujoPath. Contains design tokens (W3C DTCG format), vector screen exports across all viewports (Desktop 1440px, Mobile 390px, Android 412px), interactive Figma plugins, and validation audit reports.
+- **Detailed Documentation:** [PujoPath (Figma) README](./PujoPath%20%28Figma%29/README.md)
+- **Design Tokens:** [`design-tokens/tokens.json`](./PujoPath%20%28Figma%29/design-tokens/tokens.json)
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Capability | PujoPath (Web) | PujoPath (Capacitor) | PujoPath (Native) |
-| :--- | :--- | :--- | :--- |
-| **Framework** | Next.js 14.2 (App Router) | Next.js 14.2 + Capacitor 8.5 | React Native 0.86.3 |
-| **Runtime / Tooling**| Node.js / React 18.3 | Android Gradle Plugin / Java 17+ | Expo SDK ~57.0.28 |
-| **Language** | TypeScript 5.6 | TypeScript 5.6 | TypeScript ~6.0.3 |
-| **Styling** | Tailwind CSS 3.4 | Tailwind CSS 3.4 | React Native StyleSheet |
-| **Navigation** | Next.js App Router | Next.js App Router | React Navigation 7 |
-| **Mapping** | Leaflet 1.9 | Leaflet 1.9 | *Pending Native Maps* |
-| **Audio** | HTML5 Audio API | HTML5 Audio API | `expo-av` 16.0 |
-| **Target Platform** | Web / PWA (Universal) | Android (API 24+) | iOS / Android (Expo Go) |
+| Capability | PujoPath (Web) | PujoPath (Capacitor) | PujoPath (Native) | PujoPath (Figma) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Framework / Format** | Next.js 14.2 (App Router) | Next.js 14.2 + Capacitor 8.5 | React Native 0.86.3 / Expo SDK 57 | Figma API / SVG Vectors |
+| **Runtime / Tooling**| Node.js / React 18.3 | Android Gradle Plugin / Java 17+ | React Native New Architecture / Hermes | Tokens Studio / Node.js |
+| **Language** | TypeScript 5.6 | TypeScript 5.6 | TypeScript ~6.0.3 | TypeScript / JSON / W3C Tokens |
+| **Styling** | Tailwind CSS 3.4 | Tailwind CSS 3.4 | React Native StyleSheet | Design Tokens / Figma Styles |
+| **Navigation** | Next.js App Router | Next.js App Router | React Navigation 7 (History Stack) | Interactive Frames & Flows |
+| **Mapping** | Leaflet 1.9 | Leaflet 1.9 | Interactive Leaflet WebView Engine | Vector GIS Map Components |
+| **Audio** | HTML5 Audio API | HTML5 Audio API | `expo-audio` ~57.0.5 | UI Audio Controls & Waveforms |
+| **Target Platform** | Web / PWA (Universal) | Android (API 24+) | Android (API 24+) Standalone APK | Figma Web & Desktop |
 
 ---
 

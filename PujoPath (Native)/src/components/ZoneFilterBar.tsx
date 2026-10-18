@@ -1,7 +1,8 @@
 import React from 'react';
-import { ScrollView, TouchableOpacity, Text, StyleSheet, View } from 'react-native';
+import { ScrollView, TouchableOpacity, Text, StyleSheet, View, LayoutAnimation } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { LocalityZone } from '@/types';
 
 export const ZONES_LIST: (LocalityZone | 'All')[] = [
@@ -18,9 +19,9 @@ export const ZONES_LIST: (LocalityZone | 'All')[] = [
 
 const ZONE_TRANSLATIONS: Record<string, { en: string; bn: string }> = {
   All: { en: 'All Zones', bn: 'সব অঞ্চল' },
-  'North Kolkata': { en: 'North', bn: 'উত্তর' },
-  'South Kolkata': { en: 'South', bn: 'দক্ষিণ' },
-  'Central Kolkata': { en: 'Central', bn: 'মধ্য' },
+  'North Kolkata': { en: 'North Kolkata', bn: 'উত্তর কলকাতা' },
+  'South Kolkata': { en: 'South Kolkata', bn: 'দক্ষিণ কলকাতা' },
+  'Central Kolkata': { en: 'Central Kolkata', bn: 'মধ্য কলকাতা' },
   'Salt Lake': { en: 'Salt Lake', bn: 'সল্টলেক' },
   Behala: { en: 'Behala', bn: 'বেহালা' },
   Howrah: { en: 'Howrah', bn: 'হাওড়া' },
@@ -34,11 +35,23 @@ interface ZoneFilterBarProps {
 }
 
 export const ZoneFilterBar: React.FC<ZoneFilterBarProps> = ({ selectedZone, onSelectZone }) => {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const { language } = useLanguage();
+  const isBn = language === 'bn';
+  const reduceMotion = useReducedMotion();
+
+  const handleSelectZone = (zone: string) => {
+    if (!reduceMotion && selectedZone !== zone) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
+    onSelectZone(zone);
+  };
 
   return (
     <View style={styles.container}>
+      <Text style={[styles.heading, { color: colors.textMuted }]}>
+        {isBn ? 'এলাকা অনুযায়ী ফিল্টার' : 'Filter by Zone'}
+      </Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -53,12 +66,15 @@ export const ZoneFilterBar: React.FC<ZoneFilterBarProps> = ({ selectedZone, onSe
           return (
             <TouchableOpacity
               key={zone}
-              onPress={() => onSelectZone(zone)}
+              activeOpacity={0.75}
+              onPress={() => handleSelectZone(zone)}
               style={[
                 styles.chip,
                 {
-                  backgroundColor: isSelected ? colors.primary : colors.surface,
-                  borderColor: isSelected ? colors.primary : colors.border,
+                  backgroundColor: isSelected
+                    ? '#B42323'
+                    : (isDark ? '#1A1613' : '#FFFFFF'),
+                  borderColor: isSelected ? '#B42323' : colors.border,
                 },
               ]}
             >
@@ -67,7 +83,7 @@ export const ZoneFilterBar: React.FC<ZoneFilterBarProps> = ({ selectedZone, onSe
                   styles.chipText,
                   {
                     color: isSelected ? '#FFFFFF' : colors.textSecondary,
-                    fontWeight: isSelected ? '700' : '500',
+                    fontWeight: isSelected ? '800' : '600',
                   },
                 ]}
               >
@@ -83,21 +99,29 @@ export const ZoneFilterBar: React.FC<ZoneFilterBarProps> = ({ selectedZone, onSe
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 10,
+    paddingVertical: 4,
+  },
+  heading: {
+    fontSize: 11,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    paddingHorizontal: 16,
+    marginBottom: 8,
   },
   scrollContent: {
     paddingHorizontal: 16,
-    gap: 8,
+    gap: 6,
   },
   chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   chipText: {
-    fontSize: 13,
+    fontSize: 12,
   },
 });

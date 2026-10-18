@@ -1,7 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { Audio, AVPlaybackStatus } from 'expo-av';
+import { createAudioPlayer, setAudioModeAsync, AudioPlayer } from 'expo-audio';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MusicTrack } from '@/types';
 import { MUSIC_TRACKS_DATA } from '@/data/music';
+
+const USER_PLAYLIST_STORAGE_KEY = '@pujopath_user_playlist';
 
 interface AudioContextType {
   currentTrack: MusicTrack | null;
@@ -12,6 +15,12 @@ interface AudioContextType {
   togglePlayPause: () => Promise<void>;
   seekTo: (positionMillis: number) => Promise<void>;
   stopAudio: () => Promise<void>;
+  userPlaylistIds: string[];
+  addToPlaylist: (trackId: string) => void;
+  removeFromPlaylist: (trackId: string) => void;
+  togglePlaylistTrack: (trackId: string) => void;
+  isInPlaylist: (trackId: string) => boolean;
+  playQueue: (tracks: MusicTrack[]) => void;
 }
 
 const AudioContext = createContext<AudioContextType>({
@@ -23,6 +32,12 @@ const AudioContext = createContext<AudioContextType>({
   togglePlayPause: async () => {},
   seekTo: async () => {},
   stopAudio: async () => {},
+  userPlaylistIds: [],
+  addToPlaylist: () => {},
+  removeFromPlaylist: () => {},
+  togglePlaylistTrack: () => {},
+  isInPlaylist: () => false,
+  playQueue: () => {},
 });
 
 export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -30,47 +45,79 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [positionMs, setPositionMs] = useState<number>(0);
   const [durationMs, setDurationMs] = useState<number>(0);
+  const [userPlaylistIds, setUserPlaylistIds] = useState<string[]>([]);
 
-  const soundRef = useRef<Audio.Sound | null>(null);
+  const playerRef = useRef<AudioPlayer | null>(null);
+
+  // Hydrate user playlist from storage
+  useEffect(() => {
+    AsyncStorage.getItem(USER_PLAYLIST_STORAGE_KEY)
+      .then((data) => {
+        if (data) {
+          try {
+            setUserPlaylistIds(JSON.parse(data));
+          } catch {}
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const savePlaylist = async (ids: string[]) => {
+    setUserPlaylistIds(ids);
+    try {
+      await AsyncStorage.setItem(USER_PLAYLIST_STORAGE_KEY, JSON.stringify(ids));
+    } catch {}
+  };
+
+  const addToPlaylist = (trackId: string) => {
+    if (!userPlaylistIds.includes(trackId)) {
+      savePlaylist([...userPlaylistIds, trackId]);
+    }
+  };
+
+  const removeFromPlaylist = (trackId: string) => {
+    savePlaylist(userPlaylistIds.filter((id) => id !== trackId));
+  };
+
+  const togglePlaylistTrack = (trackId: string) => {
+    if (userPlaylistIds.includes(trackId)) {
+      removeFromPlaylist(trackId);
+    } else {
+      addToPlaylist(trackId);
+    }
+  };
+
+  const isInPlaylist = (trackId: string) => {
+    return userPlaylistIds.includes(trackId);
+  };
+
+  const playQueue = (tracks: MusicTrack[]) => {
+    if (tracks.length > 0) {
+      playTrack(tracks[0]);
+    }
+  };
 
   useEffect(() => {
-    // Configure audio mode for mobile playback
-    Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
-      staysActiveInBackground: true,
-      playsInSilentModeIOS: true,
-      shouldDuckAndroid: true,
-      playThroughEarpieceAndroid: false,
+    // Configure audio mode for background & mobile playback
+    setAudioModeAsync({
+      playsInSilentMode: true,
+      shouldRouteThroughEarpiece: false,
     }).catch(() => {});
 
     return () => {
-      if (soundRef.current) {
-        soundRef.current.unloadAsync().catch(() => {});
+      if (playerRef.current) {
+        playerRef.current.remove();
+        playerRef.current = null;
       }
     };
   }, []);
 
-  const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
-    if (status.isLoaded) {
-      setPositionMs(status.positionMillis);
-      setDurationMs(status.durationMillis || 0);
-      setIsPlaying(status.isPlaying);
-      if (status.didJustFinish) {
-        setIsPlaying(false);
-        setPositionMs(0);
-      }
-    } else if (status.error) {
-      console.warn('Playback error:', status.error);
-      setIsPlaying(false);
-    }
-  };
-
   const playTrack = async (track: MusicTrack) => {
     try {
-      if (soundRef.current) {
-        await soundRef.current.stopAsync();
-        await soundRef.current.unloadAsync();
-        soundRef.current = null;
+      if (playerRef.current) {
+        playerRef.current.pause();
+        playerRef.current.remove();
+        playerRef.current = null;
       }
 
       setCurrentTrack(track);
@@ -83,13 +130,22 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return;
       }
 
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: streamUrl },
-        { shouldPlay: true },
-        onPlaybackStatusUpdate
-      );
+      const player = createAudioPlayer(streamUrl);
+      playerRef.current = player;
 
-      soundRef.current = sound;
+      player.addListener('playbackStatusUpdate', (status) => {
+        if (status.isLoaded) {
+          setPositionMs(Math.round((status.currentTime || 0) * 1000));
+          setDurationMs(Math.round((status.duration || 0) * 1000));
+          setIsPlaying(status.playing);
+          if (status.didJustFinish) {
+            setIsPlaying(false);
+            setPositionMs(0);
+          }
+        }
+      });
+
+      player.play();
     } catch (error) {
       console.warn('Failed to load track:', error);
       setIsPlaying(false);
@@ -97,7 +153,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const togglePlayPause = async () => {
-    if (!soundRef.current) {
+    if (!playerRef.current) {
       if (currentTrack) {
         await playTrack(currentTrack);
       } else if (MUSIC_TRACKS_DATA.length > 0) {
@@ -107,15 +163,12 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
 
     try {
-      const status = await soundRef.current.getStatusAsync();
-      if (status.isLoaded) {
-        if (status.isPlaying) {
-          await soundRef.current.pauseAsync();
-          setIsPlaying(false);
-        } else {
-          await soundRef.current.playAsync();
-          setIsPlaying(true);
-        }
+      if (playerRef.current.playing) {
+        playerRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        playerRef.current.play();
+        setIsPlaying(true);
       }
     } catch (err) {
       console.warn('togglePlayPause error:', err);
@@ -123,9 +176,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const seekTo = async (positionMillis: number) => {
-    if (soundRef.current) {
+    if (playerRef.current) {
       try {
-        await soundRef.current.setPositionAsync(positionMillis);
+        await playerRef.current.seekTo(positionMillis / 1000);
       } catch (err) {
         console.warn('seekTo error:', err);
       }
@@ -133,11 +186,11 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const stopAudio = async () => {
-    if (soundRef.current) {
+    if (playerRef.current) {
       try {
-        await soundRef.current.stopAsync();
-        await soundRef.current.unloadAsync();
-        soundRef.current = null;
+        playerRef.current.pause();
+        playerRef.current.remove();
+        playerRef.current = null;
       } catch {}
       setIsPlaying(false);
       setCurrentTrack(null);
@@ -156,6 +209,12 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         togglePlayPause,
         seekTo,
         stopAudio,
+        userPlaylistIds,
+        addToPlaylist,
+        removeFromPlaylist,
+        togglePlaylistTrack,
+        isInPlaylist,
+        playQueue,
       }}
     >
       {children}
@@ -164,3 +223,4 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 };
 
 export const useAudio = () => useContext(AudioContext);
+

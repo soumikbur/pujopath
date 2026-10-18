@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="412" height="1950" viewBox="0 0 412 1950" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;family=Inter:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap');
+      text { font-family: 'Inter', system-ui, sans-serif; }
+      .title { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+      .bengali { font-family: 'Hind Siliguri', 'Inter', sans-serif; }
+    </style>
+  </defs>
+
+  <rect width="412" height="1950" fill="#FCFAF7"/>
+  
+  <!-- ANDROID SYSTEM STATUS BAR (40px) -->
+  <g id="Android_Status_Bar">
+    <rect width="412" height="40" fill="#FCFAF7"/>
+    <text x="20" y="26" fill="#242424" font-size="14" font-weight="600">9:34</text>
+    <g transform="translate(330, 14)">
+      <text x="0" y="12" fill="#242424" font-size="12" font-weight="700">5G</text>
+      <text x="22" y="12" fill="#242424" font-size="12">📶</text>
+      <text x="44" y="12" fill="#242424" font-size="12">🔋</text>
+    </g>
+  </g>
+  
+
+  <!-- Capacitor Header -->
+  <g id="Header_Capacitor" transform="translate(0, 40)">
+    <rect width="412" height="56" fill="#FFFFFF"/>
+    <line x1="0" y1="56" x2="412" y2="56" stroke="#E8E1D9" stroke-width="1"/>
+    <g transform="translate(16, 12)">
+      <rect width="32" height="32" rx="8" fill="#b42323"/>
+      <text x="16" y="21" fill="#FFFFFF" font-size="15" font-weight="800" text-anchor="middle">P</text>
+      <text x="40" y="22" fill="#242424" font-size="17" font-weight="800">PujoPath</text>
+    </g>
+    <g transform="translate(350, 12)">
+      <rect width="44" height="32" rx="8" fill="#F5F1EB" stroke="#E8E1D9" stroke-width="1"/>
+      <text x="22" y="20" fill="#b42323" font-size="11" font-weight="700" text-anchor="middle" class="bengali">বাংলা</text>
+    </g>
+  </g>
+
+  <!-- Calendar Content -->
+  <g id="Capacitor_Calendar_Body" transform="translate(16, 116)">
+    <rect width="140" height="24" rx="12" fill="#fdeeee"/>
+    <text x="70" y="16" fill="#b42323" font-size="10" font-weight="700" text-anchor="middle">📅 PUJA ALMANAC</text>
+    <text x="0" y="56" fill="#242424" font-size="24" font-weight="800" class="title">Durga Puja 2026 Calendar</text>
+    <text x="0" y="78" fill="#5C524A" font-size="13">Exact Bengali 1433 tithi timings &amp; sandhi puja</text>
+
+    <!-- SANDHI PUJA CARD -->
+    <g transform="translate(0, 100)">
+      <rect width="380" height="230" rx="20" fill="#FFFFFF" stroke="#fca5a5" stroke-width="2"/>
+      <g transform="translate(16, 16)">
+        <rect width="115" height="22" rx="11" fill="#fdeeee"/>
+        <text x="57" y="15" fill="#b42323" font-size="10" font-weight="700" text-anchor="middle">মহাসন্ধিক্ষণ ২০২৬</text>
+
+        <rect x="125" width="135" height="22" rx="11" fill="#fef3c7"/>
+        <text x="192" y="15" fill="#d97706" font-size="10" font-weight="700" text-anchor="middle">108 Lotuses &amp; Lamps</text>
+
+        <text x="0" y="58" fill="#242424" font-size="20" font-weight="800" class="title">Sandhi Puja Timings</text>
+        <text x="0" y="80" fill="#5C524A" font-size="12">48-minute sacred window calculated for Kolkata.</text>
+
+        <g transform="translate(0, 96)">
+          <rect width="348" height="42" rx="10" fill="#fff1f1" stroke="#b42323" stroke-width="1"/>
+          <text x="14" y="26" font-size="16">🔥</text>
+          <text x="36" y="26" fill="#b42323" font-size="12" font-weight="800">Mon, 19 Oct 2026 • 10:27 AM – 11:15 AM IST</text>
+        </g>
+
+        <g transform="translate(0, 148)">
+          <text x="0" y="14" fill="#7E7268" font-size="11" font-weight="700">CONVENTION: Pure Almanac (বিশুদ্ধ সিদ্ধান্ত)</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- SCHEDULE LIST -->
+    <g transform="translate(0, 350)">
+      <text x="0" y="20" fill="#242424" font-size="18" font-weight="800" class="title">Festival Dates</text>
+
+      <g transform="translate(0, 34)">
+        <!-- Day 1 -->
+        <rect width="380" height="74" rx="16" fill="#FFFFFF" stroke="#E8E1D9" stroke-width="1"/>
+        <text x="16" y="32" fill="#b42323" font-size="15" font-weight="800">10 Oct, Sat</text>
+        <text x="16" y="52" fill="#7E7268" font-size="11">Amavasya</text>
+        <text x="120" y="32" fill="#242424" font-size="15" font-weight="700">Mahalaya (মহালয়া)</text>
+        <text x="120" y="52" fill="#5C524A" font-size="12">Tarpan &amp; Radio Broadcast 4:00 AM</text>
+
+        <!-- Day 2 -->
+        <rect y="86" width="380" height="74" rx="16" fill="#FFFFFF" stroke="#E8E1D9" stroke-width="1"/>
+        <text x="16" y="118" fill="#b42323" font-size="15" font-weight="800">17 Oct, Sat</text>
+        <text x="16" y="138" fill="#7E7268" font-size="11">Shashthi</text>
+        <text x="120" y="118" fill="#242424" font-size="15" font-weight="700">Maha Shashthi (মহাষষ্ঠী)</text>
+        <text x="120" y="138" fill="#5C524A" font-size="12">Bodhon &amp; Amantran 6:30 PM</text>
+
+        <!-- Day 3 -->
+        <rect y="172" width="380" height="74" rx="16" fill="#FFFFFF" stroke="#E8E1D9" stroke-width="1"/>
+        <text x="16" y="204" fill="#b42323" font-size="15" font-weight="800">18 Oct, Sun</text>
+        <text x="16" y="224" fill="#7E7268" font-size="11">Saptami</text>
+        <text x="120" y="204" fill="#242424" font-size="15" font-weight="700">Maha Saptami (মহাসপ্তমী)</text>
+        <text x="120" y="224" fill="#5C524A" font-size="12">Kola Bou Snan 6:15 AM</text>
+
+        <!-- Day 4 -->
+        <rect y="258" width="380" height="74" rx="16" fill="#FFFFFF" stroke="#E8E1D9" stroke-width="1"/>
+        <text x="16" y="290" fill="#b42323" font-size="15" font-weight="800">19 Oct, Mon</text>
+        <text x="16" y="310" fill="#7E7268" font-size="11">Ashtami</text>
+        <text x="120" y="290" fill="#242424" font-size="15" font-weight="700">Maha Ashtami &amp; Sandhi</text>
+        <text x="120" y="310" fill="#b42323" font-size="12" font-weight="700">Sandhi Puja 10:27 AM</text>
+
+        <!-- Day 5 -->
+        <rect y="344" width="380" height="74" rx="16" fill="#FFFFFF" stroke="#E8E1D9" stroke-width="1"/>
+        <text x="16" y="376" fill="#b42323" font-size="15" font-weight="800">20 Oct, Tue</text>
+        <text x="16" y="396" fill="#7E7268" font-size="11">Navami</text>
+        <text x="120" y="376" fill="#242424" font-size="15" font-weight="700">Maha Navami (মহানবমী)</text>
+        <text x="120" y="396" fill="#5C524A" font-size="12">Navami Homa 10:30 AM</text>
+
+        <!-- Day 6 -->
+        <rect y="430" width="380" height="74" rx="16" fill="#FFFFFF" stroke="#E8E1D9" stroke-width="1"/>
+        <text x="16" y="462" fill="#b42323" font-size="15" font-weight="800">21 Oct, Wed</text>
+        <text x="16" y="482" fill="#7E7268" font-size="11">Dashami</text>
+        <text x="120" y="462" fill="#242424" font-size="15" font-weight="700">Vijaya Dashami (বিজয়া)</text>
+        <text x="120" y="482" fill="#5C524A" font-size="12">Sindoor Khela &amp; Bisarjan</text>
+      </g>
+    </g>
+  </g>
+
+  
+  <!-- Fixed Mobile Bottom Navigation (64px) -->
+  <g id="Mobile_Bottom_Nav" transform="translate(0, 1862)">
+    <rect width="412" height="64" fill="#FFFFFF"/>
+    <line x1="0" y1="0" x2="412" y2="0" stroke="#E8E1D9" stroke-width="1"/>
+    
+    <g transform="translate(41.2, 14)" text-anchor="middle">
+      <text x="0" y="16" font-size="18">🏠</text>
+      <text x="0" y="32" fill="#7E7268" font-size="10" font-weight="500">Home</text>
+    </g>
+    <g transform="translate(123.60000000000001, 14)" text-anchor="middle">
+      <text x="0" y="16" font-size="18">🧭</text>
+      <text x="0" y="32" fill="#7E7268" font-size="10" font-weight="500">Explore</text>
+    </g>
+    <g transform="translate(206, 14)" text-anchor="middle">
+      <text x="0" y="16" font-size="18">🗺️</text>
+      <text x="0" y="32" fill="#7E7268" font-size="10" font-weight="500">Map</text>
+    </g>
+    <g transform="translate(288.40000000000003, 14)" text-anchor="middle">
+      <text x="0" y="16" font-size="18">🔀</text>
+      <text x="0" y="32" fill="#7E7268" font-size="10" font-weight="500">Planner</text>
+    </g>
+    <g transform="translate(370.8, 14)" text-anchor="middle">
+      <text x="0" y="16" font-size="18">⋯</text>
+      <text x="0" y="32" fill="#b42323" font-size="10" font-weight="700">More</text>
+    </g>
+  </g>
+  
+  
+  <rect x="0" y="1926" width="412" height="24" fill="#FFFFFF"/>
+  <rect x="170" y="1936" width="72" height="4" rx="2" fill="#5a504a"/>
+  
+</svg>

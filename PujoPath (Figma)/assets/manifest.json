@@ -1,0 +1,27 @@
+{
+  "name": "PujoPath — Bengali Durga Puja Companion",
+  "short_name": "PujoPath",
+  "description": "Minimal, modern Durga Puja companion with pandal discovery, route planner, metro guide, sacred calendar, and Sharodiya music.",
+  "start_url": "./",
+  "id": "./",
+  "display": "standalone",
+  "background_color": "#F8EFE5",
+  "theme_color": "#D52F2F",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["travel", "culture", "entertainment", "navigation"]
+}

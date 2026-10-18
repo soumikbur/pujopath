@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="412" height="915" viewBox="0 0 412 915" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;family=Inter:wght@400;500;600;700;800;900&amp;display=swap');
+      text { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+      .brand { font-family: 'Inter', system-ui, sans-serif; font-weight: 800; }
+      .bengali { font-family: 'Hind Siliguri', 'Inter', sans-serif; }
+    </style>
+  </defs>
+
+  <rect width="412" height="915" fill="#fcfaf7"/>
+
+  <!-- Backdrop Dimmer Overlay -->
+  <rect width="412" height="915" fill="#000000" fill-opacity="0.45"/>
+
+  <!-- Slide-Up Modal Bottom Sheet (Matching actual_cap_more_drawer.png) -->
+  <g id="Capacitor_Bottom_Sheet" transform="translate(0, 240)">
+    <rect width="412" height="675" rx="28" fill="#ffffff"/>
+    
+    <!-- Drag Handle Pill -->
+    <rect x="182" y="12" width="48" height="5" rx="2.5" fill="#d2c7bc"/>
+
+    <!-- Header Row: Title & Close Button -->
+    <g transform="translate(24, 34)">
+      <text x="0" y="20" fill="#1a1715" font-size="20" font-weight="900">More Features</text>
+      <text x="0" y="38" fill="#625b55" font-size="12">Explore guides, audio, and tools</text>
+      
+      <circle cx="348" cy="18" r="16" fill="#fcfaf7"/>
+      <text x="348" y="23" fill="#625b55" font-size="14" text-anchor="middle">✕</text>
+    </g>
+
+    <!-- 8 Grid Items (2 Columns x 4 Rows) -->
+    <g transform="translate(24, 100)">
+      <!-- Item 1: Metro Guide -->
+      <g transform="translate(0, 0)">
+        <rect width="174" height="74" rx="14" fill="#fcfaf7" stroke="#e8e1d9" stroke-width="1"/>
+        <text x="16" y="35" font-size="18">🚇</text>
+        <text x="44" y="32" fill="#1a1715" font-size="13" font-weight="700">Metro Guide</text>
+        <text x="44" y="47" fill="#625b55" font-size="10">Lines &amp; timings</text>
+      </g>
+
+      <!-- Item 2: Sacred Calendar -->
+      <g transform="translate(190, 0)">
+        <rect width="174" height="74" rx="14" fill="#fcfaf7" stroke="#e8e1d9" stroke-width="1"/>
+        <text x="16" y="35" font-size="18">📅</text>
+        <text x="44" y="32" fill="#1a1715" font-size="13" font-weight="700">Calendar</text>
+        <text x="44" y="47" fill="#625b55" font-size="10">Sacred tithis</text>
+      </g>
+
+      <!-- Item 3: Festive Music -->
+      <g transform="translate(0, 84)">
+        <rect width="174" height="74" rx="14" fill="#fcfaf7" stroke="#e8e1d9" stroke-width="1"/>
+        <text x="16" y="35" font-size="18">🎵</text>
+        <text x="44" y="32" fill="#1a1715" font-size="13" font-weight="700">Festive Music</text>
+        <text x="44" y="47" fill="#625b55" font-size="10">Chandi Path</text>
+      </g>
+
+      <!-- Item 4: Safety & Helpline -->
+      <g transform="translate(190, 84)">
+        <rect width="174" height="74" rx="14" fill="#fcfaf7" stroke="#e8e1d9" stroke-width="1"/>
+        <text x="16" y="35" font-size="18">🚨</text>
+        <text x="44" y="32" fill="#1a1715" font-size="13" font-weight="700">Safety &amp; Help</text>
+        <text x="44" y="47" fill="#625b55" font-size="10">Emergency 100/1090</text>
+      </g>
+
+      <!-- Item 5: Dhak Beats -->
+      <g transform="translate(0, 168)">
+        <rect width="174" height="74" rx="14" fill="#fcfaf7" stroke="#e8e1d9" stroke-width="1"/>
+        <text x="16" y="35" font-size="18">🥁</text>
+        <text x="44" y="32" fill="#1a1715" font-size="13" font-weight="700">Dhak Beats</text>
+        <text x="44" y="47" fill="#625b55" font-size="10">Traditional rhythms</text>
+      </g>
+
+      <!-- Item 6: Pushpanjali Mantra -->
+      <g transform="translate(190, 168)">
+        <rect width="174" height="74" rx="14" fill="#fcfaf7" stroke="#e8e1d9" stroke-width="1"/>
+        <text x="16" y="35" font-size="18">🌸</text>
+        <text x="44" y="32" fill="#1a1715" font-size="13" font-weight="700">Mantra Guide</text>
+        <text x="44" y="47" fill="#625b55" font-size="10">Bengali &amp; Sanskrit</text>
+      </g>
+
+      <!-- Item 7: Developers -->
+      <g transform="translate(0, 252)">
+        <rect width="174" height="74" rx="14" fill="#fcfaf7" stroke="#e8e1d9" stroke-width="1"/>
+        <text x="16" y="35" font-size="18">👩‍💻</text>
+        <text x="44" y="32" fill="#1a1715" font-size="13" font-weight="700">Developers</text>
+        <text x="44" y="47" fill="#625b55" font-size="10">Soumik &amp; Moumita</text>
+      </g>
+
+      <!-- Item 8: Share App -->
+      <g transform="translate(190, 252)">
+        <rect width="174" height="74" rx="14" fill="#fcfaf7" stroke="#e8e1d9" stroke-width="1"/>
+        <text x="16" y="35" font-size="18">📤</text>
+        <text x="44" y="32" fill="#1a1715" font-size="13" font-weight="700">Share App</text>
+        <text x="44" y="47" fill="#625b55" font-size="10">With family</text>
+      </g>
+    </g>
+
+    <!-- Version & Build -->
+    <g transform="translate(206, 470)" text-anchor="middle">
+      <text x="0" y="0" fill="#625b55" font-size="12" font-weight="600">PujoPath Android v1.2.0 (Build 42)</text>
+      <text x="0" y="18" fill="#8f847b" font-size="10">Crafted with ❤️ for Kolkata Durga Puja 2026</text>
+    </g>
+  </g>
+
+  
+  <!-- CAPACITOR ANDROID BOTTOM NAVIGATION BAR (y=830) -->
+  <g id="Capacitor_Bottom_Nav" transform="translate(0, 830)">
+    <rect width="412" height="60" fill="#fcfaf7" fill-opacity="0.98"/>
+    <line x1="0" y1="0" x2="412" y2="0" stroke="#e8e1d9" stroke-width="1"/>
+    
+      <g transform="translate(0, 4)">
+        <rect x="14" y="2" width="54" height="46" rx="12" fill="transparent"/>
+        <text x="41" y="22" font-size="16" text-anchor="middle">🏠</text>
+        <text x="41" y="40" fill="#625b55" font-size="10" font-weight="500" text-anchor="middle">Home</text>
+      </g>
+    
+      <g transform="translate(82, 4)">
+        <rect x="14" y="2" width="54" height="46" rx="12" fill="transparent"/>
+        <text x="41" y="22" font-size="16" text-anchor="middle">🔍</text>
+        <text x="41" y="40" fill="#625b55" font-size="10" font-weight="500" text-anchor="middle">Explore</text>
+      </g>
+    
+      <g transform="translate(164, 4)">
+        <rect x="14" y="2" width="54" height="46" rx="12" fill="transparent"/>
+        <text x="41" y="22" font-size="16" text-anchor="middle">📍</text>
+        <text x="41" y="40" fill="#625b55" font-size="10" font-weight="500" text-anchor="middle">Map</text>
+      </g>
+    
+      <g transform="translate(246, 4)">
+        <rect x="14" y="2" width="54" height="46" rx="12" fill="transparent"/>
+        <text x="41" y="22" font-size="16" text-anchor="middle">🔀</text>
+        <text x="41" y="40" fill="#625b55" font-size="10" font-weight="500" text-anchor="middle">Planner</text>
+      </g>
+    
+      <g transform="translate(328, 4)">
+        <rect x="14" y="2" width="54" height="46" rx="12" fill="#fbe8e6"/>
+        <text x="41" y="22" font-size="16" text-anchor="middle">☰</text>
+        <text x="41" y="40" fill="#b42323" font-size="10" font-weight="800" text-anchor="middle">More</text>
+      </g>
+    
+  </g>
+  
+  
+  <!-- ANDROID SYSTEM GESTURE NAVIGATION PILL (y=890) -->
+  <g id="Android_Gesture_Pill" transform="translate(0, 890)">
+    <rect width="412" height="24" fill="none"/>
+    <rect x="170" y="10" width="72" height="4" rx="2" fill="#1A1715" fill-opacity="0.8"/>
+  </g>
+  
+</svg>

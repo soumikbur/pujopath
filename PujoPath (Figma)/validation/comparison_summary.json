@@ -1,0 +1,93 @@
+{
+  "auditDate": "2026-10-16T12:47:00.000Z",
+  "figmaFileUrl": "https://www.figma.com/design/JygRV7jLCZYwmauz1RSHZ6/PujoPath-%E2%80%94-Complete-UI-UX-Design?node-id=0-1&p=f&t=Id2g5RbpWEKo2Hrj-0",
+  "pagesAuditedAndCorrected": [
+    {
+      "page": "Web — Desktop",
+      "status": "PRESERVED_UNCHANGED",
+      "viewport": "1440 x 1400 (Canvas: 1440px)",
+      "frameCount": 6,
+      "frames": [
+        "01_web_desktop_home",
+        "02_web_desktop_developer",
+        "03_web_desktop_explore",
+        "04_web_desktop_calendar",
+        "05_web_desktop_planner",
+        "06_web_desktop_metro"
+      ],
+      "mainFeatures": [
+        "Desktop sticky header with Install App pill, Theme toggle, Language switch, Saved heart",
+        "Ghibli Durga festival artwork background and 180-day countdown pill",
+        "Moumita (UI & Frontend Lead) & Soumik (Backend & Systems Lead) authentic portraits and LinkedIn links",
+        "3-column Pandal Explore grid with native image fills for Bagbazar, Kumartuli, Sovabazar, Suruchi, Ekdalia, Sreebhumi",
+        "Sandhi Puja 108 diyas calendar card with auspicious 48-minute window",
+        "Smart Route Planner metrics and sequence stops",
+        "Metro Blue and Green line transit guides"
+      ]
+    },
+    {
+      "page": "Web — Mobile",
+      "status": "COMPLETED",
+      "viewport": "390 x 844 (Mobile Viewport: 390px)",
+      "frameCount": 7,
+      "frames": [
+        "01_web_mobile_home",
+        "02_web_mobile_developer",
+        "03_web_mobile_explore",
+        "04_web_mobile_calendar",
+        "05_web_mobile_planner",
+        "06_web_mobile_metro",
+        "07_web_mobile_music"
+      ],
+      "mainCorrections": [
+        "Header: Matched mobile header with 'App' download button, Theme toggle, Language switch, and Saved heart.",
+        "Footer: Guaranteed full visibility of footer attribution 'Made by Soumik & Moumita with ❤️' and Sandhya Aarti pause control above fixed bottom navigation.",
+        "Developer Page: Stacked responsive layout with authentic portraits, responsibility tags, and LinkedIn buttons.",
+        "Explore Page: Single-column high-res card layout with zone chips and '+ Add to Route' actions.",
+        "Route Planner: Mobile sequence stops with walking connector distances and Google Maps export.",
+        "Metro Guide: Added mobile Blue & Green line station connection cards with walking distances and all-night service notice.",
+        "Puja Music: Added Festive Puja Music traditions screen with mood pills, search input, and curated audio tracks.",
+        "Bottom Nav: Fixed 5-tab mobile navigation (Home, Explore, Map, Planner, More)."
+      ]
+    },
+    {
+      "page": "Capacitor — Android Mobile",
+      "status": "COMPLETED",
+      "viewport": "412 x 892 (Android Standard: 412px)",
+      "frameCount": 8,
+      "frames": [
+        "01_capacitor_launch_splash",
+        "02_capacitor_android_developer",
+        "03_capacitor_android_drawer",
+        "04_capacitor_android_home",
+        "05_capacitor_android_calendar",
+        "06_capacitor_android_explore",
+        "07_capacitor_android_planner",
+        "08_capacitor_android_music_player"
+      ],
+      "mainCorrections": [
+        "Header Distinction: Strictly omitted 'Install App' button from all Capacitor headers because user is already running the distributed APK.",
+        "System Bars: Native 40px Android Status Bar (clock 9:34/12:24, 5G, signal bars, battery) and 24px Gesture Home Pill.",
+        "Launch Splash: Fullscreen authentic Sacred Durga Protima artwork (durga-bg.jpg), sound badge, and sacred Sanskrit mantra.",
+        "More Drawer: Recreated authentic slide-up modal sheet with top drag handle, close button, and 8 feature navigation items.",
+        "Explore Screen: Android pandal directory with zone pills, crowd badges, and feature filter switches.",
+        "Route Planner: Android 412px route planning workspace with stop cards and export buttons.",
+        "Music & Miniplayer: Recreated authentic Festive Puja Music screen WITH the active floating mini-player (Maa Durga thumbnail, red progress line, play/pause, queue, close) matching emulator_miniplayer_paused.png."
+      ]
+    }
+  ],
+  "editabilityVerification": {
+    "flatScreenshotsUsed": false,
+    "nativeNodeTypes": [
+      "TEXT",
+      "RECTANGLE",
+      "FRAME",
+      "VECTOR"
+    ],
+    "nativeImageFills": "Native RECTANGLE fills of type IMAGE parsed from base64 JPEG buffers",
+    "totalFrames": 21,
+    "totalEditableTextNodes": 1118,
+    "totalVectorIcons": 882,
+    "totalNativeImageFills": 34
+  }
+}

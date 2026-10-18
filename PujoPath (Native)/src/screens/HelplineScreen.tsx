@@ -180,18 +180,31 @@ export const HelplineScreen: React.FC<HelplineScreenProps> = () => {
               ? 'পুজোপথকে আরও সমৃদ্ধ করতে আপনার মূল্যবান পরামর্শ বা প্রতিক্রিয়া সরাসরি লিঙ্কডইনে বার্তা পাঠিয়ে জানান।'
               : 'Have suggestions, corrections, or new features to suggest? Send your feedback directly via LinkedIn messaging.'}
           </Text>
-          <TouchableOpacity
-            style={[styles.callBtn, { backgroundColor: '#0A66C2', alignSelf: 'flex-start', paddingHorizontal: 16 }]}
-            onPress={() => Linking.openURL('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/')}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel={language === 'bn' ? 'লিঙ্কডইনে মতামত পাঠান' : 'Send feedback on LinkedIn'}
-          >
-            <Ionicons name="chatbubbles" size={16} color="#FFFFFF" />
-            <Text style={styles.callNumberText}>
-              {language === 'bn' ? 'মতামত দিন (Feedback)' : 'Feedback'}
-            </Text>
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', gap: 10, marginTop: 4 }}>
+            <TouchableOpacity
+              style={[styles.callBtn, { backgroundColor: '#0A66C2', alignSelf: 'flex-start', paddingHorizontal: 16 }]}
+              onPress={() => navigation?.navigate?.('Feedback')}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={language === 'bn' ? 'মতামত জানান' : 'Send feedback'}
+            >
+              <Ionicons name="mail" size={16} color="#FFFFFF" />
+              <Text style={styles.callNumberText}>
+                {language === 'bn' ? 'মতামত দিন (Feedback)' : 'Feedback'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.callBtn, { backgroundColor: '#004182', alignSelf: 'flex-start', paddingHorizontal: 16 }]}
+              onPress={() => Linking.openURL('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/')}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={language === 'bn' ? 'লিঙ্কডইনে বার্তা পাঠান' : 'Message on LinkedIn'}
+            >
+              <Ionicons name="logo-linkedin" size={16} color="#FFFFFF" />
+              <Text style={styles.callNumberText}>LinkedIn</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </View>

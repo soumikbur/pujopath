@@ -1,0 +1,388 @@
+
+<svg width="1440" height="1350" viewBox="0 0 1440 1350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;family=Inter:wght@400;500;600;700;800;900&amp;display=swap');
+      text { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+      .bengali { font-family: 'Hind Siliguri', 'Inter', sans-serif; }
+    </style>
+    <radialGradient id="vignetteLight" cx="50%" cy="25%" r="70%">
+      <stop offset="0%" stop-color="#fcfaf7" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#fcfaf7" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#fcfaf7" stop-opacity="0.96"/>
+    </radialGradient>
+    <filter id="softShadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#4a3b32" flood-opacity="0.05"/>
+    </filter>
+  </defs>
+
+  
+  <!-- BACKGROUND LIGHT WITH WARM CREAM -->
+  <g id="Page_Background_Light">
+    <rect width="1440" height="1350" fill="#fcfaf7"/>
+    
+    <!-- Subtle Golden/Sepia Mandala Watermarks -->
+    <g opacity="0.14" stroke="#c4b5a5" stroke-width="1" fill="none">
+      <!-- Left Watermark -->
+      <g transform="translate(60, 160)">
+        <circle cx="0" cy="0" r="140"/>
+        <circle cx="0" cy="0" r="105"/>
+        <circle cx="0" cy="0" r="70"/>
+        <circle cx="0" cy="0" r="35"/>
+        <line x1="-140" y1="0" x2="140" y2="0"/>
+        <line x1="0" y1="-140" x2="0" y2="140"/>
+        <line x1="-100" y1="-100" x2="100" y2="100"/>
+        <line x1="-100" y1="100" x2="100" y2="-100"/>
+        <path d="M 0,-105 Q 35,-70 0,-35 Q -35,-70 0,-105 Z"/>
+        <path d="M 0,105 Q 35,70 0,35 Q -35,70 0,105 Z"/>
+        <path d="M -105,0 Q -70,35 -35,0 Q -70,-35 -105,0 Z"/>
+        <path d="M 105,0 Q 70,35 35,0 Q 70,-35 105,0 Z"/>
+      </g>
+      <!-- Right Watermark -->
+      <g transform="translate(1380, 160)">
+        <circle cx="0" cy="0" r="140"/>
+        <circle cx="0" cy="0" r="105"/>
+        <circle cx="0" cy="0" r="70"/>
+        <circle cx="0" cy="0" r="35"/>
+        <line x1="-140" y1="0" x2="140" y2="0"/>
+        <line x1="0" y1="-140" x2="0" y2="140"/>
+        <line x1="-100" y1="-100" x2="100" y2="100"/>
+        <line x1="-100" y1="100" x2="100" y2="-100"/>
+        <path d="M 0,-105 Q 35,-70 0,-35 Q -35,-70 0,-105 Z"/>
+        <path d="M 0,105 Q 35,70 0,35 Q -35,70 0,105 Z"/>
+        <path d="M -105,0 Q -70,35 -35,0 Q -70,-35 -105,0 Z"/>
+        <path d="M 105,0 Q 70,35 35,0 Q 70,-35 105,0 Z"/>
+      </g>
+    </g>
+  
+  </g>
+  
+  
+  <!-- HEADER LIGHT (Height: 65px) -->
+  <g id="Header_Desktop_Light">
+    <rect width="1440" height="65" fill="#ffffff" fill-opacity="0.88"/>
+    <line x1="0" y1="65" x2="1440" y2="65" stroke="#eee8e1" stroke-width="1"/>
+
+    <g transform="translate(144, 0)">
+      <!-- Logo -->
+      <text x="0" y="41" fill="#b42323" font-size="20" font-weight="800" letter-spacing="-0.3">PujoPath</text>
+      
+      <!-- Nav items -->
+      
+      <g transform="translate(340, 13)">
+        <rect width="78" height="38" rx="12" fill="transparent"/>
+        <text x="39" y="24" fill="#57524c" font-size="14" font-weight="700" text-anchor="middle">Explore</text>
+      </g>
+    
+      <g transform="translate(426, 13)">
+        <rect width="78" height="38" rx="12" fill="transparent"/>
+        <text x="39" y="24" fill="#57524c" font-size="14" font-weight="700" text-anchor="middle">Map</text>
+      </g>
+    
+      <g transform="translate(512, 13)">
+        <rect width="78" height="38" rx="12" fill="transparent"/>
+        <text x="39" y="24" fill="#57524c" font-size="14" font-weight="700" text-anchor="middle">Plan</text>
+      </g>
+    
+      <g transform="translate(598, 13)">
+        <rect width="78" height="38" rx="12" fill="#f5efe6"/>
+        <text x="39" y="24" fill="#1a1715" font-size="14" font-weight="700" text-anchor="middle">More ⌵</text>
+      </g>
+    
+
+      <!-- Right Actions: Install App, Mode, Lang, Saved -->
+      <g transform="translate(740, 13)">
+        <!-- Install App -->
+        <g id="Btn_Install_App">
+          <rect width="124" height="38" rx="12" fill="#b42323"/>
+          <text x="22" y="24" fill="#ffffff" font-size="14">📥</text>
+          <text x="44" y="24" fill="#ffffff" font-size="14" font-weight="700">Install App</text>
+        </g>
+        <!-- Theme Toggle (Moon icon in light mode) -->
+        <g id="Btn_Theme_Toggle" transform="translate(136, 0)">
+          <rect width="38" height="38" rx="12" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="19" y="24" fill="#57524c" font-size="15" text-anchor="middle">🌙</text>
+        </g>
+        <!-- Lang Pill -->
+        <g id="Pill_Lang_Toggle" transform="translate(186, 0)">
+          <rect width="88" height="38" rx="12" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <!-- Active EN -->
+          <rect x="4" y="4" width="38" height="30" rx="8" fill="#b42323"/>
+          <text x="23" y="23" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">EN</text>
+          <!-- Inactive বাংলা -->
+          <text x="63" y="23" fill="#57524c" font-size="12" font-weight="700" text-anchor="middle" class="bengali">বাংলা</text>
+        </g>
+        <!-- Saved Heart -->
+        <g id="Btn_Saved_Trails" transform="translate(286, 0)">
+          <rect width="38" height="38" rx="12" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="19" y="24" fill="#57524c" font-size="15" text-anchor="middle">♡</text>
+        </g>
+      </g>
+    </g>
+  </g>
+  
+
+  <g transform="translate(144, 88)">
+    <!-- Label & Title -->
+    <text x="0" y="20" fill="#b42323" font-size="12" font-weight="700" letter-spacing="1">🎵 SHARODIYA SOUNDSCAPE &amp; HERITAGE</text>
+    <text x="0" y="54" fill="#1a1715" font-size="34" font-weight="800">Festive Puja Music Traditions</text>
+    <text x="0" y="82" fill="#57524c" font-size="14">Explore Bengal's rich Durga Puja music culture — traditional Dhak beats, Agomoni hymns, pandal-hopping anthems, and immersion chants.</text>
+
+    <!-- Choose Your Puja Mood Section -->
+    <g transform="translate(0, 108)">
+      <rect width="1152" height="110" rx="18" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+      <g transform="translate(24, 20)">
+        <text x="0" y="16" fill="#1a1715" font-size="14" font-weight="800">✨ Choose Your Puja Mood</text>
+        <g transform="translate(0, 32)">
+          <rect x="0" y="0" width="84" height="32" rx="10" fill="#b42323"/>
+          <text x="42" y="21" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">All Moods</text>
+
+          <rect x="94" y="0" width="134" height="32" rx="10" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="161" y="21" fill="#1a1715" font-size="12" font-weight="600" text-anchor="middle">Ritual &amp; Devotion</text>
+
+          <rect x="238" y="0" width="170" height="32" rx="10" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="323" y="21" fill="#1a1715" font-size="12" font-weight="600" text-anchor="middle">Dhak &amp; Traditional Sounds</text>
+
+          <rect x="418" y="0" width="118" height="32" rx="10" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="477" y="21" fill="#1a1715" font-size="12" font-weight="600" text-anchor="middle">Pandal Hopping</text>
+
+          <rect x="546" y="0" width="144" height="32" rx="10" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="618" y="21" fill="#1a1715" font-size="12" font-weight="600" text-anchor="middle">Bengali Festive Music</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- Search Input -->
+    <g transform="translate(0, 234)">
+      <rect width="1152" height="48" rx="14" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+      <text x="20" y="30" fill="#8c847c" font-size="15">🔍</text>
+      <text x="48" y="30" fill="#8c847c" font-size="14">Search tracks, artists, rhythms...</text>
+    </g>
+
+    <!-- Audio Tracks Grid (8 Cards) -->
+    <g transform="translate(0, 302)">
+      
+      <g transform="translate(0, 0)">
+        <rect width="564" height="142" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(16, 16)">
+          <!-- Play circle -->
+          <circle cx="24" cy="24" r="24" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <path d="M 21,17 L 31,24 L 21,31 Z" fill="#b42323"/>
+
+          <text x="60" y="20" fill="#1a1715" font-size="14" font-weight="700">Sharodiya Dhak Dhwoni & Kashi Bol</text>
+          <text x="60" y="38" fill="#736c65" font-size="11">Mamta Jagdish Dhody (Live Field Recording)  •  <tspan fill="#b42323">Dhak & Shankha</tspan></text>
+          <text x="60" y="58" fill="#57524c" font-size="11">Authentic live field recording of traditional Bengali wooden dhak ...</text>
+          
+          <text x="532" y="20" fill="#b42323" font-size="12" font-weight="700" text-anchor="end">01:39</text>
+
+          <!-- Badges -->
+          <g transform="translate(60, 76)">
+            
+              <rect width="108" height="20" rx="6" fill="#fee2e2"/>
+              <text x="54" y="14" fill="#b91c1c" font-size="9" font-weight="700" text-anchor="middle">Authorized Stream</text>
+            
+            <text x="140" y="14" fill="#736c65" font-size="10">Source ↗</text>
+          </g>
+        </g>
+      </g>
+    
+      <g transform="translate(588, 0)">
+        <rect width="564" height="142" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(16, 16)">
+          <!-- Play circle -->
+          <circle cx="24" cy="24" r="24" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <path d="M 21,17 L 31,24 L 21,31 Z" fill="#b42323"/>
+
+          <text x="60" y="20" fill="#1a1715" font-size="14" font-weight="700">Sacred Shankha Naad (Auspicious Conch ...</text>
+          <text x="60" y="38" fill="#736c65" font-size="11">David Bolton  •  <tspan fill="#b42323">Dhak & Shankha</tspan></text>
+          <text x="60" y="58" fill="#57524c" font-size="11">Resonant sacred conch blowing associated with Sandhi Puja transiti...</text>
+          
+          <text x="532" y="20" fill="#b42323" font-size="12" font-weight="700" text-anchor="end">00:07</text>
+
+          <!-- Badges -->
+          <g transform="translate(60, 76)">
+            
+              <rect width="78" height="20" rx="6" fill="#dcfce7"/>
+              <text x="39" y="14" fill="#15803d" font-size="9" font-weight="700" text-anchor="middle">Direct Audio</text>
+            
+            <text x="140" y="14" fill="#736c65" font-size="10">Source ↗</text>
+          </g>
+        </g>
+      </g>
+    
+      <g transform="translate(0, 156)">
+        <rect width="564" height="142" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(16, 16)">
+          <!-- Play circle -->
+          <circle cx="24" cy="24" r="24" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <path d="M 21,17 L 31,24 L 21,31 Z" fill="#b42323"/>
+
+          <text x="60" y="20" fill="#1a1715" font-size="14" font-weight="700">Dhunuchi Naach Dhak Taali & Kaashor</text>
+          <text x="60" y="38" fill="#736c65" font-size="11">Traditional Bengali Dhaki Ensemble  •  <tspan fill="#b42323">Dhak & Shankha</tspan></text>
+          <text x="60" y="58" fill="#57524c" font-size="11">Electrifying fast-paced rhythmic crescendo performed to accompany ...</text>
+          
+          <text x="532" y="20" fill="#b42323" font-size="12" font-weight="700" text-anchor="end">04:00</text>
+
+          <!-- Badges -->
+          <g transform="translate(60, 76)">
+            
+              <rect width="108" height="20" rx="6" fill="#fee2e2"/>
+              <text x="54" y="14" fill="#b91c1c" font-size="9" font-weight="700" text-anchor="middle">Authorized Stream</text>
+            
+            <text x="140" y="14" fill="#736c65" font-size="10">Source ↗</text>
+          </g>
+        </g>
+      </g>
+    
+      <g transform="translate(588, 156)">
+        <rect width="564" height="142" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(16, 16)">
+          <!-- Play circle -->
+          <circle cx="24" cy="24" r="24" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <path d="M 21,17 L 31,24 L 21,31 Z" fill="#b42323"/>
+
+          <text x="60" y="20" fill="#1a1715" font-size="14" font-weight="700">Master Dhaki Gokul Das Ensemble Rhythms</text>
+          <text x="60" y="38" fill="#736c65" font-size="11">Padma Shri Gokul Chandra Das & Tanmoy Bose  •  <tspan fill="#b42323">Dhak & Shankha</tspan></text>
+          <text x="60" y="58" fill="#57524c" font-size="11">Virtuosic cross-rhythms by Bengal's master dhaki Padma Shri Gokul ...</text>
+          
+          <text x="532" y="20" fill="#b42323" font-size="12" font-weight="700" text-anchor="end">05:10</text>
+
+          <!-- Badges -->
+          <g transform="translate(60, 76)">
+            
+              <rect width="108" height="20" rx="6" fill="#fee2e2"/>
+              <text x="54" y="14" fill="#b91c1c" font-size="9" font-weight="700" text-anchor="middle">Authorized Stream</text>
+            
+            <text x="140" y="14" fill="#736c65" font-size="10">Source ↗</text>
+          </g>
+        </g>
+      </g>
+    
+      <g transform="translate(0, 312)">
+        <rect width="564" height="142" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(16, 16)">
+          <!-- Play circle -->
+          <circle cx="24" cy="24" r="24" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <path d="M 21,17 L 31,24 L 21,31 Z" fill="#b42323"/>
+
+          <text x="60" y="20" fill="#1a1715" font-size="14" font-weight="700">Sharod Shondhya - Autumn Bamboo Flute ...</text>
+          <text x="60" y="38" fill="#736c65" font-size="11">Bansuri Arvind  •  <tspan fill="#b42323">Agomoni & Devotional</tspan></text>
+          <text x="60" y="58" fill="#57524c" font-size="11">Pure acoustic bamboo flute melody evoking tranquil autumn mornings...</text>
+          
+          <text x="532" y="20" fill="#b42323" font-size="12" font-weight="700" text-anchor="end">00:39</text>
+
+          <!-- Badges -->
+          <g transform="translate(60, 76)">
+            
+              <rect width="78" height="20" rx="6" fill="#dcfce7"/>
+              <text x="39" y="14" fill="#15803d" font-size="9" font-weight="700" text-anchor="middle">Direct Audio</text>
+            
+            <text x="140" y="14" fill="#736c65" font-size="10">Source ↗</text>
+          </g>
+        </g>
+      </g>
+    
+      <g transform="translate(588, 312)">
+        <rect width="564" height="142" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(16, 16)">
+          <!-- Play circle -->
+          <circle cx="24" cy="24" r="24" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <path d="M 21,17 L 31,24 L 21,31 Z" fill="#b42323"/>
+
+          <text x="60" y="20" fill="#1a1715" font-size="14" font-weight="700">Sanskrit Stotram & Chandi Dhwani (Ya D...</text>
+          <text x="60" y="38" fill="#736c65" font-size="11">Swami Atmananda (Vedic Chanting)  •  <tspan fill="#b42323">Agomoni & Devotional</tspan></text>
+          <text x="60" y="58" fill="#57524c" font-size="11">Authentic classical Sanskrit sacred chanting and stotra recitation...</text>
+          
+          <text x="532" y="20" fill="#b42323" font-size="12" font-weight="700" text-anchor="end">04:55</text>
+
+          <!-- Badges -->
+          <g transform="translate(60, 76)">
+            
+              <rect width="78" height="20" rx="6" fill="#dcfce7"/>
+              <text x="39" y="14" fill="#15803d" font-size="9" font-weight="700" text-anchor="middle">Direct Audio</text>
+            
+            <text x="140" y="14" fill="#736c65" font-size="10">Source ↗</text>
+          </g>
+        </g>
+      </g>
+    
+      <g transform="translate(0, 468)">
+        <rect width="564" height="142" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(16, 16)">
+          <!-- Play circle -->
+          <circle cx="24" cy="24" r="24" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <path d="M 21,17 L 31,24 L 21,31 Z" fill="#b42323"/>
+
+          <text x="60" y="20" fill="#1a1715" font-size="14" font-weight="700">Aigiri Nandini Rock & Fusion Crescendo</text>
+          <text x="60" y="38" fill="#736c65" font-size="11">Kolkata Youth Fusion Collective  •  <tspan fill="#b42323">Pandal Hopping</tspan></text>
+          <text x="60" y="58" fill="#57524c" font-size="11">High-energy contemporary rock-dhak fusion rendition of the Mahisha...</text>
+          
+          <text x="532" y="20" fill="#b42323" font-size="12" font-weight="700" text-anchor="end">03:45</text>
+
+          <!-- Badges -->
+          <g transform="translate(60, 76)">
+            
+              <rect width="108" height="20" rx="6" fill="#fee2e2"/>
+              <text x="54" y="14" fill="#b91c1c" font-size="9" font-weight="700" text-anchor="middle">Authorized Stream</text>
+            
+            <text x="140" y="14" fill="#736c65" font-size="10">Source ↗</text>
+          </g>
+        </g>
+      </g>
+    
+      <g transform="translate(588, 468)">
+        <rect width="564" height="142" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(16, 16)">
+          <!-- Play circle -->
+          <circle cx="24" cy="24" r="24" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <path d="M 21,17 L 31,24 L 21,31 Z" fill="#b42323"/>
+
+          <text x="60" y="20" fill="#1a1715" font-size="14" font-weight="700">Dhak Beat & Kanshi Rhythms: Bisorjon F...</text>
+          <text x="60" y="38" fill="#736c65" font-size="11">Heritage Dhaki Samiti  •  <tspan fill="#b42323">Bisorjon & Farewell</tspan></text>
+          <text x="60" y="58" fill="#57524c" font-size="11">Slow, solemn rhythmic pulse accompanying the immersion procession ...</text>
+          
+          <text x="532" y="20" fill="#b42323" font-size="12" font-weight="700" text-anchor="end">02:30</text>
+
+          <!-- Badges -->
+          <g transform="translate(60, 76)">
+            
+              <rect width="108" height="20" rx="6" fill="#fee2e2"/>
+              <text x="54" y="14" fill="#b91c1c" font-size="9" font-weight="700" text-anchor="middle">Authorized Stream</text>
+            
+            <text x="140" y="14" fill="#736c65" font-size="10">Source ↗</text>
+          </g>
+        </g>
+      </g>
+    
+    </g>
+  </g>
+
+  
+  <!-- FOOTER LIGHT (y=1192) -->
+  <g id="Footer_Desktop_Light" transform="translate(0, 1192)">
+    <rect width="1440" height="158" fill="#ffffff" fill-opacity="0.85"/>
+    <line x1="0" y1="0" x2="1440" y2="0" stroke="#eee8e1" stroke-width="1"/>
+
+    <g transform="translate(144, 28)">
+      <!-- Row 1: Brand & Mission -->
+      <text x="0" y="22" fill="#b42323" font-size="16" font-weight="800">PujoPath</text>
+      <line x1="72" y1="8" x2="72" y2="26" stroke="#eee8e1" stroke-width="1.5"/>
+      <text x="84" y="22" fill="#1a1715" font-size="14" font-weight="600">Kolkata Durga Puja Companion</text>
+      <text x="0" y="46" fill="#57524c" font-size="13">Explore pandals, plan walking routes, check metro connectivity, and celebrate Bengal.</text>
+
+      <!-- Right: Helpline & About link -->
+      <text x="1152" y="22" fill="#1a1715" font-size="14" font-weight="600" text-anchor="end">Helpline &amp; About</text>
+
+      <!-- Divider line -->
+      <line x1="0" y1="72" x2="1152" y2="72" stroke="#eee8e1" stroke-width="1"/>
+
+      <!-- Row 2: Copyright & Creator Attribution -->
+      <g transform="translate(0, 98)">
+        <text x="0" y="16" fill="#57524c" font-size="13">© 2026 PujoPath. All rights reserved.  •  🌸 Festive Pandal &amp; Dhakis  ⏸ Pause</text>
+        <text x="1152" y="16" fill="#1a1715" font-size="13" font-weight="600" text-anchor="end">Made by Soumik &amp; Moumita with ❤️</text>
+      </g>
+    </g>
+  </g>
+  
+</svg>

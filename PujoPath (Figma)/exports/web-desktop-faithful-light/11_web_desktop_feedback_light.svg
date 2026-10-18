@@ -1,0 +1,206 @@
+
+<svg width="1440" height="1120" viewBox="0 0 1440 1120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;family=Inter:wght@400;500;600;700;800;900&amp;display=swap');
+      text { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+      .bengali { font-family: 'Hind Siliguri', 'Inter', sans-serif; }
+    </style>
+    <radialGradient id="vignetteLight" cx="50%" cy="25%" r="70%">
+      <stop offset="0%" stop-color="#fcfaf7" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#fcfaf7" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#fcfaf7" stop-opacity="0.96"/>
+    </radialGradient>
+    <linearGradient id="cardGradLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#faf8f5"/>
+    </linearGradient>
+    <linearGradient id="redBannerGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#961c1c"/>
+      <stop offset="100%" stop-color="#4a1212"/>
+    </linearGradient>
+    <filter id="softShadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#4a3b32" flood-opacity="0.05"/>
+    </filter>
+  </defs>
+
+  
+  <!-- BACKGROUND LIGHT WITH WARM CREAM -->
+  <g id="Page_Background_Light">
+    <rect width="1440" height="1120" fill="#fcfaf7"/>
+  </g>
+  
+  
+  <!-- HEADER LIGHT (Height: 65px) -->
+  <g id="Header_Desktop_Light">
+    <rect width="1440" height="65" fill="#ffffff" fill-opacity="0.88"/>
+    <line x1="0" y1="65" x2="1440" y2="65" stroke="#eee8e1" stroke-width="1"/>
+
+    <g transform="translate(144, 0)">
+      <!-- Logo -->
+      <text x="0" y="41" fill="#b42323" font-size="20" font-weight="800" letter-spacing="-0.3">PujoPath</text>
+      
+      <!-- Nav items -->
+      
+      <g transform="translate(340, 13)">
+        <rect width="78" height="38" rx="12" fill="transparent"/>
+        <text x="39" y="24" fill="#57524c" font-size="14" font-weight="700" text-anchor="middle">Explore</text>
+      </g>
+    
+      <g transform="translate(426, 13)">
+        <rect width="78" height="38" rx="12" fill="transparent"/>
+        <text x="39" y="24" fill="#57524c" font-size="14" font-weight="700" text-anchor="middle">Map</text>
+      </g>
+    
+      <g transform="translate(512, 13)">
+        <rect width="78" height="38" rx="12" fill="transparent"/>
+        <text x="39" y="24" fill="#57524c" font-size="14" font-weight="700" text-anchor="middle">Plan</text>
+      </g>
+    
+      <g transform="translate(598, 13)">
+        <rect width="78" height="38" rx="12" fill="#f5efe6"/>
+        <text x="39" y="24" fill="#1a1715" font-size="14" font-weight="700" text-anchor="middle">More ⌵</text>
+      </g>
+    
+
+      <!-- Right Actions: Install App, Mode, Lang, Saved -->
+      <g transform="translate(740, 13)">
+        <!-- Install App -->
+        <g id="Btn_Install_App">
+          <rect width="124" height="38" rx="12" fill="#b42323"/>
+          <text x="22" y="24" fill="#ffffff" font-size="14">📥</text>
+          <text x="44" y="24" fill="#ffffff" font-size="14" font-weight="700">Install App</text>
+        </g>
+        <!-- Theme Toggle (Moon icon in light mode) -->
+        <g id="Btn_Theme_Toggle" transform="translate(136, 0)">
+          <rect width="38" height="38" rx="12" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="19" y="24" fill="#57524c" font-size="15" text-anchor="middle">🌙</text>
+        </g>
+        <!-- Lang Pill -->
+        <g id="Pill_Lang_Toggle" transform="translate(186, 0)">
+          <rect width="88" height="38" rx="12" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <!-- Active EN -->
+          <rect x="4" y="4" width="38" height="30" rx="8" fill="#b42323"/>
+          <text x="23" y="23" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">EN</text>
+          <!-- Inactive বাংলা -->
+          <text x="63" y="23" fill="#57524c" font-size="12" font-weight="700" text-anchor="middle" class="bengali">বাংলা</text>
+        </g>
+        <!-- Saved Heart -->
+        <g id="Btn_Saved_Trails" transform="translate(286, 0)">
+          <rect width="38" height="38" rx="12" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="19" y="24" fill="#57524c" font-size="15" text-anchor="middle">♡</text>
+        </g>
+      </g>
+    </g>
+  </g>
+  
+
+  <g transform="translate(144, 88)">
+    <!-- Label & Title -->
+    <text x="0" y="20" fill="#b42323" font-size="12" font-weight="700" letter-spacing="1">💬 FEEDBACK &amp; SUGGESTIONS</text>
+    <text x="0" y="54" fill="#1a1715" font-size="34" font-weight="800">Share Your Feedback</text>
+    <text x="0" y="82" fill="#57524c" font-size="14">Have suggestions, corrections, or new features to suggest? Send your feedback directly via email.</text>
+
+    <!-- Direct Email Card (w: 1152, h: 140) in Soft Blue -->
+    <g transform="translate(0, 114)">
+      <rect width="1152" height="140" rx="20" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+      <g transform="translate(28, 24)">
+        <rect width="90" height="20" rx="6" fill="#dbeafe"/>
+        <text x="45" y="14" fill="#1e3a8a" font-size="10" font-weight="700" text-anchor="middle">✉ Direct Email</text>
+
+        <text x="0" y="50" fill="#1e3a8a" font-size="22" font-weight="800">Send Feedback via Email</text>
+        <text x="0" y="74" fill="#1e40af" font-size="13">Messages go directly to soumik.bur@gmail.com. We review all feedback, pandal updates, and community suggestions promptly.</text>
+
+        <g transform="translate(860, 26)">
+          <rect width="210" height="42" rx="12" fill="#0a66c2"/>
+          <text x="24" y="26" fill="#FFFFFF" font-size="13">✉</text>
+          <text x="46" y="26" fill="#FFFFFF" font-size="13" font-weight="700">Send Feedback Email ↗</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- 3 Feedback Categories Cards (y: 284) -->
+    <g transform="translate(0, 284)">
+      <text x="0" y="22" fill="#736c65" font-size="11" font-weight="700" letter-spacing="0.5">WHAT YOU CAN SHARE</text>
+
+      <g transform="translate(0, 36)">
+        <!-- Cat 1: Report Bug -->
+        <g transform="translate(0, 0)">
+          <rect width="368" height="130" rx="18" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <g transform="translate(20, 20)">
+            <circle cx="16" cy="16" r="16" fill="#feeceb"/>
+            <text x="16" y="22" fill="#b42323" font-size="14" text-anchor="middle">🐞</text>
+            <text x="46" y="22" fill="#1a1715" font-size="15" font-weight="800">Report an Issue / Bug</text>
+            <text x="0" y="56" fill="#57524c" font-size="12">Spotted an incorrect timing, location issue, or broken feature? Let us know so we can fix it.</text>
+          </g>
+        </g>
+
+        <!-- Cat 2: Feature Suggestions -->
+        <g transform="translate(392, 0)">
+          <rect width="368" height="130" rx="18" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <g transform="translate(20, 20)">
+            <circle cx="16" cy="16" r="16" fill="#fef3c7"/>
+            <text x="16" y="22" fill="#b45309" font-size="14" text-anchor="middle">💡</text>
+            <text x="46" y="22" fill="#1a1715" font-size="15" font-weight="800">Feature Suggestions</text>
+            <text x="0" y="56" fill="#57524c" font-size="12">Have ideas for new filters, transit enhancements, or interactive tools for pandal hoppers?</text>
+          </g>
+        </g>
+
+        <!-- Cat 3: Community Collaboration -->
+        <g transform="translate(784, 0)">
+          <rect width="368" height="130" rx="18" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <g transform="translate(20, 20)">
+            <circle cx="16" cy="16" r="16" fill="#feeceb"/>
+            <text x="16" y="22" fill="#b42323" font-size="14" text-anchor="middle">🤝</text>
+            <text x="46" y="22" fill="#1a1715" font-size="15" font-weight="800">Community Collaboration</text>
+            <text x="0" y="56" fill="#57524c" font-size="12">Want to contribute photographs, club details, or community itineraries? Connect with us.</text>
+          </g>
+        </g>
+      </g>
+    </g>
+
+    <!-- Meet Creators Banner (y: 476) -->
+    <g transform="translate(0, 476)">
+      <rect width="1152" height="80" rx="18" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+      <g transform="translate(24, 20)">
+        <text x="0" y="16" fill="#b42323" font-size="11" font-weight="700" letter-spacing="0.5">🧑‍🤝‍🧑 PROJECT CREATORS</text>
+        <text x="0" y="38" fill="#1a1715" font-size="15" font-weight="800">Want to meet the creators behind PujoPath?</text>
+        <text x="320" y="38" fill="#736c65" font-size="12">Learn more about Soumik and Moumita and explore their professional profiles.</text>
+
+        <g transform="translate(980, 4)">
+          <rect width="128" height="34" rx="10" fill="#ffffff" stroke="#e5e0d8" stroke-width="1"/>
+          <text x="64" y="22" fill="#1a1715" font-size="12" font-weight="700" text-anchor="middle">Meet Developers ↗</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  
+  <!-- FOOTER LIGHT (y=962) -->
+  <g id="Footer_Desktop_Light" transform="translate(0, 962)">
+    <rect width="1440" height="158" fill="#ffffff" fill-opacity="0.85"/>
+    <line x1="0" y1="0" x2="1440" y2="0" stroke="#eee8e1" stroke-width="1"/>
+
+    <g transform="translate(144, 28)">
+      <!-- Row 1: Brand & Mission -->
+      <text x="0" y="22" fill="#b42323" font-size="16" font-weight="800">PujoPath</text>
+      <line x1="72" y1="8" x2="72" y2="26" stroke="#eee8e1" stroke-width="1.5"/>
+      <text x="84" y="22" fill="#1a1715" font-size="14" font-weight="600">Kolkata Durga Puja Companion</text>
+      <text x="0" y="46" fill="#57524c" font-size="13">Explore pandals, plan walking routes, check metro connectivity, and celebrate Bengal.</text>
+
+      <!-- Right: Helpline & About link -->
+      <text x="1152" y="22" fill="#1a1715" font-size="14" font-weight="600" text-anchor="end">Helpline &amp; About</text>
+
+      <!-- Divider line -->
+      <line x1="0" y1="72" x2="1152" y2="72" stroke="#eee8e1" stroke-width="1"/>
+
+      <!-- Row 2: Copyright & Creator Attribution -->
+      <g transform="translate(0, 98)">
+        <text x="0" y="16" fill="#57524c" font-size="13">© 2026 PujoPath. All rights reserved.  •  🌸 Festive Pandal &amp; Dhakis  ⏸ Pause</text>
+        <text x="1152" y="16" fill="#1a1715" font-size="13" font-weight="600" text-anchor="end">Made by Soumik &amp; Moumita with ❤️</text>
+      </g>
+    </g>
+  </g>
+  
+</svg>

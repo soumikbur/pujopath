@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,31 +6,396 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  Alert,
+  ActivityIndicator,
+  Image,
+  Dimensions,
+  BackHandler,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { WebView } from 'react-native-webview';
+const MapWebView = WebView as unknown as React.ComponentType<any>;
 import * as Linking from 'expo-linking';
+import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
 import { PANDALS_DATA } from '@/data/pandals';
-import { ZoneFilterBar } from '@/components/ZoneFilterBar';
-import { Pandal } from '@/types';
+import { METRO_STATIONS_DATA } from '@/data/metro';
+import { SelectedPandalsBar } from '@/components/SelectedPandalsBar';
+import { getPandalImageSource } from '@/lib/utils/pandalImages';
+import { Pandal, LocalityZone } from '@/types';
 
 interface MapScreenProps {
   navigation: any;
 }
 
+type FilterOption = LocalityZone | 'All' | 'Bonedi Bari';
+
 export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const { language, t } = useLanguage();
-  const { isPandalInRoute, addStop, removeStop } = useRoute();
+  const isBn = language === 'bn';
+  const { isPandalInRoute, addStop, removeStop, stops } = useRoute();
 
-  const [selectedZone, setSelectedZone] = useState('All');
-  const [selectedPandal, setSelectedPandal] = useState<Pandal>(PANDALS_DATA[0]);
+  const [selectedFilter, setSelectedFilter] = useState<FilterOption>('All');
+  const [selectedPandal, setSelectedPandal] = useState<Pandal | null>(null);
+  const [showMetro, setShowMetro] = useState(true);
+  const [isMapReady, setIsMapReady] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
 
-  const zonePandals = selectedZone === 'All'
-    ? PANDALS_DATA.slice(0, 50) // High performance subset for map overview
-    : PANDALS_DATA.filter((p) => p.zone === selectedZone);
+  const webViewRef = useRef<any>(null);
+
+  // System Back button: dismiss topmost selected pandal preview card before leaving the map
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (selectedPandal) {
+          setSelectedPandal(null);
+          return true; // Consumed: closes preview card without navigating away from map
+        }
+        return false; // Not consumed: allow standard stack/tab back navigation
+      };
+
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () => subscription.remove();
+    }, [selectedPandal])
+  );
+
+  const filterOptions: { value: FilterOption; label: string; isSpecial?: boolean }[] = [
+    { value: 'All', label: isBn ? 'সব এলাকা' : 'All' },
+    { value: 'Bonedi Bari', label: isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari', isSpecial: true },
+    { value: 'North Kolkata', label: isBn ? 'উত্তর কলকাতা' : 'North Kolkata' },
+    { value: 'South Kolkata', label: isBn ? 'দক্ষিণ কলকাতা' : 'South Kolkata' },
+    { value: 'Central Kolkata', label: isBn ? 'মধ্য কলকাতা' : 'Central Kolkata' },
+    { value: 'Salt Lake', label: isBn ? 'সল্টলেক' : 'Salt Lake' },
+    { value: 'Dum Dum', label: isBn ? 'দমদম' : 'Dum Dum' },
+    { value: 'Behala', label: isBn ? 'বেহালা' : 'Behala' },
+    { value: 'Howrah', label: isBn ? 'হাওড়া' : 'Howrah' },
+  ];
+
+  // Prepare sanitized JSON payload for the Leaflet WebView
+  const pandalsJson = useMemo(() => {
+    return JSON.stringify(
+      PANDALS_DATA.map((p) => ({
+        id: p.id,
+        name: p.name,
+        nameBn: p.nameBn || p.name,
+        locality: p.locality,
+        localityBn: p.localityBn || p.locality,
+        zone: p.zone,
+        lat: p.latitude,
+        lng: p.longitude,
+        crowdLevel: p.crowdLevel,
+        category: p.category,
+        isBonediBari: Boolean(p.isBonediBari || p.category === 'Bonedi Bari'),
+      }))
+    );
+  }, []);
+
+  const metroJson = useMemo(() => {
+    return JSON.stringify(
+      METRO_STATIONS_DATA.map((s) => ({
+        id: s.id,
+        name: s.name,
+        nameBn: s.nameBn || s.name,
+        line: s.line,
+        address: s.address,
+        lat: s.latitude,
+        lng: s.longitude,
+      }))
+    );
+  }, []);
+
+  const leafletHtml = useMemo(() => {
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body, #map { width: 100%; height: 100%; background: ${isDark ? '#1a1613' : '#f5f1ec'}; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .custom-pandal-pin { display: flex; align-items: center; justify-content: center; }
+    .custom-metro-pin { display: flex; align-items: center; justify-content: center; }
+    .leaflet-control-zoom { display: none !important; }
+    .leaflet-control-attribution { font-size: 8px !important; opacity: 0.6; }
+    .leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    var allPandals = ${pandalsJson};
+    var allMetro = ${metroJson};
+    var isBn = ${isBn};
+
+    var map = L.map('map', {
+      center: [22.5726, 88.3639],
+      zoom: 12,
+      zoomControl: false,
+      attributionControl: true
+    });
+
+    var tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    tileLayer.on('tileerror', function() {
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'TILE_ERROR' }));
+      }
+    });
+
+    var pandalsLayer = L.layerGroup().addTo(map);
+    var metroLayer = L.layerGroup().addTo(map);
+    var markerRegistry = {};
+    var userLocationMarker = null;
+    var userAccuracyCircle = null;
+
+    function getCrowdColor(level) {
+      if (level === 'Low') return '#10b981';
+      if (level === 'Moderate') return '#f59e0b';
+      if (level === 'High') return '#f97316';
+      return '#ef4444';
+    }
+
+    function createPandalIcon(pandal, isSelected) {
+      var crowdColor = getCrowdColor(pandal.crowdLevel);
+      var size = isSelected ? 42 : 32;
+      var html = '<div style="position: relative; width: ' + size + 'px; height: ' + size + 'px; display: flex; align-items: center; justify-content: center; cursor: pointer;">' +
+        '<div style="' +
+          'width: ' + size + 'px; height: ' + size + 'px; border-radius: 50%;' +
+          'background: linear-gradient(135deg, #c1272d 0%, #7f1d1d 100%);' +
+          'box-shadow: 0 4px 14px rgba(193, 39, 45, 0.5);' +
+          'display: flex; align-items: center; justify-content: center; color: white;' +
+          'font-size: ' + (isSelected ? 18 : 13) + 'px;' +
+          'border: ' + (isSelected ? '3px solid #d4af37' : '2px solid white') + ';' +
+          'transition: transform 0.15s ease;' +
+        '">🪔</div>' +
+        '<span style="' +
+          'position: absolute; bottom: -2px; right: -2px; width: 10px; height: 10px; border-radius: 50%;' +
+          'background-color: ' + crowdColor + ';' +
+          'border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.3);' +
+        '"></span>' +
+      '</div>';
+
+      return L.divIcon({
+        html: html,
+        className: 'custom-pandal-pin',
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
+        popupAnchor: [0, -size / 2]
+      });
+    }
+
+    function createMetroIcon() {
+      var html = '<div style="' +
+        'width: 24px; height: 24px; border-radius: 6px; background: #0284c7; color: white;' +
+        'display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800;' +
+        'box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 2px solid white;' +
+      '">M</div>';
+
+      return L.divIcon({
+        html: html,
+        className: 'custom-metro-pin',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        popupAnchor: [0, -12]
+      });
+    }
+
+    window.applyFilter = function(zone, showMetroFlag, selectedPandalId) {
+      pandalsLayer.clearLayers();
+      markerRegistry = {};
+
+      var visibleBounds = [];
+
+      allPandals.forEach(function(p) {
+        var matches = false;
+        if (zone === 'All') {
+          matches = true;
+        } else if (zone === 'Bonedi Bari') {
+          matches = Boolean(p.isBonediBari);
+        } else {
+          matches = p.zone === zone;
+        }
+
+        if (matches && !isNaN(p.lat) && !isNaN(p.lng)) {
+          var isSelected = (p.id === selectedPandalId);
+          var marker = L.marker([p.lat, p.lng], {
+            icon: createPandalIcon(p, isSelected),
+            title: isBn ? p.nameBn : p.name,
+            zIndexOffset: isSelected ? 1000 : 0
+          });
+
+          marker.on('click', function(e) {
+            L.DomEvent.stopPropagation(e);
+            if (window.ReactNativeWebView) {
+              window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'SELECT_PANDAL',
+                pandalId: p.id
+              }));
+            }
+          });
+
+          pandalsLayer.addLayer(marker);
+          markerRegistry[p.id] = marker;
+          visibleBounds.push([p.lat, p.lng]);
+        }
+      });
+
+      // Metro stations
+      metroLayer.clearLayers();
+      if (showMetroFlag) {
+        allMetro.forEach(function(s) {
+          if (!isNaN(s.lat) && !isNaN(s.lng)) {
+            var marker = L.marker([s.lat, s.lng], {
+              icon: createMetroIcon(),
+              title: s.name
+            });
+            var stationName = isBn ? s.nameBn : s.name;
+            marker.bindPopup('<div style="font-size: 12px; font-weight: bold; color: #0284c7;">🚇 ' + stationName + ' Metro</div><div style="font-size: 10px; color: #666; margin-top: 2px;">' + s.line + '</div>');
+            metroLayer.addLayer(marker);
+          }
+        });
+      }
+
+      // Center handling
+      if (selectedPandalId && markerRegistry[selectedPandalId]) {
+        var targetP = allPandals.find(function(item) { return item.id === selectedPandalId; });
+        if (targetP) {
+          map.setView([targetP.lat, targetP.lng], Math.max(map.getZoom(), 15), { animate: true });
+        }
+      } else if (visibleBounds.length > 0 && zone !== 'All') {
+        map.fitBounds(visibleBounds, { padding: [40, 40], maxZoom: 15 });
+      }
+    };
+
+    window.recenterKolkata = function() {
+      map.setView([22.5726, 88.3639], 12, { animate: true });
+    };
+
+    window.zoomIn = function() {
+      map.zoomIn();
+    };
+
+    window.zoomOut = function() {
+      map.zoomOut();
+    };
+
+    window.setUserLocation = function(lat, lng, accuracy) {
+      if (userLocationMarker) map.removeLayer(userLocationMarker);
+      if (userAccuracyCircle) map.removeLayer(userAccuracyCircle);
+
+      userLocationMarker = L.circleMarker([lat, lng], {
+        radius: 8,
+        fillColor: '#0284c7',
+        color: '#ffffff',
+        weight: 3,
+        opacity: 1,
+        fillOpacity: 1
+      }).addTo(map);
+
+      if (accuracy && accuracy > 10) {
+        userAccuracyCircle = L.circle([lat, lng], {
+          radius: accuracy,
+          fillColor: '#38bdf8',
+          fillOpacity: 0.15,
+          weight: 1,
+          color: '#0284c7'
+        }).addTo(map);
+      }
+
+      map.setView([lat, lng], 15, { animate: true });
+    };
+
+    map.on('click', function() {
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'DESELECT_PANDAL' }));
+      }
+    });
+
+    // Notify React Native that Map is mounted
+    setTimeout(function() {
+      window.applyFilter('All', true, null);
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'MAP_READY' }));
+      }
+    }, 200);
+  </script>
+</body>
+</html>`;
+  }, [pandalsJson, metroJson, isBn, isDark]);
+
+  // Sync React Native filter/metro/selection states to Leaflet
+  useEffect(() => {
+    if (isMapReady && webViewRef.current) {
+      const script = `window.applyFilter(${JSON.stringify(selectedFilter)}, ${showMetro}, ${JSON.stringify(selectedPandal?.id || null)}); true;`;
+      webViewRef.current.injectJavaScript(script);
+    }
+  }, [selectedFilter, showMetro, selectedPandal, isMapReady]);
+
+  const handleMessage = (event: any) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.type === 'MAP_READY') {
+        setIsMapReady(true);
+        setIsOffline(false);
+      } else if (data.type === 'SELECT_PANDAL') {
+        const found = PANDALS_DATA.find((p) => p.id === data.pandalId);
+        if (found) {
+          setSelectedPandal(found);
+        }
+      } else if (data.type === 'DESELECT_PANDAL') {
+        setSelectedPandal(null);
+      } else if (data.type === 'TILE_ERROR') {
+        setIsOffline(true);
+      }
+    } catch {
+      // Ignore non-json messages
+    }
+  };
+
+  const handleUserLocation = async () => {
+    try {
+      setIsLocating(true);
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          isBn ? 'অনুমতি প্রয়োজন' : 'Location Permission Required',
+          isBn
+            ? 'আপনার অবস্থান মানচিত্রে দেখতে লোকেশন অনুমতি প্রদান করুন।'
+            : 'Please grant location permission to view your position on the pandal map.'
+        );
+        setIsLocating(false);
+        return;
+      }
+
+      const loc = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+
+      if (loc && webViewRef.current) {
+        const script = `window.setUserLocation(${loc.coords.latitude}, ${loc.coords.longitude}, ${loc.coords.accuracy || 20}); true;`;
+        webViewRef.current.injectJavaScript(script);
+      }
+    } catch (err: any) {
+      Alert.alert(
+        isBn ? 'অবস্থান পাওয়া যায়নি' : 'Location Unavailable',
+        isBn
+          ? 'বর্তমান জিপিএস অবস্থান নির্ণয় করা সম্ভব হয়নি।'
+          : 'Could not determine your current GPS coordinates. Please ensure location services are enabled.'
+      );
+    } finally {
+      setIsLocating(false);
+    }
+  };
 
   const handleLaunchExternalNavigation = async (p: Pandal) => {
     const lat = p.latitude;
@@ -48,130 +413,370 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
     }
   };
 
-  const inPlan = isPandalInRoute(selectedPandal.id);
-  const displayName = language === 'bn' ? (selectedPandal.nameBn || selectedPandal.name) : selectedPandal.name;
+  const inPlan = selectedPandal ? isPandalInRoute(selectedPandal.id) : false;
+  const pDisplayName = selectedPandal
+    ? (isBn ? (selectedPandal.nameBn || selectedPandal.name) : selectedPandal.name)
+    : '';
+  const pLocality = selectedPandal
+    ? (isBn ? (selectedPandal.localityBn || selectedPandal.locality) : selectedPandal.locality)
+    : '';
+  const pImageSource = selectedPandal ? getPandalImageSource(selectedPandal.imageUrl, selectedPandal.id) : null;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Zone Filter selector */}
-      <ZoneFilterBar selectedZone={selectedZone} onSelectZone={setSelectedZone} />
-
-      {/* Interactive Map Visual Stage */}
-      <View style={[styles.mapStage, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}>
-        <View style={styles.mapGridPattern}>
-          <Ionicons name="map" size={54} color={colors.border} />
-          <Text style={[styles.mapWatermark, { color: colors.textMuted }]}>
-            {language === 'bn' ? 'কলকাতা মানচিত্র পরিক্রমা' : 'Kolkata Pandal Map Explorer'}
-          </Text>
-        </View>
-
-        {/* Interactive Marker Chips Carousel on Map */}
+      {/* 1. Zone & Metro Filters Bar (Matching Capacitor header bar) */}
+      <View style={[styles.filterBarWrapper, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.markersCarousel}
+          contentContainerStyle={styles.filterScrollContent}
         >
-          {zonePandals.map((p) => {
-            const isTarget = selectedPandal.id === p.id;
+          {filterOptions.map((opt) => {
+            const isSelected = selectedFilter === opt.value;
             return (
               <TouchableOpacity
-                key={p.id}
-                onPress={() => setSelectedPandal(p)}
+                key={opt.value}
+                activeOpacity={0.8}
+                onPress={() => setSelectedFilter(opt.value)}
                 style={[
-                  styles.mapMarkerPin,
+                  styles.filterChip,
                   {
-                    backgroundColor: isTarget ? colors.primary : colors.surface,
-                    borderColor: isTarget ? colors.gold : colors.border,
+                    backgroundColor: isSelected
+                      ? opt.isSpecial
+                        ? '#800020'
+                        : '#b42323'
+                      : isDark
+                      ? '#1e1915'
+                      : '#FFFFFF',
+                    borderColor: isSelected
+                      ? opt.isSpecial
+                        ? '#800020'
+                        : '#b42323'
+                      : opt.isSpecial
+                      ? isDark
+                        ? '#4a321a'
+                        : '#fde68a'
+                      : colors.border,
                   },
                 ]}
               >
-                <Ionicons
-                  name="location"
-                  size={16}
-                  color={isTarget ? '#FFFFFF' : colors.primary}
-                />
                 <Text
                   style={[
-                    styles.pinText,
-                    { color: isTarget ? '#FFFFFF' : colors.text, fontWeight: isTarget ? '700' : '500' },
+                    styles.filterChipText,
+                    {
+                      color: isSelected
+                        ? opt.isSpecial
+                          ? '#fef08a'
+                          : '#FFFFFF'
+                        : opt.isSpecial
+                        ? isDark
+                          ? '#fef08a'
+                          : '#92400e'
+                        : colors.textSecondary,
+                      fontWeight: isSelected ? '700' : '600',
+                    },
                   ]}
-                  numberOfLines={1}
                 >
-                  {p.locality}
+                  {opt.label}
                 </Text>
               </TouchableOpacity>
             );
           })}
+
+          {/* Metro Lines Toggle Chip */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => setShowMetro(!showMetro)}
+            style={[
+              styles.metroToggleChip,
+              {
+                backgroundColor: showMetro
+                  ? isDark
+                    ? '#341b18'
+                    : '#f9e9e7'
+                  : isDark
+                  ? '#1e1915'
+                  : '#FFFFFF',
+                borderColor: showMetro
+                  ? isDark
+                    ? '#4a2420'
+                    : '#f6ceca'
+                  : colors.border,
+              },
+            ]}
+          >
+            <Ionicons
+              name="subway-outline"
+              size={14}
+              color={showMetro ? '#b42323' : colors.textMuted}
+            />
+            <Text
+              style={[
+                styles.metroToggleText,
+                { color: showMetro ? '#b42323' : colors.textMuted },
+              ]}
+            >
+              {isBn ? 'মেট্রো রুট' : 'Metro Lines'}
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
       </View>
 
-      {/* Floating Selected Pandal Card */}
-      <View style={[styles.detailDrawer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <View style={styles.drawerHeader}>
-          <View style={styles.drawerBadgeRow}>
-            <View style={[styles.zoneBadge, { backgroundColor: colors.badge }]}>
-              <Text style={[styles.zoneText, { color: colors.primary }]}>{selectedPandal.zone}</Text>
+      {/* 2. Interactive Leaflet Map Canvas */}
+      <View style={styles.mapContainer}>
+        <MapWebView
+          ref={webViewRef}
+          source={{ html: leafletHtml }}
+          style={styles.mapWebView}
+          originWhitelist={['*']}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          startInLoadingState={true}
+          onMessage={handleMessage}
+          renderLoading={() => (
+            <View style={[styles.loadingOverlay, { backgroundColor: isDark ? '#1a1613' : '#f5f1ec' }]}>
+              <ActivityIndicator size="large" color="#b42323" />
+              <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+                {isBn ? 'মানচিত্র ও প্যান্ডেল লোড হচ্ছে...' : 'Loading OpenStreetMap & Pandals...'}
+              </Text>
             </View>
-            <Text style={[styles.localityText, { color: colors.textMuted }]}>
-              {selectedPandal.locality}
-            </Text>
-          </View>
-        </View>
+          )}
+        />
 
-        <Text style={[styles.drawerTitle, { color: colors.text }]} numberOfLines={1}>
-          {displayName}
-        </Text>
-        <Text style={[styles.drawerAddress, { color: colors.textSecondary }]} numberOfLines={2}>
-          {selectedPandal.address}
-        </Text>
-
-        {selectedPandal.metroLinks && selectedPandal.metroLinks.length > 0 && (
-          <View style={styles.metroRow}>
-            <Ionicons name="subway" size={14} color={colors.primary} />
-            <Text style={[styles.metroText, { color: colors.textMuted }]}>
-              {selectedPandal.metroLinks[0].stationName} (~{(selectedPandal.metroLinks[0].walkingDistanceMeters / 1000).toFixed(1)} km)
+        {/* Offline / Connectivity Banner */}
+        {isOffline && (
+          <View style={styles.offlineBanner}>
+            <Ionicons name="cloud-offline-outline" size={14} color="#FFFFFF" />
+            <Text style={styles.offlineBannerText}>
+              {isBn ? 'অফলাইন মোড: ক্যাশড ম্যাপ প্রদর্শিত হচ্ছে' : 'Offline: Showing cached pandal markers'}
             </Text>
           </View>
         )}
 
-        <View style={styles.drawerButtonsRow}>
+        {/* 3. Floating Action Controls (Right side) */}
+        <View style={styles.floatingControlsContainer}>
+          {/* Geolocation Button */}
           <TouchableOpacity
-            onPress={() => {
-              if (inPlan) removeStop(selectedPandal.id);
-              else addStop(selectedPandal);
-            }}
+            activeOpacity={0.85}
+            onPress={handleUserLocation}
+            disabled={isLocating}
             style={[
-              styles.drawerPlanBtn,
-              { backgroundColor: inPlan ? colors.background : colors.primary, borderColor: colors.primary },
+              styles.floatingControlBtn,
+              { backgroundColor: isDark ? '#1e1915' : '#FFFFFF', borderColor: colors.border },
             ]}
+            accessibilityLabel="My Location"
           >
-            <Ionicons
-              name={inPlan ? 'checkmark-circle' : 'add-circle'}
-              size={16}
-              color={inPlan ? colors.primary : '#FFFFFF'}
-            />
-            <Text style={[styles.drawerPlanText, { color: inPlan ? colors.primary : '#FFFFFF' }]}>
-              {inPlan ? t('inPlan') : t('addToPlan')}
-            </Text>
+            {isLocating ? (
+              <ActivityIndicator size="small" color="#b42323" />
+            ) : (
+              <Ionicons name="locate" size={20} color="#b42323" />
+            )}
           </TouchableOpacity>
 
+          {/* Recenter Kolkata Button */}
           <TouchableOpacity
-            onPress={() => handleLaunchExternalNavigation(selectedPandal)}
-            style={[styles.drawerNavBtn, { backgroundColor: colors.secondary }]}
+            activeOpacity={0.85}
+            onPress={() => webViewRef.current?.injectJavaScript('window.recenterKolkata(); true;')}
+            style={[
+              styles.floatingControlBtn,
+              { backgroundColor: isDark ? '#1e1915' : '#FFFFFF', borderColor: colors.border },
+            ]}
+            accessibilityLabel="Recenter Kolkata"
           >
-            <Ionicons name="navigate" size={16} color="#FFFFFF" />
-            <Text style={styles.drawerNavText}>
-              {language === 'bn' ? 'ন্যাভিগেশন' : 'Navigate'}
-            </Text>
+            <Ionicons name="compass-outline" size={20} color={colors.textPrimary} />
           </TouchableOpacity>
 
+          {/* Zoom In */}
           <TouchableOpacity
-            onPress={() => navigation.navigate('PandalDetail', { pandalId: selectedPandal.id })}
-            style={[styles.drawerDetailBtn, { borderColor: colors.border }]}
+            activeOpacity={0.85}
+            onPress={() => webViewRef.current?.injectJavaScript('window.zoomIn(); true;')}
+            style={[
+              styles.floatingControlBtn,
+              { backgroundColor: isDark ? '#1e1915' : '#FFFFFF', borderColor: colors.border },
+            ]}
+            accessibilityLabel="Zoom In"
           >
-            <Ionicons name="information-circle-outline" size={20} color={colors.textSecondary} />
+            <Ionicons name="add" size={20} color={colors.textPrimary} />
+          </TouchableOpacity>
+
+          {/* Zoom Out */}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => webViewRef.current?.injectJavaScript('window.zoomOut(); true;')}
+            style={[
+              styles.floatingControlBtn,
+              { backgroundColor: isDark ? '#1e1915' : '#FFFFFF', borderColor: colors.border },
+            ]}
+            accessibilityLabel="Zoom Out"
+          >
+            <Ionicons name="remove" size={20} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
+
+        {/* 4. Mobile Floating Selected Pandal Card (Matching Capacitor mobile floating card) */}
+        {selectedPandal && (
+          <View style={styles.floatingPandalCardContainer}>
+            <View
+              style={[
+                styles.floatingPandalCard,
+                {
+                  backgroundColor: isDark ? '#1e1915' : '#FFFFFF',
+                  borderColor: isDark ? '#3d3227' : '#eee8e1',
+                },
+              ]}
+            >
+              {/* Close Button */}
+              <TouchableOpacity
+                onPress={() => setSelectedPandal(null)}
+                style={[styles.closeCardBtn, { backgroundColor: isDark ? '#27201a' : '#f5f1ec' }]}
+                accessibilityLabel="Close"
+              >
+                <Ionicons name="close" size={16} color={colors.textSecondary} />
+              </TouchableOpacity>
+
+              <View style={styles.cardHeaderRow}>
+                {pImageSource ? (
+                  <Image source={pImageSource} style={styles.pandalThumbnail} resizeMode="cover" />
+                ) : (
+                  <View style={[styles.pandalThumbnailFallback, { backgroundColor: isDark ? '#27201a' : '#fee2e2' }]}>
+                    <Text style={{ fontSize: 18 }}>🪔</Text>
+                  </View>
+                )}
+
+                <View style={styles.cardHeaderInfo}>
+                  <Text style={[styles.pandalCardTitle, { color: colors.textPrimary }]} numberOfLines={1}>
+                    {pDisplayName}
+                  </Text>
+                  <Text style={[styles.pandalCardLocality, { color: colors.textMuted }]} numberOfLines={1}>
+                    {pLocality} • {selectedPandal.zone}
+                  </Text>
+
+                  {/* Badges row */}
+                  <View style={styles.cardBadgeRow}>
+                    <View
+                      style={[
+                        styles.crowdBadge,
+                        {
+                          backgroundColor:
+                            selectedPandal.crowdLevel === 'Low'
+                              ? '#d1fae5'
+                              : selectedPandal.crowdLevel === 'Moderate'
+                              ? '#fef3c7'
+                              : selectedPandal.crowdLevel === 'High'
+                              ? '#ffedd5'
+                              : '#fee2e2',
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.crowdBadgeText,
+                          {
+                            color:
+                              selectedPandal.crowdLevel === 'Low'
+                                ? '#065f46'
+                                : selectedPandal.crowdLevel === 'Moderate'
+                                ? '#92400e'
+                                : selectedPandal.crowdLevel === 'High'
+                                ? '#9a3412'
+                                : '#b91c1c',
+                          },
+                        ]}
+                      >
+                        {selectedPandal.crowdLevel} Rush
+                      </Text>
+                    </View>
+
+                    <Text style={[styles.categoryTag, { color: colors.textMuted }]} numberOfLines={1}>
+                      {selectedPandal.category}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Metro Station hint if available */}
+              {selectedPandal.metroLinks && selectedPandal.metroLinks.length > 0 && (
+                <View style={[styles.metroHintRow, { borderTopColor: colors.border }]}>
+                  <Ionicons name="subway-outline" size={13} color="#0284c7" />
+                  <Text style={[styles.metroHintText, { color: colors.textMuted }]} numberOfLines={1}>
+                    🚇 {selectedPandal.metroLinks[0].stationName} (~{(selectedPandal.metroLinks[0].walkingDistanceMeters / 1000).toFixed(1)} km)
+                  </Text>
+                </View>
+              )}
+
+              {/* Action Buttons Row */}
+              <View style={styles.cardActionsRow}>
+                {/* Add to Route Button */}
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  onPress={() => {
+                    if (inPlan) removeStop(selectedPandal.id);
+                    else addStop(selectedPandal);
+                  }}
+                  style={[
+                    styles.cardActionBtn,
+                    {
+                      backgroundColor: inPlan ? (isDark ? '#27201a' : '#f5f1ec') : '#b42323',
+                      borderColor: inPlan ? colors.border : '#b42323',
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name={inPlan ? 'checkmark-circle' : 'add'}
+                    size={15}
+                    color={inPlan ? '#10b981' : '#FFFFFF'}
+                  />
+                  <Text
+                    style={[
+                      styles.cardActionBtnText,
+                      { color: inPlan ? (isDark ? '#ede5dc' : '#242424') : '#FFFFFF' },
+                    ]}
+                  >
+                    {inPlan ? (isBn ? 'রুটে যুক্ত' : 'Added') : (isBn ? 'রুটে যোগ' : 'Add to Route')}
+                  </Text>
+                </TouchableOpacity>
+
+                {/* External Navigation Button */}
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  onPress={() => handleLaunchExternalNavigation(selectedPandal)}
+                  style={[
+                    styles.cardActionBtn,
+                    {
+                      backgroundColor: isDark ? '#27201a' : '#f5f1ec',
+                      borderColor: colors.border,
+                    },
+                  ]}
+                >
+                  <Ionicons name="navigate-outline" size={15} color="#b42323" />
+                  <Text style={[styles.cardActionBtnText, { color: colors.textPrimary }]}>
+                    {isBn ? 'দিকনির্দেশ' : 'Directions'}
+                  </Text>
+                </TouchableOpacity>
+
+                {/* View Details Profile Button */}
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  onPress={() => navigation.navigate('PandalDetail', { pandalId: selectedPandal.id })}
+                  style={[
+                    styles.cardActionBtn,
+                    {
+                      backgroundColor: isDark ? '#27201a' : '#f5f1ec',
+                      borderColor: colors.border,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.cardActionBtnText, { color: colors.textPrimary }]}>
+                    {isBn ? 'বিস্তারিত →' : 'Details →'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* 5. Bottom Selected Pandals Bar (matching Capacitor planner bar when no pandal open) */}
+        {!selectedPandal && <SelectedPandalsBar />}
       </View>
     </View>
   );
@@ -181,132 +786,199 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  mapStage: {
-    flex: 1,
-    marginHorizontal: 16,
-    borderRadius: 18,
+  filterBarWrapper: {
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+  },
+  filterScrollContent: {
+    paddingHorizontal: 12,
+    gap: 8,
+    alignItems: 'center',
+  },
+  filterChip: {
+    paddingHorizontal: 13,
+    paddingVertical: 7,
+    borderRadius: 12,
     borderWidth: 1,
-    overflow: 'hidden',
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  mapGridPattern: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    opacity: 0.7,
+  filterChipText: {
+    fontSize: 12,
   },
-  mapWatermark: {
-    fontSize: 14,
+  metroToggleChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 13,
+    paddingVertical: 7,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  metroToggleText: {
+    fontSize: 12,
     fontWeight: '700',
-    marginTop: 8,
   },
-  markersCarousel: {
+  mapContainer: {
+    flex: 1,
+    position: 'relative',
+  },
+  mapWebView: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  loadingOverlay: {
+    ...(StyleSheet.absoluteFill as object),
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    zIndex: 10,
+  },
+  loadingText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  offlineBanner: {
+    position: 'absolute',
+    top: 10,
+    alignSelf: 'center',
+    backgroundColor: '#b42323',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    zIndex: 20,
+    elevation: 4,
+  },
+  offlineBannerText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  floatingControlsContainer: {
+    position: 'absolute',
+    right: 14,
+    top: 14,
+    gap: 8,
+    zIndex: 20,
+  },
+  floatingControlBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+  },
+  floatingPandalCardContainer: {
     position: 'absolute',
     bottom: 12,
     left: 12,
     right: 12,
-    gap: 8,
-    paddingRight: 24,
+    zIndex: 30,
   },
-  mapMarkerPin: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 18,
-    borderWidth: 1.5,
-    elevation: 3,
-  },
-  pinText: {
-    fontSize: 12,
-  },
-  detailDrawer: {
-    margin: 16,
+  floatingPandalCard: {
     borderRadius: 16,
     borderWidth: 1,
-    padding: 16,
-    elevation: 4,
+    padding: 12,
+    elevation: 8,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
   },
-  drawerHeader: {
-    marginBottom: 6,
+  closeCardBtn: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
   },
-  drawerBadgeRow: {
+  cardHeaderRow: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'center',
+    paddingRight: 28,
+  },
+  pandalThumbnail: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+  },
+  pandalThumbnailFallback: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardHeaderInfo: {
+    flex: 1,
+  },
+  pandalCardTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    marginBottom: 2,
+  },
+  pandalCardLocality: {
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  cardBadgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
-  zoneBadge: {
-    paddingHorizontal: 8,
+  crowdBadge: {
+    paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 6,
+    borderRadius: 99,
   },
-  zoneText: {
+  crowdBadgeText: {
     fontSize: 10,
     fontWeight: '700',
   },
-  localityText: {
-    fontSize: 12,
+  categoryTag: {
+    fontSize: 11,
+    flexShrink: 1,
   },
-  drawerTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    marginBottom: 4,
-  },
-  drawerAddress: {
-    fontSize: 12,
-    lineHeight: 16,
-    marginBottom: 8,
-  },
-  metroRow: {
+  metroHintRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: 12,
+    marginTop: 8,
+    paddingTop: 6,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
-  metroText: {
-    fontSize: 12,
+  metroHintText: {
+    fontSize: 11,
   },
-  drawerButtonsRow: {
+  cardActionsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     gap: 8,
+    marginTop: 10,
   },
-  drawerPlanBtn: {
-    flex: 2,
+  cardActionBtn: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    height: 40,
+    gap: 4,
+    paddingVertical: 8,
     borderRadius: 10,
     borderWidth: 1,
   },
-  drawerPlanText: {
-    fontSize: 13,
+  cardActionBtnText: {
+    fontSize: 12,
     fontWeight: '700',
-  },
-  drawerNavBtn: {
-    flex: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    height: 40,
-    borderRadius: 10,
-  },
-  drawerNavText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  drawerDetailBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

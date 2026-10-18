@@ -16,137 +16,221 @@ interface CalendarScreenProps {
   navigation: any;
 }
 
-const conventions: SandhiPujaConvention[] = SANDHI_PUJA_SCHEDULES[2026]?.conventions || [];
+const sandhiSchedule = SANDHI_PUJA_SCHEDULES[2026] || {
+  conventions: [],
+  primaryConventionId: '',
+};
 
 export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) => {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const { language } = useLanguage();
+  const isBn = language === 'bn';
 
-  const [selectedConventionIndex, setSelectedConventionIndex] = useState(0);
-  const currentConvention = conventions[selectedConventionIndex] || conventions[0];
+  const [selectedConventionId, setSelectedConventionId] = useState<string>(
+    sandhiSchedule.primaryConventionId || (sandhiSchedule.conventions[0]?.id ?? '')
+  );
+
+  const activeConvention =
+    sandhiSchedule.conventions.find((c) => c.id === selectedConventionId) ||
+    sandhiSchedule.conventions[0];
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Sandhi Puja Featured Special Hero Card */}
-        <View style={[styles.sandhiHeroCard, { backgroundColor: colors.surface, borderColor: colors.gold }]}>
-          <View style={styles.sandhiHeaderRow}>
-            <View style={[styles.flameIconBox, { backgroundColor: colors.badge }]}>
-              <Ionicons name="flame" size={24} color={colors.primary} />
-            </View>
-            <View style={styles.sandhiTitleBox}>
-              <Text style={[styles.sandhiTitle, { color: colors.text }]}>
-                {language === 'bn' ? 'সন্ধিপূজা ২০২৬ নির্ঘণ্ট' : 'Sandhi Puja 2026 Timings'}
-              </Text>
-              <Text style={[styles.sandhiSub, { color: colors.secondary }]}>
-                {currentConvention.dateString}
-              </Text>
-            </View>
-          </View>
-
-          {/* Timing Display */}
-          <View style={[styles.timingBanner, { backgroundColor: colors.background }]}>
-            <Text style={[styles.timingTime, { color: colors.primary }]}>
-              {currentConvention.startTime} – {currentConvention.endTime}
-            </Text>
-            <Text style={[styles.durationBadge, { color: colors.textMuted }]}>
-              {currentConvention.durationDisplay}
+        {/* ========================================================= */}
+        {/* HEADER SECTION                                            */}
+        {/* ========================================================= */}
+        <View style={styles.headerSection}>
+          <View style={styles.almanacBadge}>
+            <Ionicons name="calendar-outline" size={13} color="#B42323" />
+            <Text style={styles.almanacBadgeText}>
+              {isBn ? 'পূজা পঞ্জিকা ও নির্ঘণ্ট' : 'PUJA ALMANAC'}
             </Text>
           </View>
-
-          {/* Almanac Convention Toggle Pills */}
-          <Text style={[styles.conventionLabel, { color: colors.textMuted }]}>
-            {language === 'bn' ? 'পঞ্জিকা বা সিদ্ধান্ত নির্বাচন:' : 'Select Almanac Tradition:'}
+          <Text style={[styles.pageTitle, { color: colors.textPrimary }]}>
+            {isBn ? 'শারদীয়া দুর্গাপূজা ২০২৬ বিশুদ্ধ নির্ঘণ্ট' : 'Durga Puja 2026 Sacred Calendar'}
           </Text>
-          <View style={styles.conventionRow}>
-            {conventions.map((conv: SandhiPujaConvention, idx: number) => {
-              const isSelected = selectedConventionIndex === idx;
-              return (
-                <TouchableOpacity
-                  key={conv.id}
-                  onPress={() => setSelectedConventionIndex(idx)}
-                  style={[
-                    styles.convChip,
-                    {
-                      backgroundColor: isSelected ? colors.primary : colors.surface,
-                      borderColor: isSelected ? colors.primary : colors.border,
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.convChipText,
-                      { color: isSelected ? '#FFFFFF' : colors.textSecondary, fontWeight: isSelected ? '700' : '500' },
-                    ]}
-                  >
-                    {conv.name.split(' ')[0]}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
-          <Text style={[styles.significanceText, { color: colors.textSecondary }]}>
-            {language === 'bn' ? currentConvention.significanceBn : currentConvention.significance}
+          <Text style={[styles.pageSubtitle, { color: colors.textMuted }]}>
+            {isBn
+              ? 'মহালয়া, মহাষষ্ঠী, মহাসপ্তমী, মহাষ্টমী অঞ্জলি, সন্ধিপূজা ও বিজয়া দশমীর নির্ভুল শুভ সময়সূচি।'
+              : 'Exact tithi schedules, pushpanjali auspicious timings, and sandhi puja hours.'}
           </Text>
         </View>
 
-        {/* Complete Festival Calendar Days */}
-        <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            {language === 'bn' ? 'দুর্গাপূজা ২০২৬ নির্ঘণ্ট ও তিথি' : 'Festival Days & Auspicious Tithis'}
-          </Text>
-        </View>
-
-        {PUJA_CALENDAR_DATA.map((day) => {
-          const dayName = language === 'bn' ? day.dayNameBn : day.dayName;
-          const significance = language === 'bn' ? day.significanceBn : day.significance;
-
-          return (
-            <View
-              key={day.id}
-              style={[styles.dayCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-            >
-              <View style={styles.dayTopRow}>
-                <View>
-                  <Text style={[styles.dayName, { color: colors.primary }]}>{dayName}</Text>
-                  <Text style={[styles.dateString, { color: colors.textMuted }]}>
-                    {day.dateString}
-                  </Text>
-                </View>
-                <View style={[styles.calendarIconBox, { backgroundColor: colors.background }]}>
-                  <Ionicons name="calendar" size={18} color={colors.primary} />
-                </View>
+        {/* ========================================================= */}
+        {/* SANDHI PUJA FEATURED CARD WITH CONVENTION SELECTOR         */}
+        {/* ========================================================= */}
+        <View
+          style={[
+            styles.sandhiCard,
+            {
+              backgroundColor: isDark ? '#1C1511' : '#FFF9F6',
+              borderColor: isDark ? 'rgba(180, 35, 35, 0.4)' : 'rgba(180, 35, 35, 0.3)',
+            },
+          ]}
+        >
+          {/* Card Title Row */}
+          <View style={[styles.sandhiCardHeader, { borderBottomColor: isDark ? '#38261E' : '#F0DED8' }]}>
+            <View style={styles.flameRow}>
+              <View style={styles.flameBox}>
+                <Ionicons name="flame" size={22} color="#FBBF24" />
               </View>
-
-              <Text style={[styles.daySignificance, { color: colors.textSecondary }]}>
-                {significance}
-              </Text>
-
-              {day.pushpanjaliTimings && (
-                <View style={[styles.anjaliBox, { backgroundColor: colors.background }]}>
-                  <Ionicons name="flower-outline" size={14} color={colors.gold} />
-                  <Text style={[styles.anjaliText, { color: colors.text }]}>
-                    {language === 'bn' ? 'পুষ্পাঞ্জলি: ' : 'Pushpanjali: '}
-                    {language === 'bn' ? day.pushpanjaliTimingsBn : day.pushpanjaliTimings}
-                  </Text>
-                </View>
-              )}
-
-              {/* Rituals List */}
-              <View style={styles.ritualsContainer}>
-                {day.rituals.map((ritual, rIdx) => (
-                  <View key={rIdx} style={styles.ritualLine}>
-                    <Text style={{ color: colors.primary }}>•</Text>
-                    <Text style={[styles.ritualText, { color: colors.textMuted }]}>
-                      {language === 'bn' && day.ritualsBn ? day.ritualsBn[rIdx] : ritual}
+              <View style={styles.sandhiTitleBox}>
+                <View style={styles.badgeRow}>
+                  <View style={[styles.sandhiTag, { backgroundColor: isDark ? 'rgba(180,35,35,0.25)' : 'rgba(180,35,35,0.1)' }]}>
+                    <Text style={styles.sandhiTagText}>
+                      {isBn ? 'মহাসন্ধিক্ষণ ২০২৬' : 'SACRED SANDHI WINDOW 2026'}
                     </Text>
                   </View>
-                ))}
+                  <View style={[styles.lotusTag, { backgroundColor: isDark ? 'rgba(217,119,6,0.2)' : '#FEF3C7' }]}>
+                    <Text style={styles.lotusTagText}>
+                      {isBn ? '১০৮ পদ্ম ও প্রদীপ' : '108 Lotuses & Lamps'}
+                    </Text>
+                  </View>
+                </View>
+
+                <Text style={[styles.sandhiHeading, { color: colors.textPrimary }]}>
+                  {isBn ? 'সন্ধিপূজা বিশেষ নির্ঘণ্ট' : 'Sandhi Puja Auspicious Timings'}
+                </Text>
               </View>
             </View>
-          );
-        })}
+
+            <View style={[styles.durationChip, { backgroundColor: isDark ? '#201C18' : '#FFFFFF', borderColor: isDark ? '#38261E' : '#F0DED8' }]}>
+              <Text style={styles.durationChipText}>
+                {isBn ? activeConvention?.durationDisplayBn : activeConvention?.durationDisplay}
+              </Text>
+            </View>
+          </View>
+
+          {/* Panjika Convention Selector */}
+          <View style={styles.conventionSection}>
+            <View style={styles.convHeader}>
+              <Ionicons name="information-circle-outline" size={14} color="#B42323" />
+              <Text style={[styles.convHeaderText, { color: colors.textMuted }]}>
+                {isBn ? 'পঞ্জিকা গণনা পদ্ধতি নির্বাচন করুন:' : 'Select Almanac / Panjika Convention:'}
+              </Text>
+            </View>
+
+            <View style={styles.convCardsRow}>
+              {sandhiSchedule.conventions.map((conv) => {
+                const isSelected = selectedConventionId === conv.id;
+                return (
+                  <TouchableOpacity
+                    key={conv.id}
+                    activeOpacity={0.85}
+                    onPress={() => setSelectedConventionId(conv.id)}
+                    style={[
+                      styles.convButton,
+                      {
+                        backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                        borderColor: isSelected ? '#B42323' : colors.border,
+                        borderWidth: isSelected ? 2 : 1,
+                      },
+                    ]}
+                  >
+                    <View style={styles.convTitleRow}>
+                      <Text style={[styles.convName, { color: colors.textPrimary }]} numberOfLines={1}>
+                        {isBn ? conv.nameBn : conv.name}
+                      </Text>
+                      {isSelected && (
+                        <Ionicons name="checkmark-circle" size={16} color="#B42323" />
+                      )}
+                    </View>
+                    <Text style={styles.convTimeText}>
+                      {isBn ? conv.startTimeBn : conv.startTime} – {isBn ? conv.endTimeBn : conv.endTime}
+                    </Text>
+                    <Text style={[styles.convBalidan, { color: colors.textMuted }]}>
+                      {isBn ? 'বলিদান: সকাল ০৭:৫০' : 'Sacred Balidan: 07:50 AM'}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* 3 Auspicious Highlight Boxes */}
+          <View style={styles.timingBoxesRow}>
+            <View style={[styles.timingBox, { backgroundColor: isDark ? '#201C18' : '#FFFFFF', borderColor: colors.border }]}>
+              <Ionicons name="time-outline" size={15} color="#B42323" />
+              <Text style={[styles.timingBoxLabel, { color: colors.textMuted }]}>
+                {isBn ? 'প্রারম্ভ' : 'Start'}
+              </Text>
+              <Text style={[styles.timingBoxValue, { color: colors.textPrimary }]}>
+                {isBn ? activeConvention?.startTimeBn : activeConvention?.startTime}
+              </Text>
+            </View>
+
+            <View style={[styles.timingBox, { backgroundColor: isDark ? '#201C18' : '#FFFFFF', borderColor: colors.border }]}>
+              <Ionicons name="flame-outline" size={15} color="#D97706" />
+              <Text style={[styles.timingBoxLabel, { color: colors.textMuted }]}>
+                {isBn ? 'বলিদান' : 'Balidan'}
+              </Text>
+              <Text style={[styles.timingBoxValue, { color: colors.textPrimary }]}>
+                {isBn ? 'সকাল ০৭:৫০' : '07:50 AM'}
+              </Text>
+            </View>
+
+            <View style={[styles.timingBox, { backgroundColor: isDark ? '#201C18' : '#FFFFFF', borderColor: colors.border }]}>
+              <Ionicons name="sparkles-outline" size={15} color="#B42323" />
+              <Text style={[styles.timingBoxLabel, { color: colors.textMuted }]}>
+                {isBn ? 'সমাপন' : 'End'}
+              </Text>
+              <Text style={[styles.timingBoxValue, { color: colors.textPrimary }]}>
+                {isBn ? activeConvention?.endTimeBn : activeConvention?.endTime}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* ========================================================= */}
+        {/* DAILY PUJA TITHIS LIST                                    */}
+        {/* ========================================================= */}
+        <View style={styles.tithisSection}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+            {isBn ? 'দিনভিত্তিক পূজা নির্ঘণ্ট' : 'Daily Puja Schedules & Tithis'}
+          </Text>
+
+          {PUJA_CALENDAR_DATA.map((item, idx) => (
+            <View
+              key={idx}
+              style={[
+                styles.tithiCard,
+                {
+                  backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <View style={styles.tithiHeader}>
+                <View style={styles.tithiBadge}>
+                  <Text style={styles.tithiBadgeText}>
+                    {item.tithis && item.tithis[0] ? (isBn ? item.tithis[0].nameBn : item.tithis[0].name) : (isBn ? item.dayNameBn : item.dayName)}
+                  </Text>
+                </View>
+                <Text style={[styles.tithiDate, { color: colors.textMuted }]}>
+                  {item.dateString}
+                </Text>
+              </View>
+
+              <Text style={[styles.tithiTitle, { color: colors.textPrimary }]}>
+                {isBn ? item.dayNameBn : item.dayName}
+              </Text>
+
+              {item.pushpanjaliTimings ? (
+                <View style={[styles.timingPill, { backgroundColor: isDark ? '#201C18' : '#F5F1EB' }]}>
+                  <Ionicons name="time-outline" size={13} color="#B42323" />
+                  <Text style={[styles.timingPillText, { color: colors.textSecondary }]}>
+                    {isBn ? item.pushpanjaliTimingsBn : item.pushpanjaliTimings}
+                  </Text>
+                </View>
+              ) : null}
+
+              <Text style={[styles.tithiDesc, { color: colors.textMuted }]}>
+                {isBn ? item.significanceBn : item.significance}
+              </Text>
+            </View>
+          ))}
+        </View>
       </ScrollView>
     </View>
   );
@@ -157,141 +241,227 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 40,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 90,
+    gap: 18,
   },
-  sandhiHeroCard: {
-    borderRadius: 18,
-    borderWidth: 2,
-    padding: 16,
-    marginBottom: 20,
-    elevation: 3,
+  headerSection: {
+    gap: 4,
   },
-  sandhiHeaderRow: {
+  almanacBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    gap: 6,
   },
-  flameIconBox: {
+  almanacBadgeText: {
+    color: '#B42323',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+  },
+  pageSubtitle: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  sandhiCard: {
+    borderRadius: 24,
+    borderWidth: 2,
+    padding: 18,
+    gap: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  sandhiCardHeader: {
+    paddingBottom: 14,
+    borderBottomWidth: 1,
+    gap: 10,
+  },
+  flameRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  flameBox: {
     width: 44,
     height: 44,
-    borderRadius: 12,
+    borderRadius: 14,
+    backgroundColor: '#B42323',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    shadowColor: '#B42323',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   sandhiTitleBox: {
     flex: 1,
-  },
-  sandhiTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  sandhiSub: {
-    fontSize: 12,
-    fontWeight: '700',
-    marginTop: 2,
-  },
-  timingBanner: {
-    padding: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  timingTime: {
-    fontSize: 20,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-  },
-  durationBadge: {
-    fontSize: 11,
-    fontWeight: '600',
-    marginTop: 3,
-  },
-  conventionLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    marginBottom: 6,
-  },
-  conventionRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
-  },
-  convChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 14,
-    borderWidth: 1,
-  },
-  convChipText: {
-    fontSize: 11,
-  },
-  significanceText: {
-    fontSize: 12,
-    lineHeight: 18,
-  },
-  sectionHeader: {
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '800',
-  },
-  dayCard: {
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 16,
-    marginBottom: 14,
-    elevation: 2,
-  },
-  dayTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  dayName: {
-    fontSize: 17,
-    fontWeight: '800',
-  },
-  dateString: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  calendarIconBox: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  daySignificance: {
-    fontSize: 13,
-    lineHeight: 18,
-    marginBottom: 10,
-  },
-  anjaliBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    padding: 8,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  anjaliText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  ritualsContainer: {
     gap: 4,
   },
-  ritualLine: {
+  badgeRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 6,
   },
-  ritualText: {
+  sandhiTag: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  sandhiTagText: {
+    color: '#B42323',
+    fontSize: 9,
+    fontWeight: '800',
+  },
+  lotusTag: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  lotusTagText: {
+    color: '#B45309',
+    fontSize: 9,
+    fontWeight: '700',
+  },
+  sandhiHeading: {
+    fontSize: 18,
+    fontWeight: '900',
+    letterSpacing: -0.3,
+  },
+  durationChip: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  durationChipText: {
+    color: '#B42323',
     fontSize: 12,
+    fontWeight: '800',
+  },
+  conventionSection: {
+    gap: 8,
+  },
+  convHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  convHeaderText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  convCardsRow: {
+    gap: 8,
+  },
+  convButton: {
+    borderRadius: 14,
+    padding: 12,
+    gap: 4,
+  },
+  convTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  convName: {
+    fontSize: 13,
+    fontWeight: '800',
     flex: 1,
+  },
+  convTimeText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#B42323',
+  },
+  convBalidan: {
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  timingBoxesRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  timingBox: {
+    flex: 1,
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 10,
+    alignItems: 'center',
+    gap: 2,
+  },
+  timingBoxLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  timingBoxValue: {
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  tithisSection: {
+    gap: 12,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: -0.3,
+  },
+  tithiCard: {
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 14,
+    gap: 6,
+  },
+  tithiHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  tithiBadge: {
+    backgroundColor: 'rgba(180, 35, 35, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  tithiBadgeText: {
+    color: '#B42323',
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  tithiDate: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  tithiTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  timingPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  timingPillText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  tithiDesc: {
+    fontSize: 12,
+    lineHeight: 17,
   },
 });

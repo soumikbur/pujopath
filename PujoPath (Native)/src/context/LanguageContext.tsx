@@ -41,6 +41,11 @@ export const DICTIONARY: Translations = {
   sandhiPujaDesc: { en: '19 Oct 2026, 10:27 AM – 11:15 AM IST (48 Mins)', bn: '১৯ অক্টোবর ২০২৬, সকাল ১০:২৭ – ১১:১৫ (৪৮ মিনিট)' },
   emergencyCalls: { en: 'Emergency Police & Medical Services', bn: 'জরুরি পুলিশ ও স্বাস্থ্য পরিষেবা' },
   customStopDisclaimer: { en: 'Personal custom stops are saved privately on your device only.', bn: 'ব্যক্তিগত কাস্টম স্টপগুলি কেবল আপনার ডিভাইসেই সংরক্ষিত থাকে।' },
+  developer: { en: 'Developers', bn: 'নির্মাতা' },
+  feedback: { en: 'Feedback', bn: 'মতামত' },
+  about: { en: 'About PujoPath', bn: 'পরিচিতি' },
+  meetDevelopers: { en: 'Meet Developers', bn: 'নির্মাতাদের পরিচয়' },
+  shareFeedback: { en: 'Share Feedback', bn: 'মতামত দিন' },
 };
 
 interface LanguageContextType {

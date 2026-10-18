@@ -1,0 +1,53 @@
+{
+  "body": {
+    "tag": "BODY",
+    "bg": "rgb(252, 250, 247)",
+    "color": "rgb(36, 36, 36)",
+    "borderColor": "rgb(229, 231, 235)",
+    "borderWidth": "0px",
+    "borderRadius": "0px",
+    "boxShadow": "none",
+    "backdropFilter": "none"
+  },
+  "header": {
+    "tag": "HEADER",
+    "bg": "rgba(0, 0, 0, 0)",
+    "color": "rgb(36, 36, 36)",
+    "borderColor": "rgb(238, 232, 225)",
+    "borderWidth": "0px 0px 1px",
+    "borderRadius": "0px",
+    "boxShadow": "none",
+    "backdropFilter": "blur(12px)"
+  },
+  "h1": {
+    "tag": "H1",
+    "bg": "rgba(0, 0, 0, 0)",
+    "color": "rgb(26, 23, 21)",
+    "borderColor": "rgb(229, 231, 235)",
+    "borderWidth": "0px",
+    "borderRadius": "0px",
+    "boxShadow": "none",
+    "backdropFilter": "none"
+  },
+  "heroBadge": null,
+  "card": {
+    "tag": "SECTION",
+    "bg": "rgba(255, 255, 255, 0.9)",
+    "color": "rgb(36, 36, 36)",
+    "borderColor": "rgba(238, 232, 226, 0.95)",
+    "borderWidth": "1px",
+    "borderRadius": "22px",
+    "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+    "backdropFilter": "blur(12px)"
+  },
+  "footer": {
+    "tag": "FOOTER",
+    "bg": "rgba(255, 255, 255, 0.6)",
+    "color": "rgb(36, 36, 36)",
+    "borderColor": "rgb(238, 232, 225)",
+    "borderWidth": "1px 0px 0px",
+    "borderRadius": "0px",
+    "boxShadow": "none",
+    "backdropFilter": "blur(12px)"
+  }
+}

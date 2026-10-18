@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="412" height="2000" viewBox="0 0 412 2000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;family=Inter:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap');
+      text { font-family: 'Inter', system-ui, sans-serif; }
+      .title { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+      .bengali { font-family: 'Hind Siliguri', 'Inter', sans-serif; }
+    </style>
+  </defs>
+
+  <rect width="412" height="2000" fill="#FCFAF7"/>
+  
+  <!-- ANDROID SYSTEM STATUS BAR (40px) -->
+  <g id="Android_Status_Bar">
+    <rect width="412" height="40" fill="#FCFAF7"/>
+    <text x="20" y="26" fill="#242424" font-size="14" font-weight="600">9:34</text>
+    <g transform="translate(330, 14)">
+      <text x="0" y="12" fill="#242424" font-size="12" font-weight="700">5G</text>
+      <text x="22" y="12" fill="#242424" font-size="12">📶</text>
+      <text x="44" y="12" fill="#242424" font-size="12">🔋</text>
+    </g>
+  </g>
+  
+
+  <!-- Capacitor Header (56px) - NO Install Button -->
+  <g id="Header_Capacitor" transform="translate(0, 40)">
+    <rect width="412" height="56" fill="#FFFFFF"/>
+    <line x1="0" y1="56" x2="412" y2="56" stroke="#E8E1D9" stroke-width="1"/>
+    <g transform="translate(16, 12)">
+      <rect width="32" height="32" rx="8" fill="#b42323"/>
+      <text x="16" y="21" fill="#FFFFFF" font-size="15" font-weight="800" text-anchor="middle">P</text>
+      <text x="40" y="22" fill="#242424" font-size="17" font-weight="800">PujoPath</text>
+    </g>
+    <!-- Controls (Theme & Lang only, NO Install Button in APK!) -->
+    <g transform="translate(310, 12)">
+      <rect width="34" height="32" rx="8" fill="#F5F1EB" stroke="#E8E1D9" stroke-width="1"/>
+      <text x="17" y="20" font-size="13" text-anchor="middle">☀️</text>
+      <rect x="42" width="44" height="32" rx="8" fill="#F5F1EB" stroke="#E8E1D9" stroke-width="1"/>
+      <text x="64" y="20" fill="#b42323" font-size="11" font-weight="700" text-anchor="middle" class="bengali">বাংলা</text>
+    </g>
+  </g>
+
+  <!-- Content -->
+  <g id="Capacitor_Home_Body" transform="translate(16, 116)">
+    <!-- Hero Banner -->
+    <rect width="380" height="240" rx="22" fill="#FFFFFF" stroke="#E8E1D9" stroke-width="1"/>
+    <g transform="translate(20, 24)">
+      <rect width="140" height="24" rx="12" fill="#fdeeee"/>
+      <text x="70" y="16" fill="#b42323" font-size="10" font-weight="700" text-anchor="middle">🌸 172 Days to Pujo</text>
+      <text x="0" y="60" fill="#242424" font-size="25" font-weight="800" class="title">Your Puja, made simple.</text>
+      <text x="0" y="86" fill="#5C524A" font-size="13">Explore Kolkata's grandest pandals with offline navigation.</text>
+
+      <g transform="translate(0, 120)">
+        <rect width="160" height="42" rx="12" fill="#b42323"/>
+        <text x="80" y="26" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">Find Pandals</text>
+
+        <rect x="172" width="160" height="42" rx="12" fill="#FFFFFF" stroke="#E8E1D9" stroke-width="1"/>
+        <text x="252" y="26" fill="#242424" font-size="13" font-weight="600" text-anchor="middle">Build Route</text>
+      </g>
+    </g>
+
+    <!-- Quick Access Guides -->
+    <g transform="translate(0, 264)">
+      <text x="0" y="20" fill="#242424" font-size="18" font-weight="800" class="title">Quick Access Guides</text>
+      
+      <g transform="translate(0, 34)">
+        <rect width="380" height="66" rx="16" fill="#FFFFFF" stroke="#E8E1D9" stroke-width="1"/>
+        <text x="18" y="42" font-size="24">🗺️</text>
+        <text x="58" y="32" fill="#242424" font-size="15" font-weight="700">Interactive Map</text>
+        <text x="58" y="50" fill="#7E7268" font-size="12">774 pandals mapped across 8 zones</text>
+
+        <rect y="78" width="380" height="66" rx="16" fill="#FFFFFF" stroke="#E8E1D9" stroke-width="1"/>
+        <text x="18" y="120" font-size="24">🔀</text>
+        <text x="58" y="110" fill="#242424" font-size="15" font-weight="700">Route Planner</text>
+        <text x="58" y="128" fill="#7E7268" font-size="12">Clustering algorithms &amp; distance savings</text>
+
+        <rect y="156" width="380" height="66" rx="16" fill="#FFFFFF" stroke="#E8E1D9" stroke-width="1"/>
+        <text x="18" y="198" font-size="24">🚇</text>
+        <text x="58" y="188" fill="#242424" font-size="15" font-weight="700">Metro Guide</text>
+        <text x="58" y="206" fill="#7E7268" font-size="12">Normal &amp; 2026 Puja overnight schedules</text>
+
+        <rect y="234" width="380" height="66" rx="16" fill="#FFFFFF" stroke="#E8E1D9" stroke-width="1"/>
+        <text x="18" y="276" font-size="24">📅</text>
+        <text x="58" y="266" fill="#242424" font-size="15" font-weight="700">Sacred Calendar</text>
+        <text x="58" y="284" fill="#7E7268" font-size="12">1433 Bengali schedule &amp; Sandhi Puja</text>
+      </g>
+    </g>
+
+    <!-- Featured Pandal -->
+    <g transform="translate(0, 620)">
+      <text x="0" y="20" fill="#242424" font-size="18" font-weight="800" class="title">Featured Pandal</text>
+      <g transform="translate(0, 34)">
+        <rect width="380" height="310" rx="20" fill="#FFFFFF" stroke="#E8E1D9" stroke-width="1"/>
+        <rect width="380" height="150" rx="20" fill="#a82323"/>
+        <text x="190" y="80" fill="#FFFFFF" font-size="15" font-weight="700" text-anchor="middle">Bagbazar Sarbojanin Photo</text>
+        <g transform="translate(16, 170)">
+          <rect width="90" height="22" rx="11" fill="#fdeeee"/>
+          <text x="45" y="15" fill="#b42323" font-size="10" font-weight="700" text-anchor="middle">North Kolkata</text>
+          <text x="0" y="44" fill="#242424" font-size="18" font-weight="800">Bagbazar Sarbojanin</text>
+          <text x="0" y="66" fill="#7E7268" font-size="13" class="bengali">বাগবাজার সর্বজনীন দুর্গোৎসব</text>
+          <text x="0" y="94" fill="#5C524A" font-size="12">🚇 Shyambazar • 🚶 500m • 👥 High Crowd</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  
+  <!-- Fixed Mobile Bottom Navigation (64px) -->
+  <g id="Mobile_Bottom_Nav" transform="translate(0, 1912)">
+    <rect width="412" height="64" fill="#FFFFFF"/>
+    <line x1="0" y1="0" x2="412" y2="0" stroke="#E8E1D9" stroke-width="1"/>
+    
+    <g transform="translate(41.2, 14)" text-anchor="middle">
+      <text x="0" y="16" font-size="18">🏠</text>
+      <text x="0" y="32" fill="#b42323" font-size="10" font-weight="700">Home</text>
+    </g>
+    <g transform="translate(123.60000000000001, 14)" text-anchor="middle">
+      <text x="0" y="16" font-size="18">🧭</text>
+      <text x="0" y="32" fill="#7E7268" font-size="10" font-weight="500">Explore</text>
+    </g>
+    <g transform="translate(206, 14)" text-anchor="middle">
+      <text x="0" y="16" font-size="18">🗺️</text>
+      <text x="0" y="32" fill="#7E7268" font-size="10" font-weight="500">Map</text>
+    </g>
+    <g transform="translate(288.40000000000003, 14)" text-anchor="middle">
+      <text x="0" y="16" font-size="18">🔀</text>
+      <text x="0" y="32" fill="#7E7268" font-size="10" font-weight="500">Planner</text>
+    </g>
+    <g transform="translate(370.8, 14)" text-anchor="middle">
+      <text x="0" y="16" font-size="18">⋯</text>
+      <text x="0" y="32" fill="#7E7268" font-size="10" font-weight="500">More</text>
+    </g>
+  </g>
+  
+  
+  <rect x="0" y="1976" width="412" height="24" fill="#FFFFFF"/>
+  <rect x="170" y="1986" width="72" height="4" rx="2" fill="#5a504a"/>
+  
+</svg>

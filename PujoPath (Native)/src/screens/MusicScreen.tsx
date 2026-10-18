@@ -1,212 +1,568 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
+  TextInput,
+  Image,
   StyleSheet,
+  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAudio } from '@/context/AudioContext';
-import { MUSIC_TRACKS_DATA, MUSIC_CATEGORIES_META } from '@/data/music';
-import { MusicTrack, MusicCategory } from '@/types';
+import { MUSIC_TRACKS_DATA, PUJA_MOODS_LIST, MUSIC_CATEGORIES_META } from '@/data/music';
+import { MusicTrack } from '@/types';
 
 interface MusicScreenProps {
   navigation: any;
 }
 
 export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const { language } = useLanguage();
-  const { currentTrack, isPlaying, playTrack, togglePlayPause, positionMs, durationMs } = useAudio();
+  const isBn = language === 'bn';
+  const {
+    currentTrack,
+    isPlaying,
+    playTrack,
+    togglePlayPause,
+    userPlaylistIds,
+    togglePlaylistTrack,
+    isInPlaylist,
+    playQueue,
+  } = useAudio();
 
+  const [viewTab, setViewTab] = useState<'all' | 'playlist'>('all');
+  const [selectedMood, setSelectedMood] = useState<string>('All');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredTracks = selectedCategory === 'All'
-    ? MUSIC_TRACKS_DATA
-    : MUSIC_TRACKS_DATA.filter((t) => t.category === selectedCategory);
+  const formatSeconds = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+  };
 
-  const formatMs = (ms: number) => {
-    const totalSec = Math.floor(ms / 1000);
-    const mins = Math.floor(totalSec / 60);
-    const secs = totalSec % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  const userPlaylistTracks = useMemo(() => {
+    return MUSIC_TRACKS_DATA.filter((t) => userPlaylistIds.includes(t.id));
+  }, [userPlaylistIds]);
+
+  const filteredTracks = useMemo(() => {
+    let list = viewTab === 'playlist' ? [...userPlaylistTracks] : [...MUSIC_TRACKS_DATA];
+    if (selectedMood !== 'All') {
+      list = list.filter((t) => t.mood === selectedMood);
+    }
+    if (selectedCategory !== 'All') {
+      list = list.filter((t) => t.category === selectedCategory);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      list = list.filter(
+        (t) =>
+          t.title.toLowerCase().includes(q) ||
+          (t.titleBn && t.titleBn.includes(q)) ||
+          t.artist.toLowerCase().includes(q) ||
+          (t.artistBn && t.artistBn.includes(q)) ||
+          t.category.toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [viewTab, userPlaylistTracks, selectedMood, selectedCategory, searchQuery]);
+
+  const handlePlayUserPlaylist = () => {
+    if (userPlaylistTracks.length > 0) {
+      playQueue(userPlaylistTracks);
+    }
   };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Category Filter Horizontal Chips */}
-      <View style={styles.filterRowContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
-          <TouchableOpacity
-            onPress={() => setSelectedCategory('All')}
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Page Header */}
+        <View style={styles.headerSection}>
+          <View style={styles.badgeRow}>
+            <Ionicons name="musical-notes" size={14} color="#B42323" />
+            <Text style={styles.badgeText}>
+              {isBn ? 'শারদীয়া সুর, ঢাক ও লোকঐতিহ্য' : 'Sharodiya Soundscape & Heritage'}
+            </Text>
+          </View>
+          <Text style={[styles.pageTitle, { color: colors.textPrimary }]}>
+            {isBn ? 'শারদীয়া সঙ্গীত ও ঐতিহ্যবাহী সুর' : 'Festive Puja Music Traditions'}
+          </Text>
+          <Text style={[styles.pageSubtitle, { color: colors.textMuted }]}>
+            {isBn
+              ? 'পূজা আচারের গম্ভীর শঙ্খনাদ, মণ্ডপের ঐতিহ্যবাহী ঢাকের বোল, প্যান্ডেল হপিং-এর উদ্দীপনা থেকে বিজয়ার অশ্রুসজল বিসর্জন।'
+              : 'Explore Bengal’s rich Durga Puja music culture — traditional Dhak beats, Agomoni hymns, pandal-hopping anthems, and immersion chants.'}
+          </Text>
+
+          {/* View switcher: All Soundscapes vs My Playlist */}
+          <View
             style={[
-              styles.catChip,
+              styles.viewSwitcher,
               {
-                backgroundColor: selectedCategory === 'All' ? colors.primary : colors.surface,
-                borderColor: selectedCategory === 'All' ? colors.primary : colors.border,
+                backgroundColor: isDark ? '#201C18' : '#F4EDE4',
+                borderColor: isDark ? '#2F2720' : '#EEE8E1',
               },
             ]}
           >
-            <Text
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => setViewTab('all')}
               style={[
-                styles.catChipText,
-                { color: selectedCategory === 'All' ? '#FFFFFF' : colors.textSecondary, fontWeight: selectedCategory === 'All' ? '700' : '500' },
+                styles.switcherTab,
+                viewTab === 'all' && [
+                  styles.switcherTabActive,
+                  { backgroundColor: isDark ? '#1A1613' : '#FFFFFF' },
+                ],
               ]}
             >
-              {language === 'bn' ? 'সব গান' : 'All Tracks'}
-            </Text>
-          </TouchableOpacity>
-
-          {MUSIC_CATEGORIES_META.map((cat) => {
-            const isSelected = selectedCategory === cat.id;
-            return (
-              <TouchableOpacity
-                key={cat.id}
-                onPress={() => setSelectedCategory(cat.id)}
+              <Text
                 style={[
-                  styles.catChip,
+                  styles.switcherTabText,
                   {
-                    backgroundColor: isSelected ? colors.primary : colors.surface,
-                    borderColor: isSelected ? colors.primary : colors.border,
+                    color: viewTab === 'all' ? '#B42323' : (isDark ? '#A89E95' : '#665A54'),
+                    fontWeight: viewTab === 'all' ? '800' : '600',
                   },
                 ]}
               >
-                <Text
-                  style={[
-                    styles.catChipText,
-                    { color: isSelected ? '#FFFFFF' : colors.textSecondary, fontWeight: isSelected ? '700' : '500' },
-                  ]}
-                >
-                  {language === 'bn' ? cat.nameBn : cat.name.split(' ')[0]}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Active Player Deck Card if Playing */}
-        {currentTrack && (
-          <View style={[styles.playerDeck, { backgroundColor: colors.surface, borderColor: colors.gold }]}>
-            <View style={styles.playerTopRow}>
-              <View style={[styles.deckIconBox, { backgroundColor: colors.primary }]}>
-                <Ionicons name="musical-notes" size={24} color="#FFFFFF" />
-              </View>
-              <View style={styles.deckInfo}>
-                <Text style={[styles.deckTitle, { color: colors.text }]} numberOfLines={1}>
-                  {language === 'bn' ? (currentTrack.titleBn || currentTrack.title) : currentTrack.title}
-                </Text>
-                <Text style={[styles.deckArtist, { color: colors.textMuted }]} numberOfLines={1}>
-                  {currentTrack.artist} • {currentTrack.category}
-                </Text>
-              </View>
-            </View>
-
-            {/* Playback Progress */}
-            <View style={styles.progressContainer}>
-              <View style={[styles.progressBarTrack, { backgroundColor: colors.border }]}>
-                <View
-                  style={[
-                    styles.progressBarFill,
-                    {
-                      backgroundColor: colors.primary,
-                      width: durationMs > 0 ? `${(positionMs / durationMs) * 100}%` : '0%',
-                    },
-                  ]}
-                />
-              </View>
-              <View style={styles.progressTimeRow}>
-                <Text style={[styles.timeText, { color: colors.textMuted }]}>{formatMs(positionMs)}</Text>
-                <Text style={[styles.timeText, { color: colors.textMuted }]}>{formatMs(durationMs)}</Text>
-              </View>
-            </View>
-
-            {/* Player Controls */}
-            <View style={styles.deckControls}>
-              <TouchableOpacity
-                onPress={togglePlayPause}
-                style={[styles.bigPlayBtn, { backgroundColor: colors.primary }]}
-              >
-                <Ionicons
-                  name={isPlaying ? 'pause' : 'play'}
-                  size={26}
-                  color="#FFFFFF"
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* License & Source Attribution */}
-            {currentTrack.attribution && (
-              <Text style={[styles.attributionText, { color: colors.textMuted }]}>
-                📜 {currentTrack.attribution} ({currentTrack.licenseType})
+                {isBn ? 'সব গান ও বোল' : 'All Soundscapes'}
               </Text>
-            )}
-          </View>
-        )}
+            </TouchableOpacity>
 
-        {/* Tracks List */}
-        <View style={styles.listHeader}>
-          <Text style={[styles.listTitle, { color: colors.text }]}>
-            {language === 'bn' ? 'পূজার সঙ্গীত সংগ্রহ' : 'Authentic Durga Puja Tracks'}
-          </Text>
-          <Text style={[styles.listCount, { color: colors.textMuted }]}>
-            {filteredTracks.length} {language === 'bn' ? 'টি গান' : 'tracks'}
-          </Text>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => setViewTab('playlist')}
+              style={[
+                styles.switcherTab,
+                styles.playlistTabBtn,
+                viewTab === 'playlist' && [
+                  styles.switcherTabActive,
+                  { backgroundColor: isDark ? '#1A1613' : '#FFFFFF' },
+                ],
+              ]}
+            >
+              <Ionicons
+                name="bookmark"
+                size={13}
+                color={viewTab === 'playlist' ? '#B42323' : (isDark ? '#A89E95' : '#665A54')}
+                style={{ marginRight: 4 }}
+              />
+              <Text
+                style={[
+                  styles.switcherTabText,
+                  {
+                    color: viewTab === 'playlist' ? '#B42323' : (isDark ? '#A89E95' : '#665A54'),
+                    fontWeight: viewTab === 'playlist' ? '800' : '600',
+                  },
+                ]}
+              >
+                {isBn ? 'আমার প্লেলিস্ট' : 'My Playlist'}
+              </Text>
+              <View style={styles.playlistBadge}>
+                <Text style={styles.playlistBadgeText}>{userPlaylistIds.length}</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {filteredTracks.map((track) => {
-          const isThisPlaying = currentTrack?.id === track.id && isPlaying;
-          const title = language === 'bn' ? (track.titleBn || track.title) : track.title;
-          const artist = language === 'bn' ? (track.artistBn || track.artist) : track.artist;
+        {/* Mood Selector: Choose your Puja mood */}
+        <View
+          style={[
+            styles.moodCard,
+            {
+              backgroundColor: isDark ? '#15120F' : '#FCFAF7',
+              borderColor: isDark ? '#2F2720' : '#EEE8E1',
+            },
+          ]}
+        >
+          <View style={styles.moodHeaderRow}>
+            <View style={styles.moodHeaderLeft}>
+              <Ionicons name="sparkles" size={14} color="#B42323" />
+              <Text style={[styles.moodHeading, { color: colors.textPrimary }]}>
+                {isBn ? 'আপনার পুজোর মুড বেছে নিন' : 'Choose Your Puja Mood'}
+              </Text>
+            </View>
+            {selectedMood !== 'All' && (
+              <TouchableOpacity onPress={() => setSelectedMood('All')}>
+                <Text style={styles.clearMoodText}>
+                  {isBn ? 'সব মুড দেখুন' : 'Clear Mood Filter'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
-          return (
+          <View style={styles.moodPillsRow}>
             <TouchableOpacity
-              key={track.id}
-              activeOpacity={0.85}
-              onPress={() => {
-                if (currentTrack?.id === track.id) {
-                  togglePlayPause();
-                } else {
-                  playTrack(track);
-                }
-              }}
+              activeOpacity={0.7}
+              onPress={() => setSelectedMood('All')}
               style={[
-                styles.trackCard,
+                styles.moodChip,
                 {
-                  backgroundColor: colors.surface,
-                  borderColor: currentTrack?.id === track.id ? colors.primary : colors.border,
+                  backgroundColor: selectedMood === 'All' ? '#B42323' : (isDark ? '#1A1613' : '#FFFFFF'),
+                  borderColor: selectedMood === 'All' ? '#B42323' : (isDark ? '#2F2720' : '#EEE8E1'),
                 },
               ]}
             >
-              <View style={[styles.trackPlayBox, { backgroundColor: colors.badge }]}>
-                <Ionicons
-                  name={isThisPlaying ? 'pause' : 'play'}
-                  size={18}
-                  color={colors.primary}
-                />
-              </View>
-
-              <View style={styles.trackDetails}>
-                <Text style={[styles.trackTitle, { color: colors.text }]} numberOfLines={1}>
-                  {title}
-                </Text>
-                <Text style={[styles.trackArtist, { color: colors.textMuted }]} numberOfLines={1}>
-                  {artist} • {Math.floor(track.durationSeconds / 60)}:{(track.durationSeconds % 60) < 10 ? '0' : ''}{track.durationSeconds % 60}
-                </Text>
-              </View>
-
-              <View style={[styles.catBadge, { backgroundColor: colors.background }]}>
-                <Text style={[styles.catBadgeText, { color: colors.textSecondary }]}>
-                  {track.category.split(' ')[0]}
-                </Text>
-              </View>
+              <Text
+                style={[
+                  styles.moodChipText,
+                  { color: selectedMood === 'All' ? '#FFFFFF' : (isDark ? '#A89E95' : '#665A54') },
+                  selectedMood === 'All' && { fontWeight: '800' },
+                ]}
+              >
+                {isBn ? 'সকল মুড' : 'All Moods'}
+              </Text>
             </TouchableOpacity>
-          );
-        })}
+
+            {PUJA_MOODS_LIST.map((m) => {
+              const isSelected = selectedMood === m.id;
+              return (
+                <TouchableOpacity
+                  key={m.id}
+                  activeOpacity={0.7}
+                  onPress={() => setSelectedMood(m.id)}
+                  style={[
+                    styles.moodChip,
+                    {
+                      backgroundColor: isSelected ? '#B42323' : (isDark ? '#1A1613' : '#FFFFFF'),
+                      borderColor: isSelected ? '#B42323' : (isDark ? '#2F2720' : '#EEE8E1'),
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.moodChipText,
+                      { color: isSelected ? '#FFFFFF' : (isDark ? '#A89E95' : '#665A54') },
+                      isSelected && { fontWeight: '800' },
+                    ]}
+                  >
+                    {isBn ? m.labelBn : m.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Search Bar & Play Full Playlist Action */}
+        <View style={styles.filterSection}>
+          <View
+            style={[
+              styles.searchBox,
+              {
+                backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                borderColor: isDark ? '#2F2720' : '#EEE8E1',
+              },
+            ]}
+          >
+            <Ionicons name="search" size={16} color="#776D65" style={{ marginRight: 8 }} />
+            <TextInput
+              style={[styles.searchInput, { color: colors.textPrimary }]}
+              placeholder={isBn ? 'গান, শিল্পী বা বোল খুঁজুন...' : 'Search tracks, artists, rhythms...'}
+              placeholderTextColor="#776D65"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <Ionicons name="close-circle" size={16} color="#776D65" />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {viewTab === 'playlist' && userPlaylistTracks.length > 0 && (
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={handlePlayUserPlaylist}
+              style={styles.playFullPlaylistBtn}
+            >
+              <Ionicons name="play" size={14} color="#FFFFFF" style={{ marginRight: 6 }} />
+              <Text style={styles.playFullPlaylistText}>
+                {isBn ? 'পুরো প্লেলিস্ট চালান' : 'Play Full Playlist'}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Horizontal Category Filter Pills */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoryScroll}
+          >
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setSelectedCategory('All')}
+              style={[
+                styles.categoryChip,
+                {
+                  backgroundColor:
+                    selectedCategory === 'All'
+                      ? (isDark ? '#EDE5DC' : '#242424')
+                      : (isDark ? '#1A1613' : '#FFFFFF'),
+                  borderColor:
+                    selectedCategory === 'All'
+                      ? (isDark ? '#EDE5DC' : '#242424')
+                      : (isDark ? '#2F2720' : '#EEE8E1'),
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.categoryChipText,
+                  {
+                    color:
+                      selectedCategory === 'All'
+                        ? (isDark ? '#1A1613' : '#FFFFFF')
+                        : (isDark ? '#A89E95' : '#665A54'),
+                    fontWeight: selectedCategory === 'All' ? '800' : '600',
+                  },
+                ]}
+              >
+                {isBn ? 'সকল ক্যাটেগরি' : 'All Categories'}
+              </Text>
+            </TouchableOpacity>
+
+            {MUSIC_CATEGORIES_META.map((cat) => {
+              const isSelected = selectedCategory === cat.id;
+              return (
+                <TouchableOpacity
+                  key={cat.id}
+                  activeOpacity={0.7}
+                  onPress={() => setSelectedCategory(cat.id)}
+                  style={[
+                    styles.categoryChip,
+                    {
+                      backgroundColor: isSelected
+                        ? (isDark ? '#EDE5DC' : '#242424')
+                        : (isDark ? '#1A1613' : '#FFFFFF'),
+                      borderColor: isSelected
+                        ? (isDark ? '#EDE5DC' : '#242424')
+                        : (isDark ? '#2F2720' : '#EEE8E1'),
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.categoryChipText,
+                      {
+                        color: isSelected
+                          ? (isDark ? '#1A1613' : '#FFFFFF')
+                          : (isDark ? '#A89E95' : '#665A54'),
+                        fontWeight: isSelected ? '800' : '600',
+                      },
+                    ]}
+                  >
+                    {isBn ? cat.nameBn : cat.name}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        {/* Tracks List */}
+        <View style={styles.tracksSection}>
+          <View style={styles.tracksHeaderRow}>
+            <Text style={[styles.tracksHeading, { color: colors.textPrimary }]}>
+              {viewTab === 'playlist'
+                ? (isBn ? `আমার সংরক্ষিত প্লেলিস্ট (${filteredTracks.length} টি)` : `My Curated Playlist (${filteredTracks.length})`)
+                : (isBn ? `শারদীয়া সুরের সম্ভার (${filteredTracks.length} টি)` : `Curated Audio Library (${filteredTracks.length})`)}
+            </Text>
+            <Text style={[styles.verifiedBadge, { color: colors.textMuted }]}>
+              {isBn ? 'যাচাইকৃত লাইসেন্স ও সোর্স' : 'Verified Licences & Authorized Streams'}
+            </Text>
+          </View>
+
+          {filteredTracks.length === 0 ? (
+            <View
+              style={[
+                styles.emptyCard,
+                {
+                  backgroundColor: isDark ? '#15120F' : '#FCFAF7',
+                  borderColor: isDark ? '#2F2720' : '#EEE8E1',
+                },
+              ]}
+            >
+              <Ionicons name="musical-notes-outline" size={38} color="#776D65" style={{ opacity: 0.35 }} />
+              <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
+                {viewTab === 'playlist'
+                  ? (isBn ? 'আপনার প্লেলিস্টে কোনো গান নেই।' : 'No tracks saved in your playlist yet.')
+                  : (isBn ? 'কোনো গান বা বোল পাওয়া যায়নি।' : 'No matching tracks found.')}
+              </Text>
+              <Text style={[styles.emptySubtitle, { color: colors.textMuted }]}>
+                {viewTab === 'playlist'
+                  ? (isBn ? 'যেকোনো গানের পাশের বুকমার্ক আইকনটিতে ক্লিক করে আপনার নিজস্ব শারদীয়া প্লেলিস্ট তৈরি করুন।' : 'Click the bookmark icon on any track to assemble your custom Puja hopping playlist.')
+                  : (isBn ? 'অন্য ক্যাটেগরি বা মুড নির্বাচন করে অনুসন্ধান করুন।' : 'Try resetting your mood filter or search query.')}
+              </Text>
+            </View>
+          ) : (
+            filteredTracks.map((track: MusicTrack) => {
+              const isSelected = currentTrack?.id === track.id;
+              const isThisPlaying = isSelected && isPlaying;
+              const inPlaylist = isInPlaylist(track.id);
+              const title = isBn ? (track.titleBn || track.title) : track.title;
+              const artist = isBn ? (track.artistBn || track.artist) : track.artist;
+              const desc = isBn ? track.descriptionBn : track.description;
+
+              return (
+                <TouchableOpacity
+                  key={track.id}
+                  activeOpacity={0.9}
+                  onPress={() => {
+                    if (isSelected) {
+                      togglePlayPause();
+                    } else {
+                      playTrack(track);
+                    }
+                  }}
+                  style={[
+                    styles.trackCard,
+                    {
+                      backgroundColor: isSelected && isPlaying
+                        ? (isDark ? 'rgba(52, 27, 24, 0.6)' : 'rgba(253, 238, 238, 0.6)')
+                        : (isSelected
+                          ? (isDark ? '#1F1B17' : '#FBF7F3')
+                          : (isDark ? '#1A1613' : '#FFFFFF')),
+                      borderColor: isSelected && isPlaying
+                        ? (isDark ? '#4A2420' : '#F6CECA')
+                        : (isSelected
+                          ? (isDark ? '#382F27' : '#EADCCE')
+                          : (isDark ? '#2F2720' : '#EEE8E1')),
+                    },
+                  ]}
+                >
+                  <View style={styles.trackTopRow}>
+                    {/* 48px Cover Image */}
+                    <View style={[styles.coverBox, { borderColor: isDark ? '#2F2720' : '#EEE8E1' }]}>
+                      <Image
+                        source={require('../../assets/images/durga-miniplayer.jpg')}
+                        style={styles.coverImg}
+                        resizeMode="cover"
+                      />
+                    </View>
+
+                    {/* Play/Pause Button */}
+                    <TouchableOpacity
+                      activeOpacity={0.85}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        if (isSelected) {
+                          togglePlayPause();
+                        } else {
+                          playTrack(track);
+                        }
+                      }}
+                      style={[
+                        styles.playBtn,
+                        {
+                          backgroundColor: isThisPlaying ? '#D52F2F' : (isDark ? '#201C18' : '#FFFFFF'),
+                          borderColor: isThisPlaying ? '#D52F2F' : (isDark ? '#2F2720' : '#EEE8E1'),
+                        },
+                      ]}
+                    >
+                      <Ionicons
+                        name={isThisPlaying ? 'pause' : 'play'}
+                        size={16}
+                        color={isThisPlaying ? '#FFFFFF' : '#D52F2F'}
+                        style={{ marginLeft: isThisPlaying ? 0 : 2 }}
+                      />
+                    </TouchableOpacity>
+
+                    {/* Metadata */}
+                    <View style={styles.trackInfo}>
+                      <Text style={[styles.trackTitle, { color: colors.textPrimary }]} numberOfLines={1}>
+                        {title}
+                      </Text>
+                      <Text style={[styles.trackArtist, { color: colors.textMuted }]} numberOfLines={1}>
+                        {artist} • <Text style={{ color: '#B42323', fontWeight: '700' }}>{track.category}</Text>
+                      </Text>
+                      {desc && (
+                        <Text style={[styles.trackDesc, { color: isDark ? '#7D736A' : '#8D8278' }]} numberOfLines={2}>
+                          {desc}
+                        </Text>
+                      )}
+                    </View>
+
+                    {/* Right duration & playlist bookmark */}
+                    <View style={styles.trackRightCol}>
+                      <Text style={styles.durationText}>{formatSeconds(track.durationSeconds)}</Text>
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          togglePlaylistTrack(track.id);
+                        }}
+                        style={styles.bookmarkBtn}
+                      >
+                        <Ionicons
+                          name={inPlaylist ? 'bookmark' : 'bookmark-outline'}
+                          size={18}
+                          color={inPlaylist ? '#B42323' : '#776D65'}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  {/* Cultural Context / License Details Footer */}
+                  <View
+                    style={[
+                      styles.trackFooterRow,
+                      { borderTopColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' },
+                    ]}
+                  >
+                    <Text style={[styles.licenseText, { color: colors.textMuted }]} numberOfLines={1}>
+                      {track.licenseType}
+                    </Text>
+                    <View style={styles.footerRightBadges}>
+                      <View
+                        style={[
+                          styles.methodBadge,
+                          {
+                            backgroundColor:
+                              track.playbackMethod === 'direct_audio'
+                                ? 'rgba(16, 185, 129, 0.1)'
+                                : 'rgba(180, 35, 35, 0.1)',
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.methodBadgeText,
+                            {
+                              color:
+                                track.playbackMethod === 'direct_audio'
+                                  ? (isDark ? '#6EE7B7' : '#047857')
+                                  : '#B42323',
+                            },
+                          ]}
+                        >
+                          {track.playbackMethod === 'direct_audio'
+                            ? (isBn ? 'সরাসরি অডিও' : 'Direct Audio')
+                            : (isBn ? 'অনুমোদিত স্ট্রিম' : 'Authorized Stream')}
+                        </Text>
+                      </View>
+                      {track.sourceUrl && (
+                        <TouchableOpacity
+                          activeOpacity={0.7}
+                          onPress={() => Linking.openURL(track.sourceUrl).catch(() => {})}
+                          style={styles.sourceLink}
+                        >
+                          <Text style={[styles.sourceLinkText, { color: colors.textMuted }]}>
+                            {isBn ? 'সোর্স' : 'Source'}
+                          </Text>
+                          <Ionicons name="open-outline" size={11} color={colors.textMuted} />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            })
+          )}
+        </View>
       </ScrollView>
     </View>
   );
@@ -216,141 +572,292 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  filterRowContainer: {
-    paddingVertical: 10,
-  },
-  filterScroll: {
+  scrollContent: {
     paddingHorizontal: 16,
-    gap: 8,
+    paddingTop: 16,
+    paddingBottom: 110,
+    gap: 16,
   },
-  catChip: {
+  headerSection: {
+    gap: 6,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#B42323',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  pageTitle: {
+    fontSize: 26,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+  },
+  pageSubtitle: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  viewSwitcher: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 4,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginTop: 8,
+    alignSelf: 'flex-start',
+  },
+  switcherTab: {
     paddingHorizontal: 14,
     paddingVertical: 7,
+    borderRadius: 12,
+  },
+  playlistTabBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  switcherTabActive: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  switcherTabText: {
+    fontSize: 12,
+  },
+  playlistBadge: {
+    marginLeft: 5,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 10,
+    backgroundColor: 'rgba(180, 35, 35, 0.12)',
+  },
+  playlistBadgeText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#B42323',
+  },
+  moodCard: {
+    padding: 16,
     borderRadius: 20,
     borderWidth: 1,
+    gap: 12,
   },
-  catChipText: {
-    fontSize: 12,
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 40,
-  },
-  playerDeck: {
-    borderRadius: 18,
-    borderWidth: 1.5,
-    padding: 16,
-    marginBottom: 20,
-    elevation: 4,
-  },
-  playerTopRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  deckIconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  deckInfo: {
-    flex: 1,
-  },
-  deckTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  deckArtist: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  progressContainer: {
-    marginBottom: 12,
-  },
-  progressBarTrack: {
-    height: 4,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-  },
-  progressTimeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 4,
-  },
-  timeText: {
-    fontSize: 10,
-  },
-  deckControls: {
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  bigPlayBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  attributionText: {
-    fontSize: 10,
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  listHeader: {
+  moodHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
   },
-  listTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  listCount: {
-    fontSize: 12,
-  },
-  trackCard: {
+  moodHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
+  },
+  moodHeading: {
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  clearMoodText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#B42323',
+  },
+  moodPillsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 7,
+  },
+  moodChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 12,
     borderWidth: 1,
-    padding: 12,
-    marginBottom: 10,
-    elevation: 1,
   },
-  trackPlayBox: {
+  moodChipText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  filterSection: {
+    gap: 10,
+  },
+  searchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 13,
+    padding: 0,
+  },
+  playFullPlaylistBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#B42323',
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  playFullPlaylistText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  categoryScroll: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 2,
+  },
+  categoryChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  categoryChipText: {
+    fontSize: 11,
+  },
+  tracksSection: {
+    gap: 10,
+  },
+  tracksHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 2,
+  },
+  tracksHeading: {
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  verifiedBadge: {
+    fontSize: 10,
+  },
+  emptyCard: {
+    padding: 28,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  emptyTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 11,
+    textAlign: 'center',
+    lineHeight: 16,
+    maxWidth: 280,
+  },
+  trackCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 12,
+    gap: 10,
+  },
+  trackTopRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  coverBox: {
+    width: 46,
+    height: 46,
+    borderRadius: 10,
+    overflow: 'hidden',
+    borderWidth: 1,
+    backgroundColor: '#F8F0E8',
+  },
+  coverImg: {
+    width: '100%',
+    height: '100%',
+  },
+  playBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    borderWidth: 1,
   },
-  trackDetails: {
+  trackInfo: {
     flex: 1,
+    minWidth: 0,
+    gap: 2,
   },
   trackTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
   },
   trackArtist: {
     fontSize: 11,
+  },
+  trackDesc: {
+    fontSize: 10,
+    lineHeight: 14,
     marginTop: 2,
   },
-  catBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    marginLeft: 8,
+  trackRightCol: {
+    alignItems: 'flex-end',
+    gap: 6,
   },
-  catBadgeText: {
-    fontSize: 10,
+  durationText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#B42323',
+  },
+  bookmarkBtn: {
+    padding: 4,
+  },
+  trackFooterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 8,
+    borderTopWidth: 1,
+    gap: 8,
+  },
+  licenseText: {
+    fontSize: 9,
+    flex: 1,
+  },
+  footerRightBadges: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  methodBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  methodBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+  },
+  sourceLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  sourceLinkText: {
+    fontSize: 9,
     fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });

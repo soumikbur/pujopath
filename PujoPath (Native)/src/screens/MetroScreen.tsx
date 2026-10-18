@@ -11,155 +11,334 @@ import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { METRO_STATIONS_DATA } from '@/data/metro';
 import { FESTIVAL_SPECIAL_METRO_TIMETABLES } from '@/data/metro/timetables';
-import { MetroLineTimetable } from '@/types';
+import { PANDALS_DATA } from '@/data/pandals';
+
+type MetroViewTab = 'special' | 'normal' | 'stations';
 
 interface MetroScreenProps {
   navigation: any;
 }
 
-export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
-  const { colors } = useTheme();
-  const { language } = useLanguage();
+const getLineColor = (lineKeyOrName: string) => {
+  if (lineKeyOrName.includes('blue') || lineKeyOrName.includes('Blue')) return '#2563EB';
+  if (lineKeyOrName.includes('green') || lineKeyOrName.includes('Green')) return '#059669';
+  if (lineKeyOrName.includes('purple') || lineKeyOrName.includes('Purple')) return '#7C3AED';
+  return '#EA580C';
+};
 
-  const [activeTab, setActiveTab] = useState<'stations' | 'pujaSchedule'>('stations');
+const pandalsMap = new Map(PANDALS_DATA.map((p) => [p.id, p]));
+
+export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
+  const { colors, isDark } = useTheme();
+  const { language } = useLanguage();
+  const isBn = language === 'bn';
+
+  const [activeTab, setActiveTab] = useState<MetroViewTab>('special');
+  const [selectedStationLine, setSelectedStationLine] = useState<
+    'All' | 'Blue Line (North-South)' | 'Green Line (East-West)'
+  >('All');
+
+  const filteredStations =
+    selectedStationLine === 'All'
+      ? METRO_STATIONS_DATA
+      : METRO_STATIONS_DATA.filter((s) => s.line === selectedStationLine);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Switcher Tab */}
-      <View style={[styles.tabBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <TouchableOpacity
-          onPress={() => setActiveTab('stations')}
-          style={[
-            styles.tabBtn,
-            { backgroundColor: activeTab === 'stations' ? colors.primary : 'transparent' },
-          ]}
-        >
-          <Text
-            style={[
-              styles.tabBtnText,
-              { color: activeTab === 'stations' ? '#FFFFFF' : colors.textSecondary },
-            ]}
-          >
-            {language === 'bn' ? 'মেট্রো স্টেশনসমূহ' : 'Metro Stations'}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setActiveTab('pujaSchedule')}
-          style={[
-            styles.tabBtn,
-            { backgroundColor: activeTab === 'pujaSchedule' ? colors.primary : 'transparent' },
-          ]}
-        >
-          <Text
-            style={[
-              styles.tabBtnText,
-              { color: activeTab === 'pujaSchedule' ? '#FFFFFF' : colors.textSecondary },
-            ]}
-          >
-            {language === 'bn' ? 'পূজা সারারাত সার্ভিস' : 'Puja Overnight Services'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {activeTab === 'stations' ? (
-          <>
-            <View style={[styles.infoBanner, { backgroundColor: colors.badge }]}>
-              <Ionicons name="information-circle" size={18} color={colors.primary} />
-              <Text style={[styles.infoBannerText, { color: colors.primary }]}>
-                {language === 'bn'
-                  ? 'নীল ও সবুজ লাইনের স্টেশনসমূহ এবং নিকটবর্তী বিখ্যাত মণ্ডপসমূহ'
-                  : 'Blue & Green line stations connecting to Kolkata’s top Durga Puja pandals'}
-              </Text>
-            </View>
+        {/* Header */}
+        <View style={styles.headerSection}>
+          <View style={styles.badgeRow}>
+            <Ionicons name="subway-outline" size={13} color="#B42323" />
+            <Text style={styles.badgeText}>
+              {isBn ? 'মেট্রো রেল সময়সূচি' : 'TRANSIT SCHEDULES'}
+            </Text>
+          </View>
+          <Text style={[styles.pageTitle, { color: colors.textPrimary }]}>
+            {isBn ? 'কলকাতা মেট্রো পুজো পরিক্রমা ও সময়সূচি' : 'Kolkata Metro Timetable & Puja Guide'}
+          </Text>
+          <Text style={[styles.pageSubtitle, { color: colors.textMuted }]}>
+            {isBn
+              ? 'স্বাভাবিক ট্রেনের সূচি এবং ২০২৬ দুর্গাপূজায় সারারাত মেট্রো পরিষেবার অফিশিয়াল সময়তালিকা।'
+              : 'Official Kolkata Metro Railway operating hours, first/last trains, and 2026 Durga Puja all-night special services.'}
+          </Text>
+        </View>
 
-            {METRO_STATIONS_DATA.map((station) => {
-              const name = language === 'bn' ? (station.nameBn || station.name) : station.name;
+        {/* Segmented Control 3 Tabs */}
+        <View style={[styles.segmentContainer, { backgroundColor: isDark ? '#201C18' : '#F5F1EB', borderColor: colors.border }]}>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => setActiveTab('special')}
+            style={[
+              styles.segmentBtn,
+              activeTab === 'special' && {
+                backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.1,
+                shadowRadius: 2,
+                elevation: 2,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                { color: activeTab === 'special' ? '#B42323' : colors.textMuted },
+                activeTab === 'special' && { fontWeight: '800' },
+              ]}
+              numberOfLines={1}
+            >
+              {isBn ? '🌙 সারারাত সূচি' : '🌙 Night Special'}
+            </Text>
+          </TouchableOpacity>
 
-              return (
-                <View
-                  key={station.id}
-                  style={[styles.stationCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                >
-                  <View style={styles.stationTop}>
-                    <View style={[styles.metroIconBox, { backgroundColor: colors.primary }]}>
-                      <Ionicons name="subway" size={18} color="#FFFFFF" />
-                    </View>
-                    <View style={styles.stationTitleGroup}>
-                      <Text style={[styles.stationName, { color: colors.text }]}>{name}</Text>
-                      <Text style={[styles.stationLine, { color: colors.textMuted }]}>
-                        {station.line}
-                      </Text>
-                    </View>
-                  </View>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => setActiveTab('normal')}
+            style={[
+              styles.segmentBtn,
+              activeTab === 'normal' && {
+                backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.1,
+                shadowRadius: 2,
+                elevation: 2,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                { color: activeTab === 'normal' ? '#B42323' : colors.textMuted },
+                activeTab === 'normal' && { fontWeight: '800' },
+              ]}
+              numberOfLines={1}
+            >
+              {isBn ? '⏱️ নিয়মিত সূচি' : '⏱️ Timetables'}
+            </Text>
+          </TouchableOpacity>
 
-                  <Text style={[styles.stationAddress, { color: colors.textSecondary }]}>
-                    📍 {station.address}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => setActiveTab('stations')}
+            style={[
+              styles.segmentBtn,
+              activeTab === 'stations' && {
+                backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.1,
+                shadowRadius: 2,
+                elevation: 2,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                { color: activeTab === 'stations' ? '#B42323' : colors.textMuted },
+                activeTab === 'stations' && { fontWeight: '800' },
+              ]}
+              numberOfLines={1}
+            >
+              {isBn ? '🚇 স্টেশন ও মণ্ডপ' : '🚇 Stations'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* TAB 1: ALL-NIGHT PUJA SPECIAL TIMETABLE */}
+        {activeTab === 'special' && (
+          <View style={styles.tabSection}>
+            {/* Red Lead Banner */}
+            <View style={styles.nightBanner}>
+              <View style={styles.bannerTagRow}>
+                <View style={styles.bannerPill}>
+                  <Ionicons name="moon" size={12} color="#FFFFFF" />
+                  <Text style={styles.bannerPillText}>
+                    {isBn ? 'সারারাত মেট্রো পরিষেবা' : 'ALL-NIGHT METRO SERVICE'}
                   </Text>
-
-                  {station.nearbyPandalIds && station.nearbyPandalIds.length > 0 && (
-                    <View style={[styles.connectingPandalsBox, { backgroundColor: colors.background }]}>
-                      <Text style={[styles.connectingLabel, { color: colors.primary }]}>
-                        {language === 'bn' ? 'সংযোগকারী মণ্ডপ:' : 'Connecting Pandals:'}
-                      </Text>
-                      <Text style={[styles.connectingNames, { color: colors.textSecondary }]}>
-                        {station.nearbyPandalIds.map((id) => id.replace(/-/g, ' ')).join(' • ')}
-                      </Text>
-                    </View>
-                  )}
                 </View>
-              );
-            })}
-          </>
-        ) : (
-          <>
-            <View style={[styles.infoBanner, { backgroundColor: 'rgba(217, 119, 6, 0.1)' }]}>
-              <Ionicons name="moon" size={18} color={colors.secondary} />
-              <Text style={[styles.infoBannerText, { color: colors.secondary }]}>
-                {language === 'bn'
-                  ? 'সপ্তমী, অষ্টমী ও নবমীতে মেট্রো রেলওয়ে কলকাতা কর্তৃক বিশেষ সারারাত পরিষেবা'
-                  : 'Special all-night overnight train services operated on Saptami, Ashtami & Navami'}
+                <View style={[styles.bannerPill, { backgroundColor: '#FBBF24' }]}>
+                  <Text style={[styles.bannerPillText, { color: '#1C1917' }]}>
+                    {isBn ? 'সপ্তমী • অষ্টমী • নবমী' : 'Saptami • Ashtami • Navami'}
+                  </Text>
+                </View>
+              </View>
+
+              <Text style={styles.bannerHeading}>
+                {isBn ? 'রাতভর ট্রেন পরিষেবা ২০২৬' : 'All-Night Trains across Kolkata'}
+              </Text>
+              <Text style={styles.bannerSub}>
+                {isBn
+                  ? 'সপ্তমী, অষ্টমী ও নবমী উপলক্ষে ব্লু ও গ্রীন লাইনে বিকেল থেকে ভোর ৪টা পর্যন্ত ট্রেন চলবে।'
+                  : 'Operating until 4:00 AM on Blue Line & Green Line to facilitate seamless pandal hopping.'}
               </Text>
             </View>
 
-            {FESTIVAL_SPECIAL_METRO_TIMETABLES.map((schedule: MetroLineTimetable, idx: number) => (
+            {/* Special Lines List */}
+            {FESTIVAL_SPECIAL_METRO_TIMETABLES.map((item, idx) => (
               <View
                 key={idx}
-                style={[styles.scheduleCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                style={[
+                  styles.card,
+                  {
+                    backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                    borderColor: colors.border,
+                  },
+                ]}
               >
-                <View style={styles.scheduleHeader}>
-                  <Text style={[styles.scheduleDay, { color: colors.primary }]}>
-                    {schedule.dayType}
+                <View style={styles.cardTopRow}>
+                  <View style={[styles.lineDot, { backgroundColor: getLineColor(item.lineKey) }]} />
+                  <Text style={[styles.lineName, { color: colors.textPrimary }]}>
+                    {isBn ? item.lineNameBn : item.lineName}
                   </Text>
-                  <View style={[styles.hoursBadge, { backgroundColor: colors.badge }]}>
-                    <Text style={[styles.hoursText, { color: colors.primary }]}>
-                      Overnight
+                </View>
+
+                <View style={[styles.badgeContainer, { backgroundColor: isDark ? '#201C18' : '#F5F1EB' }]}>
+                  <Text style={[styles.intervalText, { color: colors.textSecondary }]}>
+                    {isBn ? 'ট্রেন ব্যবধান: ' : 'Frequency: '}
+                    <Text style={{ fontWeight: '800', color: '#B42323' }}>
+                      {item.peakFrequencyMinutes ? `${item.peakFrequencyMinutes} mins` : '6–10 mins'}
+                    </Text>
+                  </Text>
+                </View>
+
+                <View style={styles.timingsGrid}>
+                  <View style={[styles.timingItem, { borderColor: colors.border }]}>
+                    <Text style={[styles.timingLabel, { color: colors.textMuted }]}>
+                      {isBn ? 'প্রথম ট্রেন' : 'First Train'}
+                    </Text>
+                    <Text style={[styles.timingVal, { color: colors.textPrimary }]}>
+                      {item.firstTrain}
+                    </Text>
+                  </View>
+                  <View style={[styles.timingItem, { borderColor: colors.border }]}>
+                    <Text style={[styles.timingLabel, { color: colors.textMuted }]}>
+                      {isBn ? 'শেষ ট্রেন' : 'Last Train'}
+                    </Text>
+                    <Text style={[styles.timingVal, { color: '#B42323' }]}>
+                      {item.lastTrain}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* TAB 2: REGULAR TIMETABLES */}
+        {activeTab === 'normal' && (
+          <View style={styles.tabSection}>
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <Text style={[styles.lineName, { color: colors.textPrimary }]}>
+                {isBn ? 'নিয়মিত কাজের দিন (সোমবার–শুক্রবার)' : 'Regular Weekdays (Mon–Fri)'}
+              </Text>
+              <Text style={[styles.timingLabel, { color: colors.textMuted, marginTop: 4 }]}>
+                {isBn
+                  ? 'ব্লু লাইন: সকাল ৬:৫৫ থেকে রাত ৯:৪০ পর্যন্ত (প্রতি ৫–৭ মিনিটে)'
+                  : 'Blue Line: 06:55 AM – 09:40 PM (Every 5–7 mins)'}
+              </Text>
+              <Text style={[styles.timingLabel, { color: colors.textMuted, marginTop: 4 }]}>
+                {isBn
+                  ? 'গ্রীন লাইন: সকাল ৭:০০ থেকে রাত ৯:৩০ পর্যন্ত (প্রতি ১০ মিনিটে)'
+                  : 'Green Line: 07:00 AM – 09:30 PM (Every 10 mins)'}
+              </Text>
+            </View>
+
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <Text style={[styles.lineName, { color: colors.textPrimary }]}>
+                {isBn ? 'শনিবার ও রবিবার' : 'Weekend Services'}
+              </Text>
+              <Text style={[styles.timingLabel, { color: colors.textMuted, marginTop: 4 }]}>
+                {isBn
+                  ? 'শনিবার: সকাল ৬:৫৫ থেকে রাত ৯:৪০ (৭–১০ মিনিট পর পর)'
+                  : 'Saturday: 06:55 AM – 09:40 PM (Every 7–10 mins)'}
+              </Text>
+              <Text style={[styles.timingLabel, { color: colors.textMuted, marginTop: 4 }]}>
+                {isBn
+                  ? 'রবিবার: সকাল ৯:০০ থেকে রাত ৯:৪০ (১০–১৫ মিনিট পর পর)'
+                  : 'Sunday: 09:00 AM – 09:40 PM (Every 10–15 mins)'}
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* TAB 3: STATIONS & PANDALS */}
+        {activeTab === 'stations' && (
+          <View style={styles.tabSection}>
+            {filteredStations.map((station) => (
+              <View
+                key={station.id}
+                style={[
+                  styles.card,
+                  {
+                    backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                    borderColor: colors.border,
+                  },
+                ]}
+              >
+                <View style={styles.stationHeader}>
+                  <View style={[styles.stationDot, { backgroundColor: getLineColor(station.line) }]} />
+                  <View style={styles.stationTitleContainer}>
+                    <Text style={[styles.stationName, { color: colors.textPrimary }]}>
+                      {isBn ? station.nameBn : station.name}
+                    </Text>
+                    <Text style={[styles.stationLine, { color: colors.textMuted }]}>
+                      {station.line}
                     </Text>
                   </View>
                 </View>
 
-                <Text style={[styles.scheduleLine, { color: colors.text }]}>
-                  {schedule.lineName}
-                </Text>
-
-                <View style={styles.scheduleDetails}>
-                  <Text style={[styles.scheduleDetailText, { color: colors.textSecondary }]}>
-                    ⏱ Peak Frequency: Every {schedule.peakFrequencyMinutes} mins
-                  </Text>
-                  <Text style={[styles.scheduleDetailText, { color: colors.textSecondary }]}>
-                    🚉 First Train: {schedule.firstTrain} | Last: {schedule.lastTrain}
-                  </Text>
-                </View>
-
-                {schedule.notes && (
-                  <Text style={[styles.scheduleNote, { color: colors.textMuted }]}>
-                    ℹ {schedule.notes}
-                  </Text>
+                {station.nearbyPandalIds && station.nearbyPandalIds.length > 0 && (
+                  <View style={styles.pandalsContainer}>
+                    <Text style={[styles.pandalsHeading, { color: colors.textMuted }]}>
+                      {isBn ? 'নিকটবর্তী মণ্ডপসমূহ:' : 'Nearby Pandals:'}
+                    </Text>
+                    <View style={styles.pandalChipsRow}>
+                      {station.nearbyPandalIds.slice(0, 4).map((pandalId, i) => {
+                        const p = pandalsMap.get(pandalId);
+                        const pName = p ? (isBn ? (p.nameBn || p.name) : p.name) : pandalId;
+                        return (
+                          <TouchableOpacity
+                            key={i}
+                            activeOpacity={0.8}
+                            onPress={() => navigation.navigate('PandalDetail', { pandalId })}
+                            style={[
+                              styles.pandalChip,
+                              { backgroundColor: isDark ? '#201C18' : '#F5F1EB', borderColor: colors.border },
+                            ]}
+                          >
+                            <Ionicons name="business-outline" size={12} color="#B42323" />
+                            <Text style={[styles.pandalChipText, { color: colors.textPrimary }]} numberOfLines={1}>
+                              {pName}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
                 )}
               </View>
             ))}
-          </>
+          </View>
         )}
       </ScrollView>
     </View>
@@ -170,131 +349,192 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  tabBar: {
-    flexDirection: 'row',
-    margin: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    padding: 4,
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 90,
+    gap: 16,
   },
-  tabBtn: {
+  headerSection: {
+    gap: 4,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  badgeText: {
+    color: '#B42323',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+  },
+  pageSubtitle: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  segmentContainer: {
+    flexDirection: 'row',
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 3,
+  },
+  segmentBtn: {
     flex: 1,
-    paddingVertical: 10,
-    borderRadius: 8,
+    paddingVertical: 9,
+    borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tabBtnText: {
-    fontSize: 12,
+  segmentText: {
+    fontSize: 11,
     fontWeight: '700',
   },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 40,
+  tabSection: {
+    gap: 12,
   },
-  infoBanner: {
+  nightBanner: {
+    borderRadius: 22,
+    backgroundColor: '#B42323',
+    padding: 18,
+    gap: 8,
+    shadowColor: '#B42323',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  bannerTagRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  bannerPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    gap: 4,
+  },
+  bannerPillText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  bannerHeading: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '900',
+    letterSpacing: -0.3,
+  },
+  bannerSub: {
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  card: {
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 14,
+    gap: 10,
+  },
+  cardTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 14,
   },
-  infoBannerText: {
-    fontSize: 12,
-    fontWeight: '600',
-    flex: 1,
-  },
-  stationCard: {
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 14,
-    marginBottom: 12,
-    elevation: 2,
-  },
-  stationTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  metroIconBox: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-  stationTitleGroup: {
-    flex: 1,
-  },
-  stationName: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  stationLine: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  stationAddress: {
-    fontSize: 12,
-    marginBottom: 8,
-  },
-  connectingPandalsBox: {
-    padding: 8,
-    borderRadius: 8,
-    marginTop: 4,
-  },
-  connectingLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    marginBottom: 2,
-  },
-  connectingNames: {
-    fontSize: 12,
-    textTransform: 'capitalize',
-  },
-  scheduleCard: {
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 14,
-    marginBottom: 12,
-    elevation: 2,
-  },
-  scheduleHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
-  scheduleDay: {
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  hoursBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+  lineDot: {
+    width: 12,
+    height: 12,
     borderRadius: 6,
   },
-  hoursText: {
+  lineName: {
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  badgeContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  intervalText: {
+    fontSize: 11,
+  },
+  timingsGrid: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  timingItem: {
+    flex: 1,
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 10,
+    alignItems: 'center',
+    gap: 2,
+  },
+  timingLabel: {
     fontSize: 10,
     fontWeight: '700',
   },
-  scheduleLine: {
+  timingVal: {
     fontSize: 13,
-    fontWeight: '600',
-    marginBottom: 8,
+    fontWeight: '900',
   },
-  scheduleDetails: {
-    gap: 4,
-    marginBottom: 6,
+  stationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
-  scheduleDetailText: {
-    fontSize: 12,
+  stationDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
-  scheduleNote: {
-    fontSize: 11,
-    fontStyle: 'italic',
+  stationTitleContainer: {
+    flex: 1,
+  },
+  stationName: {
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  stationLine: {
+    fontSize: 10,
+    marginTop: 1,
+  },
+  pandalsContainer: {
     marginTop: 4,
+    gap: 6,
+  },
+  pandalsHeading: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  pandalChipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  pandalChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    gap: 5,
+    maxWidth: '48%',
+  },
+  pandalChipText: {
+    fontSize: 11,
+    fontWeight: '600',
+    flexShrink: 1,
   },
 });

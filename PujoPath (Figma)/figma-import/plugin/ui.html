@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>PujoPath UI Replicator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, system-ui, sans-serif; }
+    body { background: #FCFAF7; color: #242424; padding: 16px; font-size: 13px; }
+    .header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; border-bottom: 1px solid #E8E1D9; padding-bottom: 12px; }
+    .logo { width: 32px; height: 32px; border-radius: 8px; background: #b42323; color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; }
+    h1 { font-size: 15px; font-weight: 800; color: #242424; }
+    p.subtitle { font-size: 11px; color: #7E7268; }
+    .btn { display: block; width: 100%; padding: 10px 14px; border-radius: 10px; font-weight: 700; font-size: 13px; text-align: center; cursor: pointer; border: none; margin-bottom: 8px; transition: all 0.15s; }
+    .btn-primary { background: #b42323; color: white; box-shadow: 0 2px 6px rgba(180, 35, 35, 0.25); }
+    .btn-primary:hover { background: #971e1e; }
+    .btn-secondary { background: white; color: #4A423D; border: 1px solid #E8E1D9; }
+    .btn-secondary:hover { background: #F5F1EB; }
+    .status { margin-top: 12px; padding: 10px; border-radius: 8px; background: #F5F1EB; font-size: 11px; color: #5C524A; max-height: 140px; overflow-y: auto; white-space: pre-wrap; font-family: monospace; }
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; background: #FDEEEE; color: #B42323; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">P</div>
+    <div>
+      <h1>PujoPath UI Replicator</h1>
+      <p class="subtitle">Pixel-accurate Figma Design System &amp; Screens</p>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="btn-all">⚡ Generate Everything (3 Formats + Tokens)</button>
+  <button class="btn btn-secondary" id="btn-desktop">🖥️ Generate Web Desktop</button>
+  <button class="btn btn-secondary" id="btn-web-mobile">📱 Generate Web Mobile</button>
+  <button class="btn btn-secondary" id="btn-capacitor">🤖 Generate Capacitor Android Mobile</button>
+  <button class="btn btn-secondary" id="btn-tokens">🎨 Generate Design Tokens &amp; Styles</button>
+
+  <div class="status" id="log">Ready. Click any button above to generate genuine editable frames, vector icons, auto-layouts, and text layers.</div>
+
+  <script>
+    const logEl = document.getElementById('log');
+    function log(msg) {
+      logEl.textContent += '\n' + msg;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    document.getElementById('btn-all').onclick = () => {
+      log('Starting full document generation...');
+      parent.postMessage({ pluginMessage: { type: 'generate-all' } }, '*');
+    };
+    document.getElementById('btn-desktop').onclick = () => {
+      log('Generating Web Desktop frames...');
+      parent.postMessage({ pluginMessage: { type: 'generate-desktop' } }, '*');
+    };
+    document.getElementById('btn-web-mobile').onclick = () => {
+      log('Generating Web Mobile frames...');
+      parent.postMessage({ pluginMessage: { type: 'generate-web-mobile' } }, '*');
+    };
+    document.getElementById('btn-capacitor').onclick = () => {
+      log('Generating Capacitor Android Mobile frames...');
+      parent.postMessage({ pluginMessage: { type: 'generate-capacitor' } }, '*');
+    };
+    document.getElementById('btn-tokens').onclick = () => {
+      log('Generating Design Tokens & Styles...');
+      parent.postMessage({ pluginMessage: { type: 'generate-tokens' } }, '*');
+    };
+
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (msg && msg.log) {
+        log(msg.log);
+      }
+    };
+  </script>
+</body>
+</html>

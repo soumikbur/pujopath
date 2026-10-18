@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="412" height="1750" viewBox="0 0 412 1750" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;family=Inter:wght@400;500;600;700;800;900&amp;display=swap');
+      text { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+      .bengali { font-family: 'Hind Siliguri', 'Inter', sans-serif; }
+      .brand { font-family: 'Inter', sans-serif; font-weight: 900; }
+    </style>
+  </defs>
+
+  <rect width="412" height="1750" fill="#14110e"/>
+
+  
+  <!-- ANDROID SYSTEM STATUS BAR (412 x 40) -->
+  <g id="Android_Status_Bar">
+    <rect width="412" height="40" fill="#14110e"/>
+    <text x="24" y="26" fill="#ffffff" font-size="14" font-weight="600">9:34</text>
+    
+    <g transform="translate(320, 14)">
+      <!-- 5G Badge -->
+      <text x="0" y="12" fill="#ffffff" font-size="11" font-weight="700">5G</text>
+      <!-- Signal Bars -->
+      <path d="M22 18 L22 14 M25 18 L25 10 M28 18 L28 6 M31 18 L31 2" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+      <!-- Battery Icon -->
+      <rect x="38" y="5" width="18" height="11" rx="3" stroke="#ffffff" stroke-width="1.5" fill="none"/>
+      <rect x="40" y="7" width="11" height="7" fill="#ffffff"/>
+      <line x1="57" y1="8" x2="57" y2="13" stroke="#ffffff" stroke-width="1.5"/>
+    </g>
+  </g>
+  
+  
+  <!-- CAPACITOR ANDROID APP BAR (412 x 56, NO INSTALL BUTTON) -->
+  <g id="Capacitor_App_Bar" transform="translate(0, 40)">
+    <rect width="412" height="56" fill="rgba(20, 17, 14, 0.98)"/>
+    <line x1="0" y1="56" x2="412" y2="56" stroke="#2a241f" stroke-width="1"/>
+
+    <!-- Left Brand Logo -->
+    <text x="18" y="36" fill="#b42323" font-size="22" font-weight="900" letter-spacing="-0.5" class="brand">PujoPath</text>
+
+    <!-- Right Controls: Theme Toggle, Language Switcher, Favorites Heart -->
+    <g id="Cap_Controls" transform="translate(240, 10)">
+      <!-- Moon / Sun Toggle -->
+      <g id="Cap_Theme_Toggle">
+        <rect width="36" height="36" rx="11" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+        <text x="18" y="23" fill="#d4c7ba" font-size="14" text-anchor="middle">☀️</text>
+      </g>
+
+      <!-- Language Toggle Pill (EN / বাংলা) -->
+      <g id="Cap_Lang_Toggle" transform="translate(44, 0)">
+        <rect width="68" height="36" rx="11" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+        <rect x="3" y="3" width="30" height="30" rx="8" fill="#b42323"/>
+        <text x="18" y="22" fill="#FFFFFF" font-size="11" font-weight="800" text-anchor="middle">EN</text>
+        <text x="48" y="22" fill="#d4c7ba" font-size="11" font-weight="600" text-anchor="middle" class="bengali">বাংলা</text>
+      </g>
+
+      <!-- Favorites Heart Button -->
+      <g id="Cap_Favorites" transform="translate(120, 0)">
+        <rect width="36" height="36" rx="11" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+        <text x="18" y="23" fill="#d4c7ba" font-size="15" text-anchor="middle">♡</text>
+      </g>
+    </g>
+  </g>
+  
+
+  <!-- Page Header -->
+  <g id="Cap_Planner_Header" transform="translate(20, 114)">
+    <rect width="120" height="24" rx="12" fill="#341b18"/>
+    <text x="60" y="16" fill="#fca5a5" font-size="10" font-weight="700" text-anchor="middle">🔀 ROUTE PLANNER</text>
+    <text x="0" y="52" fill="#f8f3ec" font-size="26" font-weight="900" letter-spacing="-0.5">Pandal Hopping Route</text>
+    <text x="0" y="74" fill="#d4c7ba" font-size="13">Plan your walking trail with smart nearest-neighbor routing.</text>
+
+    <!-- Metrics Summary Card -->
+    <g transform="translate(0, 96)">
+      <rect width="372" height="74" rx="16" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+      <g transform="translate(24, 18)">
+        <text x="36" y="14" fill="#d4c7ba" font-size="10" font-weight="700" text-anchor="middle">TOTAL STOPS</text>
+        <text x="36" y="38" fill="#b42323" font-size="18" font-weight="900" text-anchor="middle">4 Pandals</text>
+
+        <line x1="94" y1="4" x2="94" y2="44" stroke="#3d3227" stroke-width="1"/>
+
+        <text x="162" y="14" fill="#d4c7ba" font-size="10" font-weight="700" text-anchor="middle">WALK DISTANCE</text>
+        <text x="162" y="38" fill="#f8f3ec" font-size="18" font-weight="900" text-anchor="middle">3.8 km</text>
+
+        <line x1="230" y1="4" x2="230" y2="44" stroke="#3d3227" stroke-width="1"/>
+
+        <text x="286" y="14" fill="#d4c7ba" font-size="10" font-weight="700" text-anchor="middle">EST. DURATION</text>
+        <text x="286" y="38" fill="#f8f3ec" font-size="18" font-weight="900" text-anchor="middle">~3h 15m</text>
+      </g>
+    </g>
+
+    <!-- Optimize Button -->
+    <g transform="translate(0, 182)">
+      <rect width="372" height="44" rx="14" fill="#b42323"/>
+      <text x="186" y="27" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">⚡ Optimize Hopping Sequence</text>
+    </g>
+  </g>
+
+  <!-- Sequenced Stops -->
+  <g id="Cap_Planner_Stops" transform="translate(20, 390)">
+    
+  <g transform="translate(0, 0)">
+    <rect width="372" height="84" rx="14" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+    <circle cx="30" cy="42" r="14" fill="#b42323"/>
+    <text x="30" y="47" fill="#FFFFFF" font-size="12" font-weight="800" text-anchor="middle">1</text>
+    <g transform="translate(58, 24)">
+      <text x="0" y="16" fill="#f8f3ec" font-size="15" font-weight="800">Bagbazar Sarbojanin</text>
+      <text x="0" y="36" fill="#d4c7ba" font-size="11">Shyambazar Metro • Start Point</text>
+    </g>
+  </g>
+    
+  <g transform="translate(0, 96)">
+    <rect width="372" height="84" rx="14" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+    <circle cx="30" cy="42" r="14" fill="#b42323"/>
+    <text x="30" y="47" fill="#FFFFFF" font-size="12" font-weight="800" text-anchor="middle">2</text>
+    <g transform="translate(58, 24)">
+      <text x="0" y="16" fill="#f8f3ec" font-size="15" font-weight="800">Kumartuli Park</text>
+      <text x="0" y="36" fill="#d4c7ba" font-size="11">400m walk from Stop 1</text>
+    </g>
+  </g>
+    
+  <g transform="translate(0, 192)">
+    <rect width="372" height="84" rx="14" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+    <circle cx="30" cy="42" r="14" fill="#b42323"/>
+    <text x="30" y="47" fill="#FFFFFF" font-size="12" font-weight="800" text-anchor="middle">3</text>
+    <g transform="translate(58, 24)">
+      <text x="0" y="16" fill="#f8f3ec" font-size="15" font-weight="800">Sovabazar Rajbari</text>
+      <text x="0" y="36" fill="#d4c7ba" font-size="11">450m walk from Stop 2 • Heritage</text>
+    </g>
+  </g>
+    
+  <g transform="translate(0, 288)">
+    <rect width="372" height="84" rx="14" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+    <circle cx="30" cy="42" r="14" fill="#b42323"/>
+    <text x="30" y="47" fill="#FFFFFF" font-size="12" font-weight="800" text-anchor="middle">4</text>
+    <g transform="translate(58, 24)">
+      <text x="0" y="16" fill="#f8f3ec" font-size="15" font-weight="800">College Square</text>
+      <text x="0" y="36" fill="#d4c7ba" font-size="11">Central Metro • Evening Illumination</text>
+    </g>
+  </g>
+
+    <!-- Action Buttons -->
+    <g transform="translate(0, 396)">
+      <rect width="372" height="46" rx="14" fill="#b42323"/>
+      <text x="186" y="28" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">📍 Export Route to Google Maps</text>
+
+      <g transform="translate(0, 56)">
+        <rect width="372" height="46" rx="14" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+        <text x="186" y="28" fill="#f8f3ec" font-size="13" font-weight="700" text-anchor="middle">💬 Share Trail via WhatsApp</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Footer -->
+  
+  <!-- CAPACITOR ANDROID FOOTER -->
+  <g transform="translate(18, 1580)">
+    <line x1="0" y1="0" x2="376" y2="0" stroke="#3d3227" stroke-width="1"/>
+    
+    <g transform="translate(0, 18)">
+      <text x="0" y="16" fill="#b42323" font-size="15" font-weight="900" class="brand">PujoPath</text>
+      <text x="78" y="16" fill="#a39486" font-size="12">Kolkata Durga Puja Companion</text>
+      <text x="0" y="36" fill="#786e65" font-size="11">Explore pandals, plan walking routes, check metro connectivity.</text>
+
+      <g transform="translate(0, 56)">
+        <text x="0" y="14" fill="#a39486" font-size="11">© 2026 PujoPath. All rights reserved.</text>
+        <text x="270" y="14" fill="#b42323" font-size="11" font-weight="700">Helpline &amp; About ↗</text>
+      </g>
+
+      <g transform="translate(0, 84)">
+        <rect width="376" height="32" rx="8" fill="#251e18" stroke="#3d3227" stroke-width="1"/>
+        <text x="16" y="20" fill="#a39486" font-size="11">🌸 Festive Pandal &amp; Dhakis  ⏸ Pause</text>
+        <text x="360" y="20" fill="#786e65" font-size="10" text-anchor="end">Made by Soumik &amp; Moumita with ❤️</text>
+      </g>
+    </g>
+  </g>
+  
+
+  <!-- Fixed Bottom Navigation + Gesture Pill -->
+  
+  <!-- CAPACITOR ANDROID BOTTOM NAVIGATION (412 x 64, Y=1662) -->
+  <g id="Capacitor_Bottom_Nav" transform="translate(0, 1662)">
+    <rect width="412" height="64" fill="#181411"/>
+    <line x1="0" y1="0" x2="412" y2="0" stroke="#2a241f" stroke-width="1"/>
+    
+    <!-- Tab: Home -->
+    <g transform="translate(12, 6)">
+      
+      <g transform="translate(25, 6)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a89e95" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        </svg>
+      </g>
+      <text x="35" y="37" fill="#a89e95" font-size="11" font-weight="600" text-anchor="middle">Home</text>
+      
+    </g>
+    
+    <!-- Tab: Explore -->
+    <g transform="translate(90, 6)">
+      
+      <g transform="translate(25, 6)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a89e95" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"></path><circle cx="12" cy="12" r="10"></circle>
+        </svg>
+      </g>
+      <text x="35" y="37" fill="#a89e95" font-size="11" font-weight="600" text-anchor="middle">Explore</text>
+      
+    </g>
+    
+    <!-- Tab: Map -->
+    <g transform="translate(168, 6)">
+      
+      <g transform="translate(25, 6)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a89e95" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle>
+        </svg>
+      </g>
+      <text x="35" y="37" fill="#a89e95" font-size="11" font-weight="600" text-anchor="middle">Map</text>
+      
+    </g>
+    
+    <!-- Tab: Planner -->
+    <g transform="translate(246, 6)">
+      <rect x="0" y="0" width="70" height="48" rx="12" fill="#341b18"/>
+      <g transform="translate(25, 6)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b42323" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path><circle cx="18" cy="5" r="3"></circle>
+        </svg>
+      </g>
+      <text x="35" y="37" fill="#b42323" font-size="11" font-weight="700" text-anchor="middle">Planner</text>
+      <circle cx="35" cy="44" r="2" fill="#b42323"/>
+    </g>
+    
+    <!-- Tab: More -->
+    <g transform="translate(324, 6)">
+      
+      <g transform="translate(25, 6)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a89e95" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle><circle cx="5" cy="12" r="1.5"></circle>
+        </svg>
+      </g>
+      <text x="35" y="37" fill="#a89e95" font-size="11" font-weight="600" text-anchor="middle">More</text>
+      
+    </g>
+    
+  </g>
+  
+  
+  <!-- ANDROID SYSTEM GESTURE NAVIGATION PILL (Y=1726) -->
+  <g id="Android_Gesture_Pill" transform="translate(0, 1726)">
+    <rect width="412" height="24" fill="none"/>
+    <rect x="170" y="10" width="72" height="4" rx="2" fill="#ffffff" fill-opacity="0.8"/>
+  </g>
+  
+</svg>

@@ -1,0 +1,232 @@
+
+<svg width="1440" height="1420" viewBox="0 0 1440 1420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;family=Inter:wght@400;500;600;700;800;900&amp;display=swap');
+      text { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+      .bengali { font-family: 'Hind Siliguri', 'Inter', sans-serif; }
+    </style>
+    <radialGradient id="vignetteLight" cx="50%" cy="25%" r="70%">
+      <stop offset="0%" stop-color="#fcfaf7" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#fcfaf7" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#fcfaf7" stop-opacity="0.96"/>
+    </radialGradient>
+    <linearGradient id="cardGradLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#faf8f5"/>
+    </linearGradient>
+    <linearGradient id="redBannerGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#961c1c"/>
+      <stop offset="100%" stop-color="#4a1212"/>
+    </linearGradient>
+    <filter id="softShadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#4a3b32" flood-opacity="0.05"/>
+    </filter>
+  </defs>
+
+  
+  <!-- BACKGROUND LIGHT WITH WARM CREAM -->
+  <g id="Page_Background_Light">
+    <rect width="1440" height="1420" fill="#fcfaf7"/>
+  </g>
+  
+  
+  <!-- HEADER LIGHT (Height: 65px) -->
+  <g id="Header_Desktop_Light">
+    <rect width="1440" height="65" fill="#ffffff" fill-opacity="0.88"/>
+    <line x1="0" y1="65" x2="1440" y2="65" stroke="#eee8e1" stroke-width="1"/>
+
+    <g transform="translate(144, 0)">
+      <!-- Logo -->
+      <text x="0" y="41" fill="#b42323" font-size="20" font-weight="800" letter-spacing="-0.3">PujoPath</text>
+      
+      <!-- Nav items -->
+      
+      <g transform="translate(340, 13)">
+        <rect width="78" height="38" rx="12" fill="transparent"/>
+        <text x="39" y="24" fill="#57524c" font-size="14" font-weight="700" text-anchor="middle">Explore</text>
+      </g>
+    
+      <g transform="translate(426, 13)">
+        <rect width="78" height="38" rx="12" fill="transparent"/>
+        <text x="39" y="24" fill="#57524c" font-size="14" font-weight="700" text-anchor="middle">Map</text>
+      </g>
+    
+      <g transform="translate(512, 13)">
+        <rect width="78" height="38" rx="12" fill="transparent"/>
+        <text x="39" y="24" fill="#57524c" font-size="14" font-weight="700" text-anchor="middle">Plan</text>
+      </g>
+    
+      <g transform="translate(598, 13)">
+        <rect width="78" height="38" rx="12" fill="#f5efe6"/>
+        <text x="39" y="24" fill="#1a1715" font-size="14" font-weight="700" text-anchor="middle">More ⌵</text>
+      </g>
+    
+
+      <!-- Right Actions: Install App, Mode, Lang, Saved -->
+      <g transform="translate(740, 13)">
+        <!-- Install App -->
+        <g id="Btn_Install_App">
+          <rect width="124" height="38" rx="12" fill="#b42323"/>
+          <text x="22" y="24" fill="#ffffff" font-size="14">📥</text>
+          <text x="44" y="24" fill="#ffffff" font-size="14" font-weight="700">Install App</text>
+        </g>
+        <!-- Theme Toggle (Moon icon in light mode) -->
+        <g id="Btn_Theme_Toggle" transform="translate(136, 0)">
+          <rect width="38" height="38" rx="12" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="19" y="24" fill="#57524c" font-size="15" text-anchor="middle">🌙</text>
+        </g>
+        <!-- Lang Pill -->
+        <g id="Pill_Lang_Toggle" transform="translate(186, 0)">
+          <rect width="88" height="38" rx="12" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <!-- Active EN -->
+          <rect x="4" y="4" width="38" height="30" rx="8" fill="#b42323"/>
+          <text x="23" y="23" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">EN</text>
+          <!-- Inactive বাংলা -->
+          <text x="63" y="23" fill="#57524c" font-size="12" font-weight="700" text-anchor="middle" class="bengali">বাংলা</text>
+        </g>
+        <!-- Saved Heart -->
+        <g id="Btn_Saved_Trails" transform="translate(286, 0)">
+          <rect width="38" height="38" rx="12" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="19" y="24" fill="#57524c" font-size="15" text-anchor="middle">♡</text>
+        </g>
+      </g>
+    </g>
+  </g>
+  
+
+  <g transform="translate(144, 88)">
+    <!-- Label & Title -->
+    <text x="0" y="20" fill="#b42323" font-size="12" font-weight="700" letter-spacing="1">ℹ️ SAFETY &amp; ASSISTANCE</text>
+    <text x="0" y="54" fill="#1a1715" font-size="34" font-weight="800">Emergency Helplines &amp; Safety Guide</text>
+    <text x="0" y="82" fill="#57524c" font-size="14">Official 24×7 emergency contacts and essential guidance for safe and smooth pandal hopping.</text>
+
+    <!-- 6 Helplines Grid -->
+    <g transform="translate(0, 114)">
+      
+      <g transform="translate(0, 0)">
+        <rect width="564" height="100" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(20, 20)">
+          <text x="0" y="18" fill="#1a1715" font-size="15" font-weight="800">Kolkata Police Emergency</text>
+          <text x="0" y="38" fill="#736c65" font-size="12">Central emergency response</text>
+          <text x="0" y="62" fill="#b42323" font-size="15" font-weight="800">100 / 112</text>
+
+          <circle cx="510" cy="30" r="20" fill="#feeceb"/>
+          <text x="510" y="36" fill="#b42323" font-size="14" text-anchor="middle">📞</text>
+        </g>
+      </g>
+    
+      <g transform="translate(588, 0)">
+        <rect width="564" height="100" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(20, 20)">
+          <text x="0" y="18" fill="#1a1715" font-size="15" font-weight="800">Kolkata Traffic Police Helpline</text>
+          <text x="0" y="38" fill="#736c65" font-size="12">Traffic & road advisories</text>
+          <text x="0" y="62" fill="#b42323" font-size="15" font-weight="800">1073 / 033-2214-3644</text>
+
+          <circle cx="510" cy="30" r="20" fill="#feeceb"/>
+          <text x="510" y="36" fill="#b42323" font-size="14" text-anchor="middle">📞</text>
+        </g>
+      </g>
+    
+      <g transform="translate(0, 114)">
+        <rect width="564" height="100" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(20, 20)">
+          <text x="0" y="18" fill="#1a1715" font-size="15" font-weight="800">Women Helpline</text>
+          <text x="0" y="38" fill="#736c65" font-size="12">24×7 special assistance for women</text>
+          <text x="0" y="62" fill="#b42323" font-size="15" font-weight="800">1091 / 181</text>
+
+          <circle cx="510" cy="30" r="20" fill="#feeceb"/>
+          <text x="510" y="36" fill="#b42323" font-size="14" text-anchor="middle">📞</text>
+        </g>
+      </g>
+    
+      <g transform="translate(588, 114)">
+        <rect width="564" height="100" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(20, 20)">
+          <text x="0" y="18" fill="#1a1715" font-size="15" font-weight="800">Ambulance Emergency Services</text>
+          <text x="0" y="38" fill="#736c65" font-size="12">Immediate medical ambulance</text>
+          <text x="0" y="62" fill="#b42323" font-size="15" font-weight="800">102 / 108</text>
+
+          <circle cx="510" cy="30" r="20" fill="#feeceb"/>
+          <text x="510" y="36" fill="#b42323" font-size="14" text-anchor="middle">📞</text>
+        </g>
+      </g>
+    
+      <g transform="translate(0, 228)">
+        <rect width="564" height="100" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(20, 20)">
+          <text x="0" y="18" fill="#1a1715" font-size="15" font-weight="800">Fire & Rescue Services</text>
+          <text x="0" y="38" fill="#736c65" font-size="12">Fire rescue department</text>
+          <text x="0" y="62" fill="#b42323" font-size="15" font-weight="800">101</text>
+
+          <circle cx="510" cy="30" r="20" fill="#feeceb"/>
+          <text x="510" y="36" fill="#b42323" font-size="14" text-anchor="middle">📞</text>
+        </g>
+      </g>
+    
+      <g transform="translate(588, 228)">
+        <rect width="564" height="100" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <g transform="translate(20, 20)">
+          <text x="0" y="18" fill="#1a1715" font-size="15" font-weight="800">Kolkata Metro Rail Helpdesk</text>
+          <text x="0" y="38" fill="#736c65" font-size="12">Metro transit helpline</text>
+          <text x="0" y="62" fill="#b42323" font-size="15" font-weight="800">033-2226-7285</text>
+
+          <circle cx="510" cy="30" r="20" fill="#feeceb"/>
+          <text x="510" y="36" fill="#b42323" font-size="14" text-anchor="middle">📞</text>
+        </g>
+      </g>
+    
+    </g>
+
+    <!-- Essential Tips Card (y: 486) -->
+    <g transform="translate(0, 486)">
+      <rect width="1152" height="170" rx="18" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+      <g transform="translate(24, 24)">
+        <text x="0" y="18" fill="#b42323" font-size="16" font-weight="800">🛡️ Essential Pandal Hopping Tips</text>
+        <text x="0" y="48" fill="#57524c" font-size="13">• Use the Kolkata Metro (Blue &amp; Green lines) to travel between major hubs and bypass road traffic.</text>
+        <text x="0" y="72" fill="#57524c" font-size="13">• Visit high-crowd pandals during morning hours (8 AM – 12 PM) for minimal queues and peaceful Darshan.</text>
+        <text x="0" y="96" fill="#57524c" font-size="13">• Carry reusable water bottles and stay hydrated while hopping.</text>
+        <text x="0" y="120" fill="#57524c" font-size="13">• In case of overcrowding or emergency, reach out to the nearest Kolkata Police May I Help You kiosk.</text>
+      </g>
+    </g>
+
+    <!-- About Initiative Card (y: 686) -->
+    <g transform="translate(0, 686)">
+      <rect width="1152" height="130" rx="18" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+      <g transform="translate(24, 24)">
+        <text x="0" y="18" fill="#b42323" font-size="11" font-weight="700" letter-spacing="0.5">ℹ️ ABOUT THE INITIATIVE</text>
+        <text x="0" y="44" fill="#1a1715" font-size="20" font-weight="800">About PujoPath</text>
+        <text x="0" y="72" fill="#57524c" font-size="13">PujoPath is a non-commercial community initiative built to celebrate Kolkata's Durga Puja. It provides verified pandal information, smart hopping routes, accurate tithi almanac schedules, and public transit navigation.</text>
+      </g>
+    </g>
+  </g>
+
+  
+  <!-- FOOTER LIGHT (y=1262) -->
+  <g id="Footer_Desktop_Light" transform="translate(0, 1262)">
+    <rect width="1440" height="158" fill="#ffffff" fill-opacity="0.85"/>
+    <line x1="0" y1="0" x2="1440" y2="0" stroke="#eee8e1" stroke-width="1"/>
+
+    <g transform="translate(144, 28)">
+      <!-- Row 1: Brand & Mission -->
+      <text x="0" y="22" fill="#b42323" font-size="16" font-weight="800">PujoPath</text>
+      <line x1="72" y1="8" x2="72" y2="26" stroke="#eee8e1" stroke-width="1.5"/>
+      <text x="84" y="22" fill="#1a1715" font-size="14" font-weight="600">Kolkata Durga Puja Companion</text>
+      <text x="0" y="46" fill="#57524c" font-size="13">Explore pandals, plan walking routes, check metro connectivity, and celebrate Bengal.</text>
+
+      <!-- Right: Helpline & About link -->
+      <text x="1152" y="22" fill="#1a1715" font-size="14" font-weight="600" text-anchor="end">Helpline &amp; About</text>
+
+      <!-- Divider line -->
+      <line x1="0" y1="72" x2="1152" y2="72" stroke="#eee8e1" stroke-width="1"/>
+
+      <!-- Row 2: Copyright & Creator Attribution -->
+      <g transform="translate(0, 98)">
+        <text x="0" y="16" fill="#57524c" font-size="13">© 2026 PujoPath. All rights reserved.  •  🌸 Festive Pandal &amp; Dhakis  ⏸ Pause</text>
+        <text x="1152" y="16" fill="#1a1715" font-size="13" font-weight="600" text-anchor="end">Made by Soumik &amp; Moumita with ❤️</text>
+      </g>
+    </g>
+  </g>
+  
+</svg>

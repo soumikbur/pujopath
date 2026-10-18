@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -10,11 +10,15 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Animated,
+  Easing,
+  Pressable,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { Pandal } from '@/types';
 
 interface CustomStopModalProps {
@@ -26,11 +30,60 @@ export const CustomStopModal: React.FC<CustomStopModalProps> = ({ visible, onClo
   const { colors } = useTheme();
   const { t, language } = useLanguage();
   const { addCustomStop } = useRoute();
+  const reduceMotion = useReducedMotion();
 
   const [name, setName] = useState('');
   const [locality, setLocality] = useState('');
   const [address, setAddress] = useState('');
   const [zone, setZone] = useState('North Kolkata');
+
+  const [isRendered, setIsRendered] = useState(visible);
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      setIsRendered(true);
+      if (reduceMotion) {
+        anim.setValue(1);
+      } else {
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: 220,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }).start();
+      }
+    } else if (isRendered) {
+      if (reduceMotion) {
+        anim.setValue(0);
+        setIsRendered(false);
+      } else {
+        Animated.timing(anim, {
+          toValue: 0,
+          duration: 180,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver: true,
+        }).start(() => {
+          setIsRendered(false);
+        });
+      }
+    }
+  }, [visible, reduceMotion]);
+
+  const handleClose = () => {
+    if (reduceMotion) {
+      onClose();
+    } else {
+      Animated.timing(anim, {
+        toValue: 0,
+        duration: 180,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }).start(() => {
+        onClose();
+      });
+    }
+  };
 
   const handleSave = () => {
     if (!name.trim()) {
@@ -63,16 +116,43 @@ export const CustomStopModal: React.FC<CustomStopModalProps> = ({ visible, onClo
     setName('');
     setLocality('');
     setAddress('');
-    onClose();
+    handleClose();
   };
 
+  if (!isRendered && !visible) {
+    return null;
+  }
+
+  const backdropOpacity = anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
+  });
+
+  const translateY = anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [400, 0],
+  });
+
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal visible={isRendered || visible} animationType="none" transparent onRequestClose={handleClose}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.overlay}
       >
-        <View style={[styles.modalBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <Animated.View style={[styles.backdrop, { opacity: backdropOpacity }]}>
+          <Pressable style={styles.backdropPressable} onPress={handleClose} />
+        </Animated.View>
+
+        <Animated.View
+          style={[
+            styles.modalBox,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              transform: [{ translateY }],
+            },
+          ]}
+        >
           <View style={styles.modalHeader}>
             <View style={styles.titleRow}>
               <Ionicons name="location" size={20} color={colors.primary} />
@@ -80,7 +160,7 @@ export const CustomStopModal: React.FC<CustomStopModalProps> = ({ visible, onClo
                 {language === 'bn' ? 'ব্যক্তিগত স্টপ যোগ করুন' : 'Add Personal Stop'}
               </Text>
             </View>
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+            <TouchableOpacity onPress={handleClose} style={styles.closeBtn} activeOpacity={0.7}>
               <Ionicons name="close" size={22} color={colors.textMuted} />
             </TouchableOpacity>
           </View>
@@ -130,7 +210,8 @@ export const CustomStopModal: React.FC<CustomStopModalProps> = ({ visible, onClo
 
           <View style={styles.btnRow}>
             <TouchableOpacity
-              onPress={onClose}
+              onPress={handleClose}
+              activeOpacity={0.75}
               style={[styles.cancelBtn, { borderColor: colors.border }]}
             >
               <Text style={[styles.cancelBtnText, { color: colors.textMuted }]}>
@@ -140,6 +221,7 @@ export const CustomStopModal: React.FC<CustomStopModalProps> = ({ visible, onClo
 
             <TouchableOpacity
               onPress={handleSave}
+              activeOpacity={0.8}
               style={[styles.saveBtn, { backgroundColor: colors.primary }]}
             >
               <Text style={styles.saveBtnText}>
@@ -147,7 +229,7 @@ export const CustomStopModal: React.FC<CustomStopModalProps> = ({ visible, onClo
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -156,8 +238,15 @@ export const CustomStopModal: React.FC<CustomStopModalProps> = ({ visible, onClo
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
+    position: 'relative',
+  },
+  backdrop: {
+    ...(StyleSheet.absoluteFill as object),
+    backgroundColor: 'rgba(0,0,0,0.55)',
+  },
+  backdropPressable: {
+    flex: 1,
   },
   modalBox: {
     borderTopLeftRadius: 20,

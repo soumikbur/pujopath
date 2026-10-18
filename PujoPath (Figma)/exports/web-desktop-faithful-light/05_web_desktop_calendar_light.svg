@@ -1,0 +1,341 @@
+
+<svg width="1440" height="1720" viewBox="0 0 1440 1720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;family=Inter:wght@400;500;600;700;800;900&amp;display=swap');
+      text { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+      .bengali { font-family: 'Hind Siliguri', 'Inter', sans-serif; }
+    </style>
+    <radialGradient id="vignetteLight" cx="50%" cy="25%" r="70%">
+      <stop offset="0%" stop-color="#fcfaf7" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#fcfaf7" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#fcfaf7" stop-opacity="0.96"/>
+    </radialGradient>
+    <linearGradient id="cardGradLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#faf8f5"/>
+    </linearGradient>
+    <linearGradient id="redBannerGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#961c1c"/>
+      <stop offset="100%" stop-color="#4a1212"/>
+    </linearGradient>
+    <filter id="softShadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#4a3b32" flood-opacity="0.05"/>
+    </filter>
+  </defs>
+
+  
+  <!-- BACKGROUND LIGHT WITH WARM CREAM -->
+  <g id="Page_Background_Light">
+    <rect width="1440" height="1720" fill="#fcfaf7"/>
+  </g>
+  
+  
+  <!-- HEADER LIGHT (Height: 65px) -->
+  <g id="Header_Desktop_Light">
+    <rect width="1440" height="65" fill="#ffffff" fill-opacity="0.88"/>
+    <line x1="0" y1="65" x2="1440" y2="65" stroke="#eee8e1" stroke-width="1"/>
+
+    <g transform="translate(144, 0)">
+      <!-- Logo -->
+      <text x="0" y="41" fill="#b42323" font-size="20" font-weight="800" letter-spacing="-0.3">PujoPath</text>
+      
+      <!-- Nav items -->
+      
+      <g transform="translate(340, 13)">
+        <rect width="78" height="38" rx="12" fill="transparent"/>
+        <text x="39" y="24" fill="#57524c" font-size="14" font-weight="700" text-anchor="middle">Explore</text>
+      </g>
+    
+      <g transform="translate(426, 13)">
+        <rect width="78" height="38" rx="12" fill="transparent"/>
+        <text x="39" y="24" fill="#57524c" font-size="14" font-weight="700" text-anchor="middle">Map</text>
+      </g>
+    
+      <g transform="translate(512, 13)">
+        <rect width="78" height="38" rx="12" fill="transparent"/>
+        <text x="39" y="24" fill="#57524c" font-size="14" font-weight="700" text-anchor="middle">Plan</text>
+      </g>
+    
+      <g transform="translate(598, 13)">
+        <rect width="78" height="38" rx="12" fill="#f5efe6"/>
+        <text x="39" y="24" fill="#1a1715" font-size="14" font-weight="700" text-anchor="middle">More ⌵</text>
+      </g>
+    
+
+      <!-- Right Actions: Install App, Mode, Lang, Saved -->
+      <g transform="translate(740, 13)">
+        <!-- Install App -->
+        <g id="Btn_Install_App">
+          <rect width="124" height="38" rx="12" fill="#b42323"/>
+          <text x="22" y="24" fill="#ffffff" font-size="14">📥</text>
+          <text x="44" y="24" fill="#ffffff" font-size="14" font-weight="700">Install App</text>
+        </g>
+        <!-- Theme Toggle (Moon icon in light mode) -->
+        <g id="Btn_Theme_Toggle" transform="translate(136, 0)">
+          <rect width="38" height="38" rx="12" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="19" y="24" fill="#57524c" font-size="15" text-anchor="middle">🌙</text>
+        </g>
+        <!-- Lang Pill -->
+        <g id="Pill_Lang_Toggle" transform="translate(186, 0)">
+          <rect width="88" height="38" rx="12" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <!-- Active EN -->
+          <rect x="4" y="4" width="38" height="30" rx="8" fill="#b42323"/>
+          <text x="23" y="23" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">EN</text>
+          <!-- Inactive বাংলা -->
+          <text x="63" y="23" fill="#57524c" font-size="12" font-weight="700" text-anchor="middle" class="bengali">বাংলা</text>
+        </g>
+        <!-- Saved Heart -->
+        <g id="Btn_Saved_Trails" transform="translate(286, 0)">
+          <rect width="38" height="38" rx="12" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="19" y="24" fill="#57524c" font-size="15" text-anchor="middle">♡</text>
+        </g>
+      </g>
+    </g>
+  </g>
+  
+
+  <g transform="translate(144, 88)">
+    <!-- Label & Title -->
+    <text x="0" y="20" fill="#b42323" font-size="12" font-weight="700" letter-spacing="1">📅 PUJA ALMANAC</text>
+    <text x="0" y="54" fill="#1a1715" font-size="34" font-weight="800">Durga Puja 2026 Sacred Calendar</text>
+    <text x="0" y="82" fill="#57524c" font-size="14">Exact tithi schedules, pushpanjali auspicious timings, and sandhi puja hours.</text>
+
+    <!-- SANDHI PUJA AUSPICIOUS CALCULATOR CARD (w: 1152, h: 460) -->
+    <g id="Sandhi_Puja_Calculator_Light" transform="translate(0, 108)">
+      <rect width="1152" height="460" rx="24" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+
+      <!-- Header row inside card -->
+      <g transform="translate(36, 32)">
+        <circle cx="20" cy="20" r="20" fill="#feeceb"/>
+        <text x="20" y="26" fill="#b42323" font-size="16" text-anchor="middle">🔥</text>
+        <text x="52" y="28" fill="#1a1715" font-size="22" font-weight="800">Sandhi Puja Auspicious Timings</text>
+        
+        <rect x="360" y="10" width="190" height="26" rx="8" fill="#feeceb"/>
+        <text x="455" y="27" fill="#b42323" font-size="10" font-weight="700" text-anchor="middle">SACRED SANDHI WINDOW 2026</text>
+
+        <rect x="560" y="10" width="140" height="26" rx="8" fill="#fef3c7"/>
+        <text x="630" y="27" fill="#b45309" font-size="10" font-weight="700" text-anchor="middle">108 Lotuses &amp; Lamps</text>
+
+        <rect x="880" y="8" width="200" height="30" rx="8" fill="#ffffff" stroke="#e5e0d8" stroke-width="1"/>
+        <text x="980" y="28" fill="#b42323" font-size="11" font-weight="700" text-anchor="middle">48 mins (07:26 AM - 08:14 AM)</text>
+      </g>
+
+      <!-- 3 Panjika Conventions -->
+      <g transform="translate(36, 96)">
+        <text x="0" y="16" fill="#736c65" font-size="11" font-weight="700" letter-spacing="0.5">SELECT ALMANAC / PANJIKA CONVENTION:</text>
+
+        <!-- Convention 1 (Active) -->
+        <g transform="translate(0, 28)">
+          <rect width="344" height="76" rx="14" fill="#fef2f2" stroke="#b42323" stroke-width="1.5"/>
+          <text x="16" y="28" fill="#1a1715" font-size="13" font-weight="700">Bengali Almanac 1433 (বিশুদ্ধ সিদ্ধান্ত)</text>
+          <text x="16" y="48" fill="#b42323" font-size="12" font-weight="700">07:26 AM – 08:14 AM IST</text>
+          <text x="320" y="42" fill="#b42323" font-size="16" text-anchor="end">✓</text>
+        </g>
+
+        <!-- Convention 2 -->
+        <g transform="translate(364, 28)">
+          <rect width="344" height="76" rx="14" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="16" y="28" fill="#1a1715" font-size="13" font-weight="700">Drik Panchang (Modern Ephemeris)</text>
+          <text x="16" y="48" fill="#736c65" font-size="12">10:27 AM – 11:15 AM IST</text>
+        </g>
+
+        <!-- Convention 3 -->
+        <g transform="translate(728, 28)">
+          <rect width="344" height="76" rx="14" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+          <text x="16" y="28" fill="#1a1715" font-size="13" font-weight="700">Surya Siddhanta (Traditional)</text>
+          <text x="16" y="48" fill="#736c65" font-size="12">06:21 PM – 07:09 PM IST (Eve)</text>
+        </g>
+      </g>
+
+      <!-- 3 Metric Boxes -->
+      <g transform="translate(36, 226)">
+        <!-- Metric 1: Window -->
+        <g transform="translate(0, 0)">
+          <rect width="344" height="90" rx="14" fill="#fdfbf7" stroke="#eee8e1" stroke-width="1"/>
+          <text x="16" y="26" fill="#736c65" font-size="11" font-weight="700">FESTIVAL &amp; DATE</text>
+          <text x="16" y="52" fill="#1a1715" font-size="17" font-weight="800">Sandhi Puja (সন্ধিপূজা)</text>
+          <text x="16" y="74" fill="#736c65" font-size="12">Monday, 19 October 2026</text>
+        </g>
+
+        <!-- Metric 2: Balidan -->
+        <g transform="translate(364, 0)">
+          <rect width="344" height="90" rx="14" fill="#fdfbf7" stroke="#eee8e1" stroke-width="1"/>
+          <text x="16" y="26" fill="#736c65" font-size="11" font-weight="700">SANDHI PUJA WINDOW (IST)</text>
+          <text x="16" y="52" fill="#b42323" font-size="17" font-weight="800">07:26 AM – 08:14 AM</text>
+          <text x="16" y="74" fill="#736c65" font-size="12">Indian Standard Time (IST)</text>
+        </g>
+
+        <!-- Metric 3: Total Duration -->
+        <g transform="translate(728, 0)">
+          <rect width="344" height="90" rx="14" fill="#fdfbf7" stroke="#eee8e1" stroke-width="1"/>
+          <text x="16" y="26" fill="#736c65" font-size="11" font-weight="700">TOTAL DURATION</text>
+          <text x="16" y="52" fill="#b45309" font-size="17" font-weight="800">48 minutes (2 Dandas)</text>
+          <text x="16" y="74" fill="#736c65" font-size="12">Last 24m Ashtami + First 24m Navami</text>
+        </g>
+      </g>
+
+      <!-- Bottom Amber Disclaimer Notice -->
+      <g transform="translate(36, 334)">
+        <rect width="1072" height="48" rx="10" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
+        <text x="20" y="29" fill="#92400e" font-size="12">⚠️ Almanac Note: Official reference timetable (১৪৩৩ সালের পঞ্জিকা). Sandhi Puja begins at 07:26 AM, Balidan at 07:50 AM, ends at 08:14 AM on Monday, 19 October 2026.</text>
+      </g>
+
+      <g transform="translate(36, 400)">
+        <text x="0" y="16" fill="#736c65" font-size="12">Calculated for: <tspan fill="#1a1715" font-weight="700">Kolkata, West Bengal (22.5726° N, 88.3639° E)</tspan></text>
+        <text x="1072" y="16" fill="#b42323" font-size="12" font-weight="700" text-anchor="end">View Verified Almanac Source ↗</text>
+      </g>
+    </g>
+
+    <!-- 7 FESTIVAL DAYS LIST (y: 596) -->
+    <g transform="translate(0, 596)">
+      <text x="0" y="24" fill="#1a1715" font-size="20" font-weight="800">Complete Festive Itinerary &amp; Tithi Calendar</text>
+      <text x="0" y="46" fill="#736c65" font-size="13">Detailed daily schedule for every day of Durga Puja 2026.</text>
+
+      <g transform="translate(0, 68)">
+        
+      <g transform="translate(0, 0)">
+        <rect width="1152" height="92" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <!-- Date pill -->
+        <rect x="20" y="16" width="160" height="28" rx="8" fill="#feeceb"/>
+        <text x="100" y="35" fill="#b42323" font-size="11" font-weight="700" text-anchor="middle">Saturday</text>
+        
+        <!-- Day Info -->
+        <text x="200" y="36" fill="#1a1715" font-size="16" font-weight="800">Maha Sasthi (মহা ষষ্ঠী)</text>
+        <text x="200" y="60" fill="#736c65" font-size="12">⏰ Sasthi Tithi starts: 09:12 AM • Ends: 10:48 AM</text>
+        <text x="200" y="76" fill="#57524c" font-size="12">🌸 Bodhon, Amantran, Adhibas & Kalparambha</text>
+
+        <!-- Right Calendar Icon -->
+        <circle cx="1110" cy="46" r="18" fill="#fdfbf7" stroke="#eee8e1" stroke-width="1"/>
+        <text x="1110" y="52" fill="#736c65" font-size="14" text-anchor="middle">📅</text>
+      </g>
+    
+      <g transform="translate(0, 104)">
+        <rect width="1152" height="92" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <!-- Date pill -->
+        <rect x="20" y="16" width="160" height="28" rx="8" fill="#feeceb"/>
+        <text x="100" y="35" fill="#b42323" font-size="11" font-weight="700" text-anchor="middle">Sunday</text>
+        
+        <!-- Day Info -->
+        <text x="200" y="36" fill="#1a1715" font-size="16" font-weight="800">Maha Saptami (মহা সপ্তমী)</text>
+        <text x="200" y="60" fill="#736c65" font-size="12">⏰ Saptami Tithi starts: 10:48 AM • Ends: 11:52 AM</text>
+        <text x="200" y="76" fill="#57524c" font-size="12">🌸 Nabapatrika Pravesh (Kola Bou Snan) & Saptami Puja</text>
+
+        <!-- Right Calendar Icon -->
+        <circle cx="1110" cy="46" r="18" fill="#fdfbf7" stroke="#eee8e1" stroke-width="1"/>
+        <text x="1110" y="52" fill="#736c65" font-size="14" text-anchor="middle">📅</text>
+      </g>
+    
+      <g transform="translate(0, 208)">
+        <rect width="1152" height="92" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <!-- Date pill -->
+        <rect x="20" y="16" width="160" height="28" rx="8" fill="#feeceb"/>
+        <text x="100" y="35" fill="#b42323" font-size="11" font-weight="700" text-anchor="middle">Monday</text>
+        
+        <!-- Day Info -->
+        <text x="200" y="36" fill="#1a1715" font-size="16" font-weight="800">Maha Astami (মহা অষ্টমী)</text>
+        <text x="200" y="60" fill="#736c65" font-size="12">⏰ Astami Tithi starts: 11:52 AM • Ends: 12:28 PM</text>
+        <text x="200" y="76" fill="#57524c" font-size="12">🌸 Astami Puja, Pushpanjali, Kumari Puja & Sandhi Puja (07:26 AM)</text>
+
+        <!-- Right Calendar Icon -->
+        <circle cx="1110" cy="46" r="18" fill="#fdfbf7" stroke="#eee8e1" stroke-width="1"/>
+        <text x="1110" y="52" fill="#736c65" font-size="14" text-anchor="middle">📅</text>
+      </g>
+    
+      <g transform="translate(0, 312)">
+        <rect width="1152" height="92" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <!-- Date pill -->
+        <rect x="20" y="16" width="160" height="28" rx="8" fill="#feeceb"/>
+        <text x="100" y="35" fill="#b42323" font-size="11" font-weight="700" text-anchor="middle">Tuesday</text>
+        
+        <!-- Day Info -->
+        <text x="200" y="36" fill="#1a1715" font-size="16" font-weight="800">Maha Navami (মহা নবমী)</text>
+        <text x="200" y="60" fill="#736c65" font-size="12">⏰ Navami Tithi starts: 12:28 PM • Ends: 01:04 PM</text>
+        <text x="200" y="76" fill="#57524c" font-size="12">🌸 Maha Navami Bhog, Homa (Sacrificial Fire) & Dhunuchi Naach</text>
+
+        <!-- Right Calendar Icon -->
+        <circle cx="1110" cy="46" r="18" fill="#fdfbf7" stroke="#eee8e1" stroke-width="1"/>
+        <text x="1110" y="52" fill="#736c65" font-size="14" text-anchor="middle">📅</text>
+      </g>
+    
+      <g transform="translate(0, 416)">
+        <rect width="1152" height="92" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <!-- Date pill -->
+        <rect x="20" y="16" width="160" height="28" rx="8" fill="#feeceb"/>
+        <text x="100" y="35" fill="#b42323" font-size="11" font-weight="700" text-anchor="middle">Wednesday</text>
+        
+        <!-- Day Info -->
+        <text x="200" y="36" fill="#1a1715" font-size="16" font-weight="800">Bijoya Dashami (বিজয়া দশমী)</text>
+        <text x="200" y="60" fill="#736c65" font-size="12">⏰ Dashami Tithi starts: 01:04 PM • Ends: 02:18 PM</text>
+        <text x="200" y="76" fill="#57524c" font-size="12">🌸 Devi Baran, Sindoor Khela, Bisorjon & Shubho Bijoya Shubhechha</text>
+
+        <!-- Right Calendar Icon -->
+        <circle cx="1110" cy="46" r="18" fill="#fdfbf7" stroke="#eee8e1" stroke-width="1"/>
+        <text x="1110" y="52" fill="#736c65" font-size="14" text-anchor="middle">📅</text>
+      </g>
+    
+      <g transform="translate(0, 520)">
+        <rect width="1152" height="92" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <!-- Date pill -->
+        <rect x="20" y="16" width="160" height="28" rx="8" fill="#feeceb"/>
+        <text x="100" y="35" fill="#b42323" font-size="11" font-weight="700" text-anchor="middle">Saturday</text>
+        
+        <!-- Day Info -->
+        <text x="200" y="36" fill="#1a1715" font-size="16" font-weight="800">Kojagari Lakshmi Puja (লক্ষ্মী পূজা)</text>
+        <text x="200" y="60" fill="#736c65" font-size="12">⏰ Purnima Tithi: 03:40 PM onwards</text>
+        <text x="200" y="76" fill="#57524c" font-size="12">🌸 Household and Pandal Devi Lakshmi Aradhana on Sharad Purnima</text>
+
+        <!-- Right Calendar Icon -->
+        <circle cx="1110" cy="46" r="18" fill="#fdfbf7" stroke="#eee8e1" stroke-width="1"/>
+        <text x="1110" y="52" fill="#736c65" font-size="14" text-anchor="middle">📅</text>
+      </g>
+    
+      <g transform="translate(0, 624)">
+        <rect width="1152" height="92" rx="16" fill="#ffffff" stroke="#eee8e1" stroke-width="1"/>
+        <!-- Date pill -->
+        <rect x="20" y="16" width="160" height="28" rx="8" fill="#feeceb"/>
+        <text x="100" y="35" fill="#b42323" font-size="11" font-weight="700" text-anchor="middle">Thursday</text>
+        
+        <!-- Day Info -->
+        <text x="200" y="36" fill="#1a1715" font-size="16" font-weight="800">Kali Puja & Diwali (কালী পূজা ও দীপাবলি)</text>
+        <text x="200" y="60" fill="#736c65" font-size="12">⏰ Amavasya Tithi: 04:12 PM onwards</text>
+        <text x="200" y="76" fill="#57524c" font-size="12">🌸 Maa Shyama Puja during midnight auspicious hours & Deepavali</text>
+
+        <!-- Right Calendar Icon -->
+        <circle cx="1110" cy="46" r="18" fill="#fdfbf7" stroke="#eee8e1" stroke-width="1"/>
+        <text x="1110" y="52" fill="#736c65" font-size="14" text-anchor="middle">📅</text>
+      </g>
+    
+      </g>
+    </g>
+  </g>
+
+  
+  <!-- FOOTER LIGHT (y=1562) -->
+  <g id="Footer_Desktop_Light" transform="translate(0, 1562)">
+    <rect width="1440" height="158" fill="#ffffff" fill-opacity="0.85"/>
+    <line x1="0" y1="0" x2="1440" y2="0" stroke="#eee8e1" stroke-width="1"/>
+
+    <g transform="translate(144, 28)">
+      <!-- Row 1: Brand & Mission -->
+      <text x="0" y="22" fill="#b42323" font-size="16" font-weight="800">PujoPath</text>
+      <line x1="72" y1="8" x2="72" y2="26" stroke="#eee8e1" stroke-width="1.5"/>
+      <text x="84" y="22" fill="#1a1715" font-size="14" font-weight="600">Kolkata Durga Puja Companion</text>
+      <text x="0" y="46" fill="#57524c" font-size="13">Explore pandals, plan walking routes, check metro connectivity, and celebrate Bengal.</text>
+
+      <!-- Right: Helpline & About link -->
+      <text x="1152" y="22" fill="#1a1715" font-size="14" font-weight="600" text-anchor="end">Helpline &amp; About</text>
+
+      <!-- Divider line -->
+      <line x1="0" y1="72" x2="1152" y2="72" stroke="#eee8e1" stroke-width="1"/>
+
+      <!-- Row 2: Copyright & Creator Attribution -->
+      <g transform="translate(0, 98)">
+        <text x="0" y="16" fill="#57524c" font-size="13">© 2026 PujoPath. All rights reserved.  •  🌸 Festive Pandal &amp; Dhakis  ⏸ Pause</text>
+        <text x="1152" y="16" fill="#1a1715" font-size="13" font-weight="600" text-anchor="end">Made by Soumik &amp; Moumita with ❤️</text>
+      </g>
+    </g>
+  </g>
+  
+</svg>
