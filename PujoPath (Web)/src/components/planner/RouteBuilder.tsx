@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
-import { PANDALS_DATA } from '@/data/pandals';
+import { PANDALS_DATA, KALI_PANDALS_DATA } from '@/data/pandals';
 import { METRO_STATIONS_DATA } from '@/data/metro';
 import { calculateHaversineDistance, estimateWalkingMinutes, formatDistance, toBengaliDigits } from '@/lib/geo';
 import {
@@ -214,11 +214,20 @@ export function RouteBuilder() {
 
   // Filtered available pandals for Route Planner Explorer / Quick-Add (merging static and custom pandals)
   const availablePandals = useMemo(() => {
-    const all = [...PANDALS_DATA, ...customPandals];
+    const all = [...PANDALS_DATA, ...KALI_PANDALS_DATA, ...customPandals];
     let list = all.filter((p) => !currentRouteStops.some((s) => s.pandalId === p.id));
 
     if (quickAddCategory === 'bonedi-bari') {
       list = list.filter((p) => p.isBonediBari || p.category === 'Bonedi Bari');
+    } else if (quickAddCategory === 'barasat') {
+      list = list.filter(
+        (p) =>
+          p.zone === ('Barasat' as any) ||
+          p.zone === ('Madhyamgram' as any) ||
+          p.zone === ('North 24 Parganas' as any) ||
+          (p as any).category === 'Barasat Kali' ||
+          (p as any).festival === 'kali'
+      );
     } else if (quickAddCategory === 'north') {
       list = list.filter((p) => p.zone === 'North Kolkata');
     } else if (quickAddCategory === 'south') {
@@ -795,6 +804,7 @@ export function RouteBuilder() {
                 label: isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari',
                 badge: isBn ? toBengaliDigits(totalBonediCount) : String(totalBonediCount),
               },
+              { id: 'barasat', label: isBn ? '🪔 বারাসাত ও কালী' : '🪔 Barasat & Kali' },
               { id: 'north', label: isBn ? 'উত্তর কলকাতা' : 'North' },
               { id: 'south', label: isBn ? 'দক্ষিণ কলকাতা' : 'South' },
               { id: 'central', label: isBn ? 'মধ্য কলকাতা' : 'Central' },

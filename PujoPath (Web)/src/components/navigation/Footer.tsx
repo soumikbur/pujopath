@@ -45,6 +45,9 @@ export function Footer() {
 
           {/* Essential Helpline, Kali Puja & Contact Links */}
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-xs font-medium text-[#776d65] dark:text-[#a89e95]">
+            <Link href="/select-puja" className="hover:text-[#b42323] dark:hover:text-[#e05656] transition-colors font-bold text-[#b42323] dark:text-[#e05656]">
+              {isBn ? 'পূজা নির্বাচন' : 'Puja Selection'}
+            </Link>
             <Link href="/kali-puja" className="hover:text-[#b42323] dark:hover:text-[#e05656] transition-colors">
               {isBn ? 'শ্যামাপূজা ও বারাসাত' : 'Kali Puja & Barasat'}
             </Link>

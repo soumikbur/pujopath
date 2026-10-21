@@ -36,10 +36,13 @@ const PujoMap = dynamic(() => import('@/components/map/PujoMap'), {
   ),
 });
 
+import { useFestival } from '@/lib/context/FestivalContext';
+
 export default function MapPage() {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
   const { customPandals } = useFavorites();
+  const { activeFestival, selectFestival, isKali } = useFestival();
 
   const [selectedFilter, setSelectedFilter] = useState<LocalityZone | 'All' | 'Bonedi Bari'>('All');
   const [selectedPandal, setSelectedPandal] = useState<Pandal | null>(null);
@@ -48,29 +51,61 @@ export default function MapPage() {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [isLocating, setIsLocating] = useState(false);
 
-  // Map camera state
-  const [mapCenter, setMapCenter] = useState<[number, number]>([22.5726, 88.3639]); // Default Kolkata
-  const [mapZoom, setMapZoom] = useState<number>(12);
+  // Map camera state - initialized based on active festival
+  const [mapCenter, setMapCenter] = useState<[number, number]>(
+    isKali ? [22.7245, 88.4745] : [22.5726, 88.3639]
+  );
+  const [mapZoom, setMapZoom] = useState<number>(isKali ? 13 : 12);
+
+  // Update center when festival changes
+  useEffect(() => {
+    if (isKali) {
+      setMapCenter([22.7245, 88.4745]);
+      setMapZoom(13);
+      setSelectedFilter('Barasat' as any);
+    } else {
+      setMapCenter([22.5726, 88.3639]);
+      setMapZoom(12);
+      setSelectedFilter('All');
+    }
+  }, [isKali]);
 
   // Combine Durga pandals, verified Barasat/Kali pandals, and user custom saved pandals
   const allAvailablePandals = useMemo(() => {
+    if (isKali) {
+      return [...KALI_PANDALS_DATA, ...customPandals];
+    }
     return [...PANDALS_DATA, ...KALI_PANDALS_DATA, ...customPandals];
-  }, [customPandals]);
+  }, [isKali, customPandals]);
 
-  const filterOptions: { value: LocalityZone | 'All' | 'Bonedi Bari'; label: string; isSpecial?: boolean }[] = [
-    { value: 'All', label: isBn ? 'সব এলাকা' : 'All' },
-    { value: 'Bonedi Bari', label: isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari', isSpecial: true },
-    { value: 'Barasat' as any, label: isBn ? 'বারাসাত' : 'Barasat' },
-    { value: 'Madhyamgram' as any, label: isBn ? 'মধ্যমগ্রাম' : 'Madhyamgram' },
-    { value: 'North 24 Parganas' as any, label: isBn ? 'উত্তর ২৪ পরগনা' : 'North 24 Pgs' },
-    { value: 'North Kolkata', label: isBn ? 'উত্তর কলকাতা' : 'North Kolkata' },
-    { value: 'South Kolkata', label: isBn ? 'দক্ষিণ কলকাতা' : 'South Kolkata' },
-    { value: 'Central Kolkata', label: isBn ? 'মধ্য কলকাতা' : 'Central Kolkata' },
-    { value: 'Salt Lake', label: isBn ? 'সল্টলেক' : 'Salt Lake' },
-    { value: 'Dum Dum', label: isBn ? 'দমদম' : 'Dum Dum' },
-    { value: 'Behala', label: isBn ? 'বেহালা' : 'Behala' },
-    { value: 'Howrah', label: isBn ? 'হাওড়া' : 'Howrah' },
-  ];
+  const filterOptions: { value: LocalityZone | 'All' | 'Bonedi Bari'; label: string; isSpecial?: boolean }[] = useMemo(() => {
+    if (isKali) {
+      return [
+        { value: 'All', label: isBn ? 'সকল কালী মণ্ডপ' : 'All Kali Pandals' },
+        { value: 'Barasat' as any, label: isBn ? 'বারাসাত প্রধান' : 'Barasat Central' },
+        { value: 'Madhyamgram' as any, label: isBn ? 'মধ্যমগ্রাম' : 'Madhyamgram' },
+        { value: 'North 24 Parganas' as any, label: isBn ? 'উত্তর ২৪ পরগনা' : 'North 24 Pgs' },
+        { value: 'North Kolkata', label: isBn ? 'উত্তর কলকাতা' : 'North Kolkata' },
+        { value: 'South Kolkata', label: isBn ? 'দক্ষিণ কলকাতা' : 'South Kolkata' },
+        { value: 'Central Kolkata', label: isBn ? 'মধ্য কলকাতা' : 'Central Kolkata' },
+        { value: 'Howrah', label: isBn ? 'হাওড়া' : 'Howrah' },
+      ];
+    }
+    return [
+      { value: 'All', label: isBn ? 'সব এলাকা' : 'All' },
+      { value: 'Bonedi Bari', label: isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari', isSpecial: true },
+      { value: 'Barasat' as any, label: isBn ? 'বারাসাত' : 'Barasat' },
+      { value: 'Madhyamgram' as any, label: isBn ? 'মধ্যমগ্রাম' : 'Madhyamgram' },
+      { value: 'North 24 Parganas' as any, label: isBn ? 'উত্তর ২৪ পরগনা' : 'North 24 Pgs' },
+      { value: 'North Kolkata', label: isBn ? 'উত্তর কলকাতা' : 'North Kolkata' },
+      { value: 'South Kolkata', label: isBn ? 'দক্ষিণ কলকাতা' : 'South Kolkata' },
+      { value: 'Central Kolkata', label: isBn ? 'মধ্য কলকাতা' : 'Central Kolkata' },
+      { value: 'Salt Lake', label: isBn ? 'সল্টলেক' : 'Salt Lake' },
+      { value: 'Dum Dum', label: isBn ? 'দমদম' : 'Dum Dum' },
+      { value: 'Behala', label: isBn ? 'বেহালা' : 'Behala' },
+      { value: 'Howrah', label: isBn ? 'হাওড়া' : 'Howrah' },
+    ];
+  }, [isKali, isBn]);
 
   // Auto-center camera when user selects Barasat or specific zone
   const handleSelectFilter = (zone: LocalityZone | 'All' | 'Bonedi Bari') => {
@@ -85,8 +120,13 @@ export default function MapPage() {
       setMapCenter([22.518, 88.355]);
       setMapZoom(13);
     } else if (zone === 'All') {
-      setMapCenter([22.5726, 88.3639]);
-      setMapZoom(12);
+      if (isKali) {
+        setMapCenter([22.7245, 88.4745]);
+        setMapZoom(13);
+      } else {
+        setMapCenter([22.5726, 88.3639]);
+        setMapZoom(12);
+      }
     }
   };
 
@@ -177,35 +217,49 @@ export default function MapPage() {
           : 'space-y-3 sm:space-y-4 max-w-7xl mx-auto h-[calc(100dvh-13.5rem)] sm:h-[calc(100vh-12rem)] min-h-[380px] pb-2 sm:pb-4'
       )}
     >
-      {/* Zone Switcher & Metro Toggle Bar (Hidden in Fullscreen to maximize view area) */}
+      {/* Festival Switcher Bar (Hidden in Fullscreen to maximize view area) */}
       {!isFullscreen && (
-        <div className="flex items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-            {filterOptions.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => handleSelectFilter(opt.value)}
-                className={cn(
-                  'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-150 border shadow-xs active:scale-95',
-                  selectedFilter === opt.value
-                    ? opt.isSpecial
-                      ? 'bg-[#800020] text-amber-200 border-[#800020]'
-                      : opt.value === ('Barasat' as any) || opt.value === ('Madhyamgram' as any)
-                      ? 'bg-orange-600 text-white border-orange-600'
-                      : 'bg-[#b42323] text-white border-[#b42323]'
-                    : opt.isSpecial
-                    ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border-amber-200 dark:border-amber-800 hover:border-[#800020]'
-                    : opt.value === ('Barasat' as any)
-                    ? 'bg-orange-50 dark:bg-orange-950/40 text-orange-800 dark:text-orange-300 border-orange-200 dark:border-orange-900/50 hover:border-orange-500'
-                    : 'bg-white dark:bg-[#1a1613] border-[#eee8e1] dark:border-[#2f2720] text-[#625b55] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white hover:border-[#b42323]/40'
-                )}
-              >
-                {opt.label}
-              </button>
-            ))}
+        <div className="flex items-center justify-between gap-3 shrink-0 flex-wrap">
+          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#f4ede4] dark:bg-[#201c18] border border-[#eee8e1] dark:border-[#2f2720]">
+            <button
+              type="button"
+              onClick={() => {
+                selectFestival('durga');
+                setMapCenter([22.5726, 88.3639]);
+                setMapZoom(12);
+                setSelectedFilter('All');
+              }}
+              className={cn(
+                'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all cursor-pointer',
+                !isKali
+                  ? 'bg-[#b42323] text-white shadow-xs'
+                  : 'text-[#625b55] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white'
+              )}
+            >
+              <span>🌸</span>
+              <span>{isBn ? 'দুর্গাপূজা মানচিত্র' : 'Durga Puja Map'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                selectFestival('kali');
+                setMapCenter([22.7245, 88.4745]);
+                setMapZoom(13);
+                setSelectedFilter('Barasat' as any);
+              }}
+              className={cn(
+                'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all cursor-pointer',
+                isKali
+                  ? 'bg-purple-700 text-white shadow-xs'
+                  : 'text-[#625b55] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white'
+              )}
+            >
+              <span>🪔</span>
+              <span>{isBn ? 'বারাসাত ও শ্যামাপূজা' : 'Barasat & Kali Map'}</span>
+            </button>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setShowMetro(!showMetro)}
               className={cn(
@@ -228,6 +282,34 @@ export default function MapPage() {
               <Maximize2 className="w-4 h-4" />
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Locality Zone Filter Bar */}
+      {!isFullscreen && (
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar shrink-0">
+          {filterOptions.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => handleSelectFilter(opt.value)}
+              className={cn(
+                'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-150 border shadow-xs active:scale-95',
+                selectedFilter === opt.value
+                  ? opt.isSpecial
+                    ? 'bg-[#800020] text-amber-200 border-[#800020]'
+                    : opt.value === ('Barasat' as any) || opt.value === ('Madhyamgram' as any)
+                    ? 'bg-purple-700 text-white border-purple-700'
+                    : 'bg-[#b42323] text-white border-[#b42323]'
+                  : opt.isSpecial
+                  ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border-amber-200 dark:border-amber-800 hover:border-[#800020]'
+                  : opt.value === ('Barasat' as any)
+                  ? 'bg-purple-50 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-900/50 hover:border-purple-500'
+                  : 'bg-white dark:bg-[#1a1613] border-[#eee8e1] dark:border-[#2f2720] text-[#625b55] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white hover:border-[#b42323]/40'
+              )}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
       )}
 

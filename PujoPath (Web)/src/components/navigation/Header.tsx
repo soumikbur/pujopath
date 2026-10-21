@@ -25,6 +25,7 @@ import { useFavorites } from '@/lib/context/FavoritesContext';
 import { useNotifications } from '@/lib/context/NotificationContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useTheme } from '@/lib/context/ThemeContext';
+import { useFestival } from '@/lib/context/FestivalContext';
 import { cn } from '@/lib/utils/cn';
 
 export function Header() {
@@ -33,6 +34,7 @@ export function Header() {
   const { theme, toggleTheme } = useTheme();
   const { savedPandalIds } = useFavorites();
   const { unreadCount } = useNotifications();
+  const { activeFestival, isKali } = useFestival();
   const [moreOpen, setMoreOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isBn = locale === 'bn';
@@ -65,12 +67,14 @@ export function Header() {
   }, [pathname]);
 
   const primaryLinks = [
+    { href: '/select-puja', label: isBn ? 'পূজা নির্বাচন' : 'Puja Selection' },
     { href: '/explore', label: isBn ? 'অন্বেষণ' : 'Explore' },
     { href: '/map', label: isBn ? 'মানচিত্র' : 'Map' },
     { href: '/planner', label: isBn ? 'রুট' : 'Plan' },
   ];
 
   const secondaryLinks = [
+    { href: '/select-puja', label: isBn ? 'উৎসব নির্বাচন' : 'Puja Selection', icon: Sparkles },
     { href: '/kali-puja', label: isBn ? 'শ্যামাপূজা ও বারাসাত' : 'Kali Puja & Barasat', icon: Flame },
     { href: '/notifications', label: isBn ? 'বিজ্ঞপ্তি' : 'Notifications', icon: Bell },
     { href: '/helpline', label: isBn ? 'জরুরি হেল্পলাইন' : 'Helpline', icon: Phone },
@@ -88,14 +92,30 @@ export function Header() {
   return (
     <header className="sticky top-0 z-[1100] border-b border-[#eee8e1] dark:border-[#2a241f] bg-[#fcfaf7]/98 dark:bg-[#14110e]/98 backdrop-blur-md transition-colors duration-200 pt-[env(safe-area-inset-top,0px)]">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
-        {/* Brand Logo */}
-        <Link
-          href="/"
-          className="flex items-center text-xl font-extrabold tracking-tight text-[#b42323] transition-transform active:scale-95"
-          aria-label="PujoPath home"
-        >
-          <span>PujoPath</span>
-        </Link>
+        {/* Brand Logo & Active Festival Pill */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/"
+            className="flex items-center text-xl font-extrabold tracking-tight text-[#b42323] transition-transform active:scale-95"
+            aria-label="PujoPath home"
+          >
+            <span>PujoPath</span>
+          </Link>
+
+          {/* Dedicated Festival Switcher Pill */}
+          <Link
+            href="/select-puja"
+            className={cn(
+              'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border transition-all active:scale-95 shadow-xs',
+              isKali
+                ? 'bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-800 hover:border-purple-400'
+                : 'bg-[#fdeeee] dark:bg-[#341b18] text-[#b42323] dark:text-[#ff8787] border-[#f6ceca] dark:border-[#532822] hover:border-pujo-red/50'
+            )}
+            title={isBn ? 'উৎসব নির্বাচন ও পরিবর্তন করুন' : 'Change festival experience'}
+          >
+            <span>{isKali ? (isBn ? '🪔 শ্যামাপূজা ▾' : '🪔 Kali Puja ▾') : (isBn ? '🌸 দুর্গাপূজা ▾' : '🌸 Durga Puja ▾')}</span>
+          </Link>
+        </div>
 
         {/* Desktop Primary Nav */}
         <nav className="hidden items-center gap-1 md:flex" aria-label="Primary navigation">

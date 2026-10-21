@@ -18,11 +18,13 @@ import {
 } from 'lucide-react';
 import { useAudio } from '@/lib/context/AudioContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
+import { useFestival } from '@/lib/context/FestivalContext';
 import {
   MUSIC_TRACKS_DATA,
   MUSIC_CATEGORIES_META,
   PUJA_MOODS_LIST,
 } from '@/data/music';
+import { KALI_MUSIC_DATA, KALI_MUSIC_CATEGORIES } from '@/data/music/kaliMusic';
 import { MusicCategory, PujaMood } from '@/types';
 import { toBengaliDigits } from '@/lib/geo';
 import { cn, getAssetPath } from '@/lib/utils';
@@ -45,9 +47,10 @@ export default function MusicPage() {
 
   const { locale } = useI18n();
   const isBn = locale === 'bn';
+  const { activeFestival, selectFestival, isKali } = useFestival();
 
   // State
-  const [selectedCategory, setSelectedCategory] = useState<MusicCategory | 'All'>('All');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedMood, setSelectedMood] = useState<PujaMood | 'All'>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewTab, setViewTab] = useState<'all' | 'playlist'>('all');
@@ -59,23 +62,41 @@ export default function MusicPage() {
     return isBn ? toBengaliDigits(str) : str;
   };
 
+  // Base tracks determined by active festival
+  const baseTracks = useMemo(() => {
+    return isKali ? KALI_MUSIC_DATA : MUSIC_TRACKS_DATA;
+  }, [isKali]);
+
   // Filtered tracks
   const filteredTracks = useMemo(() => {
-    let list = [...MUSIC_TRACKS_DATA];
+    let list = [...baseTracks];
 
     // Filter by User Playlist tab
     if (viewTab === 'playlist') {
-      list = list.filter((t) => userPlaylistIds.includes(t.id));
+      const allMusic = [...MUSIC_TRACKS_DATA, ...KALI_MUSIC_DATA];
+      return allMusic.filter((t) => userPlaylistIds.includes(t.id));
     }
 
-    // Filter by Mood
-    if (selectedMood !== 'All') {
+    // Filter by Mood (Durga Puja tracks)
+    if (!isKali && selectedMood !== 'All') {
       list = list.filter((t) => t.mood === selectedMood);
     }
 
     // Filter by Category
     if (selectedCategory !== 'All') {
-      list = list.filter((t) => t.category === selectedCategory);
+      if (isKali) {
+        if (selectedCategory === 'Mahanisha & Dhyana') {
+          list = list.filter((t) => t.id.includes('malkauns') || t.id.includes('ahir'));
+        } else if (selectedCategory === 'Mantras & Stotrams') {
+          list = list.filter((t) => t.id.includes('stotram'));
+        } else if (selectedCategory === 'Temple Ambience & Aarati') {
+          list = list.filter((t) => t.id.includes('bell') || t.id.includes('shankha'));
+        } else {
+          list = list.filter((t) => t.category === selectedCategory);
+        }
+      } else {
+        list = list.filter((t) => t.category === selectedCategory);
+      }
     }
 
     // Filter by Search Query
@@ -96,11 +117,12 @@ export default function MusicPage() {
     }
 
     return list;
-  }, [viewTab, selectedMood, selectedCategory, searchQuery, userPlaylistIds]);
+  }, [baseTracks, isKali, viewTab, selectedMood, selectedCategory, searchQuery, userPlaylistIds]);
 
   // Playlist tracks
   const userPlaylistTracks = useMemo(() => {
-    return MUSIC_TRACKS_DATA.filter((t) => userPlaylistIds.includes(t.id));
+    const allMusic = [...MUSIC_TRACKS_DATA, ...KALI_MUSIC_DATA];
+    return allMusic.filter((t) => userPlaylistIds.includes(t.id));
   }, [userPlaylistIds]);
 
   const handlePlayUserPlaylist = () => {
@@ -111,20 +133,71 @@ export default function MusicPage() {
 
   return (
     <div className={cn('space-y-6 max-w-6xl mx-auto transition-all duration-200', isPlayerActive ? 'pb-16 md:pb-12' : 'pb-10 md:pb-8')}>
+      {/* Festival Switcher Bar */}
+      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-[#f4ede4] dark:bg-[#201c18] border border-[#eee8e1] dark:border-[#2f2720] w-fit">
+        <button
+          type="button"
+          onClick={() => {
+            selectFestival('durga');
+            setSelectedCategory('All');
+            setSelectedMood('All');
+          }}
+          className={cn(
+            'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer',
+            !isKali
+              ? 'bg-[#b42323] text-white shadow-xs'
+              : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white'
+          )}
+        >
+          <span>🌸</span>
+          <span>{isBn ? 'শারদীয়া সঙ্গীত ও ঢাক' : 'Sharodiya Soundscape'}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            selectFestival('kali');
+            setSelectedCategory('All');
+            setSelectedMood('All');
+          }}
+          className={cn(
+            'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer',
+            isKali
+              ? 'bg-purple-700 text-white shadow-xs'
+              : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white'
+          )}
+        >
+          <span>🪔</span>
+          <span>{isBn ? 'শ্যামাসঙ্গীত ও স্তোত্র' : 'Shyama Sangeet & Stotrams'}</span>
+        </button>
+      </div>
+
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-[#b42323] text-xs sm:text-sm font-bold uppercase tracking-wider">
+          <div className={cn(
+            'flex items-center gap-2 text-xs sm:text-sm font-bold uppercase tracking-wider',
+            isKali ? 'text-purple-600 dark:text-purple-400' : 'text-[#b42323]'
+          )}>
             <Music2 className="w-4 h-4" />
-            <span>{isBn ? 'শারদীয়া সুর, ঢাক ও লোকঐতিহ্য' : 'Sharodiya Soundscape & Heritage'}</span>
+            <span>
+              {isKali
+                ? (isBn ? 'মা শ্যামা ভক্তিগীতি ও স্তোত্র' : 'Shyama Sangeet & Sacred Ambience')
+                : (isBn ? 'শারদীয়া সুর, ঢাক ও লোকঐতিহ্য' : 'Sharodiya Soundscape & Heritage')}
+            </span>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-black text-[#242424] dark:text-[#ede5dc] mt-1 tracking-tight">
-            {isBn ? 'শারদীয়া সঙ্গীত ও ঐতিহ্যবাহী সুর' : 'Festive Puja Music Traditions'}
+            {isKali
+              ? (isBn ? 'মা শ্যামা সঙ্গীত ও শাস্ত্রীয় ধ্যানরাগ' : 'Sacred Shyama Sangeet & Ragas')
+              : (isBn ? 'শারদীয়া সঙ্গীত ও ঐতিহ্যবাহী সুর' : 'Festive Puja Music Traditions')}
           </h1>
           <p className="text-sm sm:text-base text-[#665a54] dark:text-[#a89e95] mt-1 max-w-3xl">
-            {isBn
-              ? 'পূজা আচারের গম্ভীর শঙ্খনাদ, মণ্ডপের ঐতিহ্যবাহী ঢাকের বোল, প্যান্ডেল হপিং-এর উদ্দীপনা থেকে বিজয়ার অশ্রুসজল বিসর্জন।'
-              : 'Explore Bengal’s rich Durga Puja music culture — traditional Dhak beats, Agomoni hymns, pandal-hopping anthems, and immersion chants.'}
+            {isKali
+              ? (isBn
+                  ? 'দীপান্বিতা অমাবস্যার নিশুতি রাতের শাস্ত্রীয় ধ্যানরাগ (মালকোষ, আহীর ভৈরব), আদ্যাশক্তি মহামায়ার স্তোত্র ও মন্দিরের পবিত্র কাঁসর-ঘণ্টার ধ্বনি।'
+                  : 'Nocturnal classical meditation ragas (Malkauns, Ahir Bhairav), sacred Kali stotrams, and authentic temple bells for Dipanwita Amavasya.')
+              : (isBn
+                  ? 'পূজা আচারের গম্ভীর শঙ্খনাদ, মণ্ডপের ঐতিহ্যবাহী ঢাকের বোল, প্যান্ডেল হপিং-এর উদ্দীপনা থেকে বিজয়ার অশ্রুসজল বিসর্জন।'
+                  : 'Explore Bengal’s rich Durga Puja music culture — traditional Dhak beats, Agomoni hymns, pandal-hopping anthems, and immersion chants.')}
           </p>
         </div>
 
@@ -177,56 +250,58 @@ export default function MusicPage() {
         </div>
       )}
 
-      {/* Mood Selector: "Choose your Puja mood" */}
-      <div className="space-y-3 p-5 sm:p-6 rounded-3xl bg-[#fcfaf7] dark:bg-[#15120f] border border-[#eee8e1] dark:border-[#2f2720]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#b42323]" />
-            <h3 className="text-sm sm:text-base font-black text-[#242424] dark:text-[#ede5dc]">
-              {isBn ? 'আপনার পুজোর মুড বেছে নিন' : 'Choose Your Puja Mood'}
-            </h3>
+      {/* Mood Selector: "Choose your Puja mood" (Durga Puja Soundscapes) */}
+      {!isKali && (
+        <div className="space-y-3 p-5 sm:p-6 rounded-3xl bg-[#fcfaf7] dark:bg-[#15120f] border border-[#eee8e1] dark:border-[#2f2720]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#b42323]" />
+              <h3 className="text-sm sm:text-base font-black text-[#242424] dark:text-[#ede5dc]">
+                {isBn ? 'আপনার পুজোর মুড বেছে নিন' : 'Choose Your Puja Mood'}
+              </h3>
+            </div>
+            {selectedMood !== 'All' && (
+              <button
+                type="button"
+                onClick={() => setSelectedMood('All')}
+                className="text-xs font-bold text-[#b42323] hover:underline cursor-pointer"
+              >
+                {isBn ? 'সব মুড দেখুন' : 'Clear Mood Filter'}
+              </button>
+            )}
           </div>
-          {selectedMood !== 'All' && (
+
+          <div className="flex flex-wrap items-center gap-2 pt-1">
             <button
               type="button"
               onClick={() => setSelectedMood('All')}
-              className="text-xs font-bold text-[#b42323] hover:underline cursor-pointer"
-            >
-              {isBn ? 'সব মুড দেখুন' : 'Clear Mood Filter'}
-            </button>
-          )}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 pt-1">
-          <button
-            type="button"
-            onClick={() => setSelectedMood('All')}
-            className={cn(
-              'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border',
-              selectedMood === 'All'
-                ? 'bg-[#b42323] text-white border-[#b42323] shadow-xs'
-                : 'bg-white dark:bg-[#1a1613] text-[#665a54] dark:text-[#a89e95] border-[#eee8e1] dark:border-[#2f2720] hover:border-[#b42323]'
-            )}
-          >
-            {isBn ? 'সকল মুড' : 'All Moods'}
-          </button>
-          {PUJA_MOODS_LIST.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              onClick={() => setSelectedMood(m.id)}
               className={cn(
                 'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border',
-                selectedMood === m.id
+                selectedMood === 'All'
                   ? 'bg-[#b42323] text-white border-[#b42323] shadow-xs'
                   : 'bg-white dark:bg-[#1a1613] text-[#665a54] dark:text-[#a89e95] border-[#eee8e1] dark:border-[#2f2720] hover:border-[#b42323]'
               )}
             >
-              {isBn ? m.labelBn : m.label}
+              {isBn ? 'সকল মুড' : 'All Moods'}
             </button>
-          ))}
+            {PUJA_MOODS_LIST.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => setSelectedMood(m.id)}
+                className={cn(
+                  'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border',
+                  selectedMood === m.id
+                    ? 'bg-[#b42323] text-white border-[#b42323] shadow-xs'
+                    : 'bg-white dark:bg-[#1a1613] text-[#665a54] dark:text-[#a89e95] border-[#eee8e1] dark:border-[#2f2720] hover:border-[#b42323]'
+                )}
+              >
+                {isBn ? m.labelBn : m.label}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Category Pills & Search Bar */}
       <div className="space-y-3.5">
@@ -238,7 +313,11 @@ export default function MusicPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={isBn ? 'গান, শিল্পী বা বোল খুঁজুন...' : 'Search tracks, artists, rhythms...'}
+              placeholder={
+                isKali
+                  ? (isBn ? 'শ্যামাসঙ্গীত, রাগ বা স্তোত্র খুঁজুন...' : 'Search Shyama sangeet, ragas, mantras...')
+                  : (isBn ? 'গান, শিল্পী বা বোল খুঁজুন...' : 'Search tracks, artists, rhythms...')
+              }
               className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] text-xs sm:text-sm text-[#242424] dark:text-[#ede5dc] focus:outline-hidden focus:border-[#b42323]"
             />
             {searchQuery && (
@@ -274,13 +353,15 @@ export default function MusicPage() {
             className={cn(
               'px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border cursor-pointer shrink-0',
               selectedCategory === 'All'
-                ? 'bg-[#242424] dark:bg-[#ede5dc] text-white dark:text-[#1a1613] border-[#242424] dark:border-[#ede5dc]'
+                ? isKali
+                  ? 'bg-purple-700 text-white border-purple-700'
+                  : 'bg-[#242424] dark:bg-[#ede5dc] text-white dark:text-[#1a1613] border-[#242424] dark:border-[#ede5dc]'
                 : 'bg-white dark:bg-[#1a1613] text-[#665a54] dark:text-[#a89e95] border-[#eee8e1] dark:border-[#2f2720] hover:border-[#b42323]'
             )}
           >
             {isBn ? 'সকল ক্যাটেগরি' : 'All Categories'}
           </button>
-          {MUSIC_CATEGORIES_META.map((cat) => (
+          {(isKali ? KALI_MUSIC_CATEGORIES.filter((c) => c.id !== 'All') : MUSIC_CATEGORIES_META).map((cat) => (
             <button
               key={cat.id}
               type="button"
@@ -288,7 +369,9 @@ export default function MusicPage() {
               className={cn(
                 'px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border cursor-pointer shrink-0',
                 selectedCategory === cat.id
-                  ? 'bg-[#242424] dark:bg-[#ede5dc] text-white dark:text-[#1a1613] border-[#242424] dark:border-[#ede5dc]'
+                  ? isKali
+                    ? 'bg-purple-700 text-white border-purple-700'
+                    : 'bg-[#242424] dark:bg-[#ede5dc] text-white dark:text-[#1a1613] border-[#242424] dark:border-[#ede5dc]'
                   : 'bg-white dark:bg-[#1a1613] text-[#665a54] dark:text-[#a89e95] border-[#eee8e1] dark:border-[#2f2720] hover:border-[#b42323]'
               )}
             >

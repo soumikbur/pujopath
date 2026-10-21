@@ -54,6 +54,7 @@ export function MobileBottomNav() {
   ];
 
   const secondaryItems = [
+    { href: '/select-puja', label: isBn ? 'পূজা নির্বাচন' : 'Puja Selection', icon: Sparkles },
     { href: '/kali-puja', label: isBn ? 'শ্যামাপূজা ও বারাসাত' : 'Kali Puja & Barasat', icon: Flame },
     { href: '/notifications', label: isBn ? 'বিজ্ঞপ্তি ও অ্যালার্ট' : 'Notifications', icon: Bell },
     { href: '/helpline', label: isBn ? 'জরুরি হেল্পলাইন' : 'Helpline', icon: Phone },

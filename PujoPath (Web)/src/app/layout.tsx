@@ -6,6 +6,7 @@ import { AudioProvider } from '@/lib/context/AudioContext';
 import { FavoritesProvider } from '@/lib/context/FavoritesContext';
 import { BackgroundProvider } from '@/lib/context/BackgroundContext';
 import { NotificationProvider } from '@/lib/context/NotificationContext';
+import { FestivalProvider } from '@/lib/context/FestivalContext';
 import { AppShell } from '@/components/navigation/AppShell';
 import { PwaRegister } from '@/components/pwa/PwaRegister';
 
@@ -68,16 +69,18 @@ export default function RootLayout({
       <body className="min-h-screen bg-[#FCFAF7] dark:bg-[#14110E] text-[#242424] dark:text-[#EDE5DC] antialiased selection:bg-pujo-red selection:text-white transition-colors duration-200">
         <ThemeProvider>
           <I18nProvider>
-            <AudioProvider>
-              <FavoritesProvider>
-                <BackgroundProvider>
-                  <NotificationProvider>
-                    <AppShell>{children}</AppShell>
-                    <PwaRegister />
-                  </NotificationProvider>
-                </BackgroundProvider>
-              </FavoritesProvider>
-            </AudioProvider>
+            <FestivalProvider>
+              <AudioProvider>
+                <FavoritesProvider>
+                  <BackgroundProvider>
+                    <NotificationProvider>
+                      <AppShell>{children}</AppShell>
+                      <PwaRegister />
+                    </NotificationProvider>
+                  </BackgroundProvider>
+                </FavoritesProvider>
+              </AudioProvider>
+            </FestivalProvider>
           </I18nProvider>
         </ThemeProvider>
       </body>

@@ -35,6 +35,7 @@ export function DesktopSidebar() {
 
   const navItems = [
     { href: '/', label: t('navHome'), icon: Home },
+    { href: '/select-puja', label: isBn ? 'পূজা নির্বাচন' : 'Puja Selection', icon: Sparkles },
     { href: '/explore', label: t('navExplore'), icon: Compass },
     { href: '/map', label: t('navMap'), icon: Map },
     {
