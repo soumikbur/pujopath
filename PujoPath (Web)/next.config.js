@@ -20,7 +20,8 @@ const nextConfig = {
           ];
         },
       }
-    : {
+    : (isGithubActions || process.env.STATIC_EXPORT === 'true')
+    ? {
         output: 'export',
         trailingSlash: true,
         ...(basePath
@@ -29,6 +30,9 @@ const nextConfig = {
               assetPrefix: basePath,
             }
           : {}),
+      }
+    : {
+        trailingSlash: false,
       }),
   images: {
     unoptimized: true,
