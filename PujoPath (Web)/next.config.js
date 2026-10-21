@@ -20,19 +20,15 @@ const nextConfig = {
           ];
         },
       }
-    : (isGithubActions || process.env.STATIC_EXPORT === 'true')
-    ? {
+    : {
         output: 'export',
-        trailingSlash: true,
+        trailingSlash: isGithubActions ? true : false,
         ...(basePath
           ? {
               basePath,
               assetPrefix: basePath,
             }
           : {}),
-      }
-    : {
-        trailingSlash: false,
       }),
   images: {
     unoptimized: true,
