@@ -1,10 +1,21 @@
 import { Pandal, FilterOptions, LocalityZone } from '@/types';
-import { PANDALS_DATA } from '@/data/pandals';
+import { PANDALS_DATA, KALI_PANDALS_DATA } from '@/data/pandals';
 import { calculateHaversineDistance } from '@/lib/geo';
 
 export class PandalService {
-  static getAllPandals(userLat?: number, userLng?: number, extraPandals?: Pandal[]): Pandal[] {
-    const base = [...PANDALS_DATA, ...(extraPandals || [])];
+  static getAllPandals(
+    userLat?: number,
+    userLng?: number,
+    extraPandals?: Pandal[],
+    festival: 'durga' | 'kali' | 'all' = 'all'
+  ): Pandal[] {
+    const dataSource =
+      festival === 'durga'
+        ? PANDALS_DATA
+        : festival === 'kali'
+        ? KALI_PANDALS_DATA
+        : [...PANDALS_DATA, ...KALI_PANDALS_DATA];
+    const base = [...dataSource, ...(extraPandals || [])];
     const hasValidCoords =
       typeof userLat === 'number' &&
       typeof userLng === 'number' &&
@@ -26,7 +37,7 @@ export class PandalService {
     userLng?: number,
     extraPandals?: Pandal[]
   ): Pandal | null {
-    const base = [...PANDALS_DATA, ...(extraPandals || [])];
+    const base = [...PANDALS_DATA, ...KALI_PANDALS_DATA, ...(extraPandals || [])];
     const found = base.find((p) => p.slug === slug || p.id === slug);
     if (!found) return null;
 
@@ -49,9 +60,10 @@ export class PandalService {
     options: Partial<FilterOptions>,
     userLat?: number,
     userLng?: number,
-    extraPandals?: Pandal[]
+    extraPandals?: Pandal[],
+    festival: 'durga' | 'kali' | 'all' = 'all'
   ): Pandal[] {
-    let list = this.getAllPandals(userLat, userLng, extraPandals);
+    let list = this.getAllPandals(userLat, userLng, extraPandals, festival);
 
     if (options.searchQuery && options.searchQuery.trim()) {
       const q = options.searchQuery.toLowerCase().trim();
@@ -148,7 +160,8 @@ export class PandalService {
   }
 
   static getNearbyPandals(pandal: Pandal, limit: number = 4): Pandal[] {
-    return PANDALS_DATA.filter((p) => p.id !== pandal.id)
+    const all = [...PANDALS_DATA, ...KALI_PANDALS_DATA];
+    return all.filter((p) => p.id !== pandal.id)
       .map((p) => ({
         ...p,
         distanceKm: calculateHaversineDistance(pandal.latitude, pandal.longitude, p.latitude, p.longitude),
@@ -158,11 +171,20 @@ export class PandalService {
   }
 
   static getPandalsByZone(zone: LocalityZone): Pandal[] {
-    return PANDALS_DATA.filter((p) => p.zone === zone);
+    const all = [...PANDALS_DATA, ...KALI_PANDALS_DATA];
+    return all.filter((p) => p.zone === zone);
   }
 
   static getBonediBariPandals(): Pandal[] {
     return PANDALS_DATA.filter((p) => Boolean(p.isBonediBari || p.category === 'Bonedi Bari'));
+  }
+
+  static getKaliPandals(): Pandal[] {
+    return KALI_PANDALS_DATA;
+  }
+
+  static getBarasatPandals(): Pandal[] {
+    return KALI_PANDALS_DATA.filter((p) => p.zone === 'Barasat' || p.zone === 'Madhyamgram');
   }
 }
 

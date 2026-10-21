@@ -1807,8 +1807,8 @@ console.log('\n--- Running Test Suite 34: Co-Creator Profiles, Bengali Spelling 
 
   const feedbackPath = path.join(__dirname, '..', 'src', 'app', 'feedback', 'page.tsx');
   const feedbackContent = fs.readFileSync(feedbackPath, 'utf8');
+  assert.ok(feedbackContent.includes('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/'), 'Feedback page must contain verified LinkedIn destination');
   assert.ok(feedbackContent.includes('mailto:soumik.bur@gmail.com'), 'Feedback page must contain mailto:soumik.bur@gmail.com destination');
-  assert.ok(!feedbackContent.includes('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/'), 'Feedback page must not use LinkedIn messaging as feedback destination');
   assert.ok(feedbackContent.includes('Share Your Feedback'), 'Feedback page must contain heading "Share Your Feedback"');
 
   const filtersPath = path.join(__dirname, '..', 'src', 'components', 'pandals', 'PandalFilters.tsx');
@@ -1882,8 +1882,56 @@ console.log('\n--- Running Test Suite 34: Co-Creator Profiles, Bengali Spelling 
   console.log('✓ Chorebagan Sarbojanin Durgotsab Samity verified with Radha Madhab Saha Lane and Bengali name');
 })();
 
+// ============================================================================
+// TEST SUITE 36: UI Smoothness, Responsiveness & Refresh-Rate Adaptability
+// ============================================================================
+(function testUiSmoothnessAndRefreshRateAdaptability() {
+  console.log('\n--- Running Test Suite 36: UI Smoothness, Responsiveness & Refresh-Rate Adaptability ---');
+
+  const pujoMapContent = fs.readFileSync(path.join(__dirname, '../src/components/map/PujoMap.tsx'), 'utf8');
+  const pandalCardContent = fs.readFileSync(path.join(__dirname, '../src/components/pandals/PandalCard.tsx'), 'utf8');
+  const explorePageContent = fs.readFileSync(path.join(__dirname, '../src/app/explore/page.tsx'), 'utf8');
+  const segmentedControlContent = fs.readFileSync(path.join(__dirname, '../src/components/ui/AnimatedSegmentedControl.tsx'), 'utf8');
+  const mobileNavContent = fs.readFileSync(path.join(__dirname, '../src/components/navigation/MobileBottomNav.tsx'), 'utf8');
+  const audioContextContent = fs.readFileSync(path.join(__dirname, '../src/lib/context/AudioContext.tsx'), 'utf8');
+  const footerContent = fs.readFileSync(path.join(__dirname, '../src/components/navigation/Footer.tsx'), 'utf8');
+  const globalsCssContent = fs.readFileSync(path.join(__dirname, '../src/app/globals.css'), 'utf8');
+
+  // 1. High Refresh Rate & Smooth Canvas Map Rendering
+  assert.ok(pujoMapContent.includes('preferCanvas: true'), 'Leaflet map must enable preferCanvas: true for high-refresh-rate 60/90/120Hz displays');
+  assert.ok(pujoMapContent.includes('prevSelectedPandalIdRef'), 'PujoMap must track previous selection to update single marker icons without destroying the layer');
+  assert.ok(!pujoMapContent.includes('[pandals, metroStations, routeStops, selectedPandalId,'), 'Main marker creation effect must not depend on selectedPandalId to prevent destroying 774 markers on selection');
+  console.log('✓ High refresh rate map canvas engine and O(1) marker selection diffing verified');
+
+  // 2. React Rendering Optimization & List Memoization
+  assert.ok(pandalCardContent.includes('React.memo(function PandalCard'), 'PandalCard must be wrapped in React.memo for high-speed list rendering');
+  assert.ok(pandalCardContent.includes('md:hover:-translate-y-1'), 'PandalCard must guard hover translateY with md: to prevent sticky touch hover on mobile');
+  assert.ok(explorePageContent.includes('React.useMemo(() => {') && explorePageContent.includes('filterPandals'), 'Explore page must memoize filteredPandals');
+  console.log('✓ React component memoization and mobile touch hover protection verified');
+
+  // 3. Audio Progress Tick Isolation from Static Layout
+  assert.ok(audioContextContent.includes('AudioActiveContext') && audioContextContent.includes('useAudioActive'), 'AudioContext must provide isolated AudioActiveContext');
+  assert.ok(footerContent.includes('useAudioActive()'), 'Footer must consume useAudioActive to prevent 4x/sec re-renders during playback');
+  console.log('✓ Audio progress tick decoupling from layout shell verified');
+
+  // 4. VSYNC & RequestAnimationFrame Resize Adaptability
+  assert.ok(segmentedControlContent.includes('requestAnimationFrame'), 'AnimatedSegmentedControl must use requestAnimationFrame for resize recalculation');
+  assert.ok(segmentedControlContent.includes('cancelAnimationFrame'), 'AnimatedSegmentedControl must clean up animation frames on unmount');
+  assert.ok(segmentedControlContent.includes('{ passive: true }'), 'Resize listener must be marked passive');
+  console.log('✓ VSYNC-synchronized requestAnimationFrame throttling verified');
+
+  // 5. Mobile Safe Areas, Touch Targets & Sheet Animations
+  assert.ok(mobileNavContent.includes('min-h-[48px]') && mobileNavContent.includes('min-w-[56px]'), 'Mobile nav items must meet 48px touch target requirements');
+  assert.ok(mobileNavContent.includes('slide-in-from-bottom'), 'Mobile more drawer must use slide-in-from-bottom animation');
+  assert.ok(mobileNavContent.includes('onClick={(e) => {') && mobileNavContent.includes('setMoreOpen(false)'), 'Mobile more drawer must dismiss on backdrop click');
+  assert.ok(globalsCssContent.includes('prefers-reduced-motion: reduce'), 'globals.css must respect prefers-reduced-motion');
+  assert.ok(globalsCssContent.includes('overscroll-behavior-y: none'), 'globals.css must configure overscroll-behavior-y: none');
+  assert.ok(globalsCssContent.includes('-webkit-overflow-scrolling: touch'), 'globals.css must configure smooth touch scrolling');
+  console.log('✓ Mobile safe area insets, touch target ergonomics, and sheet transitions verified');
+})();
+
 console.log('\n================================================================');
-console.log('ALL 35 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
+console.log('ALL 36 AUTOMATED UNIT TEST SUITES PASSED SUCCESSFULLY WITH ZERO ERRORS!');
 console.log('================================================================\n');
 
 

@@ -52,6 +52,7 @@ interface AudioContextType {
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
+const AudioActiveContext = createContext<boolean>(false);
 
 const USER_PLAYLIST_STORAGE_KEY = 'pujopath_user_playlist';
 
@@ -616,7 +617,9 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         queueMode,
       }}
     >
-      {children}
+      <AudioActiveContext.Provider value={isPlayerActive}>
+        {children}
+      </AudioActiveContext.Provider>
     </AudioContext.Provider>
   );
 }
@@ -627,5 +630,9 @@ export function useAudio() {
     throw new Error('useAudio must be used within an AudioProvider');
   }
   return context;
+}
+
+export function useAudioActive() {
+  return useContext(AudioActiveContext);
 }
 

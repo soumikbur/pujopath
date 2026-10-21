@@ -9,6 +9,8 @@ import {
   Route,
   Sparkles,
   Train,
+  Flame,
+  Phone,
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
 
@@ -30,6 +32,13 @@ export function QuickAccess() {
       description: isBn ? 'স্মার্ট পরিক্রমা তৈরি করুন' : 'Optimize your hopping trail',
       icon: Route,
       color: '#0d9488',
+    },
+    {
+      href: '/kali-puja',
+      label: isBn ? 'বারাসাত ও শ্যামা' : 'Kali Puja',
+      description: isBn ? 'বারাসাত আলোকসজ্জা ও তর্পণ' : 'Barasat illumination & guide',
+      icon: Flame,
+      color: '#f97316',
     },
     {
       href: '/metro',
@@ -59,6 +68,13 @@ export function QuickAccess() {
       icon: Sparkles,
       color: '#d97706',
     },
+    {
+      href: '/helpline',
+      label: isBn ? 'জরুরি হেল্পলাইন' : 'Helpline',
+      description: isBn ? 'পুলিশ, স্বাস্থ্য ও দমকল' : 'Police, Medical & Fire',
+      icon: Phone,
+      color: '#dc2626',
+    },
   ];
 
   return (
@@ -69,7 +85,7 @@ export function QuickAccess() {
         </h2>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8">
         {items.map((item) => {
           const Icon = item.icon;
           return (

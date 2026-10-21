@@ -18,6 +18,9 @@ import {
   X,
   MessageSquare,
   Users,
+  Bell,
+  Flame,
+  Phone,
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { cn } from '@/lib/utils/cn';
@@ -51,6 +54,9 @@ export function MobileBottomNav() {
   ];
 
   const secondaryItems = [
+    { href: '/kali-puja', label: isBn ? 'শ্যামাপূজা ও বারাসাত' : 'Kali Puja & Barasat', icon: Flame },
+    { href: '/notifications', label: isBn ? 'বিজ্ঞপ্তি ও অ্যালার্ট' : 'Notifications', icon: Bell },
+    { href: '/helpline', label: isBn ? 'জরুরি হেল্পলাইন' : 'Helpline', icon: Phone },
     { href: '/calendar', label: isBn ? 'ক্যালেন্ডার' : 'Calendar', icon: Calendar },
     { href: '/metro', label: isBn ? 'মেট্রো গাইড' : 'Metro Guide', icon: Train },
     { href: '/music', label: isBn ? 'পুজোর সঙ্গীত' : 'Puja Music', icon: Music2 },
@@ -121,9 +127,12 @@ export function MobileBottomNav() {
           role="dialog"
           aria-modal="true"
           aria-label={isBn ? 'অন্যান্য সুবিধাসমূহ' : 'More Features'}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setMoreOpen(false);
+          }}
           className="fixed inset-0 z-[1300] flex flex-col justify-end md:hidden bg-black/50 backdrop-blur-sm animate-in fade-in"
         >
-          <div className="bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] rounded-t-3xl p-6 space-y-4 shadow-elevated max-h-[80vh] overflow-y-auto pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
+          <div className="bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] rounded-t-3xl p-6 space-y-4 shadow-elevated max-h-[80vh] overflow-y-auto pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] animate-in slide-in-from-bottom duration-200">
             <div className="flex items-center justify-between border-b border-[#eee8e1] dark:border-[#2a241f] pb-3">
               <h3 className="font-bold text-base text-[#242424] dark:text-[#ede5dc]">
                 {isBn ? 'অন্যান্য সুবিধাসমূহ' : 'More Features'}

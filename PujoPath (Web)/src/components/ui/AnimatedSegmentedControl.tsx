@@ -85,15 +85,23 @@ export function AnimatedSegmentedControl<T extends string = string>({
 
   useEffect(() => {
     if (!containerRef.current) return;
-    const ro = new ResizeObserver(() => {
-      updateIndicator();
-    });
+    let rafId: number | null = null;
+    const throttledUpdate = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        updateIndicator();
+        rafId = null;
+      });
+    };
+
+    const ro = new ResizeObserver(throttledUpdate);
     ro.observe(containerRef.current);
-    window.addEventListener('resize', updateIndicator);
+    window.addEventListener('resize', throttledUpdate, { passive: true });
 
     return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId);
       ro.disconnect();
-      window.removeEventListener('resize', updateIndicator);
+      window.removeEventListener('resize', throttledUpdate);
     };
   }, [updateIndicator]);
 

@@ -15,7 +15,7 @@ interface PandalCardProps {
   variant?: 'grid' | 'horizontal' | 'compact';
 }
 
-export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
+export const PandalCard = React.memo(function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
   const { isPandalInRoute, addPandalToRoute, removePandalFromRoute, isPandalSaved, toggleSavePandal } = useFavorites();
@@ -87,7 +87,7 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
   }
 
   return (
-    <div className="group flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-[#b42323]/40 shadow-xs">
+    <div className="group flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-[#eee8e1] dark:border-[#2f2720] bg-white dark:bg-[#1a1613] transition-all duration-200 md:hover:-translate-y-1 hover:shadow-lg hover:border-[#b42323]/40 shadow-xs">
       <div className="relative">
         {/* Pandal Thumbnail Header (16:9 ratio, object-fit cover or honest neutral unavailable placeholder) */}
         <Link href={`/pandals/${pandal.slug}`} className="block relative aspect-video w-full overflow-hidden">
@@ -250,4 +250,4 @@ export function PandalCard({ pandal, variant = 'grid' }: PandalCardProps) {
       </div>
     </div>
   );
-}
+});

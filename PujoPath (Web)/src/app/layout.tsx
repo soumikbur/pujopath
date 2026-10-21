@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/lib/context/ThemeContext';
 import { AudioProvider } from '@/lib/context/AudioContext';
 import { FavoritesProvider } from '@/lib/context/FavoritesContext';
 import { BackgroundProvider } from '@/lib/context/BackgroundContext';
+import { NotificationProvider } from '@/lib/context/NotificationContext';
 import { AppShell } from '@/components/navigation/AppShell';
 import { PwaRegister } from '@/components/pwa/PwaRegister';
 
@@ -70,8 +71,10 @@ export default function RootLayout({
             <AudioProvider>
               <FavoritesProvider>
                 <BackgroundProvider>
-                  <AppShell>{children}</AppShell>
-                  <PwaRegister />
+                  <NotificationProvider>
+                    <AppShell>{children}</AppShell>
+                    <PwaRegister />
+                  </NotificationProvider>
                 </BackgroundProvider>
               </FavoritesProvider>
             </AudioProvider>

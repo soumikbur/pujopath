@@ -246,3 +246,7 @@ export const PUJA_CALENDAR_DATA: PujaDay[] = [
     ],
   },
 ];
+
+export * from './sandhiPuja';
+export * from './kaliPuja';
+

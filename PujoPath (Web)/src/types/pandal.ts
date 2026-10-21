@@ -6,7 +6,10 @@ export type LocalityZone =
   | 'New Town'
   | 'Howrah'
   | 'Behala'
-  | 'Dum Dum';
+  | 'Dum Dum'
+  | 'Barasat'
+  | 'Madhyamgram'
+  | 'North 24 Parganas';
 
 export type CrowdLevel = 'Low' | 'Moderate' | 'High' | 'Extreme';
 

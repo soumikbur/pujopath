@@ -216,7 +216,7 @@ export function PandalFilters({ filters, onChange, totalCount, allPandals }: Pan
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('touchstart', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside, { passive: true });
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
@@ -274,6 +274,9 @@ export function PandalFilters({ filters, onChange, totalCount, allPandals }: Pan
 
   const zoneOptions: { value: LocalityZone | 'All'; label: string }[] = [
     { value: 'All', label: isBn ? 'সব এলাকা' : 'All Zones' },
+    { value: 'Barasat', label: isBn ? 'বারাসাত' : 'Barasat' },
+    { value: 'Madhyamgram', label: isBn ? 'মধ্যমগ্রাম' : 'Madhyamgram' },
+    { value: 'North 24 Parganas', label: isBn ? 'উত্তর ২৪ পরগনা' : 'North 24 Pgs' },
     { value: 'North Kolkata', label: isBn ? 'উত্তর কলকাতা' : 'North Kolkata' },
     { value: 'South Kolkata', label: isBn ? 'দক্ষিণ কলকাতা' : 'South Kolkata' },
     { value: 'Central Kolkata', label: isBn ? 'মধ্য কলকাতা' : 'Central Kolkata' },

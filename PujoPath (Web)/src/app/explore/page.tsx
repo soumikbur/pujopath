@@ -157,12 +157,14 @@ function ExploreContent() {
     return PandalService.getAllPandals(undefined, undefined, customPandals);
   }, [customPandals]);
 
-  const filteredPandals = PandalService.filterPandals(
-    filters,
-    undefined,
-    undefined,
-    customPandals
-  );
+  const filteredPandals = React.useMemo(() => {
+    return PandalService.filterPandals(
+      filters,
+      undefined,
+      undefined,
+      customPandals
+    );
+  }, [filters, customPandals]);
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 pb-36 sm:pb-28">

@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useBackground } from '@/lib/context/BackgroundContext';
-import { useAudio } from '@/lib/context/AudioContext';
+import { useAudioActive } from '@/lib/context/AudioContext';
 import { cn } from '@/lib/utils/cn';
 import { Pause, Play } from 'lucide-react';
 
@@ -12,7 +12,7 @@ export function Footer() {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
   const { currentBackground, isPaused, togglePause, prefersReducedMotion, isHomepage } = useBackground();
-  const { isPlayerActive } = useAudio();
+  const isPlayerActive = useAudioActive();
 
   return (
     <footer className="mt-auto shrink-0 w-full border-t border-[#eee8e1] dark:border-[#2a221b] bg-white/60 dark:bg-[#181411]/60 backdrop-blur-md">
@@ -43,10 +43,19 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Essential Helpline & Contact Link */}
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs font-medium text-[#776d65] dark:text-[#a89e95]">
+          {/* Essential Helpline, Kali Puja & Contact Links */}
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-xs font-medium text-[#776d65] dark:text-[#a89e95]">
+            <Link href="/kali-puja" className="hover:text-[#b42323] dark:hover:text-[#e05656] transition-colors">
+              {isBn ? 'শ্যামাপূজা ও বারাসাত' : 'Kali Puja & Barasat'}
+            </Link>
+            <Link href="/helpline" className="hover:text-[#b42323] dark:hover:text-[#e05656] transition-colors">
+              {isBn ? 'জরুরি হেল্পলাইন' : 'Emergency Helpline'}
+            </Link>
+            <Link href="/feedback" className="hover:text-[#b42323] dark:hover:text-[#e05656] transition-colors">
+              {isBn ? 'মতামত ও পরামর্শ' : 'Feedback'}
+            </Link>
             <Link href="/about" className="hover:text-[#b42323] dark:hover:text-[#e05656] transition-colors">
-              {isBn ? 'জরুরি হেল্পলাইন ও পরিচিতি' : 'Helpline & About'}
+              {isBn ? 'পরিচিতি' : 'About'}
             </Link>
           </div>
         </div>

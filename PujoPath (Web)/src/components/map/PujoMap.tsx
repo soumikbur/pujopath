@@ -33,6 +33,8 @@ interface PujoMapProps {
   interactive?: boolean;
   className?: string;
   showMetro?: boolean;
+  userLocation?: [number, number] | null;
+  isFullscreen?: boolean;
 }
 
 // ============================================================================
@@ -49,6 +51,8 @@ function LeafletMapEngine({
   interactive = true,
   className = 'w-full h-full min-h-[450px]',
   showMetro = true,
+  userLocation = null,
+  isFullscreen = false,
 }: PujoMapProps) {
   const { locale } = useI18n();
   const isBn = locale === 'bn';
@@ -139,6 +143,8 @@ function LeafletMapEngine({
     });
   };
 
+  const prevSelectedPandalIdRef = useRef<string | null>(null);
+
   // Initialize Map
   useEffect(() => {
     const container = mapContainerRef.current;
@@ -153,6 +159,7 @@ function LeafletMapEngine({
         scrollWheelZoom: interactive,
         doubleClickZoom: interactive,
         touchZoom: interactive,
+        preferCanvas: true,
       });
 
       // Standard, high-contrast, clean OSM tiles (isolated from dark mode in globals.css)
@@ -201,7 +208,49 @@ function LeafletMapEngine({
     };
   }, []);
 
-  // Sync Markers and Overlays
+  // Update center & zoom when prop changes
+  useEffect(() => {
+    if (mapInstanceRef.current && center) {
+      mapInstanceRef.current.setView(center, zoom || 12, { animate: true });
+    }
+  }, [center?.[0], center?.[1], zoom]);
+
+  // Handle Fullscreen Invalidation
+  useEffect(() => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.invalidateSize();
+      const t = setTimeout(() => {
+        mapInstanceRef.current?.invalidateSize();
+      }, 250);
+      return () => clearTimeout(t);
+    }
+  }, [isFullscreen]);
+
+  // Handle User Geolocation Pin
+  const userMarkerRef = useRef<L.CircleMarker | null>(null);
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    if (userMarkerRef.current) {
+      map.removeLayer(userMarkerRef.current);
+      userMarkerRef.current = null;
+    }
+    if (userLocation) {
+      const [lat, lng] = userLocation;
+      userMarkerRef.current = L.circleMarker([lat, lng], {
+        radius: 9,
+        fillColor: '#0284c7',
+        color: '#ffffff',
+        weight: 3,
+        opacity: 1,
+        fillOpacity: 1,
+      }).addTo(map);
+      map.setView([lat, lng], 15, { animate: true });
+    }
+  }, [userLocation]);
+
+
+  // Sync Markers and Overlays (Only re-runs when pandals list, metro, or locale changes)
   useEffect(() => {
     const map = mapInstanceRef.current;
     const markersLayer = markersLayerRef.current;
@@ -221,11 +270,11 @@ function LeafletMapEngine({
       const marker = L.marker([pandal.latitude, pandal.longitude], {
         icon: createPandalIcon(pandal, isSelected),
         title: pandal.name,
+        zIndexOffset: isSelected ? 1000 : 0,
       });
 
       const name = isBn ? pandal.nameBn : pandal.name;
       const locality = isBn ? pandal.localityBn : pandal.locality;
-      const isAdded = currentRouteStops.some((s) => s.pandalId === pandal.id);
 
       const popupContent = `
         <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 170px; padding: 2px;">
@@ -297,19 +346,36 @@ function LeafletMapEngine({
         map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
       }
     }
-  }, [pandals, metroStations, routeStops, selectedPandalId, isBn, showMetro]);
+    prevSelectedPandalIdRef.current = selectedPandalId;
+  }, [pandals, metroStations, routeStops, isBn, showMetro]);
 
-  // Smooth pan to selected pandal
+  // Smooth, high-performance pan and marker highlight without recreating all 774 markers
   useEffect(() => {
     const map = mapInstanceRef.current;
-    if (!map || !selectedPandalId) return;
+    if (!map) return;
 
-    const marker = markerMapRef.current.get(selectedPandalId);
-    const pandal = pandals.find((p) => p.id === selectedPandalId);
-    if (marker && pandal) {
-      map.setView([pandal.latitude, pandal.longitude], 15, { animate: true });
-      marker.openPopup();
+    const prevId = prevSelectedPandalIdRef.current;
+    if (prevId && prevId !== selectedPandalId) {
+      const prevMarker = markerMapRef.current.get(prevId);
+      const prevPandal = pandals.find((p) => p.id === prevId);
+      if (prevMarker && prevPandal) {
+        prevMarker.setIcon(createPandalIcon(prevPandal, false));
+        prevMarker.setZIndexOffset(0);
+      }
     }
+
+    if (selectedPandalId) {
+      const marker = markerMapRef.current.get(selectedPandalId);
+      const pandal = pandals.find((p) => p.id === selectedPandalId);
+      if (marker && pandal) {
+        marker.setIcon(createPandalIcon(pandal, true));
+        marker.setZIndexOffset(1000);
+        map.setView([pandal.latitude, pandal.longitude], 15, { animate: true, duration: 0.5 });
+        marker.openPopup();
+      }
+    }
+
+    prevSelectedPandalIdRef.current = selectedPandalId;
   }, [selectedPandalId, pandals]);
 
   return (

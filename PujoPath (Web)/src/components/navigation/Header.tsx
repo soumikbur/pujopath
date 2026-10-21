@@ -16,9 +16,13 @@ import {
   Sun,
   Train,
   Users,
+  Bell,
+  Flame,
+  Phone,
 } from 'lucide-react';
 import { APK_DOWNLOAD_URL } from '@/lib/config';
 import { useFavorites } from '@/lib/context/FavoritesContext';
+import { useNotifications } from '@/lib/context/NotificationContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useTheme } from '@/lib/context/ThemeContext';
 import { cn } from '@/lib/utils/cn';
@@ -28,6 +32,7 @@ export function Header() {
   const { locale, setLocale } = useI18n();
   const { theme, toggleTheme } = useTheme();
   const { savedPandalIds } = useFavorites();
+  const { unreadCount } = useNotifications();
   const [moreOpen, setMoreOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isBn = locale === 'bn';
@@ -66,6 +71,9 @@ export function Header() {
   ];
 
   const secondaryLinks = [
+    { href: '/kali-puja', label: isBn ? 'শ্যামাপূজা ও বারাসাত' : 'Kali Puja & Barasat', icon: Flame },
+    { href: '/notifications', label: isBn ? 'বিজ্ঞপ্তি' : 'Notifications', icon: Bell },
+    { href: '/helpline', label: isBn ? 'জরুরি হেল্পলাইন' : 'Helpline', icon: Phone },
     { href: '/calendar', label: isBn ? 'ক্যালেন্ডার' : 'Calendar', icon: Calendar },
     { href: '/metro', label: isBn ? 'মেট্রো' : 'Metro', icon: Train },
     { href: '/music', label: isBn ? 'সঙ্গীত' : 'Music', icon: Music2 },
@@ -245,6 +253,26 @@ export function Header() {
             {savedPandalIds.length > 0 && (
               <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#b42323] px-1 text-[10px] font-bold text-white shadow-sm">
                 {savedPandalIds.length}
+              </span>
+            )}
+          </Link>
+
+          {/* Notifications Bell with Dynamic Unread Counter Badge */}
+          <Link
+            href="/notifications"
+            aria-label={isBn ? 'উৎসব নোটিফিকেশন' : 'Festive notifications'}
+            title={isBn ? 'বিজ্ঞপ্তি ও অ্যালার্ট' : 'Notifications & Alerts'}
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[#e8e1d9] dark:border-[#332b24] text-[#625b55] dark:text-[#b4a99e] hover:bg-[#f5f1ec] dark:hover:bg-[#221c17] hover:text-[#b42323] transition-all active:scale-95"
+          >
+            <Bell
+              className={cn(
+                'h-4 w-4 transition-transform',
+                unreadCount > 0 && 'text-[#b42323] dark:text-[#e05656]'
+              )}
+            />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#b42323] px-1 text-[10px] font-bold text-white shadow-sm">
+                {unreadCount}
               </span>
             )}
           </Link>

@@ -16,16 +16,22 @@ import {
   Info,
   MessageSquare,
   Users,
+  Bell,
+  Flame,
+  Phone,
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useFavorites } from '@/lib/context/FavoritesContext';
+import { useNotifications } from '@/lib/context/NotificationContext';
 import { toBengaliDigits } from '@/lib/geo';
 import { cn } from '@/lib/utils/cn';
 
 export function DesktopSidebar() {
   const pathname = usePathname();
   const { t, locale } = useI18n();
+  const isBn = locale === 'bn';
   const { currentRouteStops, savedPandalIds } = useFavorites();
+  const { unreadCount } = useNotifications();
 
   const navItems = [
     { href: '/', label: t('navHome'), icon: Home },
@@ -37,6 +43,14 @@ export function DesktopSidebar() {
       icon: Navigation,
       badge: currentRouteStops.length > 0 ? currentRouteStops.length : null,
     },
+    { href: '/kali-puja', label: isBn ? 'শ্যামাপূজা ও বারাসাত' : 'Kali Puja & Barasat', icon: Flame },
+    {
+      href: '/notifications',
+      label: isBn ? 'বিজ্ঞপ্তি' : 'Notifications',
+      icon: Bell,
+      badge: unreadCount > 0 ? unreadCount : null,
+    },
+    { href: '/helpline', label: isBn ? 'জরুরি হেল্পলাইন' : 'Helpline', icon: Phone },
     { href: '/metro', label: t('navMetro'), icon: Train },
     { href: '/music', label: t('navMusic'), icon: Music2 },
     { href: '/calendar', label: t('navCalendar'), icon: Calendar },
