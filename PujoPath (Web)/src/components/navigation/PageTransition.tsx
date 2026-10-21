@@ -64,7 +64,7 @@ export function PageTransition({ children }: PageTransitionProps) {
   return (
     <div
       key={pathname}
-      className={`w-full ${animationClass}`}
+      className={`w-full flex-1 flex flex-col ${animationClass}`}
       onAnimationEnd={() => setAnimating(false)}
     >
       {children}
