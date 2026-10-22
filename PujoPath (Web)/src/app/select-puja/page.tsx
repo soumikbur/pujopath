@@ -12,21 +12,16 @@ import {
   Calendar,
   Music2,
   CheckCircle2,
-  Sun,
-  Moon,
   Compass,
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
-import { useTheme } from '@/lib/context/ThemeContext';
 import { useFestival, FestivalType } from '@/lib/context/FestivalContext';
 import { cn } from '@/lib/utils/cn';
 
 export default function SelectPujaPage() {
   const router = useRouter();
-  const { locale, setLocale } = useI18n();
+  const { locale } = useI18n();
   const isBn = locale === 'bn';
-  const { theme, toggleTheme } = useTheme();
-  const isDark = theme === 'dark';
   const { activeFestival, selectFestival } = useFestival();
 
   const handleSelect = (festival: FestivalType) => {
@@ -36,52 +31,11 @@ export default function SelectPujaPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl py-2 sm:py-4 px-2 sm:px-4 flex-1 flex flex-col justify-center animate-in fade-in duration-200">
-      {/* Top Contextual Badge & Secondary Utility Strip */}
-      <div className="flex items-center justify-between gap-3 pb-3 mb-3 sm:mb-5 border-b border-[#eee8e1] dark:border-[#2a241f]">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-black tracking-wider uppercase bg-[#fdeeee] dark:bg-[#381c18] text-pujo-red dark:text-[#f87171] border border-[#f6ceca] dark:border-[#532822]">
+      {/* Top Contextual Edition Badge (Centered, Authoritative Preferences are in Global Navigation) */}
+      <div className="flex items-center justify-center mb-2.5 sm:mb-3.5">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-black tracking-wider uppercase bg-[#fdeeee] dark:bg-[#381c18] text-pujo-red dark:text-[#f87171] border border-[#f6ceca] dark:border-[#532822] shadow-xs">
           <span>✨</span>
           <span>{isBn ? 'উৎসব সংকলন ২০২৬ • নির্বাচন' : 'FESTIVAL EDITION 2026 • SELECTION'}</span>
-        </div>
-
-        {/* Action Controls: Theme Switcher + Language Switcher */}
-        <div className="flex items-center gap-2">
-          {/* Theme Switcher */}
-          <button
-            onClick={toggleTheme}
-            type="button"
-            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            className="flex items-center justify-center w-8 h-8 rounded-xl border border-[#e8e1d9] dark:border-[#332b24] bg-white/80 dark:bg-[#1f1a16] text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white transition-colors"
-          >
-            {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-stone-600" />}
-          </button>
-
-          {/* Language Toggle */}
-          <div className="flex items-center rounded-xl border border-[#e8e1d9] dark:border-[#332b24] bg-white/80 dark:bg-[#1f1a16] p-0.5 text-[11px] font-bold">
-            <button
-              type="button"
-              onClick={() => setLocale('en')}
-              className={cn(
-                'px-2 py-0.5 rounded-lg transition-all',
-                !isBn
-                  ? 'bg-pujo-red text-white shadow-sm'
-                  : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424]'
-              )}
-            >
-              EN
-            </button>
-            <button
-              type="button"
-              onClick={() => setLocale('bn')}
-              className={cn(
-                'px-2 py-0.5 rounded-lg transition-all',
-                isBn
-                  ? 'bg-pujo-red text-white shadow-sm'
-                  : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424]'
-              )}
-            >
-              বাংলা
-            </button>
-          </div>
         </div>
       </div>
 

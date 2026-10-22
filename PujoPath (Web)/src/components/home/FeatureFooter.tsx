@@ -6,19 +6,16 @@ import {
   Sparkles,
   Zap,
   Smartphone,
-  Moon,
-  Sun,
-  Languages,
+  Route,
+  Compass,
   Heart,
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
-import { useTheme } from '@/lib/context/ThemeContext';
 import { cn } from '@/lib/utils/cn';
 
 export function FeatureFooter() {
   const router = useRouter();
-  const { locale, setLocale } = useI18n();
-  const { theme, toggleTheme } = useTheme();
+  const { locale } = useI18n();
   const isBn = locale === 'bn';
 
   const features = [
@@ -41,17 +38,17 @@ export function FeatureFooter() {
       onClick: undefined,
     },
     {
-      icon: theme === 'dark' ? Sun : Moon,
-      title: theme === 'dark' ? (isBn ? 'লাইট মোড' : 'Light Mode') : (isBn ? 'ডার্ক মোড' : 'Dark Mode'),
-      desc: isBn ? 'ক্লিক করে বদলান' : 'Click to toggle',
-      onClick: toggleTheme,
+      icon: Route,
+      title: isBn ? 'স্মার্ট রুট প্ল্যানার' : 'Route Planner',
+      desc: isBn ? 'সেরা হাঁটার পথ' : 'Optimized hopping',
+      onClick: () => router.push('/planner'),
       isAction: true,
     },
     {
-      icon: Languages,
-      title: isBn ? 'বাংলা ও ইংরেজি' : 'Bengali & English',
-      desc: isBn ? 'ভাষা পরিবর্তন করুন' : 'Click to toggle',
-      onClick: () => setLocale(locale === 'en' ? 'bn' : 'en'),
+      icon: Compass,
+      title: isBn ? 'লাইভ মানচিত্র' : 'Live Map & Transit',
+      desc: isBn ? 'মেট্রো ও দিকনির্দেশ' : 'Metro & directions',
+      onClick: () => router.push('/map'),
       isAction: true,
     },
     {
