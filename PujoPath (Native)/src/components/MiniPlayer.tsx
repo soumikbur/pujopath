@@ -6,7 +6,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAudio } from '@/context/AudioContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useFestival } from '@/context/FestivalContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { useResponsive } from '@/hooks/useResponsive';
 
 export const MiniPlayer: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -14,7 +16,13 @@ export const MiniPlayer: React.FC = () => {
   const { currentTrack, isPlaying, positionMs, durationMs, togglePlayPause, stopAudio } = useAudio();
   const { colors, isDark } = useTheme();
   const { language } = useLanguage();
+  const { activeFestival } = useFestival();
   const reduceMotion = useReducedMotion();
+  const { isLandscape, safeLeft, safeRight, safeBottom } = useResponsive();
+
+  const isKali = activeFestival === 'kali' || currentTrack?.id?.startsWith('kali-');
+  const accentColor = isKali ? '#9333EA' : '#D52F2F';
+  const musicDest = isKali ? 'KaliMusic' : 'Music';
 
   const entranceAnim = useRef(new Animated.Value(0)).current;
   const playScale = useRef(new Animated.Value(1)).current;
@@ -64,7 +72,7 @@ export const MiniPlayer: React.FC = () => {
     }
   };
 
-  const floatingBottom = 56 + Math.max(insets.bottom, 8) + 8;
+  const floatingBottom = (isLandscape ? 40 : 56) + Math.max(safeBottom, 4) + 6;
 
   const translateY = entranceAnim.interpolate({
     inputRange: [0, 1],
@@ -88,7 +96,18 @@ export const MiniPlayer: React.FC = () => {
   const progressPercent = durationMs > 0 ? Math.min(100, Math.max(0, (positionMs / durationMs) * 100)) : 0;
 
   return (
-    <View style={[styles.floatingWrapper, { bottom: floatingBottom }]} pointerEvents="box-none">
+    <View
+      style={[
+        styles.floatingWrapper,
+        {
+          bottom: floatingBottom,
+          left: 16 + safeLeft,
+          right: 16 + safeRight,
+        },
+        isLandscape && { alignItems: 'center' },
+      ]}
+      pointerEvents="box-none"
+    >
       <Animated.View
         style={[
           styles.container,
@@ -98,25 +117,30 @@ export const MiniPlayer: React.FC = () => {
             opacity: opacity,
             transform: [{ translateY: translateY }],
           },
+          isLandscape && { maxWidth: 580, width: '100%' },
         ]}
       >
         {/* Top-edge integrated progress bar */}
         <View style={[styles.progressTrack, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)' }]}>
-          <View style={[styles.progressBar, { width: `${progressPercent}%`, backgroundColor: '#D52F2F' }]} />
+          <View style={[styles.progressBar, { width: `${progressPercent}%`, backgroundColor: accentColor }]} />
         </View>
 
         <View style={styles.innerRow}>
           {/* 1. Album Artwork 44x44 */}
           <TouchableOpacity
             activeOpacity={0.85}
-            onPress={() => navigation?.navigate('Music')}
+            onPress={() => navigation?.navigate(musicDest)}
             style={[
               styles.artworkContainer,
               { borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.45)' },
             ]}
           >
             <Image
-              source={require('../../assets/images/durga-miniplayer.jpg')}
+              source={
+                isKali
+                  ? require('../../assets/images/kali-miniplayer.jpg')
+                  : require('../../assets/images/durga-miniplayer.jpg')
+              }
               style={styles.artworkImage}
               resizeMode="cover"
             />
@@ -125,7 +149,7 @@ export const MiniPlayer: React.FC = () => {
           {/* 2. Track Title, Artist & Time */}
           <TouchableOpacity
             activeOpacity={0.85}
-            onPress={() => navigation?.navigate('Music')}
+            onPress={() => navigation?.navigate(musicDest)}
             style={styles.infoContainer}
           >
             <Text
@@ -158,6 +182,7 @@ export const MiniPlayer: React.FC = () => {
               <Animated.View
                 style={[
                   styles.playButton,
+                  { backgroundColor: accentColor, shadowColor: accentColor },
                   { transform: [{ scale: playScale }] },
                 ]}
               >
@@ -172,7 +197,7 @@ export const MiniPlayer: React.FC = () => {
 
             {/* Playlist navigation icon */}
             <TouchableOpacity
-              onPress={() => navigation?.navigate('Music')}
+              onPress={() => navigation?.navigate(musicDest)}
               activeOpacity={0.7}
               style={styles.actionIconBtn}
               accessibilityLabel="View music library"

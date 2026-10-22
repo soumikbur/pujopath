@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface AboutScreenProps {
   navigation: any;
@@ -19,6 +20,7 @@ export const AboutScreen: React.FC<AboutScreenProps> = ({ navigation }) => {
   const { colors, isDark } = useTheme();
   const { language } = useLanguage();
   const isBn = language === 'bn';
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, stackScrollBottomPadding } = useResponsive();
 
   const helplines = [
     {
@@ -61,7 +63,20 @@ export const AboutScreen: React.FC<AboutScreenProps> = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingLeft: screenPaddingLeft,
+            paddingRight: screenPaddingRight,
+            paddingBottom: stackScrollBottomPadding + 24,
+            maxWidth: isLandscape ? 860 : undefined,
+            alignSelf: isLandscape ? 'center' : undefined,
+            width: '100%',
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <View style={styles.headerSection}>
           <View style={styles.badgeRow}>
@@ -81,7 +96,7 @@ export const AboutScreen: React.FC<AboutScreenProps> = ({ navigation }) => {
         </View>
 
         {/* Helplines Directory */}
-        <View style={styles.directoryGrid}>
+        <View style={[styles.directoryGrid, isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 10 }]}>
           {helplines.map((item, idx) => (
             <View
               key={idx}
@@ -91,6 +106,7 @@ export const AboutScreen: React.FC<AboutScreenProps> = ({ navigation }) => {
                   backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
                   borderColor: colors.border,
                 },
+                isLandscape && { width: '49.1%' },
               ]}
             >
               <View style={styles.helplineInfo}>
@@ -123,49 +139,54 @@ export const AboutScreen: React.FC<AboutScreenProps> = ({ navigation }) => {
           ))}
         </View>
 
-        {/* UNESCO Heritage Tribute Card */}
-        <View
-          style={[
-            styles.unescoCard,
-            {
-              backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
-              borderColor: colors.border,
-            },
-          ]}
-        >
-          <View style={styles.unescoIconBox}>
-            <Ionicons name="sparkles" size={20} color="#D97706" />
+        {/* Tribute & About Sections */}
+        <View style={[isLandscape && { flexDirection: 'row', gap: 14 }]}>
+          {/* UNESCO Heritage Tribute Card */}
+          <View
+            style={[
+              styles.unescoCard,
+              {
+                backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                borderColor: colors.border,
+              },
+              isLandscape && { flex: 1 },
+            ]}
+          >
+            <View style={styles.unescoIconBox}>
+              <Ionicons name="sparkles" size={20} color="#D97706" />
+            </View>
+            <View style={styles.unescoContent}>
+              <Text style={[styles.unescoTitle, { color: colors.textPrimary }]}>
+                {isBn ? 'ইউনেস্কো মানবতার অমূল্য সাংস্কৃতিক ঐতিহ্য' : 'UNESCO Cultural Heritage of Humanity'}
+              </Text>
+              <Text style={[styles.unescoDesc, { color: colors.textMuted }]}>
+                {isBn
+                  ? '২০২১ সালে কলকাতার দুর্গাপূজা ইউনেস্কোর ইনট্যানজিবল কালচারাল হেরিটেজ অফ হিউম্যানিটি হিসেবে বিশ্বস্বীকৃতি লাভ করে। এটি শুধু ধর্মীয় অনুষ্ঠান নয়, বাংলার অনুপম শিল্পকলা ও সর্বজনীন মিলনোৎসব।'
+                  : "In 2021, Durga Puja in Kolkata was inscribed on UNESCO's Representative List of the Intangible Cultural Heritage of Humanity, celebrating its community-driven art, public celebrations, and secular inclusivity."}
+              </Text>
+            </View>
           </View>
-          <View style={styles.unescoContent}>
-            <Text style={[styles.unescoTitle, { color: colors.textPrimary }]}>
-              {isBn ? 'ইউনেস্কো মানবতার অমূল্য সাংস্কৃতিক ঐতিহ্য' : 'UNESCO Cultural Heritage of Humanity'}
-            </Text>
-            <Text style={[styles.unescoDesc, { color: colors.textMuted }]}>
-              {isBn
-                ? '২০২১ সালে কলকাতার দুর্গাপূজা ইউনেস্কোর ইনট্যানজিবল কালচারাল হেরিটেজ অফ হিউম্যানিটি হিসেবে বিশ্বস্বীকৃতি লাভ করে। এটি শুধু ধর্মীয় অনুষ্ঠান নয়, বাংলার অনুপম শিল্পকলা ও সর্বজনীন মিলনোৎসব।'
-                : "In 2021, Durga Puja in Kolkata was inscribed on UNESCO's Representative List of the Intangible Cultural Heritage of Humanity, celebrating its community-driven art, public celebrations, and secular inclusivity."}
-            </Text>
-          </View>
-        </View>
 
-        {/* About Initiative */}
-        <View
-          style={[
-            styles.aboutCard,
-            {
-              backgroundColor: isDark ? '#1C1511' : '#FFF9F6',
-              borderColor: isDark ? 'rgba(180, 35, 35, 0.4)' : 'rgba(180, 35, 35, 0.3)',
-            },
-          ]}
-        >
-          <Text style={[styles.aboutTitle, { color: colors.textPrimary }]}>
-            {isBn ? 'পুজোপথ উদ্যোগের কথা' : 'About the PujoPath Initiative'}
-          </Text>
-          <Text style={[styles.aboutText, { color: colors.textSecondary }]}>
-            {isBn
-              ? 'পুজোপথ হলো কলকাতার দুর্গাপূজাকে সবার কাছে সহজ, আনন্দদায়ক এবং সুন্দরভাবে পৌঁছে দেওয়ার জন্য একটি অলাভজনক ও নিরপেক্ষ ডিজিটাল উদ্যোগ। এতে কলকাতার ৭৭৪টি প্রধান মণ্ডপ, নিখুঁত সন্ধিপূজা নির্ঘণ্ট, অফলাইন মেট্রো গাইড ও রুট প্ল্যানার সংযুক্ত করা হয়েছে।'
-              : 'PujoPath is an independent community initiative designed to bring digital precision, cultural authenticity, and route clarity to Kolkata’s grandest festival. Featuring 774 curated pandals, astronomy-backed panjika timings, and transit guides.'}
-          </Text>
+          {/* About Initiative */}
+          <View
+            style={[
+              styles.aboutCard,
+              {
+                backgroundColor: isDark ? '#1C1511' : '#FFF9F6',
+                borderColor: isDark ? 'rgba(180, 35, 35, 0.4)' : 'rgba(180, 35, 35, 0.3)',
+              },
+              isLandscape && { flex: 1 },
+            ]}
+          >
+            <Text style={[styles.aboutTitle, { color: colors.textPrimary }]}>
+              {isBn ? 'পুজোপথ উদ্যোগের কথা' : 'About the PujoPath Initiative'}
+            </Text>
+            <Text style={[styles.aboutText, { color: colors.textSecondary }]}>
+              {isBn
+                ? 'পুজোপথ হলো কলকাতার দুর্গাপূজাকে সবার কাছে সহজ, আনন্দদায়ক এবং সুন্দরভাবে পৌঁছে দেওয়ার জন্য একটি অলাভজনক ও নিরপেক্ষ ডিজিটাল উদ্যোগ। এতে কলকাতার ৭৭৪টি প্রধান মণ্ডপ, নিখুঁত সন্ধিপূজা নির্ঘণ্ট, অফলাইন মেট্রো গাইড ও রুট প্ল্যানার সংযুক্ত করা হয়েছে।'
+                : 'PujoPath is an independent community initiative designed to bring digital precision, cultural authenticity, and route clarity to Kolkata’s grandest festival. Featuring 774 curated pandals, astronomy-backed panjika timings, and transit guides.'}
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </View>

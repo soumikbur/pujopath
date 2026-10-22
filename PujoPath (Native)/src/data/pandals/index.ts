@@ -1357,4 +1357,7 @@ export const PANDALS_DATA: Pandal[] = RAW_PANDALS_DATA.map((pandal) => {
   };
 });
 
+export * from './kaliTemples';
+export * from './kaliPandals';
+
 

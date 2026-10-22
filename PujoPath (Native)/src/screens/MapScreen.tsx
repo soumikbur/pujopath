@@ -11,6 +11,7 @@ import {
   Image,
   Dimensions,
   BackHandler,
+  StatusBar,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
@@ -21,11 +22,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
+import { useFestival } from '@/context/FestivalContext';
+import { useMapFullscreen } from '@/context/MapFullscreenContext';
 import { PANDALS_DATA } from '@/data/pandals';
+import { KALI_PANDALS_DATA } from '@/data/pandals/kaliPandals';
 import { METRO_STATIONS_DATA } from '@/data/metro';
 import { SelectedPandalsBar } from '@/components/SelectedPandalsBar';
 import { getPandalImageSource } from '@/lib/utils/pandalImages';
 import { Pandal, LocalityZone } from '@/types';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface MapScreenProps {
   navigation: any;
@@ -38,6 +43,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
   const { language, t } = useLanguage();
   const isBn = language === 'bn';
   const { isPandalInRoute, addStop, removeStop, stops } = useRoute();
+  const { activeFestival } = useFestival();
+  const { isLandscape, safeLeft, safeRight, safeBottom, safeTop } = useResponsive();
+  const { isMapFullscreen, setIsMapFullscreen, toggleMapFullscreen } = useMapFullscreen();
+
+  const isKali = activeFestival === 'kali';
 
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>('All');
   const [selectedPandal, setSelectedPandal] = useState<Pandal | null>(null);
@@ -48,38 +58,69 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
 
   const webViewRef = useRef<any>(null);
 
-  // System Back button: dismiss topmost selected pandal preview card before leaving the map
+  // System Back button: dismiss topmost preview card or exit fullscreen before leaving the map
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
+        // Priority 1: dismiss open pandal preview card
         if (selectedPandal) {
           setSelectedPandal(null);
           return true; // Consumed: closes preview card without navigating away from map
+        }
+        // Priority 2: exit fullscreen mode and restore original layout
+        if (isMapFullscreen) {
+          setIsMapFullscreen(false);
+          return true; // Consumed: exits fullscreen first rather than leaving Map section
         }
         return false; // Not consumed: allow standard stack/tab back navigation
       };
 
       const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () => subscription.remove();
-    }, [selectedPandal])
+    }, [selectedPandal, isMapFullscreen, setIsMapFullscreen])
   );
 
-  const filterOptions: { value: FilterOption; label: string; isSpecial?: boolean }[] = [
-    { value: 'All', label: isBn ? 'সব এলাকা' : 'All' },
-    { value: 'Bonedi Bari', label: isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari', isSpecial: true },
-    { value: 'North Kolkata', label: isBn ? 'উত্তর কলকাতা' : 'North Kolkata' },
-    { value: 'South Kolkata', label: isBn ? 'দক্ষিণ কলকাতা' : 'South Kolkata' },
-    { value: 'Central Kolkata', label: isBn ? 'মধ্য কলকাতা' : 'Central Kolkata' },
-    { value: 'Salt Lake', label: isBn ? 'সল্টলেক' : 'Salt Lake' },
-    { value: 'Dum Dum', label: isBn ? 'দমদম' : 'Dum Dum' },
-    { value: 'Behala', label: isBn ? 'বেহালা' : 'Behala' },
-    { value: 'Howrah', label: isBn ? 'হাওড়া' : 'Howrah' },
-  ];
+  // Reset fullscreen when screen loses focus (e.g. switching tabs)
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setIsMapFullscreen(false);
+      };
+    }, [setIsMapFullscreen])
+  );
+
+  const filterOptions: { value: FilterOption; label: string; isSpecial?: boolean }[] = useMemo(() => {
+    if (isKali) {
+      return [
+        { value: 'All', label: isBn ? 'সব এলাকা' : 'All' },
+        { value: 'Barasat' as any, label: isBn ? 'বারাসাত' : 'Barasat' },
+        { value: 'Madhyamgram' as any, label: isBn ? 'মধ্যমগ্রাম' : 'Madhyamgram' },
+        { value: 'North 24 Parganas' as any, label: isBn ? 'উত্তর ২৪ পরগনা' : 'North 24 Pgs' },
+        { value: 'North Kolkata', label: isBn ? 'উত্তর কলকাতা' : 'North Kolkata' },
+        { value: 'South Kolkata', label: isBn ? 'দক্ষিণ কলকাতা' : 'South Kolkata' },
+      ];
+    }
+    return [
+      { value: 'All', label: isBn ? 'সব এলাকা' : 'All' },
+      { value: 'Bonedi Bari', label: isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari', isSpecial: true },
+      { value: 'North Kolkata', label: isBn ? 'উত্তর কলকাতা' : 'North Kolkata' },
+      { value: 'South Kolkata', label: isBn ? 'দক্ষিণ কলকাতা' : 'South Kolkata' },
+      { value: 'Central Kolkata', label: isBn ? 'মধ্য কলকাতা' : 'Central Kolkata' },
+      { value: 'Salt Lake', label: isBn ? 'সল্টলেক' : 'Salt Lake' },
+      { value: 'Dum Dum', label: isBn ? 'দমদম' : 'Dum Dum' },
+      { value: 'Behala', label: isBn ? 'বেহালা' : 'Behala' },
+      { value: 'Howrah', label: isBn ? 'হাওড়া' : 'Howrah' },
+    ];
+  }, [isKali, isBn]);
+
+  const activePandalsData = useMemo(() => {
+    return isKali ? KALI_PANDALS_DATA : PANDALS_DATA;
+  }, [isKali]);
 
   // Prepare sanitized JSON payload for the Leaflet WebView
   const pandalsJson = useMemo(() => {
     return JSON.stringify(
-      PANDALS_DATA.map((p) => ({
+      activePandalsData.map((p) => ({
         id: p.id,
         name: p.name,
         nameBn: p.nameBn || p.name,
@@ -93,7 +134,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
         isBonediBari: Boolean(p.isBonediBari || p.category === 'Bonedi Bari'),
       }))
     );
-  }, []);
+  }, [activePandalsData]);
 
   const metroJson = useMemo(() => {
     return JSON.stringify(
@@ -133,12 +174,16 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
     var allPandals = ${pandalsJson};
     var allMetro = ${metroJson};
     var isBn = ${isBn};
+    var isKali = ${isKali};
+    var initialCenter = isKali ? [22.7245, 88.4745] : [22.5726, 88.3639];
+    var initialZoom = isKali ? 13 : 12;
 
     var map = L.map('map', {
-      center: [22.5726, 88.3639],
-      zoom: 12,
+      center: initialCenter,
+      zoom: initialZoom,
       zoomControl: false,
-      attributionControl: true
+      attributionControl: true,
+      preferCanvas: true
     });
 
     var tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -155,6 +200,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
     var pandalsLayer = L.layerGroup().addTo(map);
     var metroLayer = L.layerGroup().addTo(map);
     var markerRegistry = {};
+    var currentSelectedPandalId = null;
     var userLocationMarker = null;
     var userAccuracyCircle = null;
 
@@ -168,11 +214,18 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
     function createPandalIcon(pandal, isSelected) {
       var crowdColor = getCrowdColor(pandal.crowdLevel);
       var size = isSelected ? 42 : 32;
+      var bgGradient = isKali
+        ? 'linear-gradient(135deg, #7e22ce 0%, #3b0764 100%)'
+        : 'linear-gradient(135deg, #c1272d 0%, #7f1d1d 100%)';
+      var bgShadow = isKali
+        ? '0 4px 14px rgba(126, 34, 206, 0.5)'
+        : '0 4px 14px rgba(193, 39, 45, 0.5)';
+
       var html = '<div style="position: relative; width: ' + size + 'px; height: ' + size + 'px; display: flex; align-items: center; justify-content: center; cursor: pointer;">' +
         '<div style="' +
           'width: ' + size + 'px; height: ' + size + 'px; border-radius: 50%;' +
-          'background: linear-gradient(135deg, #c1272d 0%, #7f1d1d 100%);' +
-          'box-shadow: 0 4px 14px rgba(193, 39, 45, 0.5);' +
+          'background: ' + bgGradient + ';' +
+          'box-shadow: ' + bgShadow + ';' +
           'display: flex; align-items: center; justify-content: center; color: white;' +
           'font-size: ' + (isSelected ? 18 : 13) + 'px;' +
           'border: ' + (isSelected ? '3px solid #d4af37' : '2px solid white') + ';' +
@@ -213,6 +266,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
     window.applyFilter = function(zone, showMetroFlag, selectedPandalId) {
       pandalsLayer.clearLayers();
       markerRegistry = {};
+      currentSelectedPandalId = selectedPandalId;
 
       var visibleBounds = [];
 
@@ -277,9 +331,33 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
       }
     };
 
-    window.recenterKolkata = function() {
-      map.setView([22.5726, 88.3639], 12, { animate: true });
+    window.selectPandal = function(pandalId) {
+      if (currentSelectedPandalId && currentSelectedPandalId !== pandalId) {
+        var prevMarker = markerRegistry[currentSelectedPandalId];
+        var prevP = allPandals.find(function(item) { return item.id === currentSelectedPandalId; });
+        if (prevMarker && prevP) {
+          prevMarker.setIcon(createPandalIcon(prevP, false));
+          prevMarker.setZIndexOffset(0);
+        }
+      }
+
+      currentSelectedPandalId = pandalId;
+
+      if (pandalId && markerRegistry[pandalId]) {
+        var marker = markerRegistry[pandalId];
+        var p = allPandals.find(function(item) { return item.id === pandalId; });
+        if (marker && p) {
+          marker.setIcon(createPandalIcon(p, true));
+          marker.setZIndexOffset(1000);
+          map.setView([p.lat, p.lng], Math.max(map.getZoom(), 15), { animate: true });
+        }
+      }
     };
+
+    window.recenterDefault = function() {
+      map.setView(initialCenter, initialZoom, { animate: true });
+    };
+    window.recenterKolkata = window.recenterDefault;
 
     window.zoomIn = function() {
       map.zoomIn();
@@ -321,6 +399,18 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
       }
     });
 
+    window.resizeMap = function() {
+      if (map) {
+        map.invalidateSize({ animate: false });
+      }
+    };
+
+    window.addEventListener('resize', function() {
+      if (map) {
+        map.invalidateSize({ animate: false });
+      }
+    });
+
     // Notify React Native that Map is mounted
     setTimeout(function() {
       window.applyFilter('All', true, null);
@@ -331,15 +421,53 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
   </script>
 </body>
 </html>`;
-  }, [pandalsJson, metroJson, isBn, isDark]);
+  }, [pandalsJson, metroJson, isBn, isDark, isKali]);
 
-  // Sync React Native filter/metro/selection states to Leaflet
+  const prevFilterMetroRef = useRef<string>('');
+  const prevSelectedPandalIdRef = useRef<string | null>(null);
+
+  // Sync React Native filter/metro states to Leaflet
   useEffect(() => {
     if (isMapReady && webViewRef.current) {
-      const script = `window.applyFilter(${JSON.stringify(selectedFilter)}, ${showMetro}, ${JSON.stringify(selectedPandal?.id || null)}); true;`;
-      webViewRef.current.injectJavaScript(script);
+      const key = `${selectedFilter}_${showMetro}`;
+      if (key !== prevFilterMetroRef.current) {
+        prevFilterMetroRef.current = key;
+        const script = `window.applyFilter(${JSON.stringify(selectedFilter)}, ${showMetro}, ${JSON.stringify(selectedPandal?.id || null)}); true;`;
+        webViewRef.current.injectJavaScript(script);
+        prevSelectedPandalIdRef.current = selectedPandal?.id || null;
+      }
     }
-  }, [selectedFilter, showMetro, selectedPandal, isMapReady]);
+  }, [selectedFilter, showMetro, isMapReady]);
+
+  // Sync selection to Leaflet without destroying all markers
+  useEffect(() => {
+    if (isMapReady && webViewRef.current) {
+      const pandalId = selectedPandal?.id || null;
+      if (pandalId !== prevSelectedPandalIdRef.current) {
+        prevSelectedPandalIdRef.current = pandalId;
+        const script = `if (window.selectPandal) { window.selectPandal(${JSON.stringify(pandalId)}); } else { window.applyFilter(${JSON.stringify(selectedFilter)}, ${showMetro}, ${JSON.stringify(pandalId)}); } true;`;
+        webViewRef.current.injectJavaScript(script);
+      }
+    }
+  }, [selectedPandal, isMapReady, selectedFilter, showMetro]);
+
+  // On fullscreen change, orientation change, or window resize, notify Leaflet to invalidate size and refill tiles smoothly
+  useEffect(() => {
+    if (isMapReady && webViewRef.current) {
+      const script = `if (window.resizeMap) { window.resizeMap(); } else if (window.map) { window.map.invalidateSize(); } true;`;
+      webViewRef.current.injectJavaScript(script);
+      const timer1 = setTimeout(() => {
+        webViewRef.current?.injectJavaScript(script);
+      }, 100);
+      const timer2 = setTimeout(() => {
+        webViewRef.current?.injectJavaScript(script);
+      }, 300);
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
+    }
+  }, [isMapFullscreen, isLandscape, isMapReady]);
 
   const handleMessage = (event: any) => {
     try {
@@ -348,7 +476,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
         setIsMapReady(true);
         setIsOffline(false);
       } else if (data.type === 'SELECT_PANDAL') {
-        const found = PANDALS_DATA.find((p) => p.id === data.pandalId);
+        const found = activePandalsData.find((p) => p.id === data.pandalId);
         if (found) {
           setSelectedPandal(found);
         }
@@ -424,103 +552,136 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* 1. Zone & Metro Filters Bar (Matching Capacitor header bar) */}
-      <View style={[styles.filterBarWrapper, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterScrollContent}
-        >
-          {filterOptions.map((opt) => {
-            const isSelected = selectedFilter === opt.value;
-            return (
-              <TouchableOpacity
-                key={opt.value}
-                activeOpacity={0.8}
-                onPress={() => setSelectedFilter(opt.value)}
-                style={[
-                  styles.filterChip,
-                  {
-                    backgroundColor: isSelected
-                      ? opt.isSpecial
-                        ? '#800020'
-                        : '#b42323'
-                      : isDark
-                      ? '#1e1915'
-                      : '#FFFFFF',
-                    borderColor: isSelected
-                      ? opt.isSpecial
-                        ? '#800020'
-                        : '#b42323'
-                      : opt.isSpecial
-                      ? isDark
-                        ? '#4a321a'
-                        : '#fde68a'
-                      : colors.border,
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.filterChipText,
-                    {
-                      color: isSelected
-                        ? opt.isSpecial
-                          ? '#fef08a'
-                          : '#FFFFFF'
-                        : opt.isSpecial
-                        ? isDark
-                          ? '#fef08a'
-                          : '#92400e'
-                        : colors.textSecondary,
-                      fontWeight: isSelected ? '700' : '600',
-                    },
-                  ]}
-                >
-                  {opt.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+      {/* 0. Edge-to-edge transparent status bar during fullscreen */}
+      {isMapFullscreen && (
+        <StatusBar
+          barStyle={isDark ? 'light-content' : 'dark-content'}
+          translucent={true}
+          backgroundColor="transparent"
+        />
+      )}
 
-          {/* Metro Lines Toggle Chip */}
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => setShowMetro(!showMetro)}
-            style={[
-              styles.metroToggleChip,
+      {/* 1. Zone & Metro Filters Bar (Hidden in Fullscreen mode to maximize screen area) */}
+      {!isMapFullscreen && (
+        <View style={[styles.filterBarWrapper, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[
+              styles.filterScrollContent,
               {
-                backgroundColor: showMetro
-                  ? isDark
-                    ? '#341b18'
-                    : '#f9e9e7'
-                  : isDark
-                  ? '#1e1915'
-                  : '#FFFFFF',
-                borderColor: showMetro
-                  ? isDark
-                    ? '#4a2420'
-                    : '#f6ceca'
-                  : colors.border,
+                paddingLeft: 12 + safeLeft,
+                paddingRight: 12 + safeRight,
               },
             ]}
           >
-            <Ionicons
-              name="subway-outline"
-              size={14}
-              color={showMetro ? '#b42323' : colors.textMuted}
-            />
-            <Text
+            {filterOptions.map((opt) => {
+              const isSelected = selectedFilter === opt.value;
+              return (
+                <TouchableOpacity
+                  key={opt.value}
+                  activeOpacity={0.8}
+                  onPress={() => setSelectedFilter(opt.value)}
+                  style={[
+                    styles.filterChip,
+                    {
+                      backgroundColor: isSelected
+                        ? opt.isSpecial
+                          ? '#800020'
+                          : isKali
+                          ? '#7e22ce'
+                          : '#b42323'
+                        : isDark
+                        ? isKali
+                          ? '#1a1424'
+                          : '#1e1915'
+                        : '#FFFFFF',
+                      borderColor: isSelected
+                        ? opt.isSpecial
+                          ? '#800020'
+                          : isKali
+                          ? '#7e22ce'
+                          : '#b42323'
+                        : opt.isSpecial
+                        ? isDark
+                          ? '#4a321a'
+                          : '#fde68a'
+                        : colors.border,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.filterChipText,
+                      {
+                        color: isSelected
+                          ? opt.isSpecial
+                            ? '#fef08a'
+                            : '#FFFFFF'
+                          : opt.isSpecial
+                          ? isDark
+                            ? '#fef08a'
+                            : '#92400e'
+                          : colors.textSecondary,
+                        fontWeight: isSelected ? '700' : '600',
+                      },
+                    ]}
+                  >
+                    {opt.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+
+            {/* Metro Lines Toggle Chip */}
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => setShowMetro(!showMetro)}
               style={[
-                styles.metroToggleText,
-                { color: showMetro ? '#b42323' : colors.textMuted },
+                styles.metroToggleChip,
+                {
+                  backgroundColor: showMetro
+                    ? isDark
+                      ? isKali
+                        ? '#2b1b3d'
+                        : '#341b18'
+                      : isKali
+                      ? '#f3e8ff'
+                      : '#f9e9e7'
+                    : isDark
+                    ? isKali
+                      ? '#1a1424'
+                      : '#1e1915'
+                    : '#FFFFFF',
+                  borderColor: showMetro
+                    ? isDark
+                      ? isKali
+                        ? '#581c87'
+                        : '#4a2420'
+                      : isKali
+                      ? '#d8b4fe'
+                      : '#f6ceca'
+                    : colors.border,
+                },
               ]}
             >
-              {isBn ? 'মেট্রো রুট' : 'Metro Lines'}
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
+              <Ionicons
+                name="subway-outline"
+                size={14}
+                color={showMetro ? (isKali ? '#9333ea' : '#b42323') : colors.textMuted}
+              />
+              <Text
+                style={[
+                  styles.metroToggleText,
+                  { color: showMetro ? (isKali ? '#9333ea' : '#b42323') : colors.textMuted },
+                ]}
+              >
+                {isBn ? 'মেট্রো রুট' : 'Metro Lines'}
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+      )}
 
       {/* 2. Interactive Leaflet Map Canvas */}
       <View style={styles.mapContainer}>
@@ -534,8 +695,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
           startInLoadingState={true}
           onMessage={handleMessage}
           renderLoading={() => (
-            <View style={[styles.loadingOverlay, { backgroundColor: isDark ? '#1a1613' : '#f5f1ec' }]}>
-              <ActivityIndicator size="large" color="#b42323" />
+            <View style={[styles.loadingOverlay, { backgroundColor: isDark ? (isKali ? '#130f1c' : '#1a1613') : '#f5f1ec' }]}>
+              <ActivityIndicator size="large" color={isKali ? '#a855f7' : colors.primary} />
               <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
                 {isBn ? 'মানচিত্র ও প্যান্ডেল লোড হচ্ছে...' : 'Loading OpenStreetMap & Pandals...'}
               </Text>
@@ -553,8 +714,156 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
           </View>
         )}
 
+        {/* Top-Left Fullscreen Controls: Obvious Exit Button & Active Filter Badge */}
+        {isMapFullscreen && (
+          <View
+            style={[
+              styles.fullscreenTopLeftContainer,
+              {
+                top: safeTop + 10,
+                left: 14 + safeLeft,
+              },
+            ]}
+          >
+            {/* Obvious Exit Fullscreen Button */}
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => setIsMapFullscreen(false)}
+              style={[
+                styles.floatingExitBtn,
+                {
+                  backgroundColor: isDark
+                    ? isKali
+                      ? '#1a1424'
+                      : '#1e1915'
+                    : '#FFFFFF',
+                  borderColor: isKali ? '#7e22ce' : colors.primary,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={isBn ? 'পূর্ণস্ক্রিন মানচিত্র বন্ধ করুন' : 'Exit fullscreen map'}
+              accessibilityHint={isBn ? 'স্বাভাবিক মানচিত্রে ফিরে যান' : 'Restores the original map view'}
+            >
+              <Ionicons
+                name="arrow-back"
+                size={18}
+                color={isKali ? '#c084fc' : colors.primary}
+              />
+              <Text
+                style={[
+                  styles.floatingExitBtnText,
+                  { color: isKali ? '#c084fc' : colors.primary },
+                ]}
+              >
+                {isBn ? 'প্রস্থান' : 'Exit'}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Active Filter Badge */}
+            <View
+              style={[
+                styles.fullscreenFilterBadge,
+                {
+                  backgroundColor: isDark
+                    ? isKali
+                      ? 'rgba(26, 20, 36, 0.92)'
+                      : 'rgba(30, 25, 21, 0.92)'
+                    : 'rgba(255, 255, 255, 0.95)',
+                  borderColor: isKali
+                    ? isDark
+                      ? '#3b2554'
+                      : '#e9d5ff'
+                    : colors.border,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.fullscreenFilterBadgeText,
+                  { color: isDark ? colors.textSecondary : colors.textPrimary },
+                ]}
+                numberOfLines={1}
+              >
+                🪔 {filterOptions.find((f) => f.value === selectedFilter)?.label || selectedFilter}
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* 3. Floating Action Controls (Right side) */}
-        <View style={styles.floatingControlsContainer}>
+        <View
+          style={[
+            styles.floatingControlsContainer,
+            {
+              top: isMapFullscreen ? safeTop + 10 : 14,
+              right: 14 + safeRight,
+            },
+          ]}
+        >
+          {/* Fullscreen Button: Outward arrows to expand, Inward arrows to collapse */}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={toggleMapFullscreen}
+            style={[
+              styles.floatingControlBtn,
+              {
+                backgroundColor: isDark
+                  ? isKali
+                    ? isMapFullscreen
+                      ? '#2e1065'
+                      : '#1a1424'
+                    : isMapFullscreen
+                    ? '#2a1a18'
+                    : '#1e1915'
+                  : isMapFullscreen
+                  ? isKali
+                    ? '#f3e8ff'
+                    : '#fee2e2'
+                  : '#FFFFFF',
+                borderColor: isMapFullscreen
+                  ? isKali
+                    ? '#9333ea'
+                    : colors.primary
+                  : isKali
+                  ? isDark
+                    ? '#3b2554'
+                    : '#e9d5ff'
+                  : colors.border,
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel={
+              isMapFullscreen
+                ? isBn
+                  ? 'পূর্ণস্ক্রিন মানচিত্র বন্ধ করুন'
+                  : 'Exit fullscreen map'
+                : isBn
+                ? 'পূর্ণস্ক্রিন মানচিত্র খুলুন'
+                : 'Enter fullscreen map'
+            }
+            accessibilityHint={
+              isMapFullscreen
+                ? isBn
+                  ? 'স্বাভাবিক মানচিত্রে ফিরে যান'
+                  : 'Restores the original map view'
+                : isBn
+                ? 'মানচিত্রটি সম্পূর্ণ পর্দায় দেখান'
+                : 'Expands the map to occupy the full screen'
+            }
+          >
+            <Ionicons
+              name={isMapFullscreen ? 'contract-outline' : 'expand-outline'}
+              size={20}
+              color={
+                isKali
+                  ? isMapFullscreen
+                    ? '#a855f7'
+                    : '#c084fc'
+                  : colors.primary
+              }
+            />
+          </TouchableOpacity>
+
           {/* Geolocation Button */}
           <TouchableOpacity
             activeOpacity={0.85}
@@ -562,26 +871,32 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
             disabled={isLocating}
             style={[
               styles.floatingControlBtn,
-              { backgroundColor: isDark ? '#1e1915' : '#FFFFFF', borderColor: colors.border },
+              {
+                backgroundColor: isDark ? (isKali ? '#1a1424' : '#1e1915') : '#FFFFFF',
+                borderColor: isKali ? (isDark ? '#3b2554' : '#e9d5ff') : colors.border,
+              },
             ]}
-            accessibilityLabel="My Location"
+            accessibilityLabel={isBn ? 'আমার অবস্থান' : 'My Location'}
           >
             {isLocating ? (
-              <ActivityIndicator size="small" color="#b42323" />
+              <ActivityIndicator size="small" color={isKali ? '#a855f7' : colors.primary} />
             ) : (
-              <Ionicons name="locate" size={20} color="#b42323" />
+              <Ionicons name="locate" size={20} color={isKali ? '#a855f7' : colors.primary} />
             )}
           </TouchableOpacity>
 
-          {/* Recenter Kolkata Button */}
+          {/* Recenter Button */}
           <TouchableOpacity
             activeOpacity={0.85}
-            onPress={() => webViewRef.current?.injectJavaScript('window.recenterKolkata(); true;')}
+            onPress={() => webViewRef.current?.injectJavaScript('window.recenterDefault(); true;')}
             style={[
               styles.floatingControlBtn,
-              { backgroundColor: isDark ? '#1e1915' : '#FFFFFF', borderColor: colors.border },
+              {
+                backgroundColor: isDark ? (isKali ? '#1a1424' : '#1e1915') : '#FFFFFF',
+                borderColor: isKali ? (isDark ? '#3b2554' : '#e9d5ff') : colors.border,
+              },
             ]}
-            accessibilityLabel="Recenter Kolkata"
+            accessibilityLabel={isKali ? (isBn ? 'বারাসাত কেন্দ্র করুন' : 'Recenter Barasat') : (isBn ? 'কলকাতা কেন্দ্র করুন' : 'Recenter Kolkata')}
           >
             <Ionicons name="compass-outline" size={20} color={colors.textPrimary} />
           </TouchableOpacity>
@@ -592,7 +907,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
             onPress={() => webViewRef.current?.injectJavaScript('window.zoomIn(); true;')}
             style={[
               styles.floatingControlBtn,
-              { backgroundColor: isDark ? '#1e1915' : '#FFFFFF', borderColor: colors.border },
+              {
+                backgroundColor: isDark ? (isKali ? '#1a1424' : '#1e1915') : '#FFFFFF',
+                borderColor: isKali ? (isDark ? '#3b2554' : '#e9d5ff') : colors.border,
+              },
             ]}
             accessibilityLabel="Zoom In"
           >
@@ -605,7 +923,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
             onPress={() => webViewRef.current?.injectJavaScript('window.zoomOut(); true;')}
             style={[
               styles.floatingControlBtn,
-              { backgroundColor: isDark ? '#1e1915' : '#FFFFFF', borderColor: colors.border },
+              {
+                backgroundColor: isDark ? (isKali ? '#1a1424' : '#1e1915') : '#FFFFFF',
+                borderColor: isKali ? (isDark ? '#3b2554' : '#e9d5ff') : colors.border,
+              },
             ]}
             accessibilityLabel="Zoom Out"
           >
@@ -615,7 +936,24 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
 
         {/* 4. Mobile Floating Selected Pandal Card (Matching Capacitor mobile floating card) */}
         {selectedPandal && (
-          <View style={styles.floatingPandalCardContainer}>
+          <View
+            style={[
+              styles.floatingPandalCardContainer,
+              isLandscape
+                ? {
+                    left: 12 + safeLeft,
+                    bottom: (isMapFullscreen ? safeBottom : 0) + 8,
+                    right: 'auto',
+                    width: 360,
+                    maxWidth: '48%',
+                  }
+                : {
+                    left: 12,
+                    right: 12,
+                    bottom: isMapFullscreen ? safeBottom + 12 : 12,
+                  },
+            ]}
+          >
             <View
               style={[
                 styles.floatingPandalCard,
@@ -716,8 +1054,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
                   style={[
                     styles.cardActionBtn,
                     {
-                      backgroundColor: inPlan ? (isDark ? '#27201a' : '#f5f1ec') : '#b42323',
-                      borderColor: inPlan ? colors.border : '#b42323',
+                      backgroundColor: inPlan ? (isDark ? '#27201a' : '#f5f1ec') : colors.primary,
+                      borderColor: inPlan ? colors.border : colors.primary,
                     },
                   ]}
                 >
@@ -776,7 +1114,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
         )}
 
         {/* 5. Bottom Selected Pandals Bar (matching Capacitor planner bar when no pandal open) */}
-        {!selectedPandal && <SelectedPandalsBar />}
+        {!selectedPandal && (
+          <View style={isMapFullscreen ? { paddingBottom: safeBottom } : undefined}>
+            <SelectedPandalsBar />
+          </View>
+        )}
       </View>
     </View>
   );
@@ -854,6 +1196,48 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '700',
+  },
+  fullscreenTopLeftContainer: {
+    position: 'absolute',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    zIndex: 25,
+  },
+  floatingExitBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    elevation: 4,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 4,
+  },
+  floatingExitBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  fullscreenFilterBadge: {
+    paddingHorizontal: 12,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 1,
+    justifyContent: 'center',
+    elevation: 3,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 3,
+    maxWidth: 180,
+  },
+  fullscreenFilterBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   floatingControlsContainer: {
     position: 'absolute',

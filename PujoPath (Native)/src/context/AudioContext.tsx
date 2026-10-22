@@ -112,7 +112,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, []);
 
-  const playTrack = async (track: MusicTrack) => {
+  const playTrack = React.useCallback(async (track: MusicTrack) => {
     try {
       if (playerRef.current) {
         playerRef.current.pause();
@@ -133,10 +133,17 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const player = createAudioPlayer(streamUrl);
       playerRef.current = player;
 
+      let lastPos = 0;
       player.addListener('playbackStatusUpdate', (status) => {
         if (status.isLoaded) {
-          setPositionMs(Math.round((status.currentTime || 0) * 1000));
-          setDurationMs(Math.round((status.duration || 0) * 1000));
+          const newPos = Math.round((status.currentTime || 0) * 1000);
+          const newDur = Math.round((status.duration || 0) * 1000);
+          // Throttle state update to at most once every 400ms to eliminate continuous UI thrashing
+          if (Math.abs(newPos - lastPos) >= 400 || status.didJustFinish) {
+            lastPos = newPos;
+            setPositionMs(newPos);
+            setDurationMs(newDur);
+          }
           setIsPlaying(status.playing);
           if (status.didJustFinish) {
             setIsPlaying(false);
@@ -150,9 +157,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       console.warn('Failed to load track:', error);
       setIsPlaying(false);
     }
-  };
+  }, []);
 
-  const togglePlayPause = async () => {
+  const togglePlayPause = React.useCallback(async () => {
     if (!playerRef.current) {
       if (currentTrack) {
         await playTrack(currentTrack);
@@ -173,19 +180,20 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } catch (err) {
       console.warn('togglePlayPause error:', err);
     }
-  };
+  }, [currentTrack, playTrack]);
 
-  const seekTo = async (positionMillis: number) => {
+  const seekTo = React.useCallback(async (positionMillis: number) => {
     if (playerRef.current) {
       try {
         await playerRef.current.seekTo(positionMillis / 1000);
+        setPositionMs(positionMillis);
       } catch (err) {
         console.warn('seekTo error:', err);
       }
     }
-  };
+  }, []);
 
-  const stopAudio = async () => {
+  const stopAudio = React.useCallback(async () => {
     if (playerRef.current) {
       try {
         playerRef.current.pause();
@@ -196,27 +204,45 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setCurrentTrack(null);
       setPositionMs(0);
     }
-  };
+  }, []);
+
+  const value = React.useMemo(
+    () => ({
+      currentTrack,
+      isPlaying,
+      positionMs,
+      durationMs,
+      playTrack,
+      togglePlayPause,
+      seekTo,
+      stopAudio,
+      userPlaylistIds,
+      addToPlaylist,
+      removeFromPlaylist,
+      togglePlaylistTrack,
+      isInPlaylist,
+      playQueue,
+    }),
+    [
+      currentTrack,
+      isPlaying,
+      positionMs,
+      durationMs,
+      playTrack,
+      togglePlayPause,
+      seekTo,
+      stopAudio,
+      userPlaylistIds,
+      addToPlaylist,
+      removeFromPlaylist,
+      togglePlaylistTrack,
+      isInPlaylist,
+      playQueue,
+    ]
+  );
 
   return (
-    <AudioContext.Provider
-      value={{
-        currentTrack,
-        isPlaying,
-        positionMs,
-        durationMs,
-        playTrack,
-        togglePlayPause,
-        seekTo,
-        stopAudio,
-        userPlaylistIds,
-        addToPlaylist,
-        removeFromPlaylist,
-        togglePlaylistTrack,
-        isInPlaylist,
-        playQueue,
-      }}
-    >
+    <AudioContext.Provider value={value}>
       {children}
     </AudioContext.Provider>
   );

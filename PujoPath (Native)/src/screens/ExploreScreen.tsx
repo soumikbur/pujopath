@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,11 +11,13 @@ import {
   Animated,
   Easing,
   LayoutAnimation,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
+import { useFestival } from '@/context/FestivalContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { PandalService } from '@/lib/services/PandalService';
 import { PandalCard } from '@/components/PandalCard';
@@ -24,6 +26,7 @@ import { CustomStopModal } from '@/components/CustomStopModal';
 import { SelectedPandalsBar } from '@/components/SelectedPandalsBar';
 import { Pandal, FilterOptions } from '@/types';
 import { toBengaliDigits } from '@/lib/geo';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface AnimatedToggleSwitchProps {
   value: boolean;
@@ -31,6 +34,8 @@ interface AnimatedToggleSwitchProps {
   isDark: boolean;
   label: string;
   reduceMotion: boolean;
+  activeColor?: string;
+  style?: any;
 }
 
 const AnimatedToggleSwitch: React.FC<AnimatedToggleSwitchProps> = ({
@@ -39,6 +44,8 @@ const AnimatedToggleSwitch: React.FC<AnimatedToggleSwitchProps> = ({
   isDark,
   label,
   reduceMotion,
+  activeColor = '#B42323',
+  style,
 }) => {
   const anim = useRef(new Animated.Value(value ? 1 : 0)).current;
 
@@ -64,7 +71,7 @@ const AnimatedToggleSwitch: React.FC<AnimatedToggleSwitchProps> = ({
     <TouchableOpacity
       activeOpacity={0.75}
       onPress={onValueChange}
-      style={styles.switchRow}
+      style={[styles.switchRow, style]}
       accessibilityRole="switch"
       accessibilityState={{ checked: value }}
       accessibilityLabel={label}
@@ -74,12 +81,12 @@ const AnimatedToggleSwitch: React.FC<AnimatedToggleSwitchProps> = ({
           styles.switchTrack,
           {
             backgroundColor: value
-              ? '#B42323'
+              ? activeColor
               : isDark
               ? '#3D332A'
               : '#DED6CE',
             borderColor: value
-              ? '#961B1B'
+              ? activeColor
               : isDark
               ? '#524438'
               : '#C7BCAF',
@@ -97,7 +104,7 @@ const AnimatedToggleSwitch: React.FC<AnimatedToggleSwitchProps> = ({
         style={[
           styles.switchLabel,
           value
-            ? { color: '#B42323', fontWeight: '800' }
+            ? { color: activeColor, fontWeight: '800' }
             : { color: isDark ? '#C4B9AE' : '#4A423D' },
         ]}
       >
@@ -116,7 +123,9 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
   const { language } = useLanguage();
   const isBn = language === 'bn';
   const { customStops } = useRoute();
+  const { activeFestival } = useFestival();
   const reduceMotion = useReducedMotion();
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, tabScrollBottomPadding } = useResponsive();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedZone, setSelectedZone] = useState('All');
@@ -171,6 +180,8 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
     setShowSortModal(false);
   };
 
+  const isKali = activeFestival === 'kali';
+
   const filteredPandals = useMemo(() => {
     return PandalService.filterPandals(
       {
@@ -185,7 +196,8 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
       },
       undefined,
       undefined,
-      customStops
+      customStops,
+      activeFestival || 'durga'
     );
   }, [
     searchQuery,
@@ -197,6 +209,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
     featuredOnly,
     sortBy,
     customStops,
+    activeFestival,
   ]);
 
   const sortOptions = [
@@ -208,38 +221,74 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
   const currentSortLabel =
     sortOptions.find((opt) => opt.id === sortBy)?.label || (isBn ? 'সুপারিশকৃত' : 'Recommended');
 
-  const renderItem = ({ item }: { item: Pandal }) => (
-    <PandalCard
-      pandal={item}
-      onPress={() => navigation.navigate('PandalDetail', { pandalId: item.id })}
-    />
+  const handlePandalPress = useCallback(
+    (pandalId: string) => {
+      navigation.navigate('PandalDetail', { pandalId });
+    },
+    [navigation]
+  );
+
+  const keyExtractor = useCallback((item: Pandal) => item.id, []);
+
+  const renderItem = useCallback(
+    ({ item }: { item: Pandal }) => (
+      <PandalCard
+        pandal={item}
+        onPress={() => handlePandalPress(item.id)}
+        style={isLandscape ? { flex: 1, maxWidth: '48.8%', marginHorizontal: 4, marginBottom: 12 } : undefined}
+      />
+    ),
+    [isLandscape, handlePandalPress]
   );
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
+        key={isLandscape ? 'explore-grid-landscape' : 'explore-list-portrait'}
+        numColumns={isLandscape ? 2 : 1}
         data={filteredPandals}
-        keyExtractor={(item) => item.id}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
-        contentContainerStyle={styles.listContent}
-        initialNumToRender={10}
-        maxToRenderPerBatch={10}
+        contentContainerStyle={[
+          styles.listContent,
+          {
+            paddingLeft: screenPaddingLeft,
+            paddingRight: screenPaddingRight,
+            paddingBottom: tabScrollBottomPadding + 24,
+            maxWidth: isLandscape ? 960 : undefined,
+            alignSelf: isLandscape ? 'center' : undefined,
+            width: '100%',
+          },
+        ]}
+        columnWrapperStyle={isLandscape ? { justifyContent: 'space-between' } : undefined}
+        removeClippedSubviews={Platform.OS === 'android'}
+        initialNumToRender={8}
+        maxToRenderPerBatch={8}
         windowSize={5}
+        updateCellsBatchingPeriod={50}
         ListHeaderComponent={
           <View style={styles.headerContainer}>
             {/* Title Section */}
             <View style={styles.titleSection}>
               <View style={styles.directoryBadge}>
-                <Ionicons name="search" size={13} color="#B42323" />
-                <Text style={styles.directoryBadgeText}>
-                  {isBn ? 'প্যান্ডেল সন্ধান' : 'PANDAL DIRECTORY'}
+                <Ionicons name="search" size={13} color={colors.primary} />
+                <Text style={[styles.directoryBadgeText, { color: colors.primary }]}>
+                  {isKali
+                    ? isBn ? 'বারাসাত ও সংলগ্ন কালীপূজা সন্ধান' : 'BARASAT & BENGAL KALI PUJA'
+                    : isBn ? 'প্যান্ডেল সন্ধান' : 'PANDAL DIRECTORY'}
                 </Text>
               </View>
               <Text style={[styles.pageTitle, { color: colors.textPrimary }]}>
-                {isBn ? 'প্যান্ডেল খুঁজুন' : 'Explore Kolkata Pandals'}
+                {isKali
+                  ? isBn ? 'কালীপূজা মণ্ডপ পরিক্রমা' : 'Explore Kali Puja Pandals'
+                  : isBn ? 'প্যান্ডেল খুঁজুন' : 'Explore Kolkata Pandals'}
               </Text>
               <Text style={[styles.pageSubtitle, { color: colors.textMuted }]}>
-                {isBn
+                {isKali
+                  ? isBn
+                    ? 'বারাসাত, মধ্যমগ্রাম ও ঐতিহাসিক কালীক্ষেত্রের নির্ভরযোগ্য তথ্য ও পথনির্দেশিকা।'
+                    : 'Verified discovery and navigation for Barasat, Madhyamgram, and revered Shaktipeeths.'
+                  : isBn
                   ? 'নাম, এলাকা, থিম বা নিকটতম মেট্রো স্টেশন দিয়ে কলকাতার সেরা পূজামণ্ডপ খুঁজুন।'
                   : "Find Kolkata's best puja pandals by name, area, theme, or nearest metro station."}
               </Text>
@@ -269,7 +318,11 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                 <TextInput
                   style={[styles.searchInput, { color: colors.textPrimary }]}
                   placeholder={
-                    isBn
+                    isKali
+                      ? isBn
+                        ? 'বারাসাত মণ্ডপ, ক্লাব, এলাকা বা মন্দির খুঁজুন...'
+                        : 'Search Barasat pandals, clubs, locality...'
+                      : isBn
                       ? 'প্যান্ডেলের নাম, বনেদি বাড়ি, এলাকা, থিম বা মেট্রো...'
                       : 'Search pandals by name, Bonedi Bari, theme, locality or metro...'
                   }
@@ -285,7 +338,11 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
               </View>
 
               {/* Zone Filter Horizontal Scroll */}
-              <ZoneFilterBar selectedZone={selectedZone} onSelectZone={setSelectedZone} />
+              <ZoneFilterBar
+                selectedZone={selectedZone}
+                onSelectZone={setSelectedZone}
+                festival={activeFestival || 'durga'}
+              />
 
               {/* Interactive Feature Switches Grid (5 switches) */}
               <View style={[styles.featureFilterSection, { borderTopColor: isDark ? '#2F2720' : '#EEE8E1' }]}>
@@ -321,8 +378,10 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                       value={bonediBariOnly}
                       onValueChange={() => setBonediBariOnly(!bonediBariOnly)}
                       isDark={isDark}
-                      label={isBn ? 'বনেদি বাড়ির পুজো' : 'Bonedi Bari'}
+                      activeColor={colors.primary}
+                      label={isBn ? 'ঐতিহাসিক বনেদি পুজো' : 'Heritage/Bonedi'}
                       reduceMotion={reduceMotion}
+                      style={isLandscape ? { width: '31%' } : undefined}
                     />
 
                     {/* Switch 2: Near Metro */}
@@ -330,8 +389,10 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                       value={metroOnly}
                       onValueChange={() => setMetroOnly(!metroOnly)}
                       isDark={isDark}
+                      activeColor={colors.primary}
                       label={isBn ? 'মেট্রোর কাছে' : 'Near Metro'}
                       reduceMotion={reduceMotion}
+                      style={isLandscape ? { width: '31%' } : undefined}
                     />
 
                     {/* Switch 3: Heritage Sabeki */}
@@ -339,8 +400,10 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                       value={heritageOnly}
                       onValueChange={() => setHeritageOnly(!heritageOnly)}
                       isDark={isDark}
+                      activeColor={colors.primary}
                       label={isBn ? 'ঐতিহ্যবাহী সাবেকি' : 'Heritage Sabeki'}
                       reduceMotion={reduceMotion}
+                      style={isLandscape ? { width: '31%' } : undefined}
                     />
 
                     {/* Switch 4: Wheelchair Access */}
@@ -348,8 +411,10 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                       value={wheelchairOnly}
                       onValueChange={() => setWheelchairOnly(!wheelchairOnly)}
                       isDark={isDark}
+                      activeColor={colors.primary}
                       label={isBn ? 'হুইলচেয়ার সুবিধা' : 'Wheelchair Access'}
                       reduceMotion={reduceMotion}
+                      style={isLandscape ? { width: '31%' } : undefined}
                     />
 
                     {/* Switch 5: Featured Only */}
@@ -357,8 +422,10 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                       value={featuredOnly}
                       onValueChange={() => setFeaturedOnly(!featuredOnly)}
                       isDark={isDark}
+                      activeColor={colors.primary}
                       label={isBn ? 'বিশেষ সেরা মণ্ডপ' : 'Featured Only'}
                       reduceMotion={reduceMotion}
+                      style={isLandscape ? { width: '31%' } : undefined}
                     />
                   </View>
                 )}
@@ -369,7 +436,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                 <View style={styles.counterGroup}>
                   <Text style={[styles.countText, { color: isDark ? '#A89E95' : '#776D65' }]}>
                     {isBn ? 'মোট ' : 'Showing '}
-                    <Text style={styles.boldRedCount}>
+                    <Text style={[styles.boldRedCount, { color: colors.primary }]}>
                       {isBn
                         ? toBengaliDigits(filteredPandals.length)
                         : filteredPandals.length}
@@ -408,8 +475,8 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                       onPress={handleResetFilters}
                       style={styles.resetBtn}
                     >
-                      <Ionicons name="reload-outline" size={13} color="#B42323" />
-                      <Text style={styles.resetBtnText}>
+                      <Ionicons name="reload-outline" size={13} color={colors.primary} />
+                      <Text style={[styles.resetBtnText, { color: colors.primary }]}>
                         {isBn ? 'রিসেট' : 'Reset All'}
                       </Text>
                     </TouchableOpacity>
@@ -426,17 +493,41 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                 style={[
                   styles.addCustomBtn,
                   {
-                    backgroundColor: isDark ? '#341B18' : '#FDEEEE',
-                    borderColor: isDark ? '#4D221E' : '#F6CECA',
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)',
+                    borderColor: colors.borderSubtle,
                   },
                 ]}
               >
-                <Ionicons name="add-circle" size={16} color="#B42323" />
-                <Text style={styles.addCustomText}>
+                <Ionicons name="add-circle" size={16} color={colors.primary} />
+                <Text style={[styles.addCustomText, { color: colors.primary }]}>
                   {isBn ? '+ নিজস্ব কাস্টম স্টপ যোগ করুন' : '+ Add Custom Pandal Stop'}
                 </Text>
               </TouchableOpacity>
             </View>
+          </View>
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Ionicons name="search-outline" size={38} color={colors.textMuted} />
+            <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
+              {isBn ? 'কোনো মণ্ডপ খুঁজে পাওয়া যায়নি' : 'No pandals found'}
+            </Text>
+            <Text style={[styles.emptySubtitle, { color: colors.textMuted }]}>
+              {isBn
+                ? 'অনুসন্ধান শব্দ বা ফিল্টার পরিবর্তন করে পুনরায় চেষ্টা করুন।'
+                : 'Try modifying your search query or reset the active filters.'}
+            </Text>
+            {isFiltered && (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={handleResetFilters}
+                style={[styles.emptyResetBtn, { backgroundColor: colors.primary }]}
+              >
+                <Text style={styles.emptyResetBtnText}>
+                  {isBn ? 'ফিল্টার রিসেট করুন' : 'Reset Filters'}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         }
       />
@@ -511,8 +602,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 90,
+    paddingTop: 4,
   },
   headerContainer: {
     paddingTop: 16,
@@ -749,5 +839,35 @@ const styles = StyleSheet.create({
   sortModalOptionText: {
     fontSize: 13,
     fontWeight: '600',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+    paddingHorizontal: 24,
+    gap: 8,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 18,
+    maxWidth: 280,
+  },
+  emptyResetBtn: {
+    marginTop: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 12,
+  },
+  emptyResetBtnText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '800',
   },
 });

@@ -7,6 +7,10 @@ import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { useNotifications } from '@/context/NotificationContext';
+import { useFestival } from '@/context/FestivalContext';
+
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface AppHeaderProps {
   title?: string;
@@ -19,8 +23,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
   const navigation = useNavigation<any>();
   const { colors, isDark, toggleTheme } = useTheme();
   const { language, setLanguage } = useLanguage();
+  const { activeFestival, resetFestival } = useFestival();
+  const isBn = language === 'bn';
   const { favorites } = useRoute();
+  const { activeScheduledCount } = useNotifications();
   const reduceMotion = useReducedMotion();
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, headerHeight } = useResponsive();
 
   const themeAnim = useRef(new Animated.Value(0)).current;
   const heartAnim = useRef(new Animated.Value(1)).current;
@@ -69,7 +77,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
     outputRange: [1, 0.8, 1],
   });
 
-  const topInset = Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0);
+  const topInset = isLandscape
+    ? Math.max(insets.top, 4)
+    : Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0);
 
   return (
     <View
@@ -82,32 +92,115 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
         },
       ]}
     >
-      <View style={styles.headerBar}>
-        {/* Left Section: Brand Logo or Back Button */}
+      <View
+        style={[
+          styles.headerBar,
+          {
+            height: headerHeight,
+            paddingLeft: screenPaddingLeft,
+            paddingRight: screenPaddingRight,
+          },
+        ]}
+      >
+        {/* Left Section: Only left-pointing back arrow icon (no PujoPath text, no 'Back' text) */}
         <View style={styles.leftGroup}>
           {showBack && onBack ? (
             <TouchableOpacity
               onPress={onBack}
               style={styles.backButton}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              accessibilityLabel="Go back"
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              accessibilityLabel={isBn ? 'পূর্ববর্তী পৃষ্ঠায় ফিরে যান' : 'Go back'}
+              accessibilityRole="button"
+              activeOpacity={0.75}
             >
-              <Ionicons name="arrow-back" size={22} color="#B42323" />
+              <View
+                style={[
+                  styles.backIconCircle,
+                  {
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+                    borderColor: colors.borderSubtle,
+                  },
+                ]}
+              >
+                <Ionicons
+                  name="arrow-back"
+                  size={isLandscape ? 18 : 20}
+                  color={colors.primary}
+                />
+              </View>
               {title ? (
-                <Text style={[styles.screenTitle, { color: colors.textPrimary }]} numberOfLines={1}>
+                <Text
+                  style={[
+                    styles.screenTitle,
+                    {
+                      color: colors.textPrimary,
+                      fontSize: isLandscape ? 14 : 16,
+                    },
+                  ]}
+                  numberOfLines={1}
+                >
                   {title}
                 </Text>
               ) : null}
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity
-              activeOpacity={0.85}
-              onPress={() => navigation?.navigate('MainTabs', { screen: 'HomeTab' })}
-              style={styles.brandContainer}
-              accessibilityLabel="PujoPath home"
-            >
-              <Text style={styles.brandTitle}>PujoPath</Text>
-            </TouchableOpacity>
+            <View style={styles.rootBackRow}>
+              <TouchableOpacity
+                onPress={resetFestival}
+                style={styles.backButton}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                accessibilityLabel={isBn ? 'উৎসব নির্বাচনে ফিরে যান' : 'Back to festival selection'}
+                accessibilityRole="button"
+                activeOpacity={0.75}
+              >
+                <View
+                  style={[
+                    styles.backIconCircle,
+                    {
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+                      borderColor: colors.borderSubtle,
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name="arrow-back"
+                    size={isLandscape ? 18 : 20}
+                    color={colors.primary}
+                  />
+                </View>
+              </TouchableOpacity>
+
+              {activeFestival && (
+                <TouchableOpacity
+                  activeOpacity={0.75}
+                  onPress={resetFestival}
+                  style={[
+                    styles.festivalBadgePill,
+                    {
+                      backgroundColor: colors.badge,
+                      borderColor: colors.border,
+                    },
+                  ]}
+                  accessibilityLabel="Switch festival"
+                  accessibilityRole="button"
+                >
+                  <Text
+                    style={[
+                      styles.festivalBadgePillText,
+                      { color: colors.badgeText },
+                    ]}
+                  >
+                    {activeFestival === 'kali'
+                      ? isBn
+                        ? '🪔 কালীপূজা ▾'
+                        : '🪔 Kali Puja ▾'
+                      : isBn
+                      ? '🌸 দুর্গাপূজা ▾'
+                      : '🌸 Durga Puja ▾'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
           )}
         </View>
 
@@ -157,7 +250,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
               onPress={() => setLanguage('en')}
               style={[
                 styles.langOption,
-                language === 'en' && styles.langOptionActive,
+                language === 'en' && [styles.langOptionActive, { backgroundColor: colors.primary }],
               ]}
               accessibilityLabel="English"
             >
@@ -177,7 +270,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
               onPress={() => setLanguage('bn')}
               style={[
                 styles.langOption,
-                language === 'bn' && styles.langOptionActive,
+                language === 'bn' && [styles.langOptionActive, { backgroundColor: colors.primary }],
               ]}
               accessibilityLabel="Bengali"
             >
@@ -219,16 +312,46 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
               <Ionicons
                 name={favorites.length > 0 ? 'heart' : 'heart-outline'}
                 size={17}
-                color={favorites.length > 0 ? '#B42323' : (isDark ? '#B4A99E' : '#625B55')}
+                color={favorites.length > 0 ? colors.primary : (isDark ? '#B4A99E' : '#625B55')}
               />
               {favorites.length > 0 && (
-                <View style={styles.badge}>
+                <View style={[styles.badge, { backgroundColor: colors.primary }]}>
                   <Text style={styles.badgeText}>
                     {favorites.length > 99 ? '99+' : favorites.length}
                   </Text>
                 </View>
               )}
             </Animated.View>
+          </TouchableOpacity>
+
+          {/* Notifications & Reminders Bell */}
+          <TouchableOpacity
+            activeOpacity={0.75}
+            onPress={() => {
+              const rootNav = navigation?.getParent?.() || navigation;
+              rootNav?.navigate('Notifications');
+            }}
+            style={[
+              styles.iconButton,
+              {
+                borderColor: colors.border,
+                backgroundColor: isDark ? colors.surface : 'transparent',
+              },
+            ]}
+            accessibilityLabel="Notifications and reminders"
+          >
+            <Ionicons
+              name="notifications-outline"
+              size={17}
+              color={activeScheduledCount > 0 ? colors.primary : (isDark ? '#B4A99E' : '#625B55')}
+            />
+            {activeScheduledCount > 0 && (
+              <View style={[styles.badge, { backgroundColor: colors.primary }]}>
+                <Text style={styles.badgeText}>
+                  {activeScheduledCount > 9 ? '9+' : activeScheduledCount}
+                </Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -254,24 +377,42 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     marginRight: 8,
   },
-  brandContainer: {
+  rootBackRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
   },
-  brandTitle: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#B42323',
-    letterSpacing: -0.4,
+  festivalBadgePill: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  festivalBadgePillText: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.2,
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
     flexShrink: 1,
   },
+  backIconCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backButtonLabel: {
+    fontWeight: '800',
+    letterSpacing: -0.2,
+  },
   screenTitle: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '800',
     letterSpacing: -0.2,
     flexShrink: 1,
@@ -303,7 +444,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   langOptionActive: {
-    backgroundColor: '#B42323',
+    // background dynamically set via colors.primary
   },
   langText: {
     fontSize: 11,
@@ -320,7 +461,6 @@ const styles = StyleSheet.create({
     minWidth: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: '#B42323',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 3,

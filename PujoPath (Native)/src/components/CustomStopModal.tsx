@@ -19,6 +19,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { useResponsive } from '@/hooks/useResponsive';
 import { Pandal } from '@/types';
 
 interface CustomStopModalProps {
@@ -31,6 +32,7 @@ export const CustomStopModal: React.FC<CustomStopModalProps> = ({ visible, onClo
   const { t, language } = useLanguage();
   const { addCustomStop } = useRoute();
   const reduceMotion = useReducedMotion();
+  const { isLandscape } = useResponsive();
 
   const [name, setName] = useState('');
   const [locality, setLocality] = useState('');
@@ -137,7 +139,14 @@ export const CustomStopModal: React.FC<CustomStopModalProps> = ({ visible, onClo
     <Modal visible={isRendered || visible} animationType="none" transparent onRequestClose={handleClose}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.overlay}
+        style={[
+          styles.overlay,
+          isLandscape && {
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 20,
+          },
+        ]}
       >
         <Animated.View style={[styles.backdrop, { opacity: backdropOpacity }]}>
           <Pressable style={styles.backdropPressable} onPress={handleClose} />
@@ -150,6 +159,12 @@ export const CustomStopModal: React.FC<CustomStopModalProps> = ({ visible, onClo
               backgroundColor: colors.surface,
               borderColor: colors.border,
               transform: [{ translateY }],
+            },
+            isLandscape && {
+              maxWidth: 540,
+              width: '100%',
+              borderRadius: 20,
+              maxHeight: '94%',
             },
           ]}
         >

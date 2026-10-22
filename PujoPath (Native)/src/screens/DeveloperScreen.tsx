@@ -11,6 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface DeveloperScreenProps {
   navigation: any;
@@ -20,6 +21,7 @@ export const DeveloperScreen: React.FC<DeveloperScreenProps> = ({ navigation }) 
   const { colors, isDark } = useTheme();
   const { language } = useLanguage();
   const isBn = language === 'bn';
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, stackScrollBottomPadding } = useResponsive();
 
   const moumitaResponsibilities = isBn
     ? [
@@ -64,7 +66,17 @@ export const DeveloperScreen: React.FC<DeveloperScreenProps> = ({ navigation }) 
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={styles.scrollContent}
+      contentContainerStyle={[
+        styles.scrollContent,
+        {
+          paddingLeft: screenPaddingLeft,
+          paddingRight: screenPaddingRight,
+          paddingBottom: stackScrollBottomPadding + 24,
+          maxWidth: isLandscape ? 860 : undefined,
+          alignSelf: isLandscape ? 'center' : undefined,
+          width: '100%',
+        },
+      ]}
       showsVerticalScrollIndicator={false}
     >
       {/* Header Banner */}
@@ -85,13 +97,16 @@ export const DeveloperScreen: React.FC<DeveloperScreenProps> = ({ navigation }) 
         </Text>
       </View>
 
-      {/* Card 1: Moumita */}
-      <View
-        style={[
-          styles.profileCard,
-          { backgroundColor: colors.surface, borderColor: colors.border },
-        ]}
-      >
+      {/* Profiles Container (Side-by-side in Landscape) */}
+      <View style={[isLandscape && { flexDirection: 'row', gap: 14 }]}>
+        {/* Card 1: Moumita */}
+        <View
+          style={[
+            styles.profileCard,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+            isLandscape && { flex: 1, marginBottom: 0 },
+          ]}
+        >
         <View style={styles.profileTopRow}>
           <Image
             source={require('../../assets/developers/moumita.jpg')}
@@ -162,6 +177,7 @@ export const DeveloperScreen: React.FC<DeveloperScreenProps> = ({ navigation }) 
         style={[
           styles.profileCard,
           { backgroundColor: colors.surface, borderColor: colors.border },
+          isLandscape && { flex: 1, marginBottom: 0 },
         ]}
       >
         <View style={styles.profileTopRow}>
@@ -227,6 +243,7 @@ export const DeveloperScreen: React.FC<DeveloperScreenProps> = ({ navigation }) 
             <Ionicons name="open-outline" size={13} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
+      </View>
       </View>
 
       {/* Feedback CTA Card */}

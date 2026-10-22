@@ -93,47 +93,61 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
   }, []);
 
-  const saveStops = (newStops: RouteStop[]) => {
+  const stopIdsSet = React.useMemo(() => new Set(stops.map((s) => s.pandalId)), [stops]);
+  const favoritesSet = React.useMemo(() => new Set(favorites), [favorites]);
+
+  const saveStops = React.useCallback((newStops: RouteStop[]) => {
     setStops(newStops);
     AsyncStorage.setItem(STORAGE_ROUTE_KEY, JSON.stringify(newStops));
-  };
+  }, []);
 
-  const addStop = (pandal: Pandal) => {
-    if (stops.some((s) => s.pandalId === pandal.id)) return;
-    const newStop: RouteStop = {
-      pandalId: pandal.id,
-      pandal,
-      order: stops.length,
-    };
-    saveStops([...stops, newStop]);
-  };
+  const addStop = React.useCallback((pandal: Pandal) => {
+    setStops((prevStops) => {
+      if (prevStops.some((s) => s.pandalId === pandal.id)) return prevStops;
+      const newStop: RouteStop = {
+        pandalId: pandal.id,
+        pandal,
+        order: prevStops.length,
+      };
+      const updated = [...prevStops, newStop];
+      AsyncStorage.setItem(STORAGE_ROUTE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
 
-  const removeStop = (pandalId: string) => {
-    const filtered = stops
-      .filter((s) => s.pandalId !== pandalId)
-      .map((s, idx) => ({ ...s, order: idx }));
-    saveStops(filtered);
-  };
+  const removeStop = React.useCallback((pandalId: string) => {
+    setStops((prevStops) => {
+      const filtered = prevStops
+        .filter((s) => s.pandalId !== pandalId)
+        .map((s, idx) => ({ ...s, order: idx }));
+      AsyncStorage.setItem(STORAGE_ROUTE_KEY, JSON.stringify(filtered));
+      return filtered;
+    });
+  }, []);
 
-  const isPandalInRoute = (pandalId: string): boolean => {
-    return stops.some((s) => s.pandalId === pandalId);
-  };
+  const isPandalInRoute = React.useCallback((pandalId: string): boolean => {
+    return stopIdsSet.has(pandalId);
+  }, [stopIdsSet]);
 
-  const clearRoute = () => {
+  const clearRoute = React.useCallback(() => {
     setLastOptimizationResult(null);
-    saveStops([]);
-  };
+    setStops([]);
+    AsyncStorage.setItem(STORAGE_ROUTE_KEY, JSON.stringify([]));
+  }, []);
 
-  const reorderStops = (fromIndex: number, toIndex: number) => {
-    if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= stops.length || toIndex >= stops.length) return;
-    const updated = [...stops];
-    const [moved] = updated.splice(fromIndex, 1);
-    updated.splice(toIndex, 0, moved);
-    const reindexed = updated.map((s, idx) => ({ ...s, order: idx }));
-    saveStops(reindexed);
-  };
+  const reorderStops = React.useCallback((fromIndex: number, toIndex: number) => {
+    setStops((prevStops) => {
+      if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= prevStops.length || toIndex >= prevStops.length) return prevStops;
+      const updated = [...prevStops];
+      const [moved] = updated.splice(fromIndex, 1);
+      updated.splice(toIndex, 0, moved);
+      const reindexed = updated.map((s, idx) => ({ ...s, order: idx }));
+      AsyncStorage.setItem(STORAGE_ROUTE_KEY, JSON.stringify(reindexed));
+      return reindexed;
+    });
+  }, []);
 
-  const optimizeRoute = (origin?: { lat: number; lng: number } | null) => {
+  const optimizeRoute = React.useCallback((origin?: { lat: number; lng: number } | null) => {
     if (stops.length <= 1) {
       return null;
     }
@@ -141,9 +155,9 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     saveStops(result.optimizedStops);
     setLastOptimizationResult(result);
     return result;
-  };
+  }, [stops, saveStops]);
 
-  const toggleFavorite = (pandalId: string) => {
+  const toggleFavorite = React.useCallback((pandalId: string) => {
     setFavorites((prev) => {
       const updated = prev.includes(pandalId)
         ? prev.filter((id) => id !== pandalId)
@@ -151,18 +165,22 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       AsyncStorage.setItem(STORAGE_FAVORITES_KEY, JSON.stringify(updated));
       return updated;
     });
-  };
+  }, []);
 
-  const isFavorite = (pandalId: string) => favorites.includes(pandalId);
+  const isFavorite = React.useCallback((pandalId: string) => {
+    return favoritesSet.has(pandalId);
+  }, [favoritesSet]);
 
-  const addCustomStop = (stop: Pandal) => {
-    const updated = [...customStops, stop];
-    setCustomStops(updated);
-    AsyncStorage.setItem(STORAGE_CUSTOM_STOPS_KEY, JSON.stringify(updated));
+  const addCustomStop = React.useCallback((stop: Pandal) => {
+    setCustomStops((prev) => {
+      const updated = [...prev, stop];
+      AsyncStorage.setItem(STORAGE_CUSTOM_STOPS_KEY, JSON.stringify(updated));
+      return updated;
+    });
     addStop(stop);
-  };
+  }, [addStop]);
 
-  const saveCurrentRoute = (name?: string): RouteItinerary | null => {
+  const saveCurrentRoute = React.useCallback((name?: string): RouteItinerary | null => {
     if (stops.length === 0) return null;
     let totalDist = 0;
     for (let i = 0; i < stops.length - 1; i++) {
@@ -185,47 +203,75 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       createdAt: new Date().toISOString(),
     };
 
-    const updatedRoutes = [...savedRoutes, newRoute];
-    setSavedRoutes(updatedRoutes);
-    AsyncStorage.setItem(STORAGE_SAVED_ROUTES_KEY, JSON.stringify(updatedRoutes));
+    setSavedRoutes((prevRoutes) => {
+      const updatedRoutes = [...prevRoutes, newRoute];
+      AsyncStorage.setItem(STORAGE_SAVED_ROUTES_KEY, JSON.stringify(updatedRoutes));
+      return updatedRoutes;
+    });
     return newRoute;
-  };
+  }, [stops, savedRoutes.length]);
 
-  const deleteSavedRoute = (id: string) => {
-    const updated = savedRoutes.filter((r) => r.id !== id);
-    setSavedRoutes(updated);
-    AsyncStorage.setItem(STORAGE_SAVED_ROUTES_KEY, JSON.stringify(updated));
-  };
+  const deleteSavedRoute = React.useCallback((id: string) => {
+    setSavedRoutes((prev) => {
+      const updated = prev.filter((r) => r.id !== id);
+      AsyncStorage.setItem(STORAGE_SAVED_ROUTES_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
 
-  const loadSavedRoute = (route: RouteItinerary) => {
+  const loadSavedRoute = React.useCallback((route: RouteItinerary) => {
     saveStops(route.stops);
-  };
+  }, [saveStops]);
 
-  const totalDistanceKm = RouteOptimizer.calculateTotalDistance(stops);
+  const totalDistanceKm = React.useMemo(() => {
+    return RouteOptimizer.calculateTotalDistance(stops);
+  }, [stops]);
+
+  const contextValue = React.useMemo(
+    () => ({
+      stops,
+      addStop,
+      removeStop,
+      isPandalInRoute,
+      clearRoute,
+      optimizeRoute,
+      lastOptimizationResult,
+      reorderStops,
+      totalDistanceKm,
+      favorites,
+      toggleFavorite,
+      isFavorite,
+      customStops,
+      addCustomStop,
+      savedRoutes,
+      saveCurrentRoute,
+      deleteSavedRoute,
+      loadSavedRoute,
+    }),
+    [
+      stops,
+      addStop,
+      removeStop,
+      isPandalInRoute,
+      clearRoute,
+      optimizeRoute,
+      lastOptimizationResult,
+      reorderStops,
+      totalDistanceKm,
+      favorites,
+      toggleFavorite,
+      isFavorite,
+      customStops,
+      addCustomStop,
+      savedRoutes,
+      saveCurrentRoute,
+      deleteSavedRoute,
+      loadSavedRoute,
+    ]
+  );
 
   return (
-    <RouteContext.Provider
-      value={{
-        stops,
-        addStop,
-        removeStop,
-        isPandalInRoute,
-        clearRoute,
-        optimizeRoute,
-        lastOptimizationResult,
-        reorderStops,
-        totalDistanceKm,
-        favorites,
-        toggleFavorite,
-        isFavorite,
-        customStops,
-        addCustomStop,
-        savedRoutes,
-        saveCurrentRoute,
-        deleteSavedRoute,
-        loadSavedRoute,
-      }}
-    >
+    <RouteContext.Provider value={contextValue}>
       {children}
     </RouteContext.Provider>
   );

@@ -9,6 +9,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useResponsive } from '@/hooks/useResponsive';
 import { PUJA_CALENDAR_DATA } from '@/data/calendar';
 import { SANDHI_PUJA_SCHEDULES, SandhiPujaConvention } from '@/data/calendar/sandhiPuja';
 
@@ -25,6 +26,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
   const { colors, isDark } = useTheme();
   const { language } = useLanguage();
   const isBn = language === 'bn';
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, stackScrollBottomPadding } = useResponsive();
 
   const [selectedConventionId, setSelectedConventionId] = useState<string>(
     sandhiSchedule.primaryConventionId || (sandhiSchedule.conventions[0]?.id ?? '')
@@ -36,7 +38,21 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingLeft: screenPaddingLeft,
+            paddingRight: screenPaddingRight,
+            paddingBottom: stackScrollBottomPadding + 24,
+            maxWidth: isLandscape ? 860 : undefined,
+            alignSelf: isLandscape ? 'center' : undefined,
+            width: '100%',
+            gap: 20,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* ========================================================= */}
         {/* HEADER SECTION                                            */}
         {/* ========================================================= */}
@@ -111,7 +127,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
               </Text>
             </View>
 
-            <View style={styles.convCardsRow}>
+            <View style={[styles.convCardsRow, isLandscape && { flexDirection: 'row', gap: 12 }]}>
               {sandhiSchedule.conventions.map((conv) => {
                 const isSelected = selectedConventionId === conv.id;
                 return (
@@ -126,14 +142,15 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
                         borderColor: isSelected ? '#B42323' : colors.border,
                         borderWidth: isSelected ? 2 : 1,
                       },
+                      isLandscape && { flex: 1 },
                     ]}
                   >
                     <View style={styles.convTitleRow}>
-                      <Text style={[styles.convName, { color: colors.textPrimary }]} numberOfLines={1}>
+                      <Text style={[styles.convName, { color: colors.textPrimary }]} numberOfLines={2}>
                         {isBn ? conv.nameBn : conv.name}
                       </Text>
                       {isSelected && (
-                        <Ionicons name="checkmark-circle" size={16} color="#B42323" />
+                        <Ionicons name="checkmark-circle" size={16} color="#B42323" style={{ marginLeft: 6 }} />
                       )}
                     </View>
                     <Text style={styles.convTimeText}>
@@ -190,47 +207,78 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
             {isBn ? 'দিনভিত্তিক পূজা নির্ঘণ্ট' : 'Daily Puja Schedules & Tithis'}
           </Text>
 
-          {PUJA_CALENDAR_DATA.map((item, idx) => (
-            <View
-              key={idx}
-              style={[
-                styles.tithiCard,
-                {
-                  backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
-                  borderColor: colors.border,
-                },
-              ]}
-            >
-              <View style={styles.tithiHeader}>
-                <View style={styles.tithiBadge}>
-                  <Text style={styles.tithiBadgeText}>
-                    {item.tithis && item.tithis[0] ? (isBn ? item.tithis[0].nameBn : item.tithis[0].name) : (isBn ? item.dayNameBn : item.dayName)}
+          <View style={[styles.tithisGrid, isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 12 }]}>
+            {PUJA_CALENDAR_DATA.map((item, idx) => (
+              <View
+                key={idx}
+                style={[
+                  styles.tithiCard,
+                  {
+                    backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                    borderColor: colors.border,
+                  },
+                  isLandscape && { width: '48.8%' },
+                ]}
+              >
+                <View style={styles.tithiHeader}>
+                  <View style={styles.tithiBadge}>
+                    <Text style={styles.tithiBadgeText}>
+                      {item.tithis && item.tithis[0] ? (isBn ? item.tithis[0].nameBn : item.tithis[0].name) : (isBn ? item.dayNameBn : item.dayName)}
+                    </Text>
+                  </View>
+                  <Text style={[styles.tithiDate, { color: colors.textMuted }]}>
+                    {item.dateString}
                   </Text>
                 </View>
-                <Text style={[styles.tithiDate, { color: colors.textMuted }]}>
-                  {item.dateString}
+
+                <Text style={[styles.tithiTitle, { color: colors.textPrimary }]}>
+                  {isBn ? item.dayNameBn : item.dayName}
+                </Text>
+
+                {item.pushpanjaliTimings ? (
+                  <View style={[styles.timingPill, { backgroundColor: isDark ? '#201C18' : '#F5F1EB' }]}>
+                    <Ionicons name="time-outline" size={13} color="#B42323" />
+                    <Text style={[styles.timingPillText, { color: colors.textSecondary }]}>
+                      {isBn ? item.pushpanjaliTimingsBn : item.pushpanjaliTimings}
+                    </Text>
+                  </View>
+                ) : null}
+
+                <Text style={[styles.tithiDesc, { color: colors.textMuted }]}>
+                  {isBn ? item.significanceBn : item.significance}
                 </Text>
               </View>
-
-              <Text style={[styles.tithiTitle, { color: colors.textPrimary }]}>
-                {isBn ? item.dayNameBn : item.dayName}
-              </Text>
-
-              {item.pushpanjaliTimings ? (
-                <View style={[styles.timingPill, { backgroundColor: isDark ? '#201C18' : '#F5F1EB' }]}>
-                  <Ionicons name="time-outline" size={13} color="#B42323" />
-                  <Text style={[styles.timingPillText, { color: colors.textSecondary }]}>
-                    {isBn ? item.pushpanjaliTimingsBn : item.pushpanjaliTimings}
-                  </Text>
-                </View>
-              ) : null}
-
-              <Text style={[styles.tithiDesc, { color: colors.textMuted }]}>
-                {isBn ? item.significanceBn : item.significance}
-              </Text>
-            </View>
-          ))}
+            ))}
+          </View>
         </View>
+
+        {/* Contextual Link to Kali Puja 2026 Schedule */}
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate('KaliPuja')}
+          style={[
+            styles.kaliBanner,
+            {
+              backgroundColor: isDark ? '#1C1026' : '#FAF5FF',
+              borderColor: isDark ? 'rgba(147, 51, 234, 0.4)' : '#E9D5FF',
+            },
+          ]}
+          accessibilityLabel="Open Kali Puja 2026 Calendar"
+        >
+          <View style={styles.kaliBannerIcon}>
+            <Ionicons name="flame" size={20} color="#9333EA" />
+          </View>
+          <View style={styles.kaliBannerTextCol}>
+            <Text style={[styles.kaliBannerTitle, { color: isDark ? '#F5D0FE' : '#581C87' }]}>
+              {isBn ? 'কালীপূজা ও দীপাবলি ২০২৬ নির্ঘণ্ট' : 'Kali Puja & Deepavali 2026 Calendar'}
+            </Text>
+            <Text style={[styles.kaliBannerSubtitle, { color: colors.textSecondary }]}>
+              {isBn
+                ? 'কার্তিক অমাবস্যা তিথি ও মহানিশার নিশীথ কাল পূজার সময়সূচী দেখুন →'
+                : 'View Kartik Amavasya tithis and midnight Nishita Kaal muhurat →'}
+            </Text>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -241,9 +289,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 90,
     gap: 18,
   },
   headerSection: {
@@ -412,6 +458,9 @@ const styles = StyleSheet.create({
   tithisSection: {
     gap: 12,
   },
+  tithisGrid: {
+    gap: 12,
+  },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '800',
@@ -463,5 +512,35 @@ const styles = StyleSheet.create({
   tithiDesc: {
     fontSize: 12,
     lineHeight: 17,
+  },
+  kaliBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 14,
+    marginTop: 6,
+    elevation: 2,
+  },
+  kaliBannerIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(147, 51, 234, 0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  kaliBannerTextCol: {
+    flex: 1,
+  },
+  kaliBannerTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    marginBottom: 2,
+  },
+  kaliBannerSubtitle: {
+    fontSize: 11.5,
+    lineHeight: 15,
   },
 });

@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAudio } from '@/context/AudioContext';
+import { useResponsive } from '@/hooks/useResponsive';
 import { MUSIC_TRACKS_DATA, PUJA_MOODS_LIST, MUSIC_CATEGORIES_META } from '@/data/music';
 import { MusicTrack } from '@/types';
 
@@ -24,6 +25,7 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
   const { colors, isDark } = useTheme();
   const { language } = useLanguage();
   const isBn = language === 'bn';
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, stackScrollBottomPadding } = useResponsive();
   const {
     currentTrack,
     isPlaying,
@@ -80,7 +82,20 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingLeft: screenPaddingLeft,
+            paddingRight: screenPaddingRight,
+            paddingBottom: stackScrollBottomPadding + 28,
+            maxWidth: isLandscape ? 860 : undefined,
+            alignSelf: isLandscape ? 'center' : undefined,
+            width: '100%',
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Page Header */}
         <View style={styles.headerSection}>
           <View style={styles.badgeRow}>
@@ -399,41 +414,43 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
               </Text>
             </View>
           ) : (
-            filteredTracks.map((track: MusicTrack) => {
-              const isSelected = currentTrack?.id === track.id;
-              const isThisPlaying = isSelected && isPlaying;
-              const inPlaylist = isInPlaylist(track.id);
-              const title = isBn ? (track.titleBn || track.title) : track.title;
-              const artist = isBn ? (track.artistBn || track.artist) : track.artist;
-              const desc = isBn ? track.descriptionBn : track.description;
+            <View style={[styles.tracksGrid, isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 12 }]}>
+              {filteredTracks.map((track: MusicTrack) => {
+                const isSelected = currentTrack?.id === track.id;
+                const isThisPlaying = isSelected && isPlaying;
+                const inPlaylist = isInPlaylist(track.id);
+                const title = isBn ? (track.titleBn || track.title) : track.title;
+                const artist = isBn ? (track.artistBn || track.artist) : track.artist;
+                const desc = isBn ? track.descriptionBn : track.description;
 
-              return (
-                <TouchableOpacity
-                  key={track.id}
-                  activeOpacity={0.9}
-                  onPress={() => {
-                    if (isSelected) {
-                      togglePlayPause();
-                    } else {
-                      playTrack(track);
-                    }
-                  }}
-                  style={[
-                    styles.trackCard,
-                    {
-                      backgroundColor: isSelected && isPlaying
-                        ? (isDark ? 'rgba(52, 27, 24, 0.6)' : 'rgba(253, 238, 238, 0.6)')
-                        : (isSelected
-                          ? (isDark ? '#1F1B17' : '#FBF7F3')
-                          : (isDark ? '#1A1613' : '#FFFFFF')),
-                      borderColor: isSelected && isPlaying
-                        ? (isDark ? '#4A2420' : '#F6CECA')
-                        : (isSelected
-                          ? (isDark ? '#382F27' : '#EADCCE')
-                          : (isDark ? '#2F2720' : '#EEE8E1')),
-                    },
-                  ]}
-                >
+                return (
+                  <TouchableOpacity
+                    key={track.id}
+                    activeOpacity={0.9}
+                    onPress={() => {
+                      if (isSelected) {
+                        togglePlayPause();
+                      } else {
+                        playTrack(track);
+                      }
+                    }}
+                    style={[
+                      styles.trackCard,
+                      {
+                        backgroundColor: isSelected && isPlaying
+                          ? (isDark ? 'rgba(52, 27, 24, 0.6)' : 'rgba(253, 238, 238, 0.6)')
+                          : (isSelected
+                            ? (isDark ? '#1F1B17' : '#FBF7F3')
+                            : (isDark ? '#1A1613' : '#FFFFFF')),
+                        borderColor: isSelected && isPlaying
+                          ? (isDark ? '#4A2420' : '#F6CECA')
+                          : (isSelected
+                            ? (isDark ? '#382F27' : '#EADCCE')
+                            : (isDark ? '#2F2720' : '#EEE8E1')),
+                      },
+                      isLandscape && { width: '48.8%' },
+                    ]}
+                  >
                   <View style={styles.trackTopRow}>
                     {/* 48px Cover Image */}
                     <View style={[styles.coverBox, { borderColor: isDark ? '#2F2720' : '#EEE8E1' }]}>
@@ -560,7 +577,8 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                   </View>
                 </TouchableOpacity>
               );
-            })
+            })}
+            </View>
           )}
         </View>
       </ScrollView>
@@ -573,9 +591,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 110,
     gap: 16,
   },
   headerSection: {
@@ -811,6 +827,9 @@ const styles = StyleSheet.create({
     fontSize: 10,
     lineHeight: 14,
     marginTop: 2,
+  },
+  tracksGrid: {
+    gap: 10,
   },
   trackRightCol: {
     alignItems: 'flex-end',

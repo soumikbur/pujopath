@@ -75,25 +75,36 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   }, []);
 
-  const setLanguage = (lang: Language) => {
+  const setLanguage = React.useCallback((lang: Language) => {
     setLanguageState(lang);
     AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
-  };
+  }, []);
 
-  const toggleLanguage = () => {
-    const next: Language = language === 'en' ? 'bn' : 'en';
-    setLanguage(next);
-  };
+  const toggleLanguage = React.useCallback(() => {
+    setLanguageState((prev) => {
+      const next: Language = prev === 'en' ? 'bn' : 'en';
+      AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, next);
+      return next;
+    });
+  }, []);
 
-  const t = (key: string): string => {
-    if (DICTIONARY[key]) {
-      return DICTIONARY[key][language];
-    }
-    return key;
-  };
+  const t = React.useCallback(
+    (key: string): string => {
+      if (DICTIONARY[key]) {
+        return DICTIONARY[key][language];
+      }
+      return key;
+    },
+    [language]
+  );
+
+  const value = React.useMemo(
+    () => ({ language, setLanguage, toggleLanguage, t }),
+    [language, setLanguage, toggleLanguage, t]
+  );
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, toggleLanguage, t }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );

@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface FeedbackScreenProps {
   navigation: any;
@@ -19,6 +20,7 @@ export const FeedbackScreen: React.FC<FeedbackScreenProps> = ({ navigation }) =>
   const { colors, isDark } = useTheme();
   const { language } = useLanguage();
   const isBn = language === 'bn';
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, stackScrollBottomPadding } = useResponsive();
 
   const topics = [
     {
@@ -51,7 +53,17 @@ export const FeedbackScreen: React.FC<FeedbackScreenProps> = ({ navigation }) =>
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={styles.scrollContent}
+      contentContainerStyle={[
+        styles.scrollContent,
+        {
+          paddingLeft: screenPaddingLeft,
+          paddingRight: screenPaddingRight,
+          paddingBottom: stackScrollBottomPadding + 24,
+          maxWidth: isLandscape ? 860 : undefined,
+          alignSelf: isLandscape ? 'center' : undefined,
+          width: '100%',
+        },
+      ]}
       showsVerticalScrollIndicator={false}
     >
       {/* Header */}
@@ -117,13 +129,14 @@ export const FeedbackScreen: React.FC<FeedbackScreenProps> = ({ navigation }) =>
       </Text>
 
       {/* Topics List */}
-      <View style={styles.topicsGrid}>
+      <View style={[styles.topicsGrid, isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 12 }]}>
         {topics.map((t, idx) => (
           <View
             key={idx}
             style={[
               styles.topicCard,
               { backgroundColor: colors.surface, borderColor: colors.border },
+              isLandscape && { width: '31.5%', marginBottom: 0 },
             ]}
           >
             <View style={[styles.topicIconBox, { backgroundColor: colors.badge }]}>

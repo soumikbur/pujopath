@@ -11,6 +11,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAudio } from '@/context/AudioContext';
 import { MUSIC_TRACKS_DATA } from '@/data/music';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface MahalayaScreenProps {
   navigation: any;
@@ -20,13 +21,27 @@ export const MahalayaScreen: React.FC<MahalayaScreenProps> = ({ navigation }) =>
   const { colors } = useTheme();
   const { language } = useLanguage();
   const { currentTrack, isPlaying, playTrack, togglePlayPause } = useAudio();
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, stackScrollBottomPadding } = useResponsive();
 
   const mahalayaTrack = MUSIC_TRACKS_DATA.find((t) => t.category === 'Mahalaya' || t.title.toLowerCase().includes('mahalaya')) || MUSIC_TRACKS_DATA[0];
   const isThisPlaying = currentTrack?.id === mahalayaTrack.id && isPlaying;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingLeft: screenPaddingLeft,
+            paddingRight: screenPaddingRight,
+            paddingBottom: stackScrollBottomPadding + 24,
+            maxWidth: isLandscape ? 860 : undefined,
+            alignSelf: isLandscape ? 'center' : undefined,
+            width: '100%',
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Sacred Dawn Hero Card */}
         <View style={[styles.heroCard, { backgroundColor: colors.primary }]}>
           <View style={styles.heroBadge}>
@@ -62,30 +77,43 @@ export const MahalayaScreen: React.FC<MahalayaScreenProps> = ({ navigation }) =>
           </TouchableOpacity>
         </View>
 
-        {/* Historic Heritage Story Card */}
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.cardHeading, { color: colors.text }]}>
-            {language === 'bn' ? 'ঐতিহাসিক পটভূমি ও মাহাত্ম্য' : 'The Legacy of Mahalaya'}
-          </Text>
-          <Text style={[styles.cardBody, { color: colors.textSecondary }]}>
-            {language === 'bn'
-              ? '১৯৩১ সাল থেকে আকাশবাণী কলকাতা কেন্দ্রে বীরেন্দ্রকৃষ্ণ ভদ্রের কণ্ঠে মহিষাসুরমর্দিনী প্রচারিত হয়ে আসছে। পঙ্কজ কুমার মল্লিকের সুরে এবং বাণীকুমারের রচনায় এই অনুষ্ঠান বাঙালির দুর্গাপূজার অবিচ্ছেদ্য প্রারম্ভিক সুর।'
-              : 'Broadcast since 1931 over All India Radio Kolkata, composed by Bani Kumar, set to music by Pankaj Kumar Mullick, and narrated by the inimitable Birendra Krishna Bhadra, this broadcast remains the definitive sacred herald of Bengal’s autumn.'}
-          </Text>
-        </View>
+        {/* Historic Heritage Story Card & Sacred Sanskrit Invocations */}
+        <View style={[isLandscape && { flexDirection: 'row', gap: 14 }]}>
+          <View
+            style={[
+              styles.card,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+              isLandscape && { flex: 1, marginBottom: 0 },
+            ]}
+          >
+            <Text style={[styles.cardHeading, { color: colors.text }]}>
+              {language === 'bn' ? 'ঐতিহাসিক পটভূমি ও মাহাত্ম্য' : 'The Legacy of Mahalaya'}
+            </Text>
+            <Text style={[styles.cardBody, { color: colors.textSecondary }]}>
+              {language === 'bn'
+                ? '১৯৩১ সাল থেকে আকাশবাণী কলকাতা কেন্দ্রে বীরেন্দ্রকৃষ্ণ ভদ্রের কণ্ঠে মহিষাসুরমর্দিনী প্রচারিত হয়ে আসছে। পঙ্কজ কুমার মল্লিকের সুরে এবং বাণীকুমারের রচনায় এই অনুষ্ঠান বাঙালির দুর্গাপূজার অবিচ্ছেদ্য প্রারম্ভিক সুর।'
+                : 'Broadcast since 1931 over All India Radio Kolkata, composed by Bani Kumar, set to music by Pankaj Kumar Mullick, and narrated by the inimitable Birendra Krishna Bhadra, this broadcast remains the definitive sacred herald of Bengal’s autumn.'}
+            </Text>
+          </View>
 
-        {/* Sacred Sanskrit Invocations */}
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.cardHeading, { color: colors.text }]}>
-            {language === 'bn' ? 'দেবী স্তুতি ও চণ্ডীপাঠ' : 'Sacred Devi Stotram'}
-          </Text>
-          <View style={[styles.shlokaBox, { backgroundColor: colors.background, borderColor: colors.gold }]}>
-            <Text style={[styles.shlokaText, { color: colors.primary }]}>
-              "যা দেবী সর্বভূতেষু শক্তিরূপেণ সংস্থিতা।{'\n'}নমস্তস্যৈ নমস্তস্যৈ নমস্তস্যৈ নমো নমঃ॥"
+          <View
+            style={[
+              styles.card,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+              isLandscape && { flex: 1, marginBottom: 0 },
+            ]}
+          >
+            <Text style={[styles.cardHeading, { color: colors.text }]}>
+              {language === 'bn' ? 'দেবী স্তুতি ও চণ্ডীপাঠ' : 'Sacred Devi Stotram'}
             </Text>
-            <Text style={[styles.shlokaMeaning, { color: colors.textMuted }]}>
-              "Salutations again and again to the divine Goddess who abides in all beings in the form of divine energy and power."
-            </Text>
+            <View style={[styles.shlokaBox, { backgroundColor: colors.background, borderColor: colors.gold }]}>
+              <Text style={[styles.shlokaText, { color: colors.primary }]}>
+                "যা দেবী সর্বভূতেষু শক্তিরূপেণ সংস্থিতা।{'\n'}নমস্তস্যৈ নমস্তস্যৈ নমস্তস্যৈ নমো নমঃ॥"
+              </Text>
+              <Text style={[styles.shlokaMeaning, { color: colors.textMuted }]}>
+                "Salutations again and again to the divine Goddess who abides in all beings in the form of divine energy and power."
+              </Text>
+            </View>
           </View>
         </View>
       </ScrollView>

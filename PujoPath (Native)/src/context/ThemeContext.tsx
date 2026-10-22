@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useColorScheme } from 'react-native';
+import { useFestival } from '@/context/FestivalContext';
 
 export interface ThemeColors {
   primary: string;
@@ -29,8 +30,8 @@ export interface ThemeColors {
   statusBar: 'light' | 'dark';
 }
 
-// Light Mode Theme Tokens matching Capacitor source of truth
-const lightColors: ThemeColors = {
+// Durga Puja Light Mode: Warm Autumn Heritage Palette
+const durgaLightColors: ThemeColors = {
   primary: '#B42323',
   primaryHover: '#971E1E',
   primarySoft: '#FDEEEE',
@@ -57,8 +58,8 @@ const lightColors: ThemeColors = {
   statusBar: 'dark',
 };
 
-// Dark Mode Theme Tokens: Calibrated High-Contrast Warm Charcoal matching Capacitor source of truth
-const darkColors: ThemeColors = {
+// Durga Puja Dark Mode: Rich Warm Charcoal with Vermilion Accents
+const durgaDarkColors: ThemeColors = {
   primary: '#B42323',
   primaryHover: '#E23C3C',
   primarySoft: '#341B18',
@@ -85,18 +86,76 @@ const darkColors: ThemeColors = {
   statusBar: 'light',
 };
 
+// Kali Puja Light Mode: Regal Violet & Lavender Devotional Palette
+const kaliLightColors: ThemeColors = {
+  primary: '#7E22CE',
+  primaryHover: '#6B21A8',
+  primarySoft: '#F3E8FF',
+  primarySoftBorder: '#D8B4FE',
+  secondary: '#4F46E5',
+  accent: '#9333EA',
+  gold: '#D97706',
+  background: '#FAF7FD',
+  surface: '#FFFFFF',
+  surfaceSecondary: '#F3ECF9',
+  surfaceHover: '#EDE2F7',
+  surfaceElevated: '#FFFFFF',
+  surfaceHero: '#F5ECFD',
+  card: '#FFFFFF',
+  text: '#1E152A',
+  textPrimary: '#1E152A',
+  textSecondary: '#5B4B6E',
+  textMuted: '#7E6E91',
+  border: '#E8DCF5',
+  borderSubtle: '#F0E7FA',
+  borderStrong: '#C5B0E3',
+  badge: '#F3E8FF',
+  badgeText: '#7E22CE',
+  statusBar: 'dark',
+};
+
+// Kali Puja Dark Mode: Deep Midnight Indigo & Sacred Violet Palette
+const kaliDarkColors: ThemeColors = {
+  primary: '#A855F7',
+  primaryHover: '#9333EA',
+  primarySoft: '#23153C',
+  primarySoftBorder: '#4C1D95',
+  secondary: '#818CF8',
+  accent: '#C084FC',
+  gold: '#FBBF24',
+  background: '#090714',
+  surface: '#130E26',
+  surfaceSecondary: '#1B1435',
+  surfaceHover: '#241B45',
+  surfaceElevated: '#1A1235',
+  surfaceHero: '#160F30',
+  card: '#130E26',
+  text: '#F5F3FF',
+  textPrimary: '#F5F3FF',
+  textSecondary: '#C4B5FD',
+  textMuted: '#8B7AA8',
+  border: '#2E2154',
+  borderSubtle: '#221840',
+  borderStrong: '#4C3580',
+  badge: '#2A1445',
+  badgeText: '#E9D5FF',
+  statusBar: 'light',
+};
+
 interface ThemeContextType {
   isDark: boolean;
   colors: ThemeColors;
   toggleTheme: () => void;
   setTheme: (dark: boolean) => void;
+  activeFestival: 'durga' | 'kali' | null;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
   isDark: false,
-  colors: lightColors,
+  colors: durgaLightColors,
   toggleTheme: () => {},
   setTheme: () => {},
+  activeFestival: null,
 });
 
 const THEME_STORAGE_KEY = '@pujopath_theme_mode';
@@ -104,6 +163,7 @@ const THEME_STORAGE_KEY = '@pujopath_theme_mode';
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const systemColorScheme = useColorScheme();
   const [isDark, setIsDark] = useState<boolean>(false);
+  const { activeFestival } = useFestival();
 
   useEffect(() => {
     AsyncStorage.getItem(THEME_STORAGE_KEY).then((stored) => {
@@ -115,26 +175,37 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
   }, [systemColorScheme]);
 
-  const toggleTheme = () => {
+  const toggleTheme = React.useCallback(() => {
     setIsDark((prev) => {
       const next = !prev;
       AsyncStorage.setItem(THEME_STORAGE_KEY, next ? 'dark' : 'light');
       return next;
     });
-  };
+  }, []);
 
-  const setTheme = (dark: boolean) => {
+  const setTheme = React.useCallback((dark: boolean) => {
     setIsDark(dark);
     AsyncStorage.setItem(THEME_STORAGE_KEY, dark ? 'dark' : 'light');
-  };
+  }, []);
 
-  const colors = isDark ? darkColors : lightColors;
+  const colors = React.useMemo(() => {
+    if (activeFestival === 'kali') {
+      return isDark ? kaliDarkColors : kaliLightColors;
+    }
+    return isDark ? durgaDarkColors : durgaLightColors;
+  }, [isDark, activeFestival]);
+
+  const value = React.useMemo(
+    () => ({ isDark, colors, toggleTheme, setTheme, activeFestival }),
+    [isDark, colors, toggleTheme, setTheme, activeFestival]
+  );
 
   return (
-    <ThemeContext.Provider value={{ isDark, colors, toggleTheme, setTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
 export const useTheme = () => useContext(ThemeContext);
+

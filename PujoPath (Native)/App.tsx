@@ -5,6 +5,9 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { RouteProvider } from '@/context/RouteContext';
 import { AudioProvider } from '@/context/AudioContext';
+import { NotificationProvider } from '@/context/NotificationContext';
+import { FestivalProvider } from '@/context/FestivalContext';
+import { MapFullscreenProvider } from '@/context/MapFullscreenContext';
 import { RootNavigator } from '@/navigation/RootNavigator';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -14,15 +17,21 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 export default function App() {
   return (
     <SafeAreaProvider>
-      <ThemeProvider>
-        <LanguageProvider>
-          <RouteProvider>
-            <AudioProvider>
-              <RootNavigator />
-            </AudioProvider>
-          </RouteProvider>
-        </LanguageProvider>
-      </ThemeProvider>
+      <AudioProvider>
+        <FestivalProvider>
+          <ThemeProvider>
+            <LanguageProvider>
+              <NotificationProvider>
+                <RouteProvider>
+                  <MapFullscreenProvider>
+                    <RootNavigator />
+                  </MapFullscreenProvider>
+                </RouteProvider>
+              </NotificationProvider>
+            </LanguageProvider>
+          </ThemeProvider>
+        </FestivalProvider>
+      </AudioProvider>
     </SafeAreaProvider>
   );
 }

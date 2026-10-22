@@ -8,6 +8,8 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { toBengaliDigits } from '@/lib/geo';
+import { useResponsive } from '@/hooks/useResponsive';
+import { useAudio } from '@/context/AudioContext';
 
 export const SelectedPandalsBar: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -16,7 +18,9 @@ export const SelectedPandalsBar: React.FC = () => {
   const { language } = useLanguage();
   const isBn = language === 'bn';
   const { stops, removeStop, clearRoute } = useRoute();
+  const { currentTrack } = useAudio();
   const reduceMotion = useReducedMotion();
+  const { isLandscape, safeLeft, safeRight, safeBottom } = useResponsive();
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
@@ -38,7 +42,8 @@ export const SelectedPandalsBar: React.FC = () => {
   }, [isExpanded, reduceMotion]);
 
   const stopCount = stops.length;
-  const floatingBottom = 56 + Math.max(insets.bottom, 8) + 8;
+  const baseBottom = (isLandscape ? 40 : 56) + Math.max(safeBottom, 4) + 6;
+  const floatingBottom = baseBottom + (currentTrack ? 66 : 0);
 
   const handleToggleExpand = () => {
     if (!reduceMotion) {
@@ -75,7 +80,18 @@ export const SelectedPandalsBar: React.FC = () => {
   // 1. Empty State: (0 Pandals Selected)
   if (stopCount === 0) {
     return (
-      <View style={[styles.floatingWrapper, { bottom: floatingBottom }]} pointerEvents="box-none">
+      <View
+        style={[
+          styles.floatingWrapper,
+          {
+            bottom: floatingBottom,
+            left: 16 + safeLeft,
+            right: 16 + safeRight,
+          },
+          isLandscape && { alignItems: 'center' },
+        ]}
+        pointerEvents="box-none"
+      >
         <View
           style={[
             styles.barContainer,
@@ -83,6 +99,7 @@ export const SelectedPandalsBar: React.FC = () => {
               backgroundColor: isDark ? 'rgba(26, 22, 19, 0.95)' : 'rgba(255, 255, 255, 0.95)',
               borderColor: isDark ? '#2F2720' : '#EEE8E1',
             },
+            isLandscape && { maxWidth: 640, width: '100%' },
           ]}
         >
           <View style={styles.rowContent}>
@@ -138,7 +155,18 @@ export const SelectedPandalsBar: React.FC = () => {
 
   // 2. Active State with stops
   return (
-    <View style={[styles.floatingWrapper, { bottom: floatingBottom }]} pointerEvents="box-none">
+    <View
+      style={[
+        styles.floatingWrapper,
+        {
+          bottom: floatingBottom,
+          left: 16 + safeLeft,
+          right: 16 + safeRight,
+        },
+        isLandscape && { alignItems: 'center' },
+      ]}
+      pointerEvents="box-none"
+    >
       <View
         style={[
           styles.barContainer,
@@ -146,6 +174,7 @@ export const SelectedPandalsBar: React.FC = () => {
             backgroundColor: isDark ? 'rgba(26, 22, 19, 0.95)' : 'rgba(255, 255, 255, 0.95)',
             borderColor: isDark ? '#2F2720' : '#EEE8E1',
           },
+          isLandscape && { maxWidth: 640, width: '100%' },
         ]}
       >
         {/* Expanded stops list drawer */}

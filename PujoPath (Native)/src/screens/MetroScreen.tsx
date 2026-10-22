@@ -9,6 +9,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useResponsive } from '@/hooks/useResponsive';
 import { METRO_STATIONS_DATA } from '@/data/metro';
 import { FESTIVAL_SPECIAL_METRO_TIMETABLES } from '@/data/metro/timetables';
 import { PANDALS_DATA } from '@/data/pandals';
@@ -32,6 +33,7 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
   const { colors, isDark } = useTheme();
   const { language } = useLanguage();
   const isBn = language === 'bn';
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, stackScrollBottomPadding } = useResponsive();
 
   const [activeTab, setActiveTab] = useState<MetroViewTab>('special');
   const [selectedStationLine, setSelectedStationLine] = useState<
@@ -45,7 +47,20 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingLeft: screenPaddingLeft,
+            paddingRight: screenPaddingRight,
+            paddingBottom: stackScrollBottomPadding + 24,
+            maxWidth: isLandscape ? 860 : undefined,
+            alignSelf: isLandscape ? 'center' : undefined,
+            width: '100%',
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <View style={styles.headerSection}>
           <View style={styles.badgeRow}>
@@ -178,17 +193,19 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
             </View>
 
             {/* Special Lines List */}
-            {FESTIVAL_SPECIAL_METRO_TIMETABLES.map((item, idx) => (
-              <View
-                key={idx}
-                style={[
-                  styles.card,
-                  {
-                    backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
-                    borderColor: colors.border,
-                  },
-                ]}
-              >
+            <View style={[styles.cardsGrid, isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 12 }]}>
+              {FESTIVAL_SPECIAL_METRO_TIMETABLES.map((item, idx) => (
+                <View
+                  key={idx}
+                  style={[
+                    styles.card,
+                    {
+                      backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                      borderColor: colors.border,
+                    },
+                    isLandscape && { width: '48.8%' },
+                  ]}
+                >
                 <View style={styles.cardTopRow}>
                   <View style={[styles.lineDot, { backgroundColor: getLineColor(item.lineKey) }]} />
                   <Text style={[styles.lineName, { color: colors.textPrimary }]}>
@@ -225,12 +242,13 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
                 </View>
               </View>
             ))}
+            </View>
           </View>
         )}
 
         {/* TAB 2: REGULAR TIMETABLES */}
         {activeTab === 'normal' && (
-          <View style={styles.tabSection}>
+          <View style={[styles.tabSection, isLandscape && { flexDirection: 'row', gap: 12 }]}>
             <View
               style={[
                 styles.card,
@@ -238,6 +256,7 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
                   backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
                   borderColor: colors.border,
                 },
+                isLandscape && { flex: 1 },
               ]}
             >
               <Text style={[styles.lineName, { color: colors.textPrimary }]}>
@@ -262,6 +281,7 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
                   backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
                   borderColor: colors.border,
                 },
+                isLandscape && { flex: 1 },
               ]}
             >
               <Text style={[styles.lineName, { color: colors.textPrimary }]}>
@@ -284,17 +304,19 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
         {/* TAB 3: STATIONS & PANDALS */}
         {activeTab === 'stations' && (
           <View style={styles.tabSection}>
-            {filteredStations.map((station) => (
-              <View
-                key={station.id}
-                style={[
-                  styles.card,
-                  {
-                    backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
-                    borderColor: colors.border,
-                  },
-                ]}
-              >
+            <View style={[styles.cardsGrid, isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 12 }]}>
+              {filteredStations.map((station) => (
+                <View
+                  key={station.id}
+                  style={[
+                    styles.card,
+                    {
+                      backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                      borderColor: colors.border,
+                    },
+                    isLandscape && { width: '48.8%' },
+                  ]}
+                >
                 <View style={styles.stationHeader}>
                   <View style={[styles.stationDot, { backgroundColor: getLineColor(station.line) }]} />
                   <View style={styles.stationTitleContainer}>
@@ -338,6 +360,7 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
                 )}
               </View>
             ))}
+            </View>
           </View>
         )}
       </ScrollView>
@@ -350,9 +373,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 90,
     gap: 16,
   },
   headerSection: {
@@ -508,6 +529,9 @@ const styles = StyleSheet.create({
   stationLine: {
     fontSize: 10,
     marginTop: 1,
+  },
+  cardsGrid: {
+    gap: 12,
   },
   pandalsContainer: {
     marginTop: 4,

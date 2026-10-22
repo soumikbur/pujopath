@@ -9,14 +9,18 @@ import {
   Platform,
   Share,
   Animated,
+  Alert,
 } from 'react-native';
 import * as Linking from 'expo-linking';
 import { Ionicons } from '@expo/vector-icons';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { useResponsive } from '@/hooks/useResponsive';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
+import { useNotifications } from '@/context/NotificationContext';
 import { PANDALS_DATA } from '@/data/pandals';
+import { KALI_PANDALS_DATA } from '@/data/pandals/kaliPandals';
 import { VERIFIED_PHOTOS_REGISTRY } from '@/data/pandals/photoRegistry';
 import { getPandalImageSource } from '@/lib/utils/pandalImages';
 import { formatDistance, toBengaliDigits } from '@/lib/geo';
@@ -27,16 +31,30 @@ interface PandalDetailScreenProps {
 }
 
 export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, navigation }) => {
-  const { pandalId } = route.params || {};
+  const { pandalId, slug } = route.params || {};
   const { colors, isDark } = useTheme();
   const { language } = useLanguage();
   const isBn = language === 'bn';
   const { isPandalInRoute, addStop, removeStop, isFavorite, toggleFavorite, customStops } = useRoute();
-  const allPandals = [...PANDALS_DATA, ...customStops];
-  const pandal = allPandals.find((p) => p.id === pandalId) || allPandals[0];
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, stackScrollBottomPadding } = useResponsive();
+  const {
+    reminders,
+    addCustomReminder,
+    removeReminder,
+    permissionGranted,
+    requestPermission,
+  } = useNotifications();
+
+  const allPandals = [...PANDALS_DATA, ...KALI_PANDALS_DATA, ...customStops];
+  const pandal = allPandals.find((p) => p.id === pandalId || (slug && p.slug === slug)) || allPandals[0];
 
   const inPlan = isPandalInRoute(pandal.id);
   const favorited = isFavorite(pandal.id);
+
+  const existingReminder = reminders.find(
+    (r) => r.targetId === pandal.id || r.title.includes(pandal.name)
+  );
+  const hasReminder = Boolean(existingReminder);
 
   const reducedMotion = useReducedMotion();
   const favScale = React.useRef(new Animated.Value(1)).current;
@@ -73,6 +91,47 @@ export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, n
   };
 
   const displayName = isBn ? (pandal.nameBn || pandal.name) : pandal.name;
+
+  const handleToggleReminder = async () => {
+    if (hasReminder && existingReminder) {
+      await removeReminder(existingReminder.id);
+      Alert.alert(
+        isBn ? 'রিমাইন্ডার বাতিল' : 'Reminder Removed',
+        isBn
+          ? `"${displayName}"-এর জন্য নির্ধারিত রিমাইন্ডার সরানো হয়েছে।`
+          : `Removed reminder for "${pandal.name}".`
+      );
+    } else {
+      let hasPerm = permissionGranted;
+      if (!hasPerm) {
+        hasPerm = await requestPermission();
+      }
+
+      const targetDate = new Date();
+      targetDate.setHours(18, 30, 0, 0);
+      if (targetDate.getTime() <= Date.now()) {
+        targetDate.setDate(targetDate.getDate() + 1);
+      }
+
+      await addCustomReminder({
+        title: isBn ? `প্যান্ডেল দর্শন: ${displayName}` : `Visit ${pandal.name}`,
+        body: isBn
+          ? `আজ সন্ধ্যায় "${displayName}" ঘুরে দেখার জন্য প্রস্তুত হোন। দিকনির্দেশ ও রুট দেখে নিন।`
+          : `Get ready to visit "${pandal.name}" this evening. Check directions and live status.`,
+        scheduledTime: targetDate.toISOString(),
+        category: 'saved-pandals',
+        targetScreen: 'PandalDetail',
+        targetId: pandal.id,
+      });
+
+      Alert.alert(
+        isBn ? 'রিমাইন্ডার নির্ধারিত!' : 'Reminder Scheduled!',
+        isBn
+          ? `"${displayName}"-এর জন্য আজ সন্ধ্যা ৬:৩০ এ সতর্কবার্তা পাঠানো হবে।`
+          : `We'll remind you to visit "${pandal.name}" tonight at 6:30 PM.`
+      );
+    }
+  };
   const secondaryName = isBn ? pandal.name : pandal.nameBn;
   const description = isBn ? (pandal.descriptionBn || pandal.description) : pandal.description;
   const address = isBn ? (pandal.addressBn || pandal.address) : pandal.address;
@@ -117,7 +176,20 @@ export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, n
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingLeft: screenPaddingLeft,
+            paddingRight: screenPaddingRight,
+            paddingBottom: stackScrollBottomPadding + 24,
+            maxWidth: isLandscape ? 860 : undefined,
+            alignSelf: isLandscape ? 'center' : undefined,
+            width: '100%',
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Hero Header with 16:9 Image or Unavailable Banner */}
         <View
           style={[
@@ -128,7 +200,7 @@ export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, n
             },
           ]}
         >
-          <View style={styles.heroMediaContainer}>
+          <View style={[styles.heroMediaContainer, isLandscape && { height: 160 }]}>
             {hasVerifiedPhoto ? (
               <>
                 <Image source={imageSource!} style={styles.heroImg} resizeMode="cover" />
@@ -248,7 +320,7 @@ export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, n
                     {displayName}
                   </Text>
                   <View style={styles.heroAddressRow}>
-                    <Ionicons name="location" size={13} color="#B42323" />
+                    <Ionicons name="location" size={13} color={colors.primary} />
                     <Text
                       style={[styles.heroAddressTextDark, { color: colors.textMuted }]}
                       numberOfLines={1}
@@ -308,24 +380,24 @@ export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, n
                   styles.primaryActionBtn,
                   inPlan
                     ? {
-                        backgroundColor: isDark ? '#341B18' : '#FDEEEE',
-                        borderColor: '#B42323',
+                        backgroundColor: colors.primarySoft,
+                        borderColor: colors.primary,
                       }
                     : {
-                        backgroundColor: '#B42323',
-                        borderColor: '#B42323',
+                        backgroundColor: colors.primary,
+                        borderColor: colors.primary,
                       },
                 ]}
               >
                 <Ionicons
                   name={inPlan ? 'checkmark-circle' : 'add-circle'}
                   size={16}
-                  color={inPlan ? '#B42323' : '#FFFFFF'}
+                  color={inPlan ? colors.primary : '#FFFFFF'}
                 />
                 <Text
                   style={[
                     styles.primaryActionText,
-                    { color: inPlan ? '#B42323' : '#FFFFFF' },
+                    { color: inPlan ? colors.primary : '#FFFFFF' },
                   ]}
                 >
                   {inPlan
@@ -350,7 +422,7 @@ export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, n
                 },
               ]}
             >
-              <Ionicons name="map-outline" size={16} color="#B42323" />
+              <Ionicons name="map-outline" size={16} color={colors.primary} />
               <Text style={[styles.secondaryActionText, { color: colors.textPrimary }]}>
                 {isBn ? 'ম্যাপে দেখুন' : 'Directions'}
               </Text>
@@ -364,11 +436,11 @@ export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, n
                   styles.iconActionBtn,
                   {
                     backgroundColor: favorited
-                      ? '#B42323'
+                      ? colors.primary
                       : isDark
                       ? '#201C18'
                       : '#F5F1EB',
-                    borderColor: favorited ? '#B42323' : isDark ? '#3D332A' : '#DED6CE',
+                    borderColor: favorited ? colors.primary : isDark ? '#3D332A' : '#DED6CE',
                   },
                 ]}
                 accessibilityLabel="Save pandal"
@@ -397,6 +469,92 @@ export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, n
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Visit Reminder Card */}
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={handleToggleReminder}
+          style={[
+            styles.reminderCard,
+            {
+              backgroundColor: hasReminder
+                ? isDark
+                  ? '#2A170F'
+                  : '#FFF5F0'
+                : isDark
+                ? '#1A1613'
+                : '#FFFFFF',
+              borderColor: hasReminder
+                ? '#D9531E'
+                : isDark
+                ? '#2F2720'
+                : '#EEE8E1',
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.reminderIconBox,
+              {
+                backgroundColor: hasReminder
+                  ? '#D9531E'
+                  : isDark
+                  ? '#29211B'
+                  : '#F5ECE3',
+              },
+            ]}
+          >
+            <Ionicons
+              name={hasReminder ? 'notifications' : 'notifications-outline'}
+              size={18}
+              color={hasReminder ? '#FFFFFF' : '#D9531E'}
+            />
+          </View>
+          <View style={styles.reminderContentCol}>
+            <View style={styles.reminderTitleRow}>
+              <Text
+                style={[
+                  styles.reminderTitle,
+                  { color: hasReminder ? '#D9531E' : colors.textPrimary },
+                ]}
+              >
+                {hasReminder
+                  ? isBn
+                    ? 'দর্শনের রিমাইন্ডার সক্রিয়'
+                    : 'Visit Reminder Active'
+                  : isBn
+                  ? 'এই প্যান্ডেল দর্শনের রিমাইন্ডার সেট করুন'
+                  : 'Remind Me to Visit'}
+              </Text>
+              {hasReminder && (
+                <View style={styles.reminderActiveBadge}>
+                  <Text style={styles.reminderActiveBadgeText}>
+                    {isBn ? 'নির্ধারিত' : 'Scheduled'}
+                  </Text>
+                </View>
+              )}
+            </View>
+            <Text
+              style={[
+                styles.reminderSubText,
+                { color: hasReminder ? (isDark ? '#F3B49E' : '#B84013') : colors.textMuted },
+              ]}
+            >
+              {hasReminder
+                ? isBn
+                  ? 'আজ সন্ধ্যা ৬:৩০ এ সতর্কবার্তা পাঠানো হবে • বাতিল করতে ট্যাপ করুন'
+                  : 'Alert set for tonight at 6:30 PM • Tap to cancel'
+                : isBn
+                ? 'সন্ধ্যায় ঘুরে দেখার আগে ফোনে নোটিফিকেশন পেতে ট্যাপ করুন'
+                : 'Get notified this evening before heading out'}
+            </Text>
+          </View>
+          <Ionicons
+            name={hasReminder ? 'checkmark-circle' : 'chevron-forward'}
+            size={18}
+            color={hasReminder ? '#D9531E' : colors.textMuted}
+          />
+        </TouchableOpacity>
 
         {/* Theme Section */}
         {theme && (
@@ -925,6 +1083,50 @@ const styles = StyleSheet.create({
   },
   guidelineText: {
     fontSize: 13,
+    fontWeight: '500',
+  },
+  reminderCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 12,
+  },
+  reminderIconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reminderContentCol: {
+    flex: 1,
+    gap: 2,
+  },
+  reminderTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  reminderTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  reminderActiveBadge: {
+    backgroundColor: '#D9531E',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  reminderActiveBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  reminderSubText: {
+    fontSize: 11,
     fontWeight: '500',
   },
 });

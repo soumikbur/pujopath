@@ -11,6 +11,7 @@ import * as Linking from 'expo-linking';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface HelplineScreenProps {
   navigation: any;
@@ -26,9 +27,10 @@ interface HelplineItem {
   color: string;
 }
 
-export const HelplineScreen: React.FC<HelplineScreenProps> = () => {
+export const HelplineScreen: React.FC<HelplineScreenProps> = ({ navigation }) => {
   const { colors } = useTheme();
   const { language } = useLanguage();
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, stackScrollBottomPadding } = useResponsive();
 
   const helplines: HelplineItem[] = [
     {
@@ -108,7 +110,20 @@ export const HelplineScreen: React.FC<HelplineScreenProps> = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingLeft: screenPaddingLeft,
+            paddingRight: screenPaddingRight,
+            paddingBottom: stackScrollBottomPadding + 24,
+            maxWidth: isLandscape ? 860 : undefined,
+            alignSelf: isLandscape ? 'center' : undefined,
+            width: '100%',
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Banner Card */}
         <View style={[styles.headerBanner, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <View style={[styles.bannerIconBox, { backgroundColor: colors.badge }]}>
@@ -127,83 +142,101 @@ export const HelplineScreen: React.FC<HelplineScreenProps> = () => {
         </View>
 
         {/* Directory List */}
-        {helplines.map((item, idx) => {
-          const name = language === 'bn' ? item.nameBn : item.name;
-          const desc = language === 'bn' ? item.descBn : item.desc;
+        <View style={[isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 10 }]}>
+          {helplines.map((item, idx) => {
+            const name = language === 'bn' ? item.nameBn : item.name;
+            const desc = language === 'bn' ? item.descBn : item.desc;
 
-          return (
-            <TouchableOpacity
-              key={idx}
-              activeOpacity={0.85}
-              onPress={() => handleCall(item.phone, name)}
-              style={[
-                styles.itemCard,
-                { backgroundColor: colors.surface, borderColor: colors.border },
-              ]}
-            >
-              <View style={[styles.itemIconBox, { backgroundColor: `${item.color}15` }]}>
-                <Ionicons name={item.icon as any} size={22} color={item.color} />
-              </View>
+            return (
+              <TouchableOpacity
+                key={idx}
+                activeOpacity={0.85}
+                onPress={() => handleCall(item.phone, name)}
+                style={[
+                  styles.itemCard,
+                  { backgroundColor: colors.surface, borderColor: colors.border },
+                  isLandscape && { width: '49.1%', marginBottom: 0 },
+                ]}
+              >
+                <View style={[styles.itemIconBox, { backgroundColor: `${item.color}15` }]}>
+                  <Ionicons name={item.icon as any} size={22} color={item.color} />
+                </View>
 
-              <View style={styles.itemInfo}>
-                <Text style={[styles.itemName, { color: colors.text }]}>{name}</Text>
-                <Text style={[styles.itemDesc, { color: colors.textMuted }]}>{desc}</Text>
-              </View>
+                <View style={styles.itemInfo}>
+                  <Text style={[styles.itemName, { color: colors.text }]} numberOfLines={1}>{name}</Text>
+                  <Text style={[styles.itemDesc, { color: colors.textMuted }]} numberOfLines={1}>{desc}</Text>
+                </View>
 
-              <View style={[styles.callBtn, { backgroundColor: colors.primary }]}>
-                <Ionicons name="call" size={16} color="#FFFFFF" />
-                <Text style={styles.callNumberText}>{item.phone}</Text>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-
-        {/* Safety Guidelines Advice Card */}
-        <View style={[styles.safetyCard, { backgroundColor: colors.surface, borderColor: colors.gold }]}>
-          <Text style={[styles.safetyTitle, { color: colors.text }]}>
-            {language === 'bn' ? 'পূজা দর্শনে বিশেষ নিরাপত্তা পরামর্শ' : 'Puja Safety Guidelines'}
-          </Text>
-          <Text style={[styles.safetyText, { color: colors.textSecondary }]}>
-            {language === 'bn'
-              ? '• শিশুদের পকেটে অভিভাবকের ফোন নম্বর লিখে রাখা ব্যাজ সাথে রাখুন।\n• ভিড় এড়াতে মধ্যরাত ও ভোরের সময় ব্যবহার করুন।\n• মেট্রোর বিশেষ সারারাত সার্ভিস ব্যবহার করুন।'
-              : '• Keep an ID card or contact number tag in children’s pockets in heavy pandal crowds.\n• Take advantage of early morning or midnight hopping to avoid rush hours.\n• Use Kolkata Metro’s dedicated overnight festive train network.'}
-          </Text>
+                <View style={[styles.callBtn, { backgroundColor: colors.primary }]}>
+                  <Ionicons name="call" size={16} color="#FFFFFF" />
+                  <Text style={styles.callNumberText}>{item.phone}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
-        {/* Feedback & Suggestions Card */}
-        <View style={[styles.safetyCard, { backgroundColor: colors.surface, borderColor: '#0A66C2', marginTop: 12 }]}>
-          <Text style={[styles.safetyTitle, { color: colors.text }]}>
-            {language === 'bn' ? 'মতামত ও পরামর্শ (Feedback)' : 'Feedback & Suggestions'}
-          </Text>
-          <Text style={[styles.safetyText, { color: colors.textSecondary, marginBottom: 12 }]}>
-            {language === 'bn'
-              ? 'পুজোপথকে আরও সমৃদ্ধ করতে আপনার মূল্যবান পরামর্শ বা প্রতিক্রিয়া সরাসরি লিঙ্কডইনে বার্তা পাঠিয়ে জানান।'
-              : 'Have suggestions, corrections, or new features to suggest? Send your feedback directly via LinkedIn messaging.'}
-          </Text>
-          <View style={{ flexDirection: 'row', gap: 10, marginTop: 4 }}>
-            <TouchableOpacity
-              style={[styles.callBtn, { backgroundColor: '#0A66C2', alignSelf: 'flex-start', paddingHorizontal: 16 }]}
-              onPress={() => navigation?.navigate?.('Feedback')}
-              activeOpacity={0.8}
-              accessibilityRole="button"
-              accessibilityLabel={language === 'bn' ? 'মতামত জানান' : 'Send feedback'}
-            >
-              <Ionicons name="mail" size={16} color="#FFFFFF" />
-              <Text style={styles.callNumberText}>
-                {language === 'bn' ? 'মতামত দিন (Feedback)' : 'Feedback'}
-              </Text>
-            </TouchableOpacity>
+        {/* Bottom Safety & Feedback Cards */}
+        <View style={[isLandscape && { flexDirection: 'row', gap: 14, marginTop: 10 }]}>
+          {/* Safety Guidelines Advice Card */}
+          <View
+            style={[
+              styles.safetyCard,
+              { backgroundColor: colors.surface, borderColor: colors.gold },
+              isLandscape && { flex: 1, marginTop: 0 },
+            ]}
+          >
+            <Text style={[styles.safetyTitle, { color: colors.text }]}>
+              {language === 'bn' ? 'পূজা দর্শনে বিশেষ নিরাপত্তা পরামর্শ' : 'Puja Safety Guidelines'}
+            </Text>
+            <Text style={[styles.safetyText, { color: colors.textSecondary }]}>
+              {language === 'bn'
+                ? '• শিশুদের পকেটে অভিভাবকের ফোন নম্বর লিখে রাখা ব্যাজ সাথে রাখুন।\n• ভিড় এড়াতে মধ্যরাত ও ভোরের সময় ব্যবহার করুন।\n• মেট্রোর বিশেষ সারারাত সার্ভিস ব্যবহার করুন।'
+                : '• Keep an ID card or contact number tag in children’s pockets in heavy pandal crowds.\n• Take advantage of early morning or midnight hopping to avoid rush hours.\n• Use Kolkata Metro’s dedicated overnight festive train network.'}
+            </Text>
+          </View>
 
-            <TouchableOpacity
-              style={[styles.callBtn, { backgroundColor: '#004182', alignSelf: 'flex-start', paddingHorizontal: 16 }]}
-              onPress={() => Linking.openURL('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/')}
-              activeOpacity={0.8}
-              accessibilityRole="button"
-              accessibilityLabel={language === 'bn' ? 'লিঙ্কডইনে বার্তা পাঠান' : 'Message on LinkedIn'}
-            >
-              <Ionicons name="logo-linkedin" size={16} color="#FFFFFF" />
-              <Text style={styles.callNumberText}>LinkedIn</Text>
-            </TouchableOpacity>
+          {/* Feedback & Suggestions Card */}
+          <View
+            style={[
+              styles.safetyCard,
+              { backgroundColor: colors.surface, borderColor: '#0A66C2' },
+              isLandscape ? { flex: 1, marginTop: 0 } : { marginTop: 12 },
+            ]}
+          >
+            <Text style={[styles.safetyTitle, { color: colors.text }]}>
+              {language === 'bn' ? 'মতামত ও পরামর্শ (Feedback)' : 'Feedback & Suggestions'}
+            </Text>
+            <Text style={[styles.safetyText, { color: colors.textSecondary, marginBottom: 12 }]}>
+              {language === 'bn'
+                ? 'পুজোপথকে আরও সমৃদ্ধ করতে আপনার মূল্যবান পরামর্শ বা প্রতিক্রিয়া সরাসরি লিঙ্কডইনে বার্তা পাঠিয়ে জানান।'
+                : 'Have suggestions, corrections, or new features to suggest? Send your feedback directly via LinkedIn messaging.'}
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 4 }}>
+              <TouchableOpacity
+                style={[styles.callBtn, { backgroundColor: '#0A66C2', alignSelf: 'flex-start', paddingHorizontal: 16 }]}
+                onPress={() => navigation?.navigate?.('Feedback')}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={language === 'bn' ? 'মতামত জানান' : 'Send feedback'}
+              >
+                <Ionicons name="mail" size={16} color="#FFFFFF" />
+                <Text style={styles.callNumberText}>
+                  {language === 'bn' ? 'মতামত দিন (Feedback)' : 'Feedback'}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.callBtn, { backgroundColor: '#004182', alignSelf: 'flex-start', paddingHorizontal: 16 }]}
+                onPress={() => Linking.openURL('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/')}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={language === 'bn' ? 'লিঙ্কডইনে বার্তা পাঠান' : 'Message on LinkedIn'}
+              >
+                <Ionicons name="logo-linkedin" size={16} color="#FFFFFF" />
+                <Text style={styles.callNumberText}>LinkedIn</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ScrollView>

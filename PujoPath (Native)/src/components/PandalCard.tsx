@@ -12,9 +12,10 @@ import { formatDistance, toBengaliDigits } from '@/lib/geo';
 interface PandalCardProps {
   pandal: Pandal;
   onPress: () => void;
+  style?: any;
 }
 
-export const PandalCard: React.FC<PandalCardProps> = ({ pandal, onPress }) => {
+const PandalCardComponent: React.FC<PandalCardProps> = ({ pandal, onPress, style }) => {
   const { colors, isDark } = useTheme();
   const { language } = useLanguage();
   const isBn = language === 'bn';
@@ -85,6 +86,7 @@ export const PandalCard: React.FC<PandalCardProps> = ({ pandal, onPress }) => {
           backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
           borderColor: isDark ? '#2F2720' : '#EEE8E1',
         },
+        style,
       ]}
     >
       {/* 16:9 Hero Image or Honest Unavailable Banner */}
@@ -328,7 +330,7 @@ export const PandalCard: React.FC<PandalCardProps> = ({ pandal, onPress }) => {
       {/* Card Action Footer */}
       <View style={[styles.cardFooter, { borderTopColor: isDark ? '#2F2720' : '#EEE8E1' }]}>
         <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
-          <Text style={styles.viewDetailsText}>
+          <Text style={[styles.viewDetailsText, { color: colors.primary }]}>
             {isBn ? 'বিস্তারিত দেখুন →' : 'View Details →'}
           </Text>
         </TouchableOpacity>
@@ -343,8 +345,8 @@ export const PandalCard: React.FC<PandalCardProps> = ({ pandal, onPress }) => {
               { transform: [{ scale: routeScale }] },
               inPlan
                 ? {
-                    backgroundColor: '#B42323',
-                    borderColor: '#B42323',
+                    backgroundColor: colors.primary,
+                    borderColor: colors.primary,
                   }
                 : {
                     backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
@@ -355,7 +357,7 @@ export const PandalCard: React.FC<PandalCardProps> = ({ pandal, onPress }) => {
             <Ionicons
               name={inPlan ? 'checkmark' : 'navigate'}
               size={13}
-              color={inPlan ? '#FFFFFF' : '#B42323'}
+              color={inPlan ? '#FFFFFF' : colors.primary}
             />
             <Text
               style={[
@@ -537,8 +539,9 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   contentSection: {
-    padding: 14,
-    gap: 7,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 8,
   },
   localityRatingRow: {
     flexDirection: 'row',
@@ -608,28 +611,29 @@ const styles = StyleSheet.create({
   },
   cardFooter: {
     borderTopWidth: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   viewDetailsText: {
-    color: '#B42323',
     fontSize: 13,
     fontWeight: '800',
   },
   routeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
     borderRadius: 12,
     borderWidth: 1,
-    gap: 5,
+    gap: 6,
   },
   routeBtnText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '800',
   },
 });
+
+export const PandalCard = React.memo(PandalCardComponent);

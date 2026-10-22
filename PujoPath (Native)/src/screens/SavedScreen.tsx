@@ -14,6 +14,7 @@ import { PANDALS_DATA } from '@/data/pandals';
 import { PandalCard } from '@/components/PandalCard';
 import { toBengaliDigits } from '@/lib/geo';
 import { RouteItinerary } from '@/types';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface SavedScreenProps {
   navigation: any;
@@ -24,6 +25,7 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
   const { language } = useLanguage();
   const isBn = language === 'bn';
   const { favorites, customStops, savedRoutes, deleteSavedRoute, loadSavedRoute } = useRoute();
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, stackScrollBottomPadding } = useResponsive();
 
   const allPandals = [...PANDALS_DATA, ...customStops];
   const savedPandals = allPandals.filter((p) => favorites.includes(p.id));
@@ -35,7 +37,20 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingLeft: screenPaddingLeft,
+            paddingRight: screenPaddingRight,
+            paddingBottom: stackScrollBottomPadding + 24,
+            maxWidth: isLandscape ? 860 : undefined,
+            alignSelf: isLandscape ? 'center' : undefined,
+            width: '100%',
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Page Header */}
         <View style={styles.headerSection}>
           <View style={styles.badgeRow}>
@@ -95,12 +110,13 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           ) : (
-            <View style={styles.cardsList}>
+            <View style={[styles.cardsList, isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 12 }]}>
               {savedPandals.map((pandal) => (
                 <PandalCard
                   key={pandal.id}
                   pandal={pandal}
                   onPress={() => navigation.navigate('PandalDetail', { pandalId: pandal.id })}
+                  style={isLandscape ? { flex: 1, minWidth: '48%', marginBottom: 12 } : undefined}
                 />
               ))}
             </View>
@@ -154,7 +170,7 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           ) : (
-            <View style={styles.routesList}>
+            <View style={[styles.routesList, isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 12 }]}>
               {savedRoutes.map((route) => (
                 <View
                   key={route.id}
@@ -164,6 +180,7 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
                       backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
                       borderColor: isDark ? '#2F2720' : '#EEE8E1',
                     },
+                    isLandscape && { width: '48.8%', marginBottom: 0 },
                   ]}
                 >
                   <View style={styles.routeCardInfo}>

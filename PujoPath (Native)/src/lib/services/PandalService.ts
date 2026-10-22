@@ -1,10 +1,16 @@
 import { Pandal, FilterOptions, LocalityZone } from '@/types';
-import { PANDALS_DATA } from '@/data/pandals';
+import { PANDALS_DATA, KALI_PANDALS_DATA } from '@/data/pandals';
 import { calculateHaversineDistance } from '@/lib/geo';
 
 export class PandalService {
-  static getAllPandals(userLat?: number, userLng?: number, extraPandals?: Pandal[]): Pandal[] {
-    const base = [...PANDALS_DATA, ...(extraPandals || [])];
+  static getAllPandals(
+    userLat?: number,
+    userLng?: number,
+    extraPandals?: Pandal[],
+    festival?: 'durga' | 'kali'
+  ): Pandal[] {
+    const dataSource = festival === 'kali' ? KALI_PANDALS_DATA : PANDALS_DATA;
+    const base = [...dataSource, ...(extraPandals || [])];
     const hasValidCoords =
       typeof userLat === 'number' &&
       typeof userLng === 'number' &&
@@ -26,7 +32,8 @@ export class PandalService {
     userLng?: number,
     extraPandals?: Pandal[]
   ): Pandal | null {
-    const base = [...PANDALS_DATA, ...(extraPandals || [])];
+    // Search across both festival datasets and extra custom stops
+    const base = [...PANDALS_DATA, ...KALI_PANDALS_DATA, ...(extraPandals || [])];
     const found = base.find((p) => p.slug === slug || p.id === slug);
     if (!found) return null;
 
@@ -49,9 +56,10 @@ export class PandalService {
     options: Partial<FilterOptions>,
     userLat?: number,
     userLng?: number,
-    extraPandals?: Pandal[]
+    extraPandals?: Pandal[],
+    festival?: 'durga' | 'kali'
   ): Pandal[] {
-    let list = this.getAllPandals(userLat, userLng, extraPandals);
+    let list = this.getAllPandals(userLat, userLng, extraPandals, festival);
 
     if (options.searchQuery && options.searchQuery.trim()) {
       const q = options.searchQuery.toLowerCase().trim();

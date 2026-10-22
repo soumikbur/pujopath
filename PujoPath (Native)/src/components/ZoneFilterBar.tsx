@@ -3,9 +3,10 @@ import { ScrollView, TouchableOpacity, Text, StyleSheet, View, LayoutAnimation }
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { useFestival } from '@/context/FestivalContext';
 import { LocalityZone } from '@/types';
 
-export const ZONES_LIST: (LocalityZone | 'All')[] = [
+export const DURGA_ZONES_LIST: (LocalityZone | 'All')[] = [
   'All',
   'North Kolkata',
   'South Kolkata',
@@ -17,8 +18,20 @@ export const ZONES_LIST: (LocalityZone | 'All')[] = [
   'New Town',
 ];
 
+export const KALI_ZONES_LIST: (LocalityZone | 'All')[] = [
+  'All',
+  'Barasat',
+  'Madhyamgram',
+  'South Kolkata',
+  'Central Kolkata',
+  'North 24 Parganas',
+];
+
 const ZONE_TRANSLATIONS: Record<string, { en: string; bn: string }> = {
   All: { en: 'All Zones', bn: 'সব অঞ্চল' },
+  Barasat: { en: 'Barasat', bn: 'বারাসাত' },
+  Madhyamgram: { en: 'Madhyamgram', bn: 'মধ্যমগ্রাম' },
+  'North 24 Parganas': { en: 'North 24 Parganas', bn: 'উত্তর ২৪ পরগনা' },
   'North Kolkata': { en: 'North Kolkata', bn: 'উত্তর কলকাতা' },
   'South Kolkata': { en: 'South Kolkata', bn: 'দক্ষিণ কলকাতা' },
   'Central Kolkata': { en: 'Central Kolkata', bn: 'মধ্য কলকাতা' },
@@ -32,13 +45,22 @@ const ZONE_TRANSLATIONS: Record<string, { en: string; bn: string }> = {
 interface ZoneFilterBarProps {
   selectedZone: string;
   onSelectZone: (zone: string) => void;
+  festival?: 'durga' | 'kali';
 }
 
-export const ZoneFilterBar: React.FC<ZoneFilterBarProps> = ({ selectedZone, onSelectZone }) => {
+export const ZoneFilterBar: React.FC<ZoneFilterBarProps> = ({
+  selectedZone,
+  onSelectZone,
+  festival,
+}) => {
   const { colors, isDark } = useTheme();
   const { language } = useLanguage();
+  const { activeFestival } = useFestival();
+  const currentFestival = festival || activeFestival || 'durga';
   const isBn = language === 'bn';
   const reduceMotion = useReducedMotion();
+
+  const zones = currentFestival === 'kali' ? KALI_ZONES_LIST : DURGA_ZONES_LIST;
 
   const handleSelectZone = (zone: string) => {
     if (!reduceMotion && selectedZone !== zone) {
@@ -57,7 +79,7 @@ export const ZoneFilterBar: React.FC<ZoneFilterBarProps> = ({ selectedZone, onSe
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {ZONES_LIST.map((zone) => {
+        {zones.map((zone) => {
           const isSelected = selectedZone === zone;
           const label = ZONE_TRANSLATIONS[zone]
             ? ZONE_TRANSLATIONS[zone][language]
@@ -72,9 +94,11 @@ export const ZoneFilterBar: React.FC<ZoneFilterBarProps> = ({ selectedZone, onSe
                 styles.chip,
                 {
                   backgroundColor: isSelected
-                    ? '#B42323'
-                    : (isDark ? '#1A1613' : '#FFFFFF'),
-                  borderColor: isSelected ? '#B42323' : colors.border,
+                    ? colors.primary
+                    : isDark
+                    ? '#1A1613'
+                    : '#FFFFFF',
+                  borderColor: isSelected ? colors.primary : colors.border,
                 },
               ]}
             >

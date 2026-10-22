@@ -15,7 +15,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
+import { useFestival } from '@/context/FestivalContext';
 import { PANDALS_DATA } from '@/data/pandals';
+import { KALI_PANDALS_DATA } from '@/data/pandals/kaliPandals';
 import { METRO_STATIONS_DATA } from '@/data/metro';
 import {
   formatDistance,
@@ -25,6 +27,7 @@ import {
 } from '@/lib/geo';
 import { CustomStopModal } from '@/components/CustomStopModal';
 import { Pandal } from '@/types';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface PlannerScreenProps {
   navigation: any;
@@ -34,6 +37,9 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
   const { colors, isDark } = useTheme();
   const { language } = useLanguage();
   const isBn = language === 'bn';
+  const { activeFestival } = useFestival();
+  const isKali = activeFestival === 'kali';
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, tabScrollBottomPadding } = useResponsive();
   const {
     stops,
     addStop,
@@ -141,19 +147,34 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
 
   // Filter available pandals for Quick Add section
   const availablePandals = useMemo(() => {
-    const all = [...PANDALS_DATA, ...customStops];
+    const basePandals = isKali ? KALI_PANDALS_DATA : PANDALS_DATA;
+    const all = [...basePandals, ...customStops];
     let list = all.filter((p) => !stops.some((s) => s.pandalId === p.id));
 
-    if (quickAddCategory === 'bonedi-bari') {
-      list = list.filter((p) => p.isBonediBari || p.category === 'Bonedi Bari');
-    } else if (quickAddCategory === 'north') {
-      list = list.filter((p) => p.zone === 'North Kolkata');
-    } else if (quickAddCategory === 'south') {
-      list = list.filter((p) => p.zone === 'South Kolkata');
-    } else if (quickAddCategory === 'central') {
-      list = list.filter((p) => p.zone === 'Central Kolkata');
-    } else if (quickAddCategory === 'east') {
-      list = list.filter((p) => p.zone === 'Salt Lake' || p.zone === 'New Town');
+    if (isKali) {
+      if (quickAddCategory === 'barasat') {
+        list = list.filter((p) => p.zone === 'Barasat');
+      } else if (quickAddCategory === 'madhyamgram') {
+        list = list.filter((p) => p.zone === 'Madhyamgram');
+      } else if (quickAddCategory === 'north24') {
+        list = list.filter((p) => p.zone === 'North 24 Parganas');
+      } else if (quickAddCategory === 'north') {
+        list = list.filter((p) => p.zone === 'North Kolkata');
+      } else if (quickAddCategory === 'south') {
+        list = list.filter((p) => p.zone === 'South Kolkata');
+      }
+    } else {
+      if (quickAddCategory === 'bonedi-bari') {
+        list = list.filter((p) => p.isBonediBari || p.category === 'Bonedi Bari');
+      } else if (quickAddCategory === 'north') {
+        list = list.filter((p) => p.zone === 'North Kolkata');
+      } else if (quickAddCategory === 'south') {
+        list = list.filter((p) => p.zone === 'South Kolkata');
+      } else if (quickAddCategory === 'central') {
+        list = list.filter((p) => p.zone === 'Central Kolkata');
+      } else if (quickAddCategory === 'east') {
+        list = list.filter((p) => p.zone === 'Salt Lake' || p.zone === 'New Town');
+      }
     }
 
     if (quickAddSearch.trim()) {
@@ -167,35 +188,68 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
     }
 
     return list.slice(0, 15);
-  }, [stops, customStops, quickAddCategory, quickAddSearch]);
+  }, [stops, customStops, quickAddCategory, quickAddSearch, isKali]);
 
-  const quickCategories = [
-    { id: 'all', label: isBn ? 'সকল মণ্ডপ' : 'All Pandals' },
-    { id: 'bonedi-bari', label: isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari' },
-    { id: 'north', label: isBn ? 'উত্তর কলকাতা' : 'North Kolkata' },
-    { id: 'south', label: isBn ? 'দক্ষিণ কলকাতা' : 'South Kolkata' },
-    { id: 'central', label: isBn ? 'মধ্য কলকাতা' : 'Central' },
-    { id: 'east', label: isBn ? 'সল্টলেক / নিউ টাউন' : 'Salt Lake / East' },
-  ];
+  const quickCategories = useMemo(() => {
+    if (isKali) {
+      return [
+        { id: 'all', label: isBn ? 'সকল মণ্ডপ' : 'All Pandals' },
+        { id: 'barasat', label: isBn ? 'বারাসাত' : 'Barasat' },
+        { id: 'madhyamgram', label: isBn ? 'মধ্যমগ্রাম' : 'Madhyamgram' },
+        { id: 'north24', label: isBn ? 'উত্তর ২৪ পরগনা' : 'North 24 Pgs' },
+        { id: 'north', label: isBn ? 'উত্তর কলকাতা' : 'North Kolkata' },
+        { id: 'south', label: isBn ? 'দক্ষিণ কলকাতা' : 'South Kolkata' },
+      ];
+    }
+    return [
+      { id: 'all', label: isBn ? 'সকল মণ্ডপ' : 'All Pandals' },
+      { id: 'bonedi-bari', label: isBn ? '🏛️ বনেদি বাড়ি' : '🏛️ Bonedi Bari' },
+      { id: 'north', label: isBn ? 'উত্তর কলকাতা' : 'North Kolkata' },
+      { id: 'south', label: isBn ? 'দক্ষিণ কলকাতা' : 'South Kolkata' },
+      { id: 'central', label: isBn ? 'মধ্য কলকাতা' : 'Central' },
+      { id: 'east', label: isBn ? 'সল্টলেক / নিউ টাউন' : 'Salt Lake / East' },
+    ];
+  }, [isKali, isBn]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingLeft: screenPaddingLeft,
+            paddingRight: screenPaddingRight,
+            paddingBottom: tabScrollBottomPadding + 24,
+            maxWidth: isLandscape ? 860 : undefined,
+            alignSelf: isLandscape ? 'center' : undefined,
+            width: '100%',
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Page Header */}
         <View style={styles.headerSection}>
           <View style={styles.badgeRow}>
-            <Ionicons name="git-network-outline" size={14} color="#B42323" />
-            <Text style={styles.badgeText}>
-              {isBn ? 'রুট প্ল্যানার' : 'ROUTE PLANNER'}
+            <Ionicons name="git-network-outline" size={14} color={colors.primary} />
+            <Text style={[styles.badgeText, { color: colors.primary }]}>
+              {isKali
+                ? (isBn ? 'বারাসাত পরিক্রমা রুট' : 'BARASAT PUJA TRAIL')
+                : (isBn ? 'রুট প্ল্যানার' : 'ROUTE PLANNER')}
             </Text>
           </View>
           <Text style={[styles.pageTitle, { color: colors.textPrimary }]}>
-            {isBn ? 'প্যান্ডেল হপিং রুট প্ল্যানার' : 'Pandal Hopping Route Planner'}
+            {isKali
+              ? (isBn ? 'কালীপূজা পরিক্রমা রুট প্ল্যানার' : 'Kali Puja Pandal Route Planner')
+              : (isBn ? 'প্যান্ডেল হপিং রুট প্ল্যানার' : 'Pandal Hopping Route Planner')}
           </Text>
           <Text style={[styles.pageSubtitle, { color: colors.textMuted }]}>
-            {isBn
-              ? 'পছন্দের মণ্ডপগুলো নির্বাচন করুন এবং স্মার্ট অপটিমাইজার দিয়ে সবচেয়ে কম হাঁটা ও সুবিধাজনক পরিক্রমা রুট তৈরি করুন।'
-              : 'Plan your customized pandal hopping route across Kolkata with smart nearest-neighbor optimization.'}
+            {isKali
+              ? (isBn
+                ? 'বারাসাত ও সংলগ্ন অঞ্চলের পছন্দের মণ্ডপগুলো নির্বাচন করে সবচেয়ে সুবিধাজনক ও কম হাঁটার পরিক্রমা রুট তৈরি করুন।'
+                : 'Plan your customized Kali Puja hopping trail across Barasat with smart nearest-neighbor optimization.')
+              : (isBn
+                ? 'পছন্দের মণ্ডপগুলো নির্বাচন করুন এবং স্মার্ট অপটিমাইজার দিয়ে সবচেয়ে কম হাঁটা ও সুবিধাজনক পরিক্রমা রুট তৈরি করুন।'
+                : 'Plan your customized pandal hopping route across Kolkata with smart nearest-neighbor optimization.')}
           </Text>
         </View>
 
@@ -207,9 +261,10 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
               backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
               borderColor: isDark ? '#2F2720' : '#EEE8E1',
             },
+            isLandscape && { justifyContent: 'space-between', flexWrap: 'nowrap' },
           ]}
         >
-          <View style={styles.metricItem}>
+          <View style={[styles.metricItem, isLandscape && { width: '23%' }]}>
             <Text style={[styles.metricLabel, { color: colors.textMuted }]}>
               {isBn ? 'মোট প্যান্ডেল' : 'TOTAL STOPS'}
             </Text>
@@ -218,16 +273,16 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
             </Text>
           </View>
 
-          <View style={styles.metricItem}>
+          <View style={[styles.metricItem, isLandscape && { width: '23%' }]}>
             <Text style={[styles.metricLabel, { color: colors.textMuted }]}>
               {isBn ? 'হাঁটার দূরত্ব' : 'WALKING DISTANCE'}
             </Text>
-            <Text style={[styles.metricValue, { color: '#B42323' }]}>
+            <Text style={[styles.metricValue, { color: colors.primary }]}>
               {formatDistance(totalDistance, language)}
             </Text>
           </View>
 
-          <View style={styles.metricItem}>
+          <View style={[styles.metricItem, isLandscape && { width: '23%' }]}>
             <Text style={[styles.metricLabel, { color: colors.textMuted }]}>
               {isBn ? 'আনুমানিক সময়' : 'EST. DURATION'}
             </Text>
@@ -236,7 +291,7 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
             </Text>
           </View>
 
-          <View style={styles.metricItemAction}>
+          <View style={[styles.metricItemAction, isLandscape && { width: '23%' }]}>
             <TouchableOpacity
               activeOpacity={0.85}
               onPress={handleOptimize}
@@ -246,8 +301,8 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                 optimizedSuccess
                   ? { backgroundColor: '#059669' }
                   : stops.length <= 1
-                  ? { backgroundColor: '#B42323', opacity: 0.4 }
-                  : { backgroundColor: '#B42323' },
+                  ? { backgroundColor: colors.primary, opacity: 0.4 }
+                  : { backgroundColor: colors.primary },
               ]}
             >
               <Ionicons
@@ -309,7 +364,7 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                 <Ionicons
                   name={savedSuccess ? 'checkmark' : 'save-outline'}
                   size={15}
-                  color={savedSuccess ? '#059669' : '#B42323'}
+                  color={savedSuccess ? '#059669' : colors.primary}
                 />
                 <Text style={[styles.saveBtnText, { color: colors.textPrimary }]}>
                   {savedSuccess
@@ -328,8 +383,8 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                   },
                 ]}
               >
-                <Ionicons name="add" size={15} color="#B42323" />
-                <Text style={styles.addCustomBtnText}>
+                <Ionicons name="add" size={15} color={colors.primary} />
+                <Text style={[styles.addCustomBtnText, { color: colors.primary }]}>
                   {isBn ? '+ নিজস্ব মণ্ডপ যোগ করুন' : '+ Add Custom Pandal'}
                 </Text>
               </TouchableOpacity>
@@ -350,15 +405,15 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
               styles.navHubCard,
               {
                 backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
-                borderColor: isDark ? 'rgba(180, 35, 35, 0.3)' : 'rgba(180, 35, 35, 0.2)',
+                borderColor: colors.border,
               },
             ]}
           >
             <View style={styles.navHubHeader}>
               <View>
                 <View style={styles.navHubBadge}>
-                  <Ionicons name="compass" size={13} color="#B42323" />
-                  <Text style={styles.navHubBadgeText}>
+                  <Ionicons name="compass" size={13} color={colors.primary} />
+                  <Text style={[styles.navHubBadgeText, { color: colors.primary }]}>
                     {isBn ? 'পরিক্রমা ন্যাভিগেশন কন্ট্রোল' : 'TRAIL NAVIGATION HUB'}
                   </Text>
                 </View>
@@ -372,7 +427,7 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
             <TouchableOpacity
               activeOpacity={0.9}
               onPress={handleStartNavigation}
-              style={styles.launchBtn}
+              style={[styles.launchBtn, { backgroundColor: colors.primary }]}
             >
               <Ionicons name="navigate" size={18} color="#FFFFFF" />
               <Text style={styles.launchBtnText}>
@@ -398,7 +453,7 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
               },
             ]}
           >
-            <Ionicons name="navigate-outline" size={40} color="#B42323" style={{ opacity: 0.8, marginBottom: 8 }} />
+            <Ionicons name="navigate-outline" size={40} color={colors.primary} style={{ opacity: 0.8, marginBottom: 8 }} />
             <Text style={[styles.emptyStateTitle, { color: colors.textPrimary }]}>
               {isBn ? 'আপনার পুজো পরিক্রমা তালিকা খালি' : 'Your Puja Trail is Empty'}
             </Text>
@@ -411,8 +466,8 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
             <View style={styles.emptyActionRow}>
               <TouchableOpacity
                 activeOpacity={0.85}
-                onPress={() => navigation.navigate('Explore')}
-                style={styles.emptyExploreBtn}
+                onPress={() => navigation.navigate('ExploreTab')}
+                style={[styles.emptyExploreBtn, { backgroundColor: colors.primary }]}
               >
                 <Ionicons name="search" size={15} color="#FFFFFF" />
                 <Text style={styles.emptyExploreBtnText}>
@@ -427,11 +482,12 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                   styles.emptyAddBtn,
                   {
                     backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
+                    borderColor: colors.primary,
                   },
                 ]}
               >
-                <Ionicons name="add" size={15} color="#B42323" />
-                <Text style={styles.emptyAddBtnText}>
+                <Ionicons name="add" size={15} color={colors.primary} />
+                <Text style={[styles.emptyAddBtnText, { color: colors.primary }]}>
                   {isBn ? '+ নতুন মণ্ডপ যোগ করুন' : '+ Add New Pandal'}
                 </Text>
               </TouchableOpacity>
@@ -531,7 +587,7 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
         >
           <View style={styles.quickAddHeader}>
             <View style={styles.quickAddTitleRow}>
-              <Ionicons name="sparkles" size={15} color="#B42323" />
+              <Ionicons name="sparkles" size={15} color={colors.primary} />
               <Text style={[styles.quickAddTitle, { color: colors.textPrimary }]}>
                 {isBn ? 'পরিক্রমায় নতুন মণ্ডপ যোগ করুন' : 'Add Pandals to Your Trail'}
               </Text>
@@ -552,7 +608,7 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                 style={[
                   styles.quickCatPill,
                   quickAddCategory === cat.id
-                    ? { backgroundColor: '#B42323', borderColor: '#B42323' }
+                    ? { backgroundColor: colors.primary, borderColor: colors.primary }
                     : {
                         backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
                         borderColor: isDark ? '#2F2720' : '#EEE8E1',
@@ -600,7 +656,7 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
           </View>
 
           {/* Quick Add Pandals List */}
-          <View style={styles.quickPandalsList}>
+          <View style={[styles.quickPandalsList, isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 10 }]}>
             {availablePandals.map((pandal) => (
               <View
                 key={pandal.id}
@@ -610,6 +666,7 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                     backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
                     borderColor: isDark ? '#2F2720' : '#EEE8E1',
                   },
+                  isLandscape && { width: '48.8%' },
                 ]}
               >
                 <View style={styles.quickPandalInfo}>
@@ -626,8 +683,8 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                   onPress={() => addStop(pandal)}
                   style={styles.quickAddBtn}
                 >
-                  <Ionicons name="add" size={14} color="#B42323" />
-                  <Text style={styles.quickAddBtnText}>
+                  <Ionicons name="add" size={14} color={colors.primary} />
+                  <Text style={[styles.quickAddBtnText, { color: colors.primary }]}>
                     {isBn ? 'যোগ করুন' : 'Add'}
                   </Text>
                 </TouchableOpacity>

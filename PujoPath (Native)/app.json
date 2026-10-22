@@ -2,8 +2,8 @@
   "expo": {
     "name": "PujoPath",
     "slug": "pujopath",
-    "version": "0.1.0",
-    "orientation": "portrait",
+    "version": "0.2.0",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
