@@ -28,10 +28,14 @@ export const config: AppConfig = {
 };
 
 /**
- * Direct public download URL for the published Android APK release asset.
+ * Direct public download URL for the published Native Android APK release asset.
+ * Built from the dedicated PujoPath Native project (app.pujopath.mobile).
  */
-export const APK_DOWNLOAD_URL =
-  'https://github.com/soumikbur/pujopath/releases/download/v1.0.0/PujoPath-v1.0.0.apk';
+export const NATIVE_APK_DOWNLOAD_URL =
+  'https://github.com/soumikbur/pujopath/releases/download/v1.0.0/PujoPath-Native.apk';
+
+// Alias for compatibility across Web components
+export const APK_DOWNLOAD_URL = NATIVE_APK_DOWNLOAD_URL;
 
 /**
  * Validates the runtime development environment.

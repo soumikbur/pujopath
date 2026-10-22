@@ -21,7 +21,9 @@ import {
   Bell,
   Flame,
   Phone,
+  Download,
 } from 'lucide-react';
+import { NATIVE_APK_DOWNLOAD_URL } from '@/lib/config';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { cn } from '@/lib/utils/cn';
 
@@ -170,12 +172,23 @@ export function MobileBottomNav() {
               })}
             </div>
 
-            {/* Feedback Quick Action */}
-            <div className="pt-2 border-t border-[#eee8e1] dark:border-[#2a241f]">
+            {/* Quick Actions: Install Native App & Feedback */}
+            <div className="pt-2 border-t border-[#eee8e1] dark:border-[#2a241f] space-y-2">
+              <a
+                href={NATIVE_APK_DOWNLOAD_URL}
+                download="PujoPath-Native.apk"
+                onClick={() => setMoreOpen(false)}
+                className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-2xl bg-pujo-red hover:bg-[#991b1b] text-white font-bold text-xs shadow-sm transition-all active:scale-95 text-center"
+                title={isBn ? 'নেটিভ অ্যান্ড্রয়েড অ্যাপ ডাউনলোড করুন (APK)' : 'Download Native Android App (APK)'}
+              >
+                <Download className="w-4 h-4 shrink-0" />
+                <span>{isBn ? 'নেটিভ অ্যান্ড্রয়েড অ্যাপ ইনস্টল (১০৭ MB)' : 'Install Native Android App (107 MB)'}</span>
+              </a>
+
               <Link
                 href="/feedback"
                 onClick={() => setMoreOpen(false)}
-                className="flex items-center justify-center gap-2.5 w-full py-3 px-4 rounded-2xl bg-[#f0f7ff] dark:bg-[#1a2634] text-[#0a66c2] dark:text-[#70b5f9] border border-[#0a66c2]/30 dark:border-[#0a66c2]/40 font-bold text-xs hover:bg-[#0a66c2] hover:text-white transition-colors shadow-sm"
+                className="flex items-center justify-center gap-2.5 w-full py-2.5 px-4 rounded-2xl bg-[#f0f7ff] dark:bg-[#1a2634] text-[#0a66c2] dark:text-[#70b5f9] border border-[#0a66c2]/30 dark:border-[#0a66c2]/40 font-bold text-xs hover:bg-[#0a66c2] hover:text-white transition-colors shadow-sm"
                 title={isBn ? 'মতামত ও পরামর্শ দিন' : 'Share Feedback & Suggestions'}
                 aria-label={isBn ? 'মতামত পেজে যান' : 'Go to feedback page'}
               >

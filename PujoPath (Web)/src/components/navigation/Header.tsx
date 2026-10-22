@@ -20,12 +20,13 @@ import {
   Flame,
   Phone,
 } from 'lucide-react';
-import { APK_DOWNLOAD_URL } from '@/lib/config';
+import { NATIVE_APK_DOWNLOAD_URL } from '@/lib/config';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { useNotifications } from '@/lib/context/NotificationContext';
 import { useI18n } from '@/lib/i18n/I18nContext';
 import { useTheme } from '@/lib/context/ThemeContext';
 import { useFestival } from '@/lib/context/FestivalContext';
+import { InstallNativeAppModal } from './InstallNativeAppModal';
 import { cn } from '@/lib/utils/cn';
 
 export function Header() {
@@ -36,6 +37,7 @@ export function Header() {
   const { unreadCount } = useNotifications();
   const { activeFestival, isKali } = useFestival();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [installModalOpen, setInstallModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isBn = locale === 'bn';
 
@@ -197,25 +199,38 @@ export function Header() {
 
         {/* Right Controls: Install App + Theme Switch + Language Switch + Saved Heart */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Install Android App Button */}
-          <a
+          {/* Install Native Android App Button */}
+          <button
             id="install-app-header-btn"
-            href={APK_DOWNLOAD_URL}
-            download="PujoPath-v1.0.0.apk"
-            target="_blank"
-            rel="noopener noreferrer"
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                const ua = navigator.userAgent || '';
+                const isAndroid = /android/i.test(ua);
+                if (isAndroid) {
+                  // Direct download trigger for Android devices
+                  const a = document.createElement('a');
+                  a.href = NATIVE_APK_DOWNLOAD_URL;
+                  a.download = 'PujoPath-Native.apk';
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                }
+              }
+              setInstallModalOpen(true);
+            }}
             title={
               isBn
-                ? 'অ্যান্ড্রয়েড প্রিভিউ অ্যাপ ডাউনলোড করুন (APK)'
-                : 'Download Android Preview App (APK)'
+                ? 'নেটিভ অ্যান্ড্রয়েড অ্যাপ ইনস্টল করুন (APK)'
+                : 'Install Native Android App (APK)'
             }
-            aria-label={isBn ? 'অ্যান্ড্রয়েড অ্যাপ ইনস্টল করুন' : 'Install Android App'}
-            className="flex items-center gap-1 sm:gap-1.5 h-9 px-2 sm:px-3 rounded-xl bg-[#b42323] hover:bg-[#971e1e] text-white text-xs sm:text-sm font-bold shadow-sm transition-all duration-150 active:scale-95 shrink-0"
+            aria-label={isBn ? 'নেটিভ অ্যান্ড্রয়েড অ্যাপ ইনস্টল করুন' : 'Install Native Android App'}
+            className="flex items-center gap-1 sm:gap-1.5 h-9 px-2 sm:px-3 rounded-xl bg-[#b42323] hover:bg-[#971e1e] text-white text-xs sm:text-sm font-bold shadow-sm transition-all duration-150 active:scale-95 shrink-0 cursor-pointer"
           >
             <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" aria-hidden="true" />
             <span className="hidden sm:inline">{isBn ? 'অ্যাপ ইনস্টল' : 'Install App'}</span>
             <span className="hidden min-[360px]:inline sm:hidden">{isBn ? 'অ্যাপ' : 'App'}</span>
-          </a>
+          </button>
 
           {/* Theme Switcher Toggle */}
           <button
@@ -298,6 +313,12 @@ export function Header() {
           </Link>
         </div>
       </div>
+
+      {/* Cross-Device Native Android App Installation Modal */}
+      <InstallNativeAppModal
+        isOpen={installModalOpen}
+        onClose={() => setInstallModalOpen(false)}
+      />
     </header>
   );
 }
