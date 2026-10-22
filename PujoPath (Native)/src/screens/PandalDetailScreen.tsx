@@ -19,6 +19,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
 import { useNotifications } from '@/context/NotificationContext';
+import { useFestival } from '@/context/FestivalContext';
 import { PANDALS_DATA } from '@/data/pandals';
 import { KALI_PANDALS_DATA } from '@/data/pandals/kaliPandals';
 import { VERIFIED_PHOTOS_REGISTRY } from '@/data/pandals/photoRegistry';
@@ -45,8 +46,14 @@ export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, n
     requestPermission,
   } = useNotifications();
 
-  const allPandals = [...PANDALS_DATA, ...KALI_PANDALS_DATA, ...customStops];
-  const pandal = allPandals.find((p) => p.id === pandalId || (slug && p.slug === slug)) || allPandals[0];
+  const { activeFestival } = useFestival();
+  const isKali = activeFestival === 'kali';
+  const activeDataset = isKali ? KALI_PANDALS_DATA : PANDALS_DATA;
+  const otherDataset = isKali ? PANDALS_DATA : KALI_PANDALS_DATA;
+  const allPandals = [...activeDataset, ...customStops, ...otherDataset];
+  const pandal =
+    allPandals.find((p) => p.id === pandalId || (slug && p.slug === slug)) ||
+    activeDataset[0];
 
   const inPlan = isPandalInRoute(pandal.id);
   const favorited = isFavorite(pandal.id);

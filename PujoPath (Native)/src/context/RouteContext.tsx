@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Pandal, RouteStop, RouteItinerary } from '@/types';
 import { RouteOptimizer, RouteOptimizationResult } from '@/lib/services/RouteOptimizer';
 import { estimateWalkingMinutes, calculateHaversineDistance } from '@/lib/geo';
+import { useFestival } from '@/context/FestivalContext';
 
 interface RouteContextType {
   stops: RouteStop[];
@@ -46,118 +47,228 @@ const RouteContext = createContext<RouteContextType>({
   loadSavedRoute: () => {},
 });
 
-const STORAGE_ROUTE_KEY = '@pujopath_app_route_stops';
+const STORAGE_ROUTE_KEY_LEGACY = '@pujopath_app_route_stops';
+const STORAGE_ROUTE_KEY_DURGA = '@pujopath_route_stops_durga';
+const STORAGE_ROUTE_KEY_KALI = '@pujopath_route_stops_kali';
 const STORAGE_FAVORITES_KEY = '@pujopath_app_favorites';
 const STORAGE_CUSTOM_STOPS_KEY = '@pujopath_app_custom_stops';
 const STORAGE_SAVED_ROUTES_KEY = '@pujopath_saved_routes';
 
 export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [stops, setStops] = useState<RouteStop[]>([]);
+  const { activeFestival } = useFestival();
+  const currentFestival: 'durga' | 'kali' = activeFestival === 'kali' ? 'kali' : 'durga';
+
+  const [durgaStops, setDurgaStops] = useState<RouteStop[]>([]);
+  const [kaliStops, setKaliStops] = useState<RouteStop[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [customStops, setCustomStops] = useState<Pandal[]>([]);
+  const [allCustomStops, setAllCustomStops] = useState<Pandal[]>([]);
   const [savedRoutes, setSavedRoutes] = useState<RouteItinerary[]>([]);
   const [lastOptimizationResult, setLastOptimizationResult] = useState<RouteOptimizationResult | null>(null);
 
-  // Load from AsyncStorage on mount
+  // Load from AsyncStorage on mount with migration support
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_ROUTE_KEY).then((data) => {
-      if (data) {
+    Promise.all([
+      AsyncStorage.getItem(STORAGE_ROUTE_KEY_DURGA),
+      AsyncStorage.getItem(STORAGE_ROUTE_KEY_KALI),
+      AsyncStorage.getItem(STORAGE_ROUTE_KEY_LEGACY),
+      AsyncStorage.getItem(STORAGE_FAVORITES_KEY),
+      AsyncStorage.getItem(STORAGE_CUSTOM_STOPS_KEY),
+      AsyncStorage.getItem(STORAGE_SAVED_ROUTES_KEY),
+    ]).then(([durgaData, kaliData, legacyData, favsData, customData, routesData]) => {
+      let loadedDurga: RouteStop[] = [];
+      let loadedKali: RouteStop[] = [];
+
+      if (durgaData) {
         try {
-          setStops(JSON.parse(data));
+          loadedDurga = JSON.parse(durgaData);
         } catch {}
       }
-    });
-
-    AsyncStorage.getItem(STORAGE_FAVORITES_KEY).then((data) => {
-      if (data) {
+      if (kaliData) {
         try {
-          setFavorites(JSON.parse(data));
+          loadedKali = JSON.parse(kaliData);
         } catch {}
       }
-    });
 
-    AsyncStorage.getItem(STORAGE_CUSTOM_STOPS_KEY).then((data) => {
-      if (data) {
+      // If festival-specific lists are empty, check legacy storage and migrate partitioned
+      if (loadedDurga.length === 0 && loadedKali.length === 0 && legacyData) {
         try {
-          setCustomStops(JSON.parse(data));
+          const legacy: RouteStop[] = JSON.parse(legacyData);
+          legacy.forEach((s) => {
+            const isK =
+              s.pandal?.festival === 'kali' ||
+              s.pandalId.startsWith('kali-');
+            if (isK) {
+              loadedKali.push(s);
+            } else {
+              loadedDurga.push(s);
+            }
+          });
+          AsyncStorage.setItem(STORAGE_ROUTE_KEY_DURGA, JSON.stringify(loadedDurga));
+          AsyncStorage.setItem(STORAGE_ROUTE_KEY_KALI, JSON.stringify(loadedKali));
         } catch {}
       }
-    });
 
-    AsyncStorage.getItem(STORAGE_SAVED_ROUTES_KEY).then((data) => {
-      if (data) {
+      setDurgaStops(loadedDurga);
+      setKaliStops(loadedKali);
+
+      if (favsData) {
         try {
-          setSavedRoutes(JSON.parse(data));
+          setFavorites(JSON.parse(favsData));
+        } catch {}
+      }
+
+      if (customData) {
+        try {
+          setAllCustomStops(JSON.parse(customData));
+        } catch {}
+      }
+
+      if (routesData) {
+        try {
+          setSavedRoutes(JSON.parse(routesData));
         } catch {}
       }
     });
   }, []);
 
-  const stopIdsSet = React.useMemo(() => new Set(stops.map((s) => s.pandalId)), [stops]);
-  const favoritesSet = React.useMemo(() => new Set(favorites), [favorites]);
+  // Active stops strictly mapped to active festival
+  const activeStops = currentFestival === 'kali' ? kaliStops : durgaStops;
+  const stopIdsSet = useMemo(() => new Set(activeStops.map((s) => s.pandalId)), [activeStops]);
+  const favoritesSet = useMemo(() => new Set(favorites), [favorites]);
 
-  const saveStops = React.useCallback((newStops: RouteStop[]) => {
-    setStops(newStops);
-    AsyncStorage.setItem(STORAGE_ROUTE_KEY, JSON.stringify(newStops));
-  }, []);
-
-  const addStop = React.useCallback((pandal: Pandal) => {
-    setStops((prevStops) => {
-      if (prevStops.some((s) => s.pandalId === pandal.id)) return prevStops;
-      const newStop: RouteStop = {
-        pandalId: pandal.id,
-        pandal,
-        order: prevStops.length,
-      };
-      const updated = [...prevStops, newStop];
-      AsyncStorage.setItem(STORAGE_ROUTE_KEY, JSON.stringify(updated));
-      return updated;
+  // Filter custom stops so they only appear in the festival they were created in
+  const customStops = useMemo(() => {
+    return allCustomStops.filter((p) => {
+      if (currentFestival === 'kali') {
+        return p.festival === 'kali' || p.id.startsWith('kali-');
+      }
+      return p.festival !== 'kali' && !p.id.startsWith('kali-');
     });
-  }, []);
+  }, [allCustomStops, currentFestival]);
 
-  const removeStop = React.useCallback((pandalId: string) => {
-    setStops((prevStops) => {
-      const filtered = prevStops
-        .filter((s) => s.pandalId !== pandalId)
-        .map((s, idx) => ({ ...s, order: idx }));
-      AsyncStorage.setItem(STORAGE_ROUTE_KEY, JSON.stringify(filtered));
-      return filtered;
-    });
-  }, []);
+  const saveFestivalStops = useCallback(
+    (festival: 'durga' | 'kali', newStops: RouteStop[]) => {
+      if (festival === 'kali') {
+        setKaliStops(newStops);
+        AsyncStorage.setItem(STORAGE_ROUTE_KEY_KALI, JSON.stringify(newStops));
+      } else {
+        setDurgaStops(newStops);
+        AsyncStorage.setItem(STORAGE_ROUTE_KEY_DURGA, JSON.stringify(newStops));
+      }
+    },
+    []
+  );
 
-  const isPandalInRoute = React.useCallback((pandalId: string): boolean => {
-    return stopIdsSet.has(pandalId);
-  }, [stopIdsSet]);
+  const addStop = useCallback(
+    (pandal: Pandal) => {
+      const isPandalKali = pandal.festival === 'kali' || pandal.id.startsWith('kali-');
+      const targetFestival: 'durga' | 'kali' = isPandalKali ? 'kali' : 'durga';
 
-  const clearRoute = React.useCallback(() => {
+      if (targetFestival === 'kali') {
+        setKaliStops((prev) => {
+          if (prev.some((s) => s.pandalId === pandal.id)) return prev;
+          const newStop: RouteStop = {
+            pandalId: pandal.id,
+            pandal: { ...pandal, festival: 'kali' },
+            order: prev.length,
+          };
+          const updated = [...prev, newStop];
+          AsyncStorage.setItem(STORAGE_ROUTE_KEY_KALI, JSON.stringify(updated));
+          return updated;
+        });
+      } else {
+        setDurgaStops((prev) => {
+          if (prev.some((s) => s.pandalId === pandal.id)) return prev;
+          const newStop: RouteStop = {
+            pandalId: pandal.id,
+            pandal: { ...pandal, festival: 'durga' },
+            order: prev.length,
+          };
+          const updated = [...prev, newStop];
+          AsyncStorage.setItem(STORAGE_ROUTE_KEY_DURGA, JSON.stringify(updated));
+          return updated;
+        });
+      }
+    },
+    []
+  );
+
+  const removeStop = useCallback(
+    (pandalId: string) => {
+      if (currentFestival === 'kali') {
+        setKaliStops((prev) => {
+          const filtered = prev
+            .filter((s) => s.pandalId !== pandalId)
+            .map((s, idx) => ({ ...s, order: idx }));
+          AsyncStorage.setItem(STORAGE_ROUTE_KEY_KALI, JSON.stringify(filtered));
+          return filtered;
+        });
+      } else {
+        setDurgaStops((prev) => {
+          const filtered = prev
+            .filter((s) => s.pandalId !== pandalId)
+            .map((s, idx) => ({ ...s, order: idx }));
+          AsyncStorage.setItem(STORAGE_ROUTE_KEY_DURGA, JSON.stringify(filtered));
+          return filtered;
+        });
+      }
+    },
+    [currentFestival]
+  );
+
+  const isPandalInRoute = useCallback(
+    (pandalId: string): boolean => {
+      return stopIdsSet.has(pandalId);
+    },
+    [stopIdsSet]
+  );
+
+  const clearRoute = useCallback(() => {
     setLastOptimizationResult(null);
-    setStops([]);
-    AsyncStorage.setItem(STORAGE_ROUTE_KEY, JSON.stringify([]));
-  }, []);
+    if (currentFestival === 'kali') {
+      setKaliStops([]);
+      AsyncStorage.setItem(STORAGE_ROUTE_KEY_KALI, JSON.stringify([]));
+    } else {
+      setDurgaStops([]);
+      AsyncStorage.setItem(STORAGE_ROUTE_KEY_DURGA, JSON.stringify([]));
+    }
+  }, [currentFestival]);
 
-  const reorderStops = React.useCallback((fromIndex: number, toIndex: number) => {
-    setStops((prevStops) => {
-      if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= prevStops.length || toIndex >= prevStops.length) return prevStops;
-      const updated = [...prevStops];
+  const reorderStops = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      const targetList = currentFestival === 'kali' ? kaliStops : durgaStops;
+      if (
+        fromIndex === toIndex ||
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= targetList.length ||
+        toIndex >= targetList.length
+      ) {
+        return;
+      }
+      const updated = [...targetList];
       const [moved] = updated.splice(fromIndex, 1);
       updated.splice(toIndex, 0, moved);
       const reindexed = updated.map((s, idx) => ({ ...s, order: idx }));
-      AsyncStorage.setItem(STORAGE_ROUTE_KEY, JSON.stringify(reindexed));
-      return reindexed;
-    });
-  }, []);
+      saveFestivalStops(currentFestival, reindexed);
+    },
+    [currentFestival, kaliStops, durgaStops, saveFestivalStops]
+  );
 
-  const optimizeRoute = React.useCallback((origin?: { lat: number; lng: number } | null) => {
-    if (stops.length <= 1) {
-      return null;
-    }
-    const result = RouteOptimizer.optimizeStops(stops, origin);
-    saveStops(result.optimizedStops);
-    setLastOptimizationResult(result);
-    return result;
-  }, [stops, saveStops]);
+  const optimizeRoute = useCallback(
+    (origin?: { lat: number; lng: number } | null) => {
+      if (activeStops.length <= 1) {
+        return null;
+      }
+      const result = RouteOptimizer.optimizeStops(activeStops, origin);
+      saveFestivalStops(currentFestival, result.optimizedStops);
+      setLastOptimizationResult(result);
+      return result;
+    },
+    [activeStops, currentFestival, saveFestivalStops]
+  );
 
-  const toggleFavorite = React.useCallback((pandalId: string) => {
+  const toggleFavorite = useCallback((pandalId: string) => {
     setFavorites((prev) => {
       const updated = prev.includes(pandalId)
         ? prev.filter((id) => id !== pandalId)
@@ -167,51 +278,76 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
   }, []);
 
-  const isFavorite = React.useCallback((pandalId: string) => {
-    return favoritesSet.has(pandalId);
-  }, [favoritesSet]);
+  const isFavorite = useCallback(
+    (pandalId: string) => {
+      return favoritesSet.has(pandalId);
+    },
+    [favoritesSet]
+  );
 
-  const addCustomStop = React.useCallback((stop: Pandal) => {
-    setCustomStops((prev) => {
-      const updated = [...prev, stop];
-      AsyncStorage.setItem(STORAGE_CUSTOM_STOPS_KEY, JSON.stringify(updated));
-      return updated;
-    });
-    addStop(stop);
-  }, [addStop]);
+  const addCustomStop = useCallback(
+    (stop: Pandal) => {
+      const taggedStop: Pandal = {
+        ...stop,
+        festival: currentFestival,
+      };
+      setAllCustomStops((prev) => {
+        const updated = [...prev, taggedStop];
+        AsyncStorage.setItem(STORAGE_CUSTOM_STOPS_KEY, JSON.stringify(updated));
+        return updated;
+      });
+      addStop(taggedStop);
+    },
+    [currentFestival, addStop]
+  );
 
-  const saveCurrentRoute = React.useCallback((name?: string): RouteItinerary | null => {
-    if (stops.length === 0) return null;
-    let totalDist = 0;
-    for (let i = 0; i < stops.length - 1; i++) {
-      totalDist += calculateHaversineDistance(
-        stops[i].pandal.latitude,
-        stops[i].pandal.longitude,
-        stops[i + 1].pandal.latitude,
-        stops[i + 1].pandal.longitude
-      );
-    }
+  const saveCurrentRoute = useCallback(
+    (name?: string): RouteItinerary | null => {
+      if (activeStops.length === 0) return null;
+      let totalDist = 0;
+      for (let i = 0; i < activeStops.length - 1; i++) {
+        totalDist += calculateHaversineDistance(
+          activeStops[i].pandal.latitude,
+          activeStops[i].pandal.longitude,
+          activeStops[i + 1].pandal.latitude,
+          activeStops[i + 1].pandal.longitude
+        );
+      }
 
-    const newRoute: RouteItinerary = {
-      id: `route-${Date.now()}`,
-      name: name || `Puja Trail ${savedRoutes.length + 1}`,
-      nameBn: `পুজো পরিক্রমা ${savedRoutes.length + 1}`,
-      stops: [...stops],
-      totalDistanceKm: totalDist,
-      estimatedDurationMinutes: Math.round(estimateWalkingMinutes(totalDist) + stops.length * 25),
-      suggestedTransitMode: totalDist > 3 ? 'Metro + Walking' : 'Walking',
-      createdAt: new Date().toISOString(),
-    };
+      const defaultName =
+        currentFestival === 'kali'
+          ? `Kali Puja Trail ${savedRoutes.length + 1}`
+          : `Puja Trail ${savedRoutes.length + 1}`;
+      const defaultNameBn =
+        currentFestival === 'kali'
+          ? `কালীপূজা পরিক্রমা ${savedRoutes.length + 1}`
+          : `পুজো পরিক্রমা ${savedRoutes.length + 1}`;
 
-    setSavedRoutes((prevRoutes) => {
-      const updatedRoutes = [...prevRoutes, newRoute];
-      AsyncStorage.setItem(STORAGE_SAVED_ROUTES_KEY, JSON.stringify(updatedRoutes));
-      return updatedRoutes;
-    });
-    return newRoute;
-  }, [stops, savedRoutes.length]);
+      const newRoute: RouteItinerary = {
+        id: `route-${currentFestival}-${Date.now()}`,
+        name: name || defaultName,
+        nameBn: defaultNameBn,
+        festival: currentFestival,
+        stops: [...activeStops],
+        totalDistanceKm: totalDist,
+        estimatedDurationMinutes: Math.round(
+          estimateWalkingMinutes(totalDist) + activeStops.length * 25
+        ),
+        suggestedTransitMode: totalDist > 3 ? 'Metro + Walking' : 'Walking',
+        createdAt: new Date().toISOString(),
+      };
 
-  const deleteSavedRoute = React.useCallback((id: string) => {
+      setSavedRoutes((prevRoutes) => {
+        const updatedRoutes = [...prevRoutes, newRoute];
+        AsyncStorage.setItem(STORAGE_SAVED_ROUTES_KEY, JSON.stringify(updatedRoutes));
+        return updatedRoutes;
+      });
+      return newRoute;
+    },
+    [activeStops, currentFestival, savedRoutes.length]
+  );
+
+  const deleteSavedRoute = useCallback((id: string) => {
     setSavedRoutes((prev) => {
       const updated = prev.filter((r) => r.id !== id);
       AsyncStorage.setItem(STORAGE_SAVED_ROUTES_KEY, JSON.stringify(updated));
@@ -219,17 +355,27 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
   }, []);
 
-  const loadSavedRoute = React.useCallback((route: RouteItinerary) => {
-    saveStops(route.stops);
-  }, [saveStops]);
+  const loadSavedRoute = useCallback(
+    (route: RouteItinerary) => {
+      const targetFestival =
+        route.festival ||
+        (route.stops.some(
+          (s) => s.pandal?.festival === 'kali' || s.pandalId.startsWith('kali-')
+        )
+          ? 'kali'
+          : 'durga');
+      saveFestivalStops(targetFestival, route.stops);
+    },
+    [saveFestivalStops]
+  );
 
-  const totalDistanceKm = React.useMemo(() => {
-    return RouteOptimizer.calculateTotalDistance(stops);
-  }, [stops]);
+  const totalDistanceKm = useMemo(() => {
+    return RouteOptimizer.calculateTotalDistance(activeStops);
+  }, [activeStops]);
 
-  const contextValue = React.useMemo(
+  const contextValue = useMemo(
     () => ({
-      stops,
+      stops: activeStops,
       addStop,
       removeStop,
       isPandalInRoute,
@@ -249,7 +395,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       loadSavedRoute,
     }),
     [
-      stops,
+      activeStops,
       addStop,
       removeStop,
       isPandalInRoute,
@@ -270,12 +416,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     ]
   );
 
-  return (
-    <RouteContext.Provider value={contextValue}>
-      {children}
-    </RouteContext.Provider>
-  );
+  return <RouteContext.Provider value={contextValue}>{children}</RouteContext.Provider>;
 };
 
 export const useRoute = () => useContext(RouteContext);
-

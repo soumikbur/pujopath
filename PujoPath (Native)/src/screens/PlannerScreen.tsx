@@ -233,7 +233,7 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
             <Ionicons name="git-network-outline" size={14} color={colors.primary} />
             <Text style={[styles.badgeText, { color: colors.primary }]}>
               {isKali
-                ? (isBn ? 'বারাসাত পরিক্রমা রুট' : 'BARASAT PUJA TRAIL')
+                ? (isBn ? 'কালীপূজা রুট প্ল্যানার' : 'KALI PUJA ROUTE PLANNER')
                 : (isBn ? 'রুট প্ল্যানার' : 'ROUTE PLANNER')}
             </Text>
           </View>
@@ -245,8 +245,8 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
           <Text style={[styles.pageSubtitle, { color: colors.textMuted }]}>
             {isKali
               ? (isBn
-                ? 'বারাসাত ও সংলগ্ন অঞ্চলের পছন্দের মণ্ডপগুলো নির্বাচন করে সবচেয়ে সুবিধাজনক ও কম হাঁটার পরিক্রমা রুট তৈরি করুন।'
-                : 'Plan your customized Kali Puja hopping trail across Barasat with smart nearest-neighbor optimization.')
+                ? 'কালীপূজার পছন্দের মণ্ডপগুলো নির্বাচন করে সবচেয়ে সুবিধাজনক ও কম হাঁটার পরিক্রমা রুট তৈরি করুন।'
+                : 'Plan your customized Kali Puja hopping trail with smart nearest-neighbor optimization.')
               : (isBn
                 ? 'পছন্দের মণ্ডপগুলো নির্বাচন করুন এবং স্মার্ট অপটিমাইজার দিয়ে সবচেয়ে কম হাঁটা ও সুবিধাজনক পরিক্রমা রুট তৈরি করুন।'
                 : 'Plan your customized pandal hopping route across Kolkata with smart nearest-neighbor optimization.')}

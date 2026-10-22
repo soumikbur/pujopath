@@ -10,7 +10,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
+import { useFestival } from '@/context/FestivalContext';
 import { PANDALS_DATA } from '@/data/pandals';
+import { KALI_PANDALS_DATA } from '@/data/pandals/kaliPandals';
 import { PandalCard } from '@/components/PandalCard';
 import { toBengaliDigits } from '@/lib/geo';
 import { RouteItinerary } from '@/types';
@@ -25,10 +27,22 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
   const { language } = useLanguage();
   const isBn = language === 'bn';
   const { favorites, customStops, savedRoutes, deleteSavedRoute, loadSavedRoute } = useRoute();
+  const { activeFestival } = useFestival();
+  const isKali = activeFestival === 'kali';
   const { isLandscape, screenPaddingLeft, screenPaddingRight, stackScrollBottomPadding } = useResponsive();
 
-  const allPandals = [...PANDALS_DATA, ...customStops];
+  const basePandals = isKali ? KALI_PANDALS_DATA : PANDALS_DATA;
+  const allPandals = [...basePandals, ...customStops];
   const savedPandals = allPandals.filter((p) => favorites.includes(p.id));
+
+  // Filter saved itineraries strictly by active festival
+  const festivalRoutes = savedRoutes.filter((r) => {
+    if (r.festival) return r.festival === (activeFestival || 'durga');
+    const isRouteKali = r.stops.some(
+      (s) => s.pandal?.festival === 'kali' || s.pandalId.startsWith('kali-')
+    );
+    return isKali ? isRouteKali : !isRouteKali;
+  });
 
   const handleLoadRoute = (route: RouteItinerary) => {
     loadSavedRoute(route);
@@ -129,11 +143,11 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
         <View style={[styles.sectionContainer, styles.routesSection, { borderTopColor: isDark ? '#2F2720' : '#EEE8E1' }]}>
           <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
             {isBn
-              ? `সংরক্ষিত পরিক্রমা রুট (${toBengaliDigits(savedRoutes.length)})`
-              : `Saved Route Itineraries (${savedRoutes.length})`}
+              ? `সংরক্ষিত পরিক্রমা রুট (${toBengaliDigits(festivalRoutes.length)})`
+              : `Saved Route Itineraries (${festivalRoutes.length})`}
           </Text>
 
-          {savedRoutes.length === 0 ? (
+          {festivalRoutes.length === 0 ? (
             <View
               style={[
                 styles.emptyCard,
@@ -171,7 +185,7 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
             </View>
           ) : (
             <View style={[styles.routesList, isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 12 }]}>
-              {savedRoutes.map((route) => (
+              {festivalRoutes.map((route) => (
                 <View
                   key={route.id}
                   style={[

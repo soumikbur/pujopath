@@ -8,7 +8,7 @@ import { Pandal } from '@/types';
  * NOTE: There is no single authoritative total for all Kali Pujas in Barasat.
  * This list represents verified public committees, clubs, and historic shrines.
  */
-export const KALI_PANDALS_DATA: Pandal[] = [
+const RAW_KALI_PANDALS_DATA: Pandal[] = [
   // ==========================================
   // BARASAT VERIFIED PUBLIC PANDALS (PRIORITY)
   // ==========================================
@@ -1949,3 +1949,9 @@ export const KALI_PANDALS_DATA: Pandal[] = [
     verificationStatus: 'Verified',
   },
 ];
+
+export const KALI_PANDALS_DATA: Pandal[] = RAW_KALI_PANDALS_DATA.map((p) => ({
+  ...p,
+  festival: 'kali' as const,
+}));
+

@@ -17,4 +17,5 @@ export interface RouteItinerary {
   totalDistanceKm: number;
   estimatedDurationMinutes: number;
   suggestedTransitMode: 'Walking' | 'Metro + Walking' | 'Cab/Auto';
+  festival?: 'durga' | 'kali';
 }

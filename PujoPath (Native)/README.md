@@ -22,7 +22,7 @@ PujoPath Native is built as a genuine, 100% native Android application using Rea
 
 ## 2. Feature & Data Parity
 
-PujoPath Native delivers complete feature, data, and visual parity with the Web and Capacitor editions:
+PujoPath Native delivers complete feature, data, and visual parity with the Web edition:
 
 | Feature | Details |
 | :--- | :--- |

@@ -896,7 +896,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
                 borderColor: isKali ? (isDark ? '#3b2554' : '#e9d5ff') : colors.border,
               },
             ]}
-            accessibilityLabel={isKali ? (isBn ? 'বারাসাত কেন্দ্র করুন' : 'Recenter Barasat') : (isBn ? 'কলকাতা কেন্দ্র করুন' : 'Recenter Kolkata')}
+            accessibilityLabel={isKali ? (isBn ? 'মানচিত্র কেন্দ্র করুন' : 'Recenter Map') : (isBn ? 'কলকাতা কেন্দ্র করুন' : 'Recenter Map')}
           >
             <Ionicons name="compass-outline" size={20} color={colors.textPrimary} />
           </TouchableOpacity>
@@ -934,7 +934,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {/* 4. Mobile Floating Selected Pandal Card (Matching Capacitor mobile floating card) */}
+        {/* 4. Mobile Floating Selected Pandal Card */}
         {selectedPandal && (
           <View
             style={[
@@ -1113,7 +1113,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
           </View>
         )}
 
-        {/* 5. Bottom Selected Pandals Bar (matching Capacitor planner bar when no pandal open) */}
+        {/* 5. Bottom Selected Pandals Bar (planner bar when no pandal open) */}
         {!selectedPandal && (
           <View style={isMapFullscreen ? { paddingBottom: safeBottom } : undefined}>
             <SelectedPandalsBar />

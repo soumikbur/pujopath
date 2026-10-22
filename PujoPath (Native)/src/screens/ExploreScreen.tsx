@@ -133,7 +133,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
   const [showSortModal, setShowSortModal] = useState(false);
   const [sortBy, setSortBy] = useState<FilterOptions['sortBy']>('recommended');
 
-  // 5 Feature Filter Switches matching Capacitor PandalFilters
+  // 5 Feature Filter Switches
   const [isFeatureFiltersOpen, setIsFeatureFiltersOpen] = useState(true);
   const [bonediBariOnly, setBonediBariOnly] = useState(false);
   const [metroOnly, setMetroOnly] = useState(false);
@@ -181,6 +181,12 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
   };
 
   const isKali = activeFestival === 'kali';
+
+  // Immediately clear stale filters when switching festival
+  useEffect(() => {
+    setSelectedZone('All');
+    setSearchQuery('');
+  }, [activeFestival]);
 
   const filteredPandals = useMemo(() => {
     return PandalService.filterPandals(
@@ -274,20 +280,20 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                 <Ionicons name="search" size={13} color={colors.primary} />
                 <Text style={[styles.directoryBadgeText, { color: colors.primary }]}>
                   {isKali
-                    ? isBn ? 'বারাসাত ও সংলগ্ন কালীপূজা সন্ধান' : 'BARASAT & BENGAL KALI PUJA'
+                    ? isBn ? 'কালীপূজা মণ্ডপ সন্ধান' : 'KALI PUJA PANDALS'
                     : isBn ? 'প্যান্ডেল সন্ধান' : 'PANDAL DIRECTORY'}
                 </Text>
               </View>
               <Text style={[styles.pageTitle, { color: colors.textPrimary }]}>
                 {isKali
-                  ? isBn ? 'কালীপূজা মণ্ডপ পরিক্রমা' : 'Explore Kali Puja Pandals'
+                  ? isBn ? 'কালীপূজা মণ্ডপ পরিক্রমা' : 'Kali Puja Pandals'
                   : isBn ? 'প্যান্ডেল খুঁজুন' : 'Explore Kolkata Pandals'}
               </Text>
               <Text style={[styles.pageSubtitle, { color: colors.textMuted }]}>
                 {isKali
                   ? isBn
-                    ? 'বারাসাত, মধ্যমগ্রাম ও ঐতিহাসিক কালীক্ষেত্রের নির্ভরযোগ্য তথ্য ও পথনির্দেশিকা।'
-                    : 'Verified discovery and navigation for Barasat, Madhyamgram, and revered Shaktipeeths.'
+                    ? 'যাচাইকৃত সর্বজনীন কালীপূজা মণ্ডপ, আলোকসজ্জা ও ঐতিহাসিক তীর্থক্ষেত্রের তথ্য ও পথনির্দেশিকা।'
+                    : 'Verified discovery and navigation for celebrated Kali Puja pandals and heritage shrines.'
                   : isBn
                   ? 'নাম, এলাকা, থিম বা নিকটতম মেট্রো স্টেশন দিয়ে কলকাতার সেরা পূজামণ্ডপ খুঁজুন।'
                   : "Find Kolkata's best puja pandals by name, area, theme, or nearest metro station."}
@@ -320,8 +326,8 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                   placeholder={
                     isKali
                       ? isBn
-                        ? 'বারাসাত মণ্ডপ, ক্লাব, এলাকা বা মন্দির খুঁজুন...'
-                        : 'Search Barasat pandals, clubs, locality...'
+                        ? 'কালীপূজা মণ্ডপ, ক্লাব, এলাকা বা মন্দির খুঁজুন...'
+                        : 'Search Kali Puja pandals, clubs, locality...'
                       : isBn
                       ? 'প্যান্ডেলের নাম, বনেদি বাড়ি, এলাকা, থিম বা মেট্রো...'
                       : 'Search pandals by name, Bonedi Bari, theme, locality or metro...'

@@ -1350,6 +1350,7 @@ export const PANDALS_DATA: Pandal[] = RAW_PANDALS_DATA.map((pandal) => {
   const photo = getPandalPhotoRecord(pandal.id);
   return {
     ...pandal,
+    festival: 'durga' as const,
     imageUrl: photo.isAvailable ? photo.imageUrl : '',
     hasVerifiedPhoto: photo.isAvailable,
     photoMetadata: photo,

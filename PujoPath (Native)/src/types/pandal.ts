@@ -182,6 +182,7 @@ export interface Pandal {
   heritageClassification?: string;
   isCommunitySubmitted?: boolean;
   submittedBy?: string;
+  festival?: 'durga' | 'kali';
 }
 
 export interface FilterOptions {

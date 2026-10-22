@@ -32,14 +32,14 @@ export const KaliHomeScreen: React.FC<KaliHomeScreenProps> = ({ navigation }) =>
     () => [
       {
         screen: 'ExploreTab',
-        label: isBn ? 'বারাসাত কালীপূজা' : 'Barasat Pandals',
-        desc: isBn ? 'পাইওনিয়ার, নবপল্লী ও সেরা মণ্ডপ' : 'Pioneer, Nabapally, Regiment & more',
+        label: isBn ? 'কালীপূজা মণ্ডপ' : 'Kali Puja Pandals',
+        desc: isBn ? 'যাচাইকৃত সর্বজনীন ও ঐতিহাসিক মণ্ডপ' : 'Verified public pandals & heritage shrines',
         icon: 'business' as const,
         color: '#9333EA',
       },
       {
         screen: 'MapTab',
-        label: isBn ? 'বারাসাত মানচিত্র' : 'Barasat Map',
+        label: isBn ? 'কালীপূজা মানচিত্র' : 'Kali Puja Map',
         desc: isBn ? 'যাচাইকৃত অবস্থান ও রুট পিন' : 'GPS navigation & pandal pins',
         icon: 'map' as const,
         color: '#2563EB',
@@ -79,13 +79,13 @@ export const KaliHomeScreen: React.FC<KaliHomeScreenProps> = ({ navigation }) =>
   const highlights = useMemo(
     () => [
       {
-        title: isBn ? 'বারাসাত কালীপূজা পরিক্রমা' : 'Barasat Kali Puja Guide',
+        title: isBn ? 'কালীপূজা মণ্ডপ পরিক্রমা' : 'Kali Puja Pandal Guide',
         desc: isBn
-          ? 'পাইওনিয়ার, নবপল্লী, রেজিমেন্ট, সন্ধানী, সত্যদল ও বিদ্রোহী সহ বারাসাত ও সংলগ্ন সেরা মণ্ডপ।'
-          : 'Pioneer Park, Nabapally Byam Samity, Regiment, Sandhani, Satadal and top public pandals across Barasat.',
+          ? 'পাইওনিয়ার, নবপল্লী, রেজিমেন্ট, সন্ধানী ও বিখ্যাত সর্বজনীন শ্যামাপূজা পরিক্রমা।'
+          : 'Pioneer Park, Nabapally, Regiment, Sandhani and top public Kali Puja pandals.',
         image: require('../../assets/images/kali-hero.jpg'),
         screen: 'ExploreTab',
-        badge: isBn ? 'বারাসাত বিশেষ' : 'Barasat Special',
+        badge: isBn ? 'মণ্ডপ পরিক্রমা' : 'Pandal Guide',
       },
       {
         title: isBn ? 'নিশীথ কাল মহানির্ঘণ্ট ২০২৬' : 'Sacred Midnight Muhurat 2026',
