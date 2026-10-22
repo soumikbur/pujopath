@@ -120,7 +120,7 @@ export function InstallNativeAppModal({ isOpen, onClose }: InstallNativeAppModal
                   <p className="text-[11px] text-[#776d65] dark:text-[#a89e95] mt-0.5">
                     {isBn
                       ? 'নিচের বাটনে ট্যাপ করে PujoPath-Native.apk ডাউনলোড শুরু করুন।'
-                      : 'Tap the download button below. File size is ~107 MB.'}
+                      : 'Tap the download button below. File size is ~114 MB (v0.2.0 with Durga & Kali Puja).'}
                   </p>
                 </div>
               </div>
@@ -166,7 +166,7 @@ export function InstallNativeAppModal({ isOpen, onClose }: InstallNativeAppModal
                 className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-pujo-red hover:bg-[#991b1b] text-white font-bold text-sm shadow-md transition-all active:scale-95 text-center"
               >
                 <Download className="w-4 h-4 shrink-0" />
-                <span>{isBn ? 'ডাউনলোড PujoPath-Native.apk (১০৭ MB)' : 'Download PujoPath-Native.apk (107 MB)'}</span>
+                <span>{isBn ? 'ডাউনলোড PujoPath-Native.apk (১১৪ MB)' : 'Download PujoPath-Native.apk (114 MB)'}</span>
               </a>
               <button
                 type="button"
@@ -230,7 +230,7 @@ export function InstallNativeAppModal({ isOpen, onClose }: InstallNativeAppModal
                 className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-pujo-red hover:bg-[#991b1b] text-white font-bold text-sm shadow-md transition-all active:scale-95 text-center"
               >
                 <Download className="w-4 h-4 shrink-0" />
-                <span>{isBn ? 'ফোনের জন্য APK ডাউনলোড করুন (১০৭ MB)' : 'Download APK for Phone (107 MB)'}</span>
+                <span>{isBn ? 'ফোনের জন্য APK ডাউনলোড করুন (১১৪ MB)' : 'Download APK for Phone (114 MB)'}</span>
               </a>
               <button
                 type="button"

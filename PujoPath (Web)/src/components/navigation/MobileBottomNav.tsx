@@ -182,7 +182,7 @@ export function MobileBottomNav() {
                 title={isBn ? 'নেটিভ অ্যান্ড্রয়েড অ্যাপ ডাউনলোড করুন (APK)' : 'Download Native Android App (APK)'}
               >
                 <Download className="w-4 h-4 shrink-0" />
-                <span>{isBn ? 'নেটিভ অ্যান্ড্রয়েড অ্যাপ ইনস্টল (১০৭ MB)' : 'Install Native Android App (107 MB)'}</span>
+                <span>{isBn ? 'নেটিভ অ্যান্ড্রয়েড অ্যাপ ইনস্টল (১১৪ MB)' : 'Install Native Android App (114 MB)'}</span>
               </a>
 
               <Link
