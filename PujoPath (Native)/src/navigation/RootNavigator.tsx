@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   Modal,
   StyleSheet,
   Pressable,
@@ -25,6 +24,8 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useNotifications } from '@/context/NotificationContext';
+import { motion } from '@/theme/motion';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 
 import { HomeScreen } from '@/screens/HomeScreen';
 import { ExploreScreen } from '@/screens/ExploreScreen';
@@ -83,8 +84,8 @@ const MoreDrawerModal: React.FC<MoreDrawerModalProps> = ({ visible, onClose, nav
       } else {
         Animated.timing(anim, {
           toValue: 1,
-          duration: 220,
-          easing: Easing.out(Easing.cubic),
+          duration: motion.duration.standard,
+          easing: motion.easing.decelerate,
           useNativeDriver: true,
         }).start();
       }
@@ -95,8 +96,8 @@ const MoreDrawerModal: React.FC<MoreDrawerModalProps> = ({ visible, onClose, nav
       } else {
         Animated.timing(anim, {
           toValue: 0,
-          duration: 180,
-          easing: Easing.in(Easing.cubic),
+          duration: motion.duration.quick,
+          easing: motion.easing.accelerate,
           useNativeDriver: true,
         }).start(() => {
           setIsRendered(false);
@@ -298,18 +299,19 @@ const MoreDrawerModal: React.FC<MoreDrawerModalProps> = ({ visible, onClose, nav
             >
               {isBn ? 'অন্যান্য সুবিধাসমূহ' : 'More Features'}
             </Text>
-            <TouchableOpacity
+            <AnimatedPressable
+              preset="icon"
+              scaleTo={0.88}
               onPress={onClose}
               style={styles.closeBtn}
               accessibilityLabel="Close features drawer"
-              activeOpacity={0.7}
             >
               <Feather
                 name="x"
                 size={isLandscape ? 18 : 20}
                 color={isDark ? (isKali ? '#C084FC' : '#A89E95') : (isKali ? '#7E22CE' : '#776D65')}
               />
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
 
           {/* 8 Feature Cards Grid (2 cols in portrait, 4 cols in landscape) */}
@@ -323,16 +325,19 @@ const MoreDrawerModal: React.FC<MoreDrawerModalProps> = ({ visible, onClose, nav
             ]}
           >
             {secondaryItems.map((item) => (
-              <TouchableOpacity
+              <AnimatedPressable
                 key={item.name}
-                activeOpacity={0.75}
+                preset="chip"
+                scaleTo={0.94}
                 onPress={() => {
                   onClose();
-                  if ((item as any).onAction) {
-                    (item as any).onAction();
-                  } else {
-                    navigation.navigate(item.name);
-                  }
+                  requestAnimationFrame(() => {
+                    if ((item as any).onAction) {
+                      (item as any).onAction();
+                    } else {
+                      navigation.navigate(item.name);
+                    }
+                  });
                 }}
                 style={[
                   styles.featureCard,
@@ -367,7 +372,7 @@ const MoreDrawerModal: React.FC<MoreDrawerModalProps> = ({ visible, onClose, nav
                 >
                   {item.label}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             ))}
           </View>
 
@@ -383,8 +388,9 @@ const MoreDrawerModal: React.FC<MoreDrawerModalProps> = ({ visible, onClose, nav
               },
             ]}
           >
-            <TouchableOpacity
-              activeOpacity={0.75}
+            <AnimatedPressable
+              preset="button"
+              scaleTo={0.96}
               onPress={() => {
                 onClose();
                 navigation.navigate('Feedback');
@@ -410,7 +416,7 @@ const MoreDrawerModal: React.FC<MoreDrawerModalProps> = ({ visible, onClose, nav
               >
                 {isBn ? 'মতামত জানান (Feedback)' : 'Share Feedback'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         </Animated.View>
       </View>
@@ -450,6 +456,8 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
   isLandscape = false,
 }) => {
   const animValue = useRef(new Animated.Value(isFocused ? 1 : 0)).current;
+  const pressScale = useRef(new Animated.Value(1)).current;
+  const iconPop = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     if (reduceMotion) {
@@ -457,26 +465,74 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
     } else {
       Animated.timing(animValue, {
         toValue: isFocused ? 1 : 0,
-        duration: 180,
-        easing: Easing.out(Easing.cubic),
+        duration: motion.duration.standard,
+        easing: motion.easing.standard,
+        useNativeDriver: true,
+      }).start();
+
+      if (isFocused) {
+        // Deliberate, noticeable icon spring feedback when selected
+        Animated.sequence([
+          Animated.spring(iconPop, {
+            toValue: 1.18,
+            tension: 320,
+            friction: 12,
+            useNativeDriver: true,
+          }),
+          Animated.spring(iconPop, {
+            toValue: 1.0,
+            tension: 260,
+            friction: 20,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }
+    }
+  }, [isFocused, reduceMotion]);
+
+  const handlePressIn = () => {
+    if (!reduceMotion) {
+      Animated.timing(pressScale, {
+        toValue: 0.92,
+        duration: motion.duration.instant,
+        easing: motion.easing.standard,
         useNativeDriver: true,
       }).start();
     }
-  }, [isFocused, reduceMotion]);
+  };
+
+  const handlePressOut = () => {
+    if (!reduceMotion) {
+      Animated.spring(pressScale, {
+        toValue: 1,
+        tension: 320,
+        friction: 20,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
 
   const dotScale = animValue.interpolate({
     inputRange: [0, 1],
     outputRange: [0.3, 1.0],
   });
 
-  const dotOpacity = animValue;
-  const bgOpacity = animValue;
+  const bgScaleX = animValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.85, 1.0],
+  });
+
+  const bgScaleY = animValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.85, 1.0],
+  });
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.7}
+    <Pressable
       onPress={onPress}
       onLongPress={onLongPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       accessibilityRole={accessibilityRole}
       accessibilityState={accessibilityState}
       accessibilityLabel={accessibilityLabel}
@@ -485,70 +541,80 @@ const TabBarButton: React.FC<TabBarButtonProps> = ({
         isLandscape && styles.tabItemLandscape,
       ]}
     >
-      {/* Animated active pill background highlight */}
       <Animated.View
-        pointerEvents="none"
-        style={[
-          styles.tabActiveBg,
-          {
-            backgroundColor: activeBgColor,
-            opacity: bgOpacity,
-          },
-        ]}
-      />
-
-      <View style={styles.tabIconWrapper}>
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          transform: [{ scale: pressScale }],
+        }}
+      >
+        {/* Animated active pill background highlight with blooming scale */}
         <Animated.View
-          style={{
-            opacity: animValue.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
-          }}
-        >
-          {renderIcon(inactiveColor)}
-        </Animated.View>
-        <Animated.View
+          pointerEvents="none"
           style={[
-            StyleSheet.absoluteFill,
+            styles.tabActiveBg,
             {
+              backgroundColor: activeBgColor,
               opacity: animValue,
-            },
-          ]}
-        >
-          {renderIcon(activeColor)}
-        </Animated.View>
-      </View>
-
-      <View style={[styles.tabLabelWrapper, isLandscape && { marginTop: 0, marginLeft: 4 }]}>
-        <Animated.Text
-          style={[
-            styles.tabLabel,
-            {
-              color: animValue.interpolate({
-                inputRange: [0, 1],
-                outputRange: [inactiveColor, activeColor],
-              }),
-              fontWeight: isFocused ? '700' : '600',
-            },
-            isLandscape && { fontSize: 11 },
-          ]}
-          numberOfLines={1}
-        >
-          {label}
-        </Animated.Text>
-      </View>
-
-      {!isLandscape && (
-        <Animated.View
-          style={[
-            styles.tabDot,
-            {
-              backgroundColor: activeColor,
-              transform: [{ scale: dotScale }],
-              opacity: dotOpacity,
+              transform: [{ scaleX: bgScaleX }, { scaleY: bgScaleY }],
             },
           ]}
         />
-      )}
-    </TouchableOpacity>
+
+        <Animated.View style={[styles.tabIconWrapper, { transform: [{ scale: iconPop }] }]}>
+          <Animated.View
+            style={{
+              opacity: animValue.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
+            }}
+          >
+            {renderIcon(inactiveColor)}
+          </Animated.View>
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                opacity: animValue,
+              },
+            ]}
+          >
+            {renderIcon(activeColor)}
+          </Animated.View>
+        </Animated.View>
+
+        <View style={[styles.tabLabelWrapper, isLandscape && { marginTop: 0, marginLeft: 4 }]}>
+          <Animated.Text
+            style={[
+              styles.tabLabel,
+              {
+                color: animValue.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [inactiveColor, activeColor],
+                }),
+                fontWeight: isFocused ? '700' : '600',
+              },
+              isLandscape && { fontSize: 11 },
+            ]}
+            numberOfLines={1}
+          >
+            {label}
+          </Animated.Text>
+        </View>
+
+        {!isLandscape && (
+          <Animated.View
+            style={[
+              styles.tabDot,
+              {
+                backgroundColor: activeColor,
+                transform: [{ scale: dotScale }],
+                opacity: animValue,
+              },
+            ]}
+          />
+        )}
+      </Animated.View>
+    </Pressable>
   );
 };
 
@@ -723,14 +789,16 @@ type TabSceneInterpolatedStyle = {
 const forTabSlide = ({ current }: TabSceneInterpolationProps): TabSceneInterpolatedStyle => {
   const { progress } = current;
 
-  // progress is:
-  // -1 if screen index < active index (outgoing to left or incoming from left)
-  //  0 if active screen
-  //  1 if screen index > active index (outgoing to right or incoming from right)
-  // Subtle, high-performance slide transition for immediate visual feedback without GPU thrashing
+  // Fluid 40dp horizontal slide with subtle perceived depth scaling
   const translateX = progress.interpolate({
     inputRange: [-1, 0, 1],
-    outputRange: [-32, 0, 32],
+    outputRange: [-40, 0, 40],
+    extrapolate: 'clamp',
+  });
+
+  const scale = progress.interpolate({
+    inputRange: [-1, 0, 1],
+    outputRange: [0.98, 1, 0.98],
     extrapolate: 'clamp',
   });
 
@@ -744,7 +812,7 @@ const forTabSlide = ({ current }: TabSceneInterpolationProps): TabSceneInterpola
   return {
     sceneStyle: {
       opacity,
-      transform: [{ translateX }],
+      transform: [{ translateX }, { scale }],
     },
   };
 };
@@ -752,8 +820,8 @@ const forTabSlide = ({ current }: TabSceneInterpolationProps): TabSceneInterpola
 const tabTransitionSpec = {
   animation: 'timing' as const,
   config: {
-    duration: 200,
-    easing: Easing.out(Easing.cubic),
+    duration: motion.duration.navigation,
+    easing: motion.easing.standard,
   },
 };
 
@@ -775,7 +843,7 @@ function MainTabNavigator({ navigation }: any) {
       {!isMapFullscreen && <AppHeader />}
       <Tab.Navigator
         backBehavior="history"
-        detachInactiveScreens={false}
+        detachInactiveScreens={true}
         tabBar={(props) =>
           isMapFullscreen ? null : (
             <MobileBottomTabBar
@@ -822,7 +890,7 @@ function KaliTabNavigator({ navigation }: any) {
       {!isMapFullscreen && <AppHeader />}
       <KaliTab.Navigator
         backBehavior="history"
-        detachInactiveScreens={false}
+        detachInactiveScreens={true}
         tabBar={(props) =>
           isMapFullscreen ? null : (
             <MobileBottomTabBar
@@ -912,8 +980,8 @@ export function RootNavigator() {
               />
             ),
             contentStyle: { backgroundColor: colors.background },
-            animation: 'fade_from_bottom',
-            animationDuration: 220,
+            animation: 'slide_from_right',
+            animationDuration: motion.duration.navigation,
             gestureEnabled: true,
           }}
         >
@@ -921,25 +989,41 @@ export function RootNavigator() {
             <Stack.Screen
               name="FestivalSelect"
               component={FestivalSelectScreen}
-              options={{ headerShown: false }}
+              options={{
+                headerShown: false,
+                animation: 'fade',
+                animationDuration: motion.duration.standard,
+              }}
             />
           ) : activeFestival === 'kali' ? (
             <Stack.Screen
               name="KaliTabs"
               component={KaliTabNavigator}
-              options={{ headerShown: false }}
+              options={{
+                headerShown: false,
+                animation: 'fade_from_bottom',
+                animationDuration: motion.duration.navigation,
+              }}
             />
           ) : (
             <Stack.Screen
               name="MainTabs"
               component={MainTabNavigator}
-              options={{ headerShown: false }}
+              options={{
+                headerShown: false,
+                animation: 'fade_from_bottom',
+                animationDuration: motion.duration.navigation,
+              }}
             />
           )}
           <Stack.Screen
             name="PandalDetail"
             component={PandalDetailScreen}
-            options={{ title: 'Pandal Profile' }}
+            options={{
+              title: 'Pandal Profile',
+              animation: 'slide_from_right',
+              animationDuration: motion.duration.navigation,
+            }}
           />
           <Stack.Screen
             name="Explore"

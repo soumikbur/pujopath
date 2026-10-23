@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, LayoutAnimation, BackHandler } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,6 +10,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { toBengaliDigits } from '@/lib/geo';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useAudio } from '@/context/AudioContext';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 
 export const SelectedPandalsBar: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -77,80 +78,9 @@ export const SelectedPandalsBar: React.FC = () => {
     return null;
   }
 
-  // 1. Empty State: (0 Pandals Selected)
+  // Do not render floating bar when no pandals are selected
   if (stopCount === 0) {
-    return (
-      <View
-        style={[
-          styles.floatingWrapper,
-          {
-            bottom: floatingBottom,
-            left: 16 + safeLeft,
-            right: 16 + safeRight,
-          },
-          isLandscape && { alignItems: 'center' },
-        ]}
-        pointerEvents="box-none"
-      >
-        <View
-          style={[
-            styles.barContainer,
-            {
-              backgroundColor: isDark ? 'rgba(26, 22, 19, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-              borderColor: isDark ? '#2F2720' : '#EEE8E1',
-            },
-            isLandscape && { maxWidth: 640, width: '100%' },
-          ]}
-        >
-          <View style={styles.rowContent}>
-            <View style={styles.leftInfo}>
-              <View style={[styles.iconBox, { backgroundColor: isDark ? 'rgba(180,35,35,0.2)' : '#FDEEEE' }]}>
-                <Ionicons name="git-network-outline" size={17} color="#B42323" />
-              </View>
-              <View style={styles.textBox}>
-                <Text style={[styles.mainTitle, { color: colors.textPrimary }]} numberOfLines={1}>
-                  {isBn ? 'কোনো মণ্ডপ নির্বাচিত নেই' : '0 Pandals Selected'}
-                </Text>
-                <Text style={[styles.subTitle, { color: colors.textMuted }]} numberOfLines={1}>
-                  {isBn ? 'কার্ড থেকে "রুট যোগ" বাটনে চাপ দিন' : 'Click "Add Route" on any card to build your trail'}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.rightActions}>
-              <TouchableOpacity
-                activeOpacity={0.85}
-                onPress={() => navigation.navigate('Planner')}
-                style={[
-                  styles.openPlannerBtn,
-                  {
-                    borderColor: isDark ? '#2F2720' : '#EEE8E1',
-                  },
-                ]}
-              >
-                <Ionicons name="git-network" size={13} color={colors.textSecondary} />
-                <Text style={[styles.openPlannerBtnText, { color: colors.textSecondary }]}>
-                  {isBn ? 'প্ল্যানার খুলুন' : 'Open Planner'}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={handleDismiss}
-                activeOpacity={0.7}
-                style={[
-                  styles.dismissBtn,
-                  {
-                    borderColor: isDark ? '#2F2720' : '#EEE8E1',
-                  },
-                ]}
-              >
-                <Ionicons name="close" size={14} color={colors.textMuted} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </View>
-    );
+    return null;
   }
 
   // 2. Active State with stops
@@ -186,11 +116,11 @@ export const SelectedPandalsBar: React.FC = () => {
                   ? `নির্বাচিত মণ্ডপসমূহ (${toBengaliDigits(stopCount)}টি):`
                   : `Selected Pandals (${stopCount} stops):`}
               </Text>
-              <TouchableOpacity onPress={handleClearRoute} activeOpacity={0.7}>
+              <AnimatedPressable preset="chip" scaleTo={0.92} onPress={handleClearRoute}>
                 <Text style={styles.clearAllText}>
                   {isBn ? 'সব মুছুন' : 'Clear All'}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             </View>
 
             <View style={styles.expandedStopsList}>
@@ -216,9 +146,9 @@ export const SelectedPandalsBar: React.FC = () => {
                     </Text>
                   </View>
 
-                  <TouchableOpacity onPress={() => handleRemoveStop(stop.pandalId)} activeOpacity={0.7}>
+                  <AnimatedPressable preset="icon" scaleTo={0.85} onPress={() => handleRemoveStop(stop.pandalId)}>
                     <Ionicons name="close" size={15} color="#F43F5E" />
-                  </TouchableOpacity>
+                  </AnimatedPressable>
                 </View>
               ))}
             </View>
@@ -227,8 +157,9 @@ export const SelectedPandalsBar: React.FC = () => {
 
         {/* Compact row */}
         <View style={styles.rowContent}>
-          <TouchableOpacity
-            activeOpacity={0.75}
+          <AnimatedPressable
+            preset="card"
+            scaleTo={0.98}
             onPress={handleToggleExpand}
             style={styles.leftInfo}
           >
@@ -252,11 +183,12 @@ export const SelectedPandalsBar: React.FC = () => {
                 {isBn ? 'তালিকায় ক্লিক করে বিস্তারিত দেখুন' : 'Tap to expand stops list'}
               </Text>
             </View>
-          </TouchableOpacity>
+          </AnimatedPressable>
 
           <View style={styles.rightActions}>
-            <TouchableOpacity
-              activeOpacity={0.85}
+            <AnimatedPressable
+              preset="button"
+              scaleTo={0.94}
               onPress={() => navigation.navigate('Planner')}
               style={styles.launchPlannerBtn}
             >
@@ -264,7 +196,7 @@ export const SelectedPandalsBar: React.FC = () => {
               <Text style={styles.launchPlannerBtnText}>
                 {isBn ? 'রুট দেখুন' : 'View Route'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         </View>
       </View>

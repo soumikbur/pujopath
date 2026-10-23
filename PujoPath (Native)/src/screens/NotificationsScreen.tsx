@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   Switch,
   Modal,
   TextInput,
@@ -16,6 +15,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useNotifications } from '@/context/NotificationContext';
 import { useResponsive } from '@/hooks/useResponsive';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { NotificationCategory, CustomReminder, InAppNotificationItem } from '@/types/notification';
 
 interface NotificationsScreenProps {
@@ -320,19 +320,22 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                   : 'Enable notifications to receive Sandhi Puja timings and saved pandal alerts.'}
               </Text>
               <View style={styles.bannerBtnRow}>
-                <TouchableOpacity
+                <AnimatedPressable
+                  preset="button"
+                  scaleTo={0.95}
                   style={styles.enableBtn}
                   onPress={requestPermission}
-                  activeOpacity={0.8}
                   accessibilityLabel="Enable Notifications"
                 >
                   <Text style={styles.enableBtnText}>
                     {isBn ? 'বিজ্ঞপ্তি সক্রিয় করুন' : 'Enable Notifications'}
                   </Text>
                   <Feather name="arrow-right" size={14} color="#FFFFFF" />
-                </TouchableOpacity>
+                </AnimatedPressable>
 
-                <TouchableOpacity
+                <AnimatedPressable
+                  preset="button"
+                  scaleTo={0.95}
                   style={[
                     styles.settingsBtn,
                     {
@@ -341,14 +344,13 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                     },
                   ]}
                   onPress={openSettings}
-                  activeOpacity={0.8}
                   accessibilityLabel="Open System Settings"
                 >
                   <Feather name="settings" size={13} color={isDark ? '#FED7AA' : '#9A3412'} />
                   <Text style={[styles.settingsBtnText, { color: isDark ? '#FED7AA' : '#9A3412' }]}>
                     {isBn ? 'সিস্টেম সেটিংস' : 'System Settings'}
                   </Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
               </View>
             </View>
           </View>
@@ -393,9 +395,14 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                   : `Muted in system settings: ${blockedChannels.join(', ')}. Open Settings to re-enable.`}
               </Text>
             </View>
-            <TouchableOpacity onPress={openSettings} style={styles.channelFixBtn}>
+            <AnimatedPressable
+              preset="chip"
+              scaleTo={0.92}
+              onPress={openSettings}
+              style={styles.channelFixBtn}
+            >
               <Text style={styles.channelFixBtnText}>{isBn ? 'ঠিক করুন' : 'Settings'}</Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         )}
 
@@ -409,7 +416,9 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
             },
           ]}
         >
-          <TouchableOpacity
+          <AnimatedPressable
+            preset="chip"
+            scaleTo={0.94}
             style={[
               styles.tabItem,
               activeTab === 'settings' && {
@@ -417,7 +426,6 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
               },
             ]}
             onPress={() => setActiveTab('settings')}
-            activeOpacity={0.8}
           >
             <Feather
               name="sliders"
@@ -432,9 +440,11 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
             >
               {isBn ? 'পছন্দ ও রিমাইন্ডার' : 'Preferences & Reminders'}
             </Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
 
-          <TouchableOpacity
+          <AnimatedPressable
+            preset="chip"
+            scaleTo={0.94}
             style={[
               styles.tabItem,
               activeTab === 'history' && {
@@ -442,7 +452,6 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
               },
             ]}
             onPress={() => setActiveTab('history')}
-            activeOpacity={0.8}
           >
             <Feather
               name="clock"
@@ -457,7 +466,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
             >
               {isBn ? `বিজ্ঞপ্তি ইতিহাস (${history.length})` : `Alert History (${history.length})`}
             </Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
         </View>
 
         {activeTab === 'settings' ? (
@@ -517,8 +526,10 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                     {DAILY_TIME_OPTIONS.map((time) => {
                       const isSelected = preferences.dailyScheduleTime === time;
                       return (
-                        <TouchableOpacity
+                        <AnimatedPressable
                           key={time}
+                          preset="chip"
+                          scaleTo={0.92}
                           style={[
                             styles.timeChip,
                             {
@@ -531,7 +542,6 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                             },
                           ]}
                           onPress={() => handleTogglePreference('dailyScheduleTime', time)}
-                          activeOpacity={0.8}
                         >
                           <Text
                             style={[
@@ -541,7 +551,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                           >
                             {time}
                           </Text>
-                        </TouchableOpacity>
+                        </AnimatedPressable>
                       );
                     })}
                   </View>
@@ -606,17 +616,18 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                       : `${reminders.length} personal alerts currently scheduled`}
                   </Text>
                 </View>
-                <TouchableOpacity
+                <AnimatedPressable
+                  preset="button"
+                  scaleTo={0.94}
                   style={styles.addReminderBtn}
                   onPress={handleOpenAddReminder}
-                  activeOpacity={0.8}
                   accessibilityLabel="Add Reminder"
                 >
                   <Feather name="plus" size={14} color="#FFFFFF" />
                   <Text style={styles.addReminderBtnText}>
                     {isBn ? 'নতুন রিমাইন্ডার' : 'Add Reminder'}
                   </Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
               </View>
 
               {reminders.length === 0 ? (
@@ -681,22 +692,24 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                           )}
                         </View>
                         <View style={styles.reminderActionsRow}>
-                          <TouchableOpacity
+                          <AnimatedPressable
+                            preset="icon"
+                            scaleTo={0.88}
                             style={styles.actionIconBtn}
                             onPress={() => handleEditReminder(reminder)}
-                            activeOpacity={0.7}
                             accessibilityLabel="Edit Reminder"
                           >
                             <Feather name="edit-2" size={15} color={colors.textSecondary} />
-                          </TouchableOpacity>
-                          <TouchableOpacity
+                          </AnimatedPressable>
+                          <AnimatedPressable
+                            preset="icon"
+                            scaleTo={0.88}
                             style={styles.actionIconBtn}
                             onPress={() => removeReminder(reminder.id)}
-                            activeOpacity={0.7}
                             accessibilityLabel="Delete Reminder"
                           >
                             <Feather name="trash-2" size={15} color={colors.textSecondary} />
-                          </TouchableOpacity>
+                          </AnimatedPressable>
                         </View>
                       </View>
                     );
@@ -729,8 +742,10 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                     };
 
                     return (
-                      <TouchableOpacity
+                      <AnimatedPressable
                         key={cat}
+                        preset="chip"
+                        scaleTo={0.92}
                         style={[
                           styles.testCatChip,
                           {
@@ -743,7 +758,6 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                           },
                         ]}
                         onPress={() => setSelectedTestCategory(cat)}
-                        activeOpacity={0.8}
                       >
                         <Text
                           style={[
@@ -753,18 +767,19 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                         >
                           {labels[cat]}
                         </Text>
-                      </TouchableOpacity>
+                      </AnimatedPressable>
                     );
                   }
                 )}
               </View>
 
               {/* Action 1: Instant Test Alert */}
-              <TouchableOpacity
+              <AnimatedPressable
+                preset="button"
+                scaleTo={0.95}
                 style={[styles.testSendBtn, testSending && { opacity: 0.6 }]}
                 onPress={handleSendTest}
                 disabled={testSending}
-                activeOpacity={0.8}
                 accessibilityLabel="Send Instant Test Notification"
               >
                 <Feather name="bell" size={15} color="#FFFFFF" />
@@ -773,10 +788,12 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                     ? isBn ? 'পাঠানো হচ্ছে...' : 'Sending Test Alert...'
                     : isBn ? 'তাৎক্ষণিক নোটিফিকেশন পাঠান' : 'Send Instant Notification Now'}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
 
               {/* Action 2: Delayed 5s Background Test */}
-              <TouchableOpacity
+              <AnimatedPressable
+                preset="button"
+                scaleTo={0.95}
                 style={[
                   styles.testDelayBtn,
                   {
@@ -785,7 +802,6 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                   },
                 ]}
                 onPress={handleSendDelayedTest}
-                activeOpacity={0.8}
                 accessibilityLabel="Send 5-second Delayed Background Notification"
               >
                 <Feather name="clock" size={15} color="#B42323" />
@@ -798,10 +814,12 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                     ? '৫ সেকেন্ড ব্যাকগ্রাউন্ড টেস্ট (লক/মিনিমাইজ পরীক্ষা)'
                     : 'Test in Background (5s Delay)'}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
 
               {/* Action 3: Clear Shade Test Alerts */}
-              <TouchableOpacity
+              <AnimatedPressable
+                preset="button"
+                scaleTo={0.95}
                 style={[
                   styles.clearShadeBtn,
                   {
@@ -809,14 +827,13 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                   },
                 ]}
                 onPress={handleClearShade}
-                activeOpacity={0.7}
                 accessibilityLabel="Dismiss All Test Notifications"
               >
                 <Feather name="check-circle" size={14} color={colors.textSecondary} />
                 <Text style={[styles.clearShadeBtnText, { color: colors.textSecondary }]}>
                   {isBn ? 'নোটিফিকেশন শেড পরিষ্কার করুন' : 'Dismiss All Shade Alerts'}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             </View>
           </View>
         ) : (
@@ -835,15 +852,16 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                   </Text>
                 </View>
                 {history.length > 0 && (
-                  <TouchableOpacity
+                  <AnimatedPressable
+                    preset="chip"
+                    scaleTo={0.92}
                     style={styles.clearHistoryBtn}
                     onPress={clearHistory}
-                    activeOpacity={0.7}
                   >
                     <Text style={styles.clearHistoryBtnText}>
                       {isBn ? 'সব মুছুন' : 'Clear All'}
                     </Text>
-                  </TouchableOpacity>
+                  </AnimatedPressable>
                 )}
               </View>
 
@@ -862,8 +880,10 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
               ) : (
                 <View style={styles.historyList}>
                   {history.map((item) => (
-                    <TouchableOpacity
+                    <AnimatedPressable
                       key={item.id}
+                      preset="card"
+                      scaleTo={0.98}
                       style={[
                         styles.historyItem,
                         {
@@ -878,7 +898,6 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                         },
                       ]}
                       onPress={() => handleHistoryTap(item)}
-                      activeOpacity={0.7}
                     >
                       <View style={styles.historyDotWrap}>
                         {!item.read && <View style={styles.unreadDot} />}
@@ -910,7 +929,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                           </View>
                         )}
                       </View>
-                    </TouchableOpacity>
+                    </AnimatedPressable>
                   ))}
                 </View>
               )}
@@ -945,9 +964,13 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                   ? isBn ? 'রিমাইন্ডার সম্পাদনা করুন' : 'Edit Scheduled Reminder'
                   : isBn ? 'নতুন রিমাইন্ডার সেট করুন' : 'Schedule Custom Reminder'}
               </Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)} activeOpacity={0.7}>
+              <AnimatedPressable
+                preset="icon"
+                scaleTo={0.88}
+                onPress={() => setModalVisible(false)}
+              >
                 <Feather name="x" size={20} color={colors.textSecondary} />
-              </TouchableOpacity>
+              </AnimatedPressable>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -1002,8 +1025,10 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                 ].map((item) => {
                   const isSelected = reminderDay === item.date;
                   return (
-                    <TouchableOpacity
+                    <AnimatedPressable
                       key={item.date}
+                      preset="chip"
+                      scaleTo={0.92}
                       style={[
                         styles.dayPresetBtn,
                         {
@@ -1016,7 +1041,6 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                         },
                       ]}
                       onPress={() => setReminderDay(item.date)}
-                      activeOpacity={0.8}
                     >
                       <Text
                         style={[
@@ -1026,7 +1050,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                       >
                         {item.label}
                       </Text>
-                    </TouchableOpacity>
+                    </AnimatedPressable>
                   );
                 })}
               </View>
@@ -1039,8 +1063,10 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                 {['06:00', '07:00', '07:30', '11:00', '17:30', '20:00'].map((time) => {
                   const isSelected = reminderTime === time;
                   return (
-                    <TouchableOpacity
+                    <AnimatedPressable
                       key={time}
+                      preset="chip"
+                      scaleTo={0.92}
                       style={[
                         styles.timePresetBtn,
                         {
@@ -1053,7 +1079,6 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                         },
                       ]}
                       onPress={() => setReminderTime(time)}
-                      activeOpacity={0.8}
                     >
                       <Text
                         style={[
@@ -1063,34 +1088,36 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
                       >
                         {time}
                       </Text>
-                    </TouchableOpacity>
+                    </AnimatedPressable>
                   );
                 })}
               </View>
 
               {/* Action Buttons */}
               <View style={styles.modalActionRow}>
-                <TouchableOpacity
+                <AnimatedPressable
+                  preset="button"
+                  scaleTo={0.95}
                   style={[styles.modalCancelBtn, { borderColor: colors.border }]}
                   onPress={() => setModalVisible(false)}
-                  activeOpacity={0.8}
                 >
                   <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>
                     {isBn ? 'বাতিল' : 'Cancel'}
                   </Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
 
-                <TouchableOpacity
+                <AnimatedPressable
+                  preset="button"
+                  scaleTo={0.95}
                   style={styles.modalSubmitBtn}
                   onPress={handleSaveReminder}
-                  activeOpacity={0.8}
                 >
                   <Text style={styles.modalSubmitText}>
                     {editingReminderId
                       ? isBn ? 'আপডেট করুন' : 'Update Alert'
                       : isBn ? 'সংরক্ষণ করুন' : 'Set Reminder'}
                   </Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
               </View>
             </ScrollView>
           </View>

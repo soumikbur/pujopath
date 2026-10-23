@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   FlatList,
-  TouchableOpacity,
   StyleSheet,
   Modal,
   Pressable,
@@ -24,6 +23,8 @@ import { PandalCard } from '@/components/PandalCard';
 import { ZoneFilterBar } from '@/components/ZoneFilterBar';
 import { CustomStopModal } from '@/components/CustomStopModal';
 import { SelectedPandalsBar } from '@/components/SelectedPandalsBar';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 import { Pandal, FilterOptions } from '@/types';
 import { toBengaliDigits } from '@/lib/geo';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -68,8 +69,8 @@ const AnimatedToggleSwitch: React.FC<AnimatedToggleSwitchProps> = ({
   });
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.75}
+    <AnimatedPressable
+      scaleTo={0.96}
       onPress={onValueChange}
       style={[styles.switchRow, style]}
       accessibilityRole="switch"
@@ -110,7 +111,7 @@ const AnimatedToggleSwitch: React.FC<AnimatedToggleSwitchProps> = ({
       >
         {label}
       </Text>
-    </TouchableOpacity>
+    </AnimatedPressable>
   );
 };
 
@@ -150,6 +151,33 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
     wheelchairOnly ||
     featuredOnly ||
     sortBy !== 'recommended';
+
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchFocusAnim = useRef(new Animated.Value(0)).current;
+
+  const handleSearchFocus = () => {
+    setIsSearchFocused(true);
+    if (!reduceMotion) {
+      Animated.timing(searchFocusAnim, {
+        toValue: 1,
+        duration: motion.duration.quick,
+        easing: motion.easing.decelerate,
+        useNativeDriver: false,
+      }).start();
+    }
+  };
+
+  const handleSearchBlur = () => {
+    setIsSearchFocused(false);
+    if (!reduceMotion) {
+      Animated.timing(searchFocusAnim, {
+        toValue: 0,
+        duration: motion.duration.quick,
+        easing: motion.easing.decelerate,
+        useNativeDriver: false,
+      }).start();
+    }
+  };
 
   const handleToggleFeatureFilters = () => {
     if (!reduceMotion) {
@@ -234,25 +262,66 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
     [navigation]
   );
 
-  const keyExtractor = useCallback((item: Pandal) => item.id, []);
+  const listData = useMemo(() => {
+    if (!isLandscape) return filteredPandals;
+    const pairs: (Pandal | [Pandal, Pandal?])[] = [];
+    for (let i = 0; i < filteredPandals.length; i += 2) {
+      if (i + 1 < filteredPandals.length) {
+        pairs.push([filteredPandals[i], filteredPandals[i + 1]]);
+      } else {
+        pairs.push([filteredPandals[i]]);
+      }
+    }
+    return pairs;
+  }, [isLandscape, filteredPandals]);
+
+  const keyExtractor = useCallback((item: any) => {
+    if (Array.isArray(item)) {
+      return item[0].id;
+    }
+    return (item as Pandal).id;
+  }, []);
 
   const renderItem = useCallback(
-    ({ item }: { item: Pandal }) => (
-      <PandalCard
-        pandal={item}
-        onPress={() => handlePandalPress(item.id)}
-        style={isLandscape ? { flex: 1, maxWidth: '48.8%', marginHorizontal: 4, marginBottom: 12 } : undefined}
-      />
-    ),
-    [isLandscape, handlePandalPress]
+    ({ item }: { item: any }) => {
+      if (Array.isArray(item)) {
+        const first = item[0] as Pandal;
+        const second = item[1] as Pandal | undefined;
+        return (
+          <View style={styles.landscapeRow}>
+            <PandalCard
+              pandal={first}
+              onPress={() => handlePandalPress(first.id)}
+              style={styles.landscapeCard}
+            />
+            {second ? (
+              <PandalCard
+                pandal={second}
+                onPress={() => handlePandalPress(second.id)}
+                style={styles.landscapeCard}
+              />
+            ) : (
+              <View style={styles.landscapeCardSpacer} />
+            )}
+          </View>
+        );
+      }
+      return (
+        <PandalCard
+          pandal={item as Pandal}
+          onPress={() => handlePandalPress((item as Pandal).id)}
+          style={styles.portraitCard}
+        />
+      );
+    },
+    [handlePandalPress]
   );
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
-        key={isLandscape ? 'explore-grid-landscape' : 'explore-list-portrait'}
-        numColumns={isLandscape ? 2 : 1}
-        data={filteredPandals}
+        key="explore-pandal-list"
+        data={listData}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         contentContainerStyle={[
@@ -266,10 +335,9 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
             width: '100%',
           },
         ]}
-        columnWrapperStyle={isLandscape ? { justifyContent: 'space-between' } : undefined}
         removeClippedSubviews={Platform.OS === 'android'}
-        initialNumToRender={8}
-        maxToRenderPerBatch={8}
+        initialNumToRender={6}
+        maxToRenderPerBatch={6}
         windowSize={5}
         updateCellsBatchingPeriod={50}
         ListHeaderComponent={
@@ -310,17 +378,27 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                 },
               ]}
             >
-              {/* Search Input Bar */}
-              <View
+              {/* Search Input Bar with animated focus border */}
+              <Animated.View
                 style={[
                   styles.searchBox,
                   {
                     backgroundColor: isDark ? '#14110E' : '#FCFAF7',
-                    borderColor: isDark ? '#2F2720' : '#EEE8E1',
+                    borderColor: reduceMotion
+                      ? (isSearchFocused ? colors.primary : (isDark ? '#2F2720' : '#EEE8E1'))
+                      : searchFocusAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [isDark ? '#2F2720' : '#EEE8E1', colors.primary],
+                        }),
                   },
                 ]}
               >
-                <Ionicons name="search" size={18} color="#8A8179" style={styles.searchIcon} />
+                <Ionicons
+                  name="search"
+                  size={18}
+                  color={isSearchFocused ? colors.primary : '#8A8179'}
+                  style={styles.searchIcon}
+                />
                 <TextInput
                   style={[styles.searchInput, { color: colors.textPrimary }]}
                   placeholder={
@@ -335,13 +413,20 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                   placeholderTextColor="#8A8179"
                   value={searchQuery}
                   onChangeText={setSearchQuery}
+                  onFocus={handleSearchFocus}
+                  onBlur={handleSearchBlur}
                 />
                 {searchQuery.length > 0 && (
-                  <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearBtn}>
+                  <AnimatedPressable
+                    scaleTo={motion.scale.icon}
+                    onPress={() => setSearchQuery('')}
+                    style={styles.clearBtn}
+                    accessibilityLabel="Clear search text"
+                  >
                     <Ionicons name="close-circle" size={18} color="#8A8179" />
-                  </TouchableOpacity>
+                  </AnimatedPressable>
                 )}
-              </View>
+              </Animated.View>
 
               {/* Zone Filter Horizontal Scroll */}
               <ZoneFilterBar
@@ -352,10 +437,12 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
 
               {/* Interactive Feature Switches Grid (5 switches) */}
               <View style={[styles.featureFilterSection, { borderTopColor: isDark ? '#2F2720' : '#EEE8E1' }]}>
-                <TouchableOpacity
-                  activeOpacity={0.8}
+                <AnimatedPressable
+                  scaleTo={0.99}
                   onPress={handleToggleFeatureFilters}
                   style={styles.featureHeaderRow}
+                  accessibilityRole="button"
+                  accessibilityLabel="Toggle feature filters"
                 >
                   <Text style={[styles.featureSectionTitle, { color: isDark ? '#A89E95' : '#776D65' }]}>
                     {isBn ? 'সুবিধা ও বৈশিষ্ট্য ফিল্টার' : 'FEATURE FILTERS'}
@@ -375,7 +462,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                       color={isDark ? '#C4B9AE' : '#524942'}
                     />
                   </View>
-                </TouchableOpacity>
+                </AnimatedPressable>
 
                 {isFeatureFiltersOpen && (
                   <View style={styles.switchesGrid}>
@@ -453,8 +540,8 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
 
                 <View style={styles.sortResetGroup}>
                   {/* Sort Trigger Button */}
-                  <TouchableOpacity
-                    activeOpacity={0.8}
+                  <AnimatedPressable
+                    scaleTo={motion.scale.button}
                     onPress={() => setShowSortModal(true)}
                     style={[
                       styles.sortBtn,
@@ -463,6 +550,8 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                         borderColor: isDark ? '#2F2720' : '#EEE8E1',
                       },
                     ]}
+                    accessibilityRole="button"
+                    accessibilityLabel="Change sort order"
                   >
                     <Ionicons name="options-outline" size={13} color={colors.textSecondary} />
                     <Text
@@ -472,20 +561,22 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                       {currentSortLabel}
                     </Text>
                     <Ionicons name="chevron-down" size={12} color={colors.textMuted} />
-                  </TouchableOpacity>
+                  </AnimatedPressable>
 
                   {/* Reset All Filters Button */}
                   {isFiltered && (
-                    <TouchableOpacity
-                      activeOpacity={0.8}
+                    <AnimatedPressable
+                      scaleTo={motion.scale.chip}
                       onPress={handleResetFilters}
                       style={styles.resetBtn}
+                      accessibilityRole="button"
+                      accessibilityLabel="Reset all filters"
                     >
                       <Ionicons name="reload-outline" size={13} color={colors.primary} />
                       <Text style={[styles.resetBtnText, { color: colors.primary }]}>
                         {isBn ? 'রিসেট' : 'Reset All'}
                       </Text>
-                    </TouchableOpacity>
+                    </AnimatedPressable>
                   )}
                 </View>
               </View>
@@ -493,8 +584,8 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
 
             {/* Custom Stop Action Banner */}
             <View style={styles.customStopBar}>
-              <TouchableOpacity
-                activeOpacity={0.85}
+              <AnimatedPressable
+                scaleTo={motion.scale.card}
                 onPress={() => setShowCustomModal(true)}
                 style={[
                   styles.addCustomBtn,
@@ -503,12 +594,14 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                     borderColor: colors.borderSubtle,
                   },
                 ]}
+                accessibilityRole="button"
+                accessibilityLabel="Add custom pandal stop"
               >
                 <Ionicons name="add-circle" size={16} color={colors.primary} />
                 <Text style={[styles.addCustomText, { color: colors.primary }]}>
                   {isBn ? '+ নিজস্ব কাস্টম স্টপ যোগ করুন' : '+ Add Custom Pandal Stop'}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             </View>
           </View>
         }
@@ -524,15 +617,17 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                 : 'Try modifying your search query or reset the active filters.'}
             </Text>
             {isFiltered && (
-              <TouchableOpacity
-                activeOpacity={0.8}
+              <AnimatedPressable
+                scaleTo={motion.scale.button}
                 onPress={handleResetFilters}
                 style={[styles.emptyResetBtn, { backgroundColor: colors.primary }]}
+                accessibilityRole="button"
+                accessibilityLabel="Reset active filters"
               >
                 <Text style={styles.emptyResetBtnText}>
                   {isBn ? 'ফিল্টার রিসেট করুন' : 'Reset Filters'}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             )}
           </View>
         }
@@ -561,9 +656,9 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
             {sortOptions.map((opt) => {
               const isSelected = sortBy === opt.id;
               return (
-                <TouchableOpacity
+                <AnimatedPressable
                   key={opt.id}
-                  activeOpacity={0.8}
+                  scaleTo={0.97}
                   onPress={() => {
                     handleSelectSort(opt.id as any);
                   }}
@@ -573,6 +668,8 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                       backgroundColor: isDark ? '#341B18' : '#FDEEEE',
                     },
                   ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Sort by ${opt.label}`}
                 >
                   <Text
                     style={[
@@ -584,7 +681,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ navigation }) => {
                     {opt.label}
                   </Text>
                   {isSelected && <Ionicons name="checkmark" size={18} color="#B42323" />}
-                </TouchableOpacity>
+                </AnimatedPressable>
               );
             })}
           </View>
@@ -875,5 +972,19 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '800',
+  },
+  landscapeRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 12,
+  },
+  landscapeCard: {
+    flex: 1,
+  },
+  landscapeCardSpacer: {
+    flex: 1,
+  },
+  portraitCard: {
+    marginBottom: 12,
   },
 });

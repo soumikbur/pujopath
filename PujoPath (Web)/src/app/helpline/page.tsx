@@ -94,7 +94,7 @@ export default function HelplinePage() {
   ];
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto pb-14 px-1">
+    <div className="space-y-8 w-full max-w-4xl mx-auto pb-14 px-1 min-w-0">
       {/* Header Banner */}
       <div>
         <div className="flex items-center gap-2 text-[#b42323] dark:text-[#e05656] text-xs sm:text-sm font-bold uppercase tracking-wider">

@@ -4,7 +4,6 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   StyleSheet,
   Alert,
   KeyboardAvoidingView,
@@ -20,6 +19,8 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useResponsive } from '@/hooks/useResponsive';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 import { Pandal } from '@/types';
 
 interface CustomStopModalProps {
@@ -175,9 +176,14 @@ export const CustomStopModal: React.FC<CustomStopModalProps> = ({ visible, onClo
                 {language === 'bn' ? 'ব্যক্তিগত স্টপ যোগ করুন' : 'Add Personal Stop'}
               </Text>
             </View>
-            <TouchableOpacity onPress={handleClose} style={styles.closeBtn} activeOpacity={0.7}>
+            <AnimatedPressable
+              onPress={handleClose}
+              scaleTo={motion.scale.icon}
+              style={styles.closeBtn}
+              accessibilityLabel="Close modal"
+            >
               <Ionicons name="close" size={22} color={colors.textMuted} />
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
 
           {/* Privacy Disclaimer Banner */}
@@ -224,25 +230,27 @@ export const CustomStopModal: React.FC<CustomStopModalProps> = ({ visible, onClo
           </ScrollView>
 
           <View style={styles.btnRow}>
-            <TouchableOpacity
+            <AnimatedPressable
               onPress={handleClose}
-              activeOpacity={0.75}
+              scaleTo={motion.scale.button}
               style={[styles.cancelBtn, { borderColor: colors.border }]}
+              accessibilityLabel={language === 'bn' ? 'বাতিল' : 'Cancel'}
             >
               <Text style={[styles.cancelBtnText, { color: colors.textMuted }]}>
                 {language === 'bn' ? 'বাতিল' : 'Cancel'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
 
-            <TouchableOpacity
+            <AnimatedPressable
               onPress={handleSave}
-              activeOpacity={0.8}
+              scaleTo={motion.scale.button}
               style={[styles.saveBtn, { backgroundColor: colors.primary }]}
+              accessibilityLabel={language === 'bn' ? 'সংরক্ষণ ও রুটে যোগ' : 'Save & Add to Plan'}
             >
               <Text style={styles.saveBtnText}>
                 {language === 'bn' ? 'সংরক্ষণ ও রুটে যোগ' : 'Save & Add to Plan'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         </Animated.View>
       </KeyboardAvoidingView>

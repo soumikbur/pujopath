@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   Image,
   StyleSheet,
   StatusBar,
@@ -18,6 +17,9 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useFestival } from '@/context/FestivalContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useResponsive } from '@/hooks/useResponsive';
+import { motion } from '@/theme/motion';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { FadeInView } from '@/components/ui/FadeInView';
 
 export const FestivalSelectScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
@@ -26,7 +28,7 @@ export const FestivalSelectScreen: React.FC = () => {
   const isBn = language === 'bn';
   const { selectFestival } = useFestival();
   const reduceMotion = useReducedMotion();
-  const { isLandscape, screenPaddingLeft, screenPaddingRight } = useResponsive();
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, width } = useResponsive();
 
   const entranceAnim = useRef(new Animated.Value(0)).current;
   const durgaScaleAnim = useRef(new Animated.Value(1)).current;
@@ -38,8 +40,8 @@ export const FestivalSelectScreen: React.FC = () => {
     } else {
       Animated.timing(entranceAnim, {
         toValue: 1,
-        duration: 320,
-        easing: Easing.out(Easing.cubic),
+        duration: motion.duration.navigation,
+        easing: motion.easing.decelerate,
         useNativeDriver: true,
       }).start();
     }
@@ -51,13 +53,14 @@ export const FestivalSelectScreen: React.FC = () => {
       Animated.sequence([
         Animated.timing(scaleAnim, {
           toValue: 0.96,
-          duration: 90,
+          duration: motion.duration.instant,
+          easing: motion.easing.standard,
           useNativeDriver: true,
         }),
         Animated.spring(scaleAnim, {
           toValue: 1,
-          friction: 4,
-          tension: 180,
+          tension: 300,
+          friction: 18,
           useNativeDriver: true,
         }),
       ]).start(() => {
@@ -78,7 +81,7 @@ export const FestivalSelectScreen: React.FC = () => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
-        backgroundColor={colors.background}
+        backgroundColor="transparent"
         translucent={true}
       />
 
@@ -97,17 +100,19 @@ export const FestivalSelectScreen: React.FC = () => {
       >
         <View style={styles.brandGroup}>
           <Text style={[styles.brandTitle, { color: '#B42323' }]}>PujoPath</Text>
-          <View style={styles.platformBadge}>
-            <Text style={styles.platformBadgeText}>
-              {isBn ? 'উৎসব সংকলন' : 'FESTIVAL EDITION'}
-            </Text>
-          </View>
+          {width >= 360 && (
+            <View style={styles.platformBadge}>
+              <Text style={styles.platformBadgeText}>
+                {isBn ? 'উৎসব সংকলন' : 'FESTIVAL EDITION'}
+              </Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.headerActions}>
           {/* Light / Dark Mode Toggle */}
-          <TouchableOpacity
-            activeOpacity={0.75}
+          <AnimatedPressable
+            preset="icon"
             onPress={toggleTheme}
             style={[
               styles.iconBtn,
@@ -123,57 +128,78 @@ export const FestivalSelectScreen: React.FC = () => {
               size={17}
               color={isDark ? '#FBBF24' : '#625B55'}
             />
-          </TouchableOpacity>
+          </AnimatedPressable>
 
-          {/* Language Toggle [ EN | বাংলা ] */}
-          <View
-            style={[
-              styles.langPill,
-              {
-                borderColor: colors.border,
-                backgroundColor: isDark ? colors.surface : 'transparent',
-              },
-            ]}
-          >
-            <TouchableOpacity
-              activeOpacity={0.75}
-              onPress={() => setLanguage('en')}
+          {/* Language Toggle: Compact single-button on width < 360, dual pill on >= 360 */}
+          {width < 360 ? (
+            <AnimatedPressable
+              preset="icon"
+              onPress={() => setLanguage(language === 'en' ? 'bn' : 'en')}
               style={[
-                styles.langOption,
-                language === 'en' && styles.langOptionActive,
+                styles.iconBtn,
+                {
+                  borderColor: colors.border,
+                  backgroundColor: isDark ? colors.surface : 'transparent',
+                },
               ]}
-              accessibilityLabel="English"
+              accessibilityLabel={isBn ? 'Switch to English' : 'বাংলায় পরিবর্তন করুন'}
             >
-              <Text
-                style={[
-                  styles.langText,
-                  { color: language === 'en' ? '#FFFFFF' : colors.textSecondary },
-                  language === 'en' && styles.langTextActive,
-                ]}
-              >
-                EN
+              <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textPrimary }}>
+                {language === 'en' ? 'বাং' : 'EN'}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              activeOpacity={0.75}
-              onPress={() => setLanguage('bn')}
+            </AnimatedPressable>
+          ) : (
+            <View
               style={[
-                styles.langOption,
-                language === 'bn' && styles.langOptionActive,
+                styles.langPill,
+                {
+                  borderColor: colors.border,
+                  backgroundColor: isDark ? colors.surface : 'transparent',
+                },
               ]}
-              accessibilityLabel="Bengali"
             >
-              <Text
+              <AnimatedPressable
+                preset="chip"
+                scaleTo={0.92}
+                onPress={() => setLanguage('en')}
                 style={[
-                  styles.langText,
-                  { color: language === 'bn' ? '#FFFFFF' : colors.textSecondary },
-                  language === 'bn' && styles.langTextActive,
+                  styles.langOption,
+                  language === 'en' && styles.langOptionActive,
                 ]}
+                accessibilityLabel="English"
               >
-                বাংলা
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <Text
+                  style={[
+                    styles.langText,
+                    { color: language === 'en' ? '#FFFFFF' : colors.textSecondary },
+                    language === 'en' && styles.langTextActive,
+                  ]}
+                >
+                  EN
+                </Text>
+              </AnimatedPressable>
+              <AnimatedPressable
+                preset="chip"
+                scaleTo={0.92}
+                onPress={() => setLanguage('bn')}
+                style={[
+                  styles.langOption,
+                  language === 'bn' && styles.langOptionActive,
+                ]}
+                accessibilityLabel="Bengali"
+              >
+                <Text
+                  style={[
+                    styles.langText,
+                    { color: language === 'bn' ? '#FFFFFF' : colors.textSecondary },
+                    language === 'bn' && styles.langTextActive,
+                  ]}
+                >
+                  বাংলা
+                </Text>
+              </AnimatedPressable>
+            </View>
+          )}
         </View>
       </View>
 
@@ -223,204 +249,206 @@ export const FestivalSelectScreen: React.FC = () => {
           {/* ============================================================ */}
           {/* 1. DURGA PUJA OPTION (Appears First)                         */}
           {/* ============================================================ */}
-          <Animated.View
-            style={[
-              styles.cardWrapper,
-              isLandscape && styles.cardWrapperLandscape,
-              { transform: [{ scale: durgaScaleAnim }] },
-            ]}
+          <FadeInView
+            delay={60}
+            duration={motion.duration.standard}
+            style={[styles.cardWrapper, isLandscape && styles.cardWrapperLandscape]}
           >
-            <TouchableOpacity
-              activeOpacity={0.92}
-              onPress={() => handleSelect('durga')}
-              style={[
-                styles.festivalCard,
-                {
-                  backgroundColor: isDark ? '#231512' : '#FFF9F5',
-                  borderColor: isDark ? '#4A231C' : '#FCD5CF',
-                },
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel="Select Durga Puja"
-            >
-              {/* Artwork Banner */}
-              <View style={[styles.imageContainer, isLandscape && styles.imageContainerLandscape]}>
-                <Image
-                  source={require('../../assets/images/hero-durga.jpg')}
-                  style={styles.cardImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.imageOverlayDurga} />
-                <View style={styles.seasonBadgeDurga}>
-                  <Text style={styles.seasonBadgeText}>
-                    {isBn ? '🍁 শারদোৎসব ২০২৬' : '🍁 SHARODOTSAV 2026'}
+            <Animated.View style={{ transform: [{ scale: durgaScaleAnim }] }}>
+              <AnimatedPressable
+                preset="card"
+                scaleTo={0.97}
+                onPress={() => handleSelect('durga')}
+                style={[
+                  styles.festivalCard,
+                  {
+                    backgroundColor: isDark ? '#231512' : '#FFF9F5',
+                    borderColor: isDark ? '#4A231C' : '#FCD5CF',
+                  },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel="Select Durga Puja"
+              >
+                {/* Artwork Banner */}
+                <View style={[styles.imageContainer, isLandscape && styles.imageContainerLandscape]}>
+                  <Image
+                    source={require('../../assets/images/hero-durga.jpg')}
+                    style={styles.cardImage}
+                    resizeMode="cover"
+                  />
+                  <View style={styles.imageOverlayDurga} />
+                  <View style={styles.seasonBadgeDurga}>
+                    <Text style={styles.seasonBadgeText}>
+                      {isBn ? '🍁 শারদোৎসব ২০২৬' : '🍁 SHARODOTSAV 2026'}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Card Body */}
+                <View style={styles.cardBody}>
+                  <View style={styles.titleRow}>
+                    <Text style={[styles.festivalTitle, { color: colors.textPrimary }]}>
+                      {isBn ? 'শ্রী শ্রী দুর্গাপূজা' : 'Durga Puja'}
+                    </Text>
+                    <View style={styles.iconCircleDurga}>
+                      <Ionicons name="sparkles" size={16} color="#B42323" />
+                    </View>
+                  </View>
+
+                  <Text style={styles.festivalTaglineDurga}>
+                    {isBn ? 'মায়ের আগমনী ও ঐতিহ্যময় শারদোৎসব' : 'Grand Autumn Heritage Carnival'}
                   </Text>
-                </View>
-              </View>
 
-              {/* Card Body */}
-              <View style={styles.cardBody}>
-                <View style={styles.titleRow}>
-                  <Text style={[styles.festivalTitle, { color: colors.textPrimary }]}>
-                    {isBn ? 'শ্রী শ্রী দুর্গাপূজা' : 'Durga Puja'}
+                  <Text
+                    style={[styles.festivalDescription, { color: colors.textSecondary }]}
+                    numberOfLines={3}
+                  >
+                    {isBn
+                      ? 'কলকাতার শ্রেষ্ঠ ৪৫০+ মণ্ডপ পরিক্রমা, থিম শিল্পকলা, বনেদি বাড়ির ইতিহাস, মহালয়ার চণ্ডীপাঠ ও ঢাকের উৎসব।'
+                      : "Explore 450+ iconic pandals across Kolkata, heritage Bonedi Bari traditions, smart hopping routes, and authentic festive dhak rhythms."}
                   </Text>
-                  <View style={styles.iconCircleDurga}>
-                    <Ionicons name="sparkles" size={16} color="#B42323" />
+
+                  {/* Key Feature Pills */}
+                  <View style={styles.featurePillsRow}>
+                    <View style={[styles.pill, { backgroundColor: isDark ? '#381C18' : '#FEE2E2' }]}>
+                      <Ionicons name="location-outline" size={11} color="#B42323" />
+                      <Text style={[styles.pillText, { color: '#B42323' }]}>
+                        {isBn ? '৪৫০+ মণ্ডপ' : '450+ Pandals'}
+                      </Text>
+                    </View>
+                    <View style={[styles.pill, { backgroundColor: isDark ? '#381C18' : '#FEE2E2' }]}>
+                      <Ionicons name="git-network-outline" size={11} color="#B42323" />
+                      <Text style={[styles.pillText, { color: '#B42323' }]}>
+                        {isBn ? 'রুট প্ল্যানার' : 'Hopping Trails'}
+                      </Text>
+                    </View>
+                    <View style={[styles.pill, { backgroundColor: isDark ? '#381C18' : '#FEE2E2' }]}>
+                      <Ionicons name="calendar-outline" size={11} color="#B42323" />
+                      <Text style={[styles.pillText, { color: '#B42323' }]}>
+                        {isBn ? 'পঞ্জিকা ও সন্ধিপূজা' : 'Almanac'}
+                      </Text>
+                    </View>
+                    <View style={[styles.pill, { backgroundColor: isDark ? '#381C18' : '#FEE2E2' }]}>
+                      <Ionicons name="musical-notes-outline" size={11} color="#B42323" />
+                      <Text style={[styles.pillText, { color: '#B42323' }]}>
+                        {isBn ? 'শারদীয়া সঙ্গীত' : 'Puja Music'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Clear Tap Target Action Button */}
+                  <View style={styles.enterButtonDurga}>
+                    <Text style={styles.enterButtonText}>
+                      {isBn ? 'দুর্গোৎসবে প্রবেশ করুন' : 'Enter Durga Puja Experience'}
+                    </Text>
+                    <Feather name="arrow-right" size={16} color="#FFFFFF" />
                   </View>
                 </View>
-
-                <Text style={styles.festivalTaglineDurga}>
-                  {isBn ? 'মায়ের আগমনী ও ঐতিহ্যময় শারদোৎসব' : 'Grand Autumn Heritage Carnival'}
-                </Text>
-
-                <Text
-                  style={[styles.festivalDescription, { color: colors.textSecondary }]}
-                  numberOfLines={3}
-                >
-                  {isBn
-                    ? 'কলকাতার শ্রেষ্ঠ ৪৫০+ মণ্ডপ পরিক্রমা, থিম শিল্পকলা, বনেদি বাড়ির ইতিহাস, মহালয়ার চণ্ডীপাঠ ও ঢাকের উৎসব।'
-                    : "Explore 450+ iconic pandals across Kolkata, heritage Bonedi Bari traditions, smart hopping routes, and authentic festive dhak rhythms."}
-                </Text>
-
-                {/* Key Feature Pills */}
-                <View style={styles.featurePillsRow}>
-                  <View style={[styles.pill, { backgroundColor: isDark ? '#381C18' : '#FEE2E2' }]}>
-                    <Ionicons name="location-outline" size={11} color="#B42323" />
-                    <Text style={[styles.pillText, { color: '#B42323' }]}>
-                      {isBn ? '৪৫০+ মণ্ডপ' : '450+ Pandals'}
-                    </Text>
-                  </View>
-                  <View style={[styles.pill, { backgroundColor: isDark ? '#381C18' : '#FEE2E2' }]}>
-                    <Ionicons name="git-network-outline" size={11} color="#B42323" />
-                    <Text style={[styles.pillText, { color: '#B42323' }]}>
-                      {isBn ? 'রুট প্ল্যানার' : 'Hopping Trails'}
-                    </Text>
-                  </View>
-                  <View style={[styles.pill, { backgroundColor: isDark ? '#381C18' : '#FEE2E2' }]}>
-                    <Ionicons name="calendar-outline" size={11} color="#B42323" />
-                    <Text style={[styles.pillText, { color: '#B42323' }]}>
-                      {isBn ? 'পঞ্জিকা ও সন্ধিপূজা' : 'Almanac'}
-                    </Text>
-                  </View>
-                  <View style={[styles.pill, { backgroundColor: isDark ? '#381C18' : '#FEE2E2' }]}>
-                    <Ionicons name="musical-notes-outline" size={11} color="#B42323" />
-                    <Text style={[styles.pillText, { color: '#B42323' }]}>
-                      {isBn ? 'শারদীয়া সঙ্গীত' : 'Puja Music'}
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Clear Tap Target Action Button */}
-                <View style={styles.enterButtonDurga}>
-                  <Text style={styles.enterButtonText}>
-                    {isBn ? 'দুর্গোৎসবে প্রবেশ করুন' : 'Enter Durga Puja Experience'}
-                  </Text>
-                  <Feather name="arrow-right" size={16} color="#FFFFFF" />
-                </View>
-              </View>
-            </TouchableOpacity>
-          </Animated.View>
+              </AnimatedPressable>
+            </Animated.View>
+          </FadeInView>
 
           {/* ============================================================ */}
           {/* 2. KALI PUJA OPTION (Appears Second)                         */}
           {/* ============================================================ */}
-          <Animated.View
-            style={[
-              styles.cardWrapper,
-              isLandscape && styles.cardWrapperLandscape,
-              { transform: [{ scale: kaliScaleAnim }] },
-            ]}
+          <FadeInView
+            delay={140}
+            duration={motion.duration.standard}
+            style={[styles.cardWrapper, isLandscape && styles.cardWrapperLandscape]}
           >
-            <TouchableOpacity
-              activeOpacity={0.92}
-              onPress={() => handleSelect('kali')}
-              style={[
-                styles.festivalCard,
-                {
-                  backgroundColor: isDark ? '#140C24' : '#FAF5FF',
-                  borderColor: isDark ? '#3E1C58' : '#E9D5FF',
-                },
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel="Select Kali Puja"
-            >
-              {/* Artwork Banner */}
-              <View style={[styles.imageContainer, isLandscape && styles.imageContainerLandscape]}>
-                <Image
-                  source={require('../../assets/images/kali-hero.jpg')}
-                  style={styles.cardImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.imageOverlayKali} />
-                <View style={styles.seasonBadgeKali}>
-                  <Text style={styles.seasonBadgeTextKali}>
-                    {isBn ? '🪔 দীপান্বিতা অমাবস্যা ২০২৬' : '🪔 DIPANWITA AMAVASYA 2026'}
+            <Animated.View style={{ transform: [{ scale: kaliScaleAnim }] }}>
+              <AnimatedPressable
+                preset="card"
+                scaleTo={0.97}
+                onPress={() => handleSelect('kali')}
+                style={[
+                  styles.festivalCard,
+                  {
+                    backgroundColor: isDark ? '#140C24' : '#FAF5FF',
+                    borderColor: isDark ? '#3E1C58' : '#E9D5FF',
+                  },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel="Select Kali Puja"
+              >
+                {/* Artwork Banner */}
+                <View style={[styles.imageContainer, isLandscape && styles.imageContainerLandscape]}>
+                  <Image
+                    source={require('../../assets/images/kali-hero.jpg')}
+                    style={styles.cardImage}
+                    resizeMode="cover"
+                  />
+                  <View style={styles.imageOverlayKali} />
+                  <View style={styles.seasonBadgeKali}>
+                    <Text style={styles.seasonBadgeTextKali}>
+                      {isBn ? '🪔 দীপান্বিতা অমাবস্যা ২০২৬' : '🪔 DIPANWITA AMAVASYA 2026'}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Card Body */}
+                <View style={styles.cardBody}>
+                  <View style={styles.titleRow}>
+                    <Text style={[styles.festivalTitle, { color: colors.textPrimary }]}>
+                      {isBn ? 'মা শ্যামা পূজা ও দীপাবলি' : 'Kali Puja'}
+                    </Text>
+                    <View style={styles.iconCircleKali}>
+                      <Ionicons name="flame" size={16} color="#FBBF24" />
+                    </View>
+                  </View>
+
+                  <Text style={styles.festivalTaglineKali}>
+                    {isBn ? 'অন্ধকার বিনাশিনী আদ্যাশক্তির আরাধনা' : 'Devotion, Illumination & Shaktipeeths'}
                   </Text>
-                </View>
-              </View>
 
-              {/* Card Body */}
-              <View style={styles.cardBody}>
-                <View style={styles.titleRow}>
-                  <Text style={[styles.festivalTitle, { color: colors.textPrimary }]}>
-                    {isBn ? 'মা শ্যামা পূজা ও দীপাবলি' : 'Kali Puja'}
+                  <Text
+                    style={[styles.festivalDescription, { color: colors.textSecondary }]}
+                    numberOfLines={3}
+                  >
+                    {isBn
+                      ? 'কালীঘাট ও দক্ষিণেশ্বর সহ ঐতিহাসিক কালীক্ষেত্র দর্শন, নিশীথ অমাবস্যার মহানির্ঘণ্ট, ১৪ প্রদীপ ও ভক্তিগম্ভীর শ্যামাসঙ্গীত।'
+                      : "Journey through revered Shaktipeeths, authentic Dipanwita Amavasya midnight timings, sacred pradip rituals, and soulful devotional music."}
                   </Text>
-                  <View style={styles.iconCircleKali}>
-                    <Ionicons name="flame" size={16} color="#FBBF24" />
+
+                  {/* Key Feature Pills */}
+                  <View style={styles.featurePillsRow}>
+                    <View style={[styles.pill, { backgroundColor: isDark ? '#2B1445' : '#F3E8FF' }]}>
+                      <Ionicons name="business-outline" size={11} color={isDark ? '#C084FC' : '#7E22CE'} />
+                      <Text style={[styles.pillText, { color: isDark ? '#E9D5FF' : '#7E22CE' }]}>
+                        {isBn ? 'ঐতিহাসিক কালীক্ষেত্র' : 'Sacred Temples'}
+                      </Text>
+                    </View>
+                    <View style={[styles.pill, { backgroundColor: isDark ? '#2B1445' : '#F3E8FF' }]}>
+                      <Ionicons name="time-outline" size={11} color={isDark ? '#C084FC' : '#7E22CE'} />
+                      <Text style={[styles.pillText, { color: isDark ? '#E9D5FF' : '#7E22CE' }]}>
+                        {isBn ? 'নিশীথ কাল নির্ঘণ্ট' : 'Midnight Tithi'}
+                      </Text>
+                    </View>
+                    <View style={[styles.pill, { backgroundColor: isDark ? '#2B1445' : '#F3E8FF' }]}>
+                      <Ionicons name="flame-outline" size={11} color={isDark ? '#C084FC' : '#7E22CE'} />
+                      <Text style={[styles.pillText, { color: isDark ? '#E9D5FF' : '#7E22CE' }]}>
+                        {isBn ? '১৪ প্রদীপ ও রীতি' : '14 Diyas'}
+                      </Text>
+                    </View>
+                    <View style={[styles.pill, { backgroundColor: isDark ? '#2B1445' : '#F3E8FF' }]}>
+                      <Ionicons name="musical-notes-outline" size={11} color={isDark ? '#C084FC' : '#7E22CE'} />
+                      <Text style={[styles.pillText, { color: isDark ? '#E9D5FF' : '#7E22CE' }]}>
+                        {isBn ? 'শ্যামাসঙ্গীত' : 'Shyama Sangeet'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Clear Tap Target Action Button */}
+                  <View style={[styles.enterButtonKali, { backgroundColor: isDark ? '#7E22CE' : '#6B21A8' }]}>
+                    <Text style={styles.enterButtonText}>
+                      {isBn ? 'কালীপূজায় প্রবেশ করুন' : 'Enter Kali Puja Experience'}
+                    </Text>
+                    <Feather name="arrow-right" size={16} color="#FFFFFF" />
                   </View>
                 </View>
-
-                <Text style={styles.festivalTaglineKali}>
-                  {isBn ? 'অন্ধকার বিনাশিনী আদ্যাশক্তির আরাধনা' : 'Devotion, Illumination & Shaktipeeths'}
-                </Text>
-
-                <Text
-                  style={[styles.festivalDescription, { color: colors.textSecondary }]}
-                  numberOfLines={3}
-                >
-                  {isBn
-                    ? 'কালীঘাট ও দক্ষিণেশ্বর সহ ঐতিহাসিক কালীক্ষেত্র দর্শন, নিশীথ অমাবস্যার মহানির্ঘণ্ট, ১৪ প্রদীপ ও ভক্তিগম্ভীর শ্যামাসঙ্গীত।'
-                    : "Journey through revered Shaktipeeths, authentic Dipanwita Amavasya midnight timings, sacred pradip rituals, and soulful devotional music."}
-                </Text>
-
-                {/* Key Feature Pills */}
-                <View style={styles.featurePillsRow}>
-                  <View style={[styles.pill, { backgroundColor: isDark ? '#2B1445' : '#F3E8FF' }]}>
-                    <Ionicons name="business-outline" size={11} color={isDark ? '#C084FC' : '#7E22CE'} />
-                    <Text style={[styles.pillText, { color: isDark ? '#E9D5FF' : '#7E22CE' }]}>
-                      {isBn ? 'ঐতিহাসিক কালীক্ষেত্র' : 'Sacred Temples'}
-                    </Text>
-                  </View>
-                  <View style={[styles.pill, { backgroundColor: isDark ? '#2B1445' : '#F3E8FF' }]}>
-                    <Ionicons name="time-outline" size={11} color={isDark ? '#C084FC' : '#7E22CE'} />
-                    <Text style={[styles.pillText, { color: isDark ? '#E9D5FF' : '#7E22CE' }]}>
-                      {isBn ? 'নিশীথ কাল নির্ঘণ্ট' : 'Midnight Tithi'}
-                    </Text>
-                  </View>
-                  <View style={[styles.pill, { backgroundColor: isDark ? '#2B1445' : '#F3E8FF' }]}>
-                    <Ionicons name="flame-outline" size={11} color={isDark ? '#C084FC' : '#7E22CE'} />
-                    <Text style={[styles.pillText, { color: isDark ? '#E9D5FF' : '#7E22CE' }]}>
-                      {isBn ? '১৪ প্রদীপ ও রীতি' : '14 Diyas'}
-                    </Text>
-                  </View>
-                  <View style={[styles.pill, { backgroundColor: isDark ? '#2B1445' : '#F3E8FF' }]}>
-                    <Ionicons name="musical-notes-outline" size={11} color={isDark ? '#C084FC' : '#7E22CE'} />
-                    <Text style={[styles.pillText, { color: isDark ? '#E9D5FF' : '#7E22CE' }]}>
-                      {isBn ? 'শ্যামাসঙ্গীত' : 'Shyama Sangeet'}
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Clear Tap Target Action Button */}
-                <View style={[styles.enterButtonKali, { backgroundColor: isDark ? '#7E22CE' : '#6B21A8' }]}>
-                  <Text style={styles.enterButtonText}>
-                    {isBn ? 'কালীপূজায় প্রবেশ করুন' : 'Enter Kali Puja Experience'}
-                  </Text>
-                  <Feather name="arrow-right" size={16} color="#FFFFFF" />
-                </View>
-              </View>
-            </TouchableOpacity>
-          </Animated.View>
+              </AnimatedPressable>
+            </Animated.View>
+          </FadeInView>
         </View>
       </ScrollView>
     </View>

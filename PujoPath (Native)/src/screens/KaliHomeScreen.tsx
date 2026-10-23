@@ -3,12 +3,13 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   Image,
   StyleSheet,
   StatusBar,
 } from 'react-native';
 import { Ionicons, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useFestival } from '@/context/FestivalContext';
@@ -118,6 +119,13 @@ export const KaliHomeScreen: React.FC<KaliHomeScreenProps> = ({ navigation }) =>
     [isBn, schedule2026]
   );
 
+  const availableContentWidth = isLandscape
+    ? Math.min(width - screenPaddingLeft - screenPaddingRight, 980)
+    : width - screenPaddingLeft - screenPaddingRight;
+  const quickCardWidth = isLandscape
+    ? Math.floor((availableContentWidth - 24) / 3)
+    : Math.floor((availableContentWidth - 12) / 2);
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
@@ -168,17 +176,18 @@ export const KaliHomeScreen: React.FC<KaliHomeScreenProps> = ({ navigation }) =>
                 </Text>
               </View>
 
-              <TouchableOpacity
+              <AnimatedPressable
+                preset="chip"
+                scaleTo={0.92}
                 onPress={resetFestival}
                 style={[styles.switchPillBtn, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(126, 34, 206, 0.12)' }]}
-                activeOpacity={0.8}
                 accessibilityLabel="Switch festival"
               >
                 <Ionicons name="swap-horizontal" size={12} color={isDark ? '#E9D5FF' : '#7E22CE'} />
                 <Text style={[styles.switchPillText, { color: isDark ? '#E9D5FF' : '#7E22CE' }]}>
                   {isBn ? 'উৎসব বদল' : 'Switch'}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             </View>
 
             <Text style={[styles.heroTitle, { color: isDark ? '#FFFFFF' : '#2E1065' }]}>
@@ -246,16 +255,16 @@ export const KaliHomeScreen: React.FC<KaliHomeScreenProps> = ({ navigation }) =>
             };
 
             return (
-              <TouchableOpacity
+              <AnimatedPressable
                 key={idx}
-                activeOpacity={0.85}
+                scaleTo={motion.scale.card}
                 onPress={handlePress}
                 style={[
                   styles.quickCard,
                   {
                     backgroundColor: isDark ? colors.surface : '#FFFFFF',
                     borderColor: isDark ? colors.border : '#EDE5DC',
-                    width: isLandscape ? '31.5%' : '48%',
+                    width: quickCardWidth,
                   },
                 ]}
                 accessibilityRole="button"
@@ -276,7 +285,7 @@ export const KaliHomeScreen: React.FC<KaliHomeScreenProps> = ({ navigation }) =>
                 >
                   {item.desc}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             );
           })}
         </View>
@@ -295,9 +304,9 @@ export const KaliHomeScreen: React.FC<KaliHomeScreenProps> = ({ navigation }) =>
 
         <View style={[styles.highlightsContainer, isLandscape && styles.highlightsLandscape]}>
           {highlights.map((h, i) => (
-            <TouchableOpacity
+            <AnimatedPressable
               key={i}
-              activeOpacity={0.9}
+              scaleTo={motion.scale.card}
               onPress={() => navigation.navigate(h.screen)}
               style={[
                 styles.highlightCard,
@@ -334,7 +343,7 @@ export const KaliHomeScreen: React.FC<KaliHomeScreenProps> = ({ navigation }) =>
                   <Feather name="arrow-right" size={13} color="#9333EA" />
                 </View>
               </View>
-            </TouchableOpacity>
+            </AnimatedPressable>
           ))}
         </View>
 
@@ -363,9 +372,9 @@ export const KaliHomeScreen: React.FC<KaliHomeScreenProps> = ({ navigation }) =>
                 : 'Switch back to the Durga Puja experience with 450+ pandals, routes & music.'}
             </Text>
           </View>
-          <TouchableOpacity
+          <AnimatedPressable
+            scaleTo={motion.scale.button}
             onPress={resetFestival}
-            activeOpacity={0.85}
             style={[styles.switchActionBtn, { backgroundColor: isDark ? '#7E22CE' : '#6B21A8' }]}
             accessibilityLabel="Switch to Durga Puja"
           >
@@ -373,7 +382,7 @@ export const KaliHomeScreen: React.FC<KaliHomeScreenProps> = ({ navigation }) =>
               {isBn ? 'দুর্গাপূজা' : 'Durga Puja'}
             </Text>
             <Feather name="arrow-right" size={14} color="#FFFFFF" />
-          </TouchableOpacity>
+          </AnimatedPressable>
         </View>
       </ScrollView>
     </View>

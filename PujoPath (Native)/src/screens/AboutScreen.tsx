@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   StyleSheet,
   Linking,
 } from 'react-native';
@@ -11,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useResponsive } from '@/hooks/useResponsive';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 
 interface AboutScreenProps {
   navigation: any;
@@ -121,8 +121,9 @@ export const AboutScreen: React.FC<AboutScreenProps> = ({ navigation }) => {
                 </Text>
               </View>
 
-              <TouchableOpacity
-                activeOpacity={0.8}
+              <AnimatedPressable
+                preset="icon"
+                scaleTo={0.88}
                 onPress={() => Linking.openURL(`tel:${item.dial}`)}
                 style={[
                   styles.callButton,
@@ -134,7 +135,7 @@ export const AboutScreen: React.FC<AboutScreenProps> = ({ navigation }) => {
                 accessibilityLabel={`Call ${item.label}`}
               >
                 <Ionicons name="call" size={16} color="#B42323" />
-              </TouchableOpacity>
+              </AnimatedPressable>
             </View>
           ))}
         </View>

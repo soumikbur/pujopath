@@ -3,10 +3,11 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
@@ -112,8 +113,8 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
                   ? 'প্যান্ডেল কার্ডের হার্ট আইকনে ট্যাপ করে আপনার পছন্দের তালিকা তৈরি করুন।'
                   : 'Tap the heart icon on any pandal card to bookmark your must-visit collection.'}
               </Text>
-              <TouchableOpacity
-                activeOpacity={0.85}
+              <AnimatedPressable
+                scaleTo={motion.scale.button}
                 onPress={() => navigation.navigate('Explore')}
                 style={styles.primaryActionBtn}
               >
@@ -121,7 +122,7 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
                 <Text style={styles.primaryActionBtnText}>
                   {isBn ? 'প্যান্ডেল দেখুন' : 'Explore Pandals'}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             </View>
           ) : (
             <View style={[styles.cardsList, isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 12 }]}>
@@ -166,8 +167,8 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
                   ? 'রুট প্ল্যানারে গিয়ে নতুন পরিক্রমা তৈরি করুন এবং "রুট সংরক্ষণ করুন" ক্লিক করুন।'
                   : 'Create an itinerary in the Route Planner and click "Save Itinerary".'}
               </Text>
-              <TouchableOpacity
-                activeOpacity={0.85}
+              <AnimatedPressable
+                scaleTo={motion.scale.button}
                 onPress={() => navigation.navigate('Planner')}
                 style={[
                   styles.secondaryActionBtn,
@@ -181,7 +182,7 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
                   {isBn ? 'রুট প্ল্যানারে যান' : 'Go to Route Planner'}
                 </Text>
                 <Ionicons name="arrow-forward" size={15} color={colors.textPrimary} />
-              </TouchableOpacity>
+              </AnimatedPressable>
             </View>
           ) : (
             <View style={[styles.routesList, isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 12 }]}>
@@ -209,8 +210,8 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
                   </View>
 
                   <View style={styles.routeCardActions}>
-                    <TouchableOpacity
-                      activeOpacity={0.85}
+                    <AnimatedPressable
+                      scaleTo={motion.scale.button}
                       onPress={() => handleLoadRoute(route)}
                       style={[
                         styles.loadBtn,
@@ -223,16 +224,16 @@ export const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
                       <Text style={styles.loadBtnText}>
                         {isBn ? 'লোড করে দেখুন' : 'Load Trail'}
                       </Text>
-                    </TouchableOpacity>
+                    </AnimatedPressable>
 
-                    <TouchableOpacity
-                      activeOpacity={0.8}
+                    <AnimatedPressable
+                      scaleTo={motion.scale.iconButton}
                       onPress={() => deleteSavedRoute(route.id)}
                       style={styles.deleteBtn}
                       accessibilityLabel="Delete route"
                     >
                       <Ionicons name="trash-outline" size={16} color="#F43F5E" />
-                    </TouchableOpacity>
+                    </AnimatedPressable>
                   </View>
                 </View>
               ))}

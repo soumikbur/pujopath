@@ -3,13 +3,14 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useResponsive } from '@/hooks/useResponsive';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 import { PUJA_CALENDAR_DATA } from '@/data/calendar';
 import { SANDHI_PUJA_SCHEDULES, SandhiPujaConvention } from '@/data/calendar/sandhiPuja';
 
@@ -131,9 +132,9 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
               {sandhiSchedule.conventions.map((conv) => {
                 const isSelected = selectedConventionId === conv.id;
                 return (
-                  <TouchableOpacity
+                  <AnimatedPressable
                     key={conv.id}
-                    activeOpacity={0.85}
+                    scaleTo={motion.scale.button}
                     onPress={() => setSelectedConventionId(conv.id)}
                     style={[
                       styles.convButton,
@@ -144,6 +145,8 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
                       },
                       isLandscape && { flex: 1 },
                     ]}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Select convention ${conv.name}`}
                   >
                     <View style={styles.convTitleRow}>
                       <Text style={[styles.convName, { color: colors.textPrimary }]} numberOfLines={2}>
@@ -159,7 +162,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
                     <Text style={[styles.convBalidan, { color: colors.textMuted }]}>
                       {isBn ? 'বলিদান: সকাল ০৭:৫০' : 'Sacred Balidan: 07:50 AM'}
                     </Text>
-                  </TouchableOpacity>
+                  </AnimatedPressable>
                 );
               })}
             </View>
@@ -253,8 +256,8 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
         </View>
 
         {/* Contextual Link to Kali Puja 2026 Schedule */}
-        <TouchableOpacity
-          activeOpacity={0.85}
+        <AnimatedPressable
+          scaleTo={motion.scale.card}
           onPress={() => navigation.navigate('KaliPuja')}
           style={[
             styles.kaliBanner,
@@ -263,6 +266,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
               borderColor: isDark ? 'rgba(147, 51, 234, 0.4)' : '#E9D5FF',
             },
           ]}
+          accessibilityRole="button"
           accessibilityLabel="Open Kali Puja 2026 Calendar"
         >
           <View style={styles.kaliBannerIcon}>
@@ -278,7 +282,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
                 : 'View Kartik Amavasya tithis and midnight Nishita Kaal muhurat →'}
             </Text>
           </View>
-        </TouchableOpacity>
+        </AnimatedPressable>
       </ScrollView>
     </View>
   );

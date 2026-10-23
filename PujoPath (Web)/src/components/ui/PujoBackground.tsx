@@ -53,7 +53,7 @@ export function PujoBackground() {
   return (
     <div
       aria-hidden="true"
-      className="home-background pujopath-fixed-background pointer-events-none z-0 overflow-hidden select-none transition-colors duration-500"
+      className="home-background pujopath-fixed-background pointer-events-none z-0 overflow-hidden select-none transition-colors duration-500 w-full max-w-full fixed inset-0"
     >
       {/* ============================================================== */}
       {/* 1. HOMEPAGE-ONLY: Photographic Durga Puja Artwork (NO ALPANA)  */}
@@ -73,7 +73,8 @@ export function PujoBackground() {
               <div className="hidden md:block absolute inset-0">
                 <Image
                   src={currentLandscape}
-                  alt=""
+                  alt="Pujo atmospheric illustration"
+                  role="presentation"
                   fill
                   priority
                   unoptimized
@@ -88,7 +89,8 @@ export function PujoBackground() {
               <div className="block md:hidden absolute inset-0">
                 <Image
                   src={currentPortrait}
-                  alt=""
+                  alt="Pujo atmospheric illustration"
+                  role="presentation"
                   fill
                   priority
                   unoptimized
@@ -113,7 +115,8 @@ export function PujoBackground() {
                 <div className="hidden md:block absolute inset-0">
                   <Image
                     src={incomingLandscape}
-                    alt=""
+                    alt="Pujo atmospheric illustration"
+                    role="presentation"
                     fill
                     unoptimized
                     sizes="100vw"
@@ -127,7 +130,8 @@ export function PujoBackground() {
                 <div className="block md:hidden absolute inset-0">
                   <Image
                     src={incomingPortrait}
-                    alt=""
+                    alt="Pujo atmospheric illustration"
+                    role="presentation"
                     fill
                     unoptimized
                     sizes="100vw"
@@ -184,7 +188,7 @@ export function PujoBackground() {
 
           {/* Top-Left Sacred Alpana Motif (Subtle slow 75s rotation on non-homepage) */}
           <svg
-            className={`absolute -top-16 -left-16 w-80 h-80 sm:w-96 sm:h-96 text-[#B42323] opacity-[0.065] dark:opacity-[0.09] transition-opacity duration-300 ${
+            className={`absolute -top-16 -left-16 w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[50vw] max-h-[50vw] text-[#B42323] opacity-[0.065] dark:opacity-[0.09] transition-opacity duration-300 ${
               shouldAnimateAlpana ? 'animate-alpana-spin' : ''
             }`}
             viewBox="0 0 200 200"
@@ -219,7 +223,7 @@ export function PujoBackground() {
 
           {/* Top-Right Mirrored Mandala Accent (Subtle slow 90s reverse rotation on non-homepage) */}
           <svg
-            className={`absolute -top-20 -right-20 w-88 h-88 sm:w-[420px] sm:h-[420px] text-[#B42323] opacity-[0.06] dark:opacity-[0.085] transition-opacity duration-300 ${
+            className={`absolute -top-16 sm:-top-20 -right-12 sm:-right-20 w-64 h-64 sm:w-88 sm:h-88 md:w-[420px] md:h-[420px] max-w-[45vw] max-h-[45vw] sm:max-w-none sm:max-h-none text-[#B42323] opacity-[0.06] dark:opacity-[0.085] transition-opacity duration-300 ${
               shouldAnimateAlpana ? 'animate-alpana-spin-reverse' : ''
             }`}
             viewBox="0 0 200 200"
@@ -242,7 +246,7 @@ export function PujoBackground() {
 
           {/* Autumn Kash Flower (কাশফুল) Graceful Swirl Accent (Subtle drifting movement on non-homepage) */}
           <svg
-            className={`absolute top-1/3 -right-16 sm:-right-12 w-52 h-80 sm:w-64 sm:h-96 text-[#B42323] opacity-[0.05] dark:opacity-[0.075] transition-opacity duration-300 ${
+            className={`absolute top-1/3 -right-12 sm:-right-12 w-44 h-64 sm:w-64 sm:h-96 max-w-[40vw] text-[#B42323] opacity-[0.05] dark:opacity-[0.075] transition-opacity duration-300 ${
               shouldAnimateAlpana ? 'animate-alpana-drift' : ''
             }`}
             viewBox="0 0 100 200"
@@ -259,7 +263,7 @@ export function PujoBackground() {
 
           {/* Bottom Delicate Geometric Border Accent (Subtle gentle pulsing on non-homepage) */}
           <svg
-            className={`absolute -bottom-16 left-1/2 -translate-x-1/2 w-[700px] h-36 text-[#B42323] opacity-[0.05] dark:opacity-[0.07] transition-opacity duration-300 ${
+            className={`absolute -bottom-16 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-28 sm:h-36 text-[#B42323] opacity-[0.05] dark:opacity-[0.07] transition-opacity duration-300 ${
               shouldAnimateAlpana ? 'animate-alpana-pulse' : ''
             }`}
             viewBox="0 0 600 80"

@@ -3,10 +3,11 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -81,8 +82,8 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
 
         {/* Segmented Control 3 Tabs */}
         <View style={[styles.segmentContainer, { backgroundColor: isDark ? '#201C18' : '#F5F1EB', borderColor: colors.border }]}>
-          <TouchableOpacity
-            activeOpacity={0.85}
+          <AnimatedPressable
+            scaleTo={motion.scale.chip}
             onPress={() => setActiveTab('special')}
             style={[
               styles.segmentBtn,
@@ -106,10 +107,10 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
             >
               {isBn ? '🌙 সারারাত সূচি' : '🌙 Night Special'}
             </Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
 
-          <TouchableOpacity
-            activeOpacity={0.85}
+          <AnimatedPressable
+            scaleTo={motion.scale.chip}
             onPress={() => setActiveTab('normal')}
             style={[
               styles.segmentBtn,
@@ -133,10 +134,10 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
             >
               {isBn ? '⏱️ নিয়মিত সূচি' : '⏱️ Timetables'}
             </Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
 
-          <TouchableOpacity
-            activeOpacity={0.85}
+          <AnimatedPressable
+            scaleTo={motion.scale.chip}
             onPress={() => setActiveTab('stations')}
             style={[
               styles.segmentBtn,
@@ -160,7 +161,7 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
             >
               {isBn ? '🚇 স্টেশন ও মণ্ডপ' : '🚇 Stations'}
             </Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
         </View>
 
         {/* TAB 1: ALL-NIGHT PUJA SPECIAL TIMETABLE */}
@@ -339,9 +340,9 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
                         const p = pandalsMap.get(pandalId);
                         const pName = p ? (isBn ? (p.nameBn || p.name) : p.name) : pandalId;
                         return (
-                          <TouchableOpacity
+                          <AnimatedPressable
                             key={i}
-                            activeOpacity={0.8}
+                            scaleTo={motion.scale.chip}
                             onPress={() => navigation.navigate('PandalDetail', { pandalId })}
                             style={[
                               styles.pandalChip,
@@ -352,7 +353,7 @@ export const MetroScreen: React.FC<MetroScreenProps> = ({ navigation }) => {
                             <Text style={[styles.pandalChipText, { color: colors.textPrimary }]} numberOfLines={1}>
                               {pName}
                             </Text>
-                          </TouchableOpacity>
+                          </AnimatedPressable>
                         );
                       })}
                     </View>

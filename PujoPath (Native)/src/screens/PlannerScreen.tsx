@@ -1,14 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   TextInput,
   StyleSheet,
   Alert,
   Platform,
   LayoutAnimation,
+  Animated,
 } from 'react-native';
 import * as Linking from 'expo-linking';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,6 +16,10 @@ import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useRoute } from '@/context/RouteContext';
 import { useFestival } from '@/context/FestivalContext';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { FadeInView } from '@/components/ui/FadeInView';
+import { motion } from '@/theme/motion';
 import { PANDALS_DATA } from '@/data/pandals';
 import { KALI_PANDALS_DATA } from '@/data/pandals/kaliPandals';
 import { METRO_STATIONS_DATA } from '@/data/metro';
@@ -52,6 +56,10 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
     customStops,
   } = useRoute();
 
+  const reduceMotion = useReducedMotion();
+  const optimizeScaleAnim = useRef(new Animated.Value(1)).current;
+  const saveScaleAnim = useRef(new Animated.Value(1)).current;
+
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [optimizedSuccess, setOptimizedSuccess] = useState(false);
@@ -68,17 +76,23 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
   const [quickAddSearch, setQuickAddSearch] = useState<string>('');
 
   const handleReorder = (fromIndex: number, toIndex: number) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (!reduceMotion) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
     reorderStops(fromIndex, toIndex);
   };
 
   const handleRemove = (pandalId: string) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (!reduceMotion) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
     removeStop(pandalId);
   };
 
   const handleClear = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (!reduceMotion) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
     clearRoute();
   };
 
@@ -107,6 +121,13 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
     const res = optimizeRoute();
     if (res) {
       setOptimizedSuccess(true);
+      if (!reduceMotion) {
+        optimizeScaleAnim.setValue(0.82);
+        Animated.spring(optimizeScaleAnim, {
+          toValue: 1,
+          ...motion.spring.bouncy,
+        }).start();
+      }
       setTimeout(() => setOptimizedSuccess(false), 2500);
     }
   };
@@ -115,6 +136,13 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
     const res = saveCurrentRoute();
     if (res) {
       setSavedSuccess(true);
+      if (!reduceMotion) {
+        saveScaleAnim.setValue(0.82);
+        Animated.spring(saveScaleAnim, {
+          toValue: 1,
+          ...motion.spring.bouncy,
+        }).start();
+      }
       setTimeout(() => setSavedSuccess(false), 2500);
     }
   };
@@ -292,8 +320,8 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
           </View>
 
           <View style={[styles.metricItemAction, isLandscape && { width: '23%' }]}>
-            <TouchableOpacity
-              activeOpacity={0.85}
+            <AnimatedPressable
+              scaleTo={motion.scale.button}
               onPress={handleOptimize}
               disabled={stops.length <= 1}
               style={[
@@ -304,54 +332,65 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                   ? { backgroundColor: colors.primary, opacity: 0.4 }
                   : { backgroundColor: colors.primary },
               ]}
+              accessibilityRole="button"
+              accessibilityLabel={
+                stops.length <= 1
+                  ? (isBn ? 'স্মার্ট সাজান (কমপক্ষে ২টি মণ্ডপ প্রয়োজন)' : 'Optimize trail hopping order (Requires 2 or more stops)')
+                  : (isBn ? 'স্মার্ট সাজান' : 'Optimize trail hopping order')
+              }
+              accessibilityState={{ disabled: stops.length <= 1 }}
             >
-              <Ionicons
-                name={optimizedSuccess ? 'checkmark' : 'sparkles'}
-                size={14}
-                color="#FFFFFF"
-              />
+              <Animated.View style={{ transform: [{ scale: optimizeScaleAnim }] }}>
+                <Ionicons
+                  name={optimizedSuccess ? 'checkmark' : 'sparkles'}
+                  size={14}
+                  color="#FFFFFF"
+                />
+              </Animated.View>
               <Text style={styles.optimizeBtnText}>
                 {optimizedSuccess
                   ? (isBn ? 'সাজানো হয়েছে!' : 'Optimized!')
                   : (isBn ? 'স্মার্ট সাজান' : 'Optimize Trail')}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         </View>
 
         {/* 2-Opt Optimization Feedback Banner */}
         {lastOptimizationResult && (
-          <View
-            style={[
-              styles.optBanner,
-              {
-                backgroundColor: isDark ? 'rgba(6, 78, 59, 0.3)' : '#ECFDF5',
-                borderColor: isDark ? '#065F46' : '#6EE7B7',
-              },
-            ]}
-          >
-            <View style={styles.optBannerHeader}>
-              <Ionicons name="sparkles" size={15} color="#059669" />
-              <Text style={[styles.optBannerTitle, { color: isDark ? '#A7F3D0' : '#065F46' }]}>
+          <FadeInView slideOffset={16} duration={motion.duration.standard}>
+            <View
+              style={[
+                styles.optBanner,
+                {
+                  backgroundColor: isDark ? 'rgba(6, 78, 59, 0.3)' : '#ECFDF5',
+                  borderColor: isDark ? '#065F46' : '#6EE7B7',
+                },
+              ]}
+            >
+              <View style={styles.optBannerHeader}>
+                <Ionicons name="sparkles" size={15} color="#059669" />
+                <Text style={[styles.optBannerTitle, { color: isDark ? '#A7F3D0' : '#065F46' }]}>
+                  {isBn
+                    ? `রুট স্মার্ট অপ্টিমাইজ হয়েছে! নিকটবর্তী মণ্ডপগুলো পরপর সাজানো হয়েছে (${lastOptimizationResult.savingsPercent.toFixed(0)}% দূরত্ব সাশ্রয়, ~${lastOptimizationResult.savingsKm.toFixed(1)} কিমি)।`
+                    : `Trail optimized! Consecutive visits to nearby pandals saved ~${lastOptimizationResult.savingsKm.toFixed(1)} km (${lastOptimizationResult.savingsPercent.toFixed(0)}% reduction).`}
+                </Text>
+              </View>
+              <Text style={[styles.optBannerSubtitle, { color: isDark ? '#6EE7B7' : '#047857' }]}>
                 {isBn
-                  ? `রুট স্মার্ট অপ্টিমাইজ হয়েছে! নিকটবর্তী মণ্ডপগুলো পরপর সাজানো হয়েছে (${lastOptimizationResult.savingsPercent.toFixed(0)}% দূরত্ব সাশ্রয়, ~${lastOptimizationResult.savingsKm.toFixed(1)} কিমি)।`
-                  : `Trail optimized! Consecutive visits to nearby pandals saved ~${lastOptimizationResult.savingsKm.toFixed(1)} km (${lastOptimizationResult.savingsPercent.toFixed(0)}% reduction).`}
+                  ? '* সরলরেখা দূরত্বের অনুমান; বাস্তব সড়ক পথের অবস্থা ও ট্র্যাফিকের ওপর নির্ভর করে পরিবর্তন হতে পারে।'
+                  : '* Straight-line distance estimate; actual road travel may vary.'}
               </Text>
             </View>
-            <Text style={[styles.optBannerSubtitle, { color: isDark ? '#6EE7B7' : '#047857' }]}>
-              {isBn
-                ? '* সরলরেখা দূরত্বের অনুমান; বাস্তব সড়ক পথের অবস্থা ও ট্র্যাফিকের ওপর নির্ভর করে পরিবর্তন হতে পারে।'
-                : '* Straight-line distance estimate; actual road travel may vary.'}
-            </Text>
-          </View>
+          </FadeInView>
         )}
 
         {/* Save, Add Custom Pandal & Clear Controls (When stops > 0) */}
         {stops.length > 0 && (
           <View style={styles.controlsRow}>
             <View style={styles.controlsLeft}>
-              <TouchableOpacity
-                activeOpacity={0.85}
+              <AnimatedPressable
+                scaleTo={motion.scale.button}
                 onPress={handleSave}
                 style={[
                   styles.saveBtn,
@@ -360,21 +399,25 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                     borderColor: isDark ? '#2F2720' : '#EEE8E1',
                   },
                 ]}
+                accessibilityRole="button"
+                accessibilityLabel="Save route itinerary"
               >
-                <Ionicons
-                  name={savedSuccess ? 'checkmark' : 'save-outline'}
-                  size={15}
-                  color={savedSuccess ? '#059669' : colors.primary}
-                />
+                <Animated.View style={{ transform: [{ scale: saveScaleAnim }] }}>
+                  <Ionicons
+                    name={savedSuccess ? 'checkmark' : 'save-outline'}
+                    size={15}
+                    color={savedSuccess ? '#059669' : colors.primary}
+                  />
+                </Animated.View>
                 <Text style={[styles.saveBtnText, { color: colors.textPrimary }]}>
                   {savedSuccess
                     ? (isBn ? 'সংরক্ষিত হয়েছে!' : 'Saved to Itineraries!')
                     : (isBn ? 'রুট সংরক্ষণ করুন' : 'Save Itinerary')}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
 
-              <TouchableOpacity
-                activeOpacity={0.85}
+              <AnimatedPressable
+                scaleTo={motion.scale.button}
                 onPress={() => setShowCustomModal(true)}
                 style={[
                   styles.addCustomBtn,
@@ -382,19 +425,27 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                     backgroundColor: isDark ? '#1A1613' : '#FFFFFF',
                   },
                 ]}
+                accessibilityRole="button"
+                accessibilityLabel="Add custom pandal stop"
               >
                 <Ionicons name="add" size={15} color={colors.primary} />
                 <Text style={[styles.addCustomBtnText, { color: colors.primary }]}>
                   {isBn ? '+ নিজস্ব মণ্ডপ যোগ করুন' : '+ Add Custom Pandal'}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             </View>
 
-            <TouchableOpacity onPress={handleClear} style={styles.clearBtn}>
+            <AnimatedPressable
+              scaleTo={motion.scale.chip}
+              onPress={handleClear}
+              style={styles.clearBtn}
+              accessibilityRole="button"
+              accessibilityLabel="Clear complete route"
+            >
               <Text style={styles.clearBtnText}>
                 {isBn ? 'সম্পূর্ণ রুট পরিষ্কার করুন' : 'Clear Route'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         )}
 
@@ -424,17 +475,19 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
             </View>
 
             {/* Launch Action Button */}
-            <TouchableOpacity
-              activeOpacity={0.9}
+            <AnimatedPressable
+              scaleTo={motion.scale.card}
               onPress={handleStartNavigation}
               style={[styles.launchBtn, { backgroundColor: colors.primary }]}
+              accessibilityRole="button"
+              accessibilityLabel="Start pandal hopping navigation"
             >
               <Ionicons name="navigate" size={18} color="#FFFFFF" />
               <Text style={styles.launchBtnText}>
                 {isBn ? 'পুজো পরিক্রমা শুরু করুন' : 'Start Pandal Hopping'}
               </Text>
               <Ionicons name="open-outline" size={15} color="#FFFFFF" style={{ opacity: 0.8 }} />
-            </TouchableOpacity>
+            </AnimatedPressable>
 
             <Text style={[styles.navHubFootnote, { color: colors.textMuted }]}>
               {provider === 'google' ? 'Google Maps Walking Trail' : 'Apple Maps Walking Trail'} • {stops.length} stops
@@ -464,19 +517,21 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
             </Text>
 
             <View style={styles.emptyActionRow}>
-              <TouchableOpacity
-                activeOpacity={0.85}
+              <AnimatedPressable
+                scaleTo={motion.scale.button}
                 onPress={() => navigation.navigate('ExploreTab')}
                 style={[styles.emptyExploreBtn, { backgroundColor: colors.primary }]}
+                accessibilityRole="button"
+                accessibilityLabel="Explore pandals directory"
               >
                 <Ionicons name="search" size={15} color="#FFFFFF" />
                 <Text style={styles.emptyExploreBtnText}>
                   {isBn ? 'প্যান্ডেল সন্ধান করুন' : 'Explore Pandals'}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
 
-              <TouchableOpacity
-                activeOpacity={0.85}
+              <AnimatedPressable
+                scaleTo={motion.scale.button}
                 onPress={() => setShowCustomModal(true)}
                 style={[
                   styles.emptyAddBtn,
@@ -485,12 +540,14 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                     borderColor: colors.primary,
                   },
                 ]}
+                accessibilityRole="button"
+                accessibilityLabel="Add new pandal"
               >
                 <Ionicons name="add" size={15} color={colors.primary} />
                 <Text style={[styles.emptyAddBtnText, { color: colors.primary }]}>
                   {isBn ? '+ নতুন মণ্ডপ যোগ করুন' : '+ Add New Pandal'}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             </View>
           </View>
         ) : (
@@ -534,8 +591,8 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
 
                   <View style={styles.stopActions}>
                     {idx > 0 && (
-                      <TouchableOpacity
-                        activeOpacity={0.8}
+                      <AnimatedPressable
+                        scaleTo={motion.scale.icon}
                         onPress={() => handleReorder(idx, idx - 1)}
                         style={[
                           styles.reorderBtn,
@@ -543,13 +600,15 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                             borderColor: isDark ? '#2F2720' : '#EEE8E1',
                           },
                         ]}
+                        accessibilityRole="button"
+                        accessibilityLabel="Move stop up"
                       >
                         <Ionicons name="arrow-up" size={14} color={colors.textSecondary} />
-                      </TouchableOpacity>
+                      </AnimatedPressable>
                     )}
                     {idx < stops.length - 1 && (
-                      <TouchableOpacity
-                        activeOpacity={0.8}
+                      <AnimatedPressable
+                        scaleTo={motion.scale.icon}
                         onPress={() => handleReorder(idx, idx + 1)}
                         style={[
                           styles.reorderBtn,
@@ -557,17 +616,21 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                             borderColor: isDark ? '#2F2720' : '#EEE8E1',
                           },
                         ]}
+                        accessibilityRole="button"
+                        accessibilityLabel="Move stop down"
                       >
                         <Ionicons name="arrow-down" size={14} color={colors.textSecondary} />
-                      </TouchableOpacity>
+                      </AnimatedPressable>
                     )}
-                    <TouchableOpacity
-                      activeOpacity={0.8}
+                    <AnimatedPressable
+                      scaleTo={motion.scale.icon}
                       onPress={() => handleRemove(stop.pandalId)}
                       style={styles.deleteStopBtn}
+                      accessibilityRole="button"
+                      accessibilityLabel="Remove stop from route"
                     >
                       <Ionicons name="trash-outline" size={16} color="#F43F5E" />
-                    </TouchableOpacity>
+                    </AnimatedPressable>
                   </View>
                 </View>
               ))}
@@ -602,8 +665,9 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
           {/* Category Filter Pills */}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickCategoryScroll}>
             {quickCategories.map((cat) => (
-              <TouchableOpacity
+              <AnimatedPressable
                 key={cat.id}
+                scaleTo={motion.scale.chip}
                 onPress={() => setQuickAddCategory(cat.id)}
                 style={[
                   styles.quickCatPill,
@@ -614,6 +678,8 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                         borderColor: isDark ? '#2F2720' : '#EEE8E1',
                       },
                 ]}
+                accessibilityRole="button"
+                accessibilityLabel={`Filter by ${cat.label}`}
               >
                 <Text
                   style={[
@@ -626,7 +692,7 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                 >
                   {cat.label}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             ))}
           </ScrollView>
 
@@ -649,9 +715,13 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
               onChangeText={setQuickAddSearch}
             />
             {quickAddSearch.length > 0 && (
-              <TouchableOpacity onPress={() => setQuickAddSearch('')}>
+              <AnimatedPressable
+                scaleTo={motion.scale.icon}
+                onPress={() => setQuickAddSearch('')}
+                accessibilityLabel="Clear quick search text"
+              >
                 <Ionicons name="close-circle" size={15} color="#8A8179" />
-              </TouchableOpacity>
+              </AnimatedPressable>
             )}
           </View>
 
@@ -678,16 +748,18 @@ export const PlannerScreen: React.FC<PlannerScreenProps> = ({ navigation }) => {
                   </Text>
                 </View>
 
-                <TouchableOpacity
-                  activeOpacity={0.85}
+                <AnimatedPressable
+                  scaleTo={motion.scale.chip}
                   onPress={() => addStop(pandal)}
                   style={styles.quickAddBtn}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Add ${pandal.name} to trail`}
                 >
                   <Ionicons name="add" size={14} color={colors.primary} />
                   <Text style={[styles.quickAddBtnText, { color: colors.primary }]}>
                     {isBn ? 'যোগ করুন' : 'Add'}
                   </Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
               </View>
             ))}
           </View>

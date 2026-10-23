@@ -74,7 +74,7 @@ export function MobileBottomNav() {
     <>
       <nav
         aria-label="Mobile Bottom Navigation"
-        className="md:hidden fixed bottom-0 inset-x-0 z-[1100] bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] px-3 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] shadow-elevated transition-colors duration-200"
+        className="lg:hidden fixed bottom-0 inset-x-0 z-[1100] bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] px-3 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] shadow-elevated transition-colors duration-200"
       >
         <div className="flex items-center justify-around max-w-sm mx-auto">
           {mainItems.map((item) => {
@@ -133,7 +133,7 @@ export function MobileBottomNav() {
           onClick={(e) => {
             if (e.target === e.currentTarget) setMoreOpen(false);
           }}
-          className="fixed inset-0 z-[1300] flex flex-col justify-end md:hidden bg-black/50 backdrop-blur-sm animate-in fade-in"
+          className="fixed inset-0 z-[1300] flex flex-col justify-end lg:hidden bg-black/50 backdrop-blur-sm animate-in fade-in"
         >
           <div className="bg-white dark:bg-[#181411] border-t border-[#eee8e1] dark:border-[#2a241f] rounded-t-3xl p-6 space-y-4 shadow-elevated max-h-[80vh] overflow-y-auto pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] animate-in slide-in-from-bottom duration-200">
             <div className="flex items-center justify-between border-b border-[#eee8e1] dark:border-[#2a241f] pb-3">

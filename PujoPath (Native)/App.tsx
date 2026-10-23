@@ -10,9 +10,6 @@ import { FestivalProvider } from '@/context/FestivalContext';
 import { MapFullscreenProvider } from '@/context/MapFullscreenContext';
 import { RootNavigator } from '@/navigation/RootNavigator';
 
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 export default function App() {
   return (

@@ -132,9 +132,9 @@ export default function MusicPage() {
   };
 
   return (
-    <div className={cn('space-y-6 max-w-6xl mx-auto transition-all duration-200', isPlayerActive ? 'pb-16 md:pb-12' : 'pb-10 md:pb-8')}>
+    <div className={cn('space-y-6 w-full max-w-6xl mx-auto transition-all duration-200 min-w-0', isPlayerActive ? 'pb-16 md:pb-12' : 'pb-10 md:pb-8')}>
       {/* Festival Switcher Bar */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-[#f4ede4] dark:bg-[#201c18] border border-[#eee8e1] dark:border-[#2f2720] w-fit">
+      <div className="flex items-center gap-1.5 sm:gap-2 p-1 sm:p-1.5 rounded-2xl bg-[#f4ede4] dark:bg-[#201c18] border border-[#eee8e1] dark:border-[#2f2720] max-w-full overflow-x-auto no-scrollbar">
         <button
           type="button"
           onClick={() => {
@@ -143,7 +143,7 @@ export default function MusicPage() {
             setSelectedMood('All');
           }}
           className={cn(
-            'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer',
+            'px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 shrink-0 transition-all cursor-pointer whitespace-nowrap',
             !isKali
               ? 'bg-[#b42323] text-white shadow-xs'
               : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white'
@@ -160,7 +160,7 @@ export default function MusicPage() {
             setSelectedMood('All');
           }}
           className={cn(
-            'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer',
+            'px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 shrink-0 transition-all cursor-pointer whitespace-nowrap',
             isKali
               ? 'bg-purple-700 text-white shadow-xs'
               : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white'

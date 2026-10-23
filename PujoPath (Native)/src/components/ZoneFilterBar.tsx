@@ -1,10 +1,11 @@
 import React from 'react';
-import { ScrollView, TouchableOpacity, Text, StyleSheet, View, LayoutAnimation } from 'react-native';
+import { ScrollView, Text, StyleSheet, View, LayoutAnimation } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useFestival } from '@/context/FestivalContext';
 import { LocalityZone } from '@/types';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 
 export const DURGA_ZONES_LIST: (LocalityZone | 'All')[] = [
   'All',
@@ -86,9 +87,10 @@ export const ZoneFilterBar: React.FC<ZoneFilterBarProps> = ({
             : zone;
 
           return (
-            <TouchableOpacity
+            <AnimatedPressable
               key={zone}
-              activeOpacity={0.75}
+              preset="chip"
+              scaleTo={0.92}
               onPress={() => handleSelectZone(zone)}
               style={[
                 styles.chip,
@@ -113,7 +115,7 @@ export const ZoneFilterBar: React.FC<ZoneFilterBarProps> = ({
               >
                 {label}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           );
         })}
       </ScrollView>

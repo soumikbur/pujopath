@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="412" height="1350" viewBox="0 0 412 1350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;family=Inter:wght@400;500;600;700;800;900&amp;display=swap');
+      text { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+      .bengali { font-family: 'Hind Siliguri', 'Inter', sans-serif; }
+      .brand { font-family: 'Inter', sans-serif; font-weight: 900; }
+    </style>
+  </defs>
+
+  <rect width="412" height="1350" fill="#14110e"/>
+  
+  <!-- ANDROID SYSTEM STATUS BAR (412 x 40) -->
+  <g id="Native_Status_Bar">
+    <rect width="412" height="40" fill="#14110e"/>
+    <text x="24" y="26" fill="#ffffff" font-size="14" font-weight="600">9:10</text>
+    
+    <g transform="translate(320, 14)">
+      <!-- 5G Badge -->
+      <text x="0" y="12" fill="#ffffff" font-size="11" font-weight="700">5G</text>
+      <!-- Signal Bars -->
+      <path d="M22 18 L22 14 M25 18 L25 10 M28 18 L28 6 M31 18 L31 2" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+      <!-- Battery Icon -->
+      <rect x="38" y="5" width="18" height="11" rx="3" stroke="#ffffff" stroke-width="1.5" fill="none"/>
+      <rect x="40" y="7" width="11" height="7" fill="#ffffff"/>
+      <line x1="57" y1="8" x2="57" y2="13" stroke="#ffffff" stroke-width="1.5"/>
+    </g>
+  </g>
+  
+  
+  <!-- NATIVE REACT NATIVE APP HEADER (412 x 56) -->
+  <g id="Native_Header" transform="translate(0, 40)">
+    <rect width="412" height="56" fill="#181411"/>
+    <line x1="0" y1="56" x2="412" y2="56" stroke="#2a241f" stroke-width="1"/>
+
+    
+      <!-- Back Arrow -->
+      <g transform="translate(16, 10)">
+        <circle cx="18" cy="18" r="18" fill="#26201b"/>
+        <path d="M22 18H14M14 18L18 14M14 18L18 22" stroke="#f8f3ec" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <text x="60" y="36" fill="#f8f3ec" font-size="18" font-weight="700">Puja Music</text>
+    
+
+    <!-- Right Controls: Theme Toggle, Language, Heart, Bell -->
+    <g id="Native_Controls" transform="translate(200, 10)">
+      <!-- Theme Toggle -->
+      <g id="Theme_Toggle">
+        <rect width="34" height="36" rx="11" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+        <text x="17" y="23" fill="#d4c7ba" font-size="13" text-anchor="middle">☀️</text>
+      </g>
+
+      <!-- Language Pill -->
+      <g id="Lang_Pill" transform="translate(40, 0)">
+        <rect width="66" height="36" rx="11" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+        <rect x="2" y="3" width="28" height="30" rx="8" fill="#b42323"/>
+        <text x="16" y="22" fill="#FFFFFF" font-size="10" font-weight="800" text-anchor="middle">EN</text>
+        <text x="46" y="22" fill="#d4c7ba" font-size="11" font-weight="600" text-anchor="middle" class="bengali">বাংলা</text>
+      </g>
+
+      <!-- Favorites Heart with badge -->
+      <g id="Favorites_Btn" transform="translate(112, 0)">
+        <rect width="36" height="36" rx="11" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+        <text x="18" y="24" fill="#d4c7ba" font-size="15" text-anchor="middle">♡</text>
+        <circle cx="28" cy="8" r="6" fill="#b42323"/>
+        <text x="28" y="11" fill="#FFFFFF" font-size="8" font-weight="800" text-anchor="middle">1</text>
+      </g>
+
+      <!-- Notification Bell -->
+      <g id="Bell_Btn" transform="translate(154, 0)">
+        <rect width="36" height="36" rx="11" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+        <text x="18" y="23" fill="#d4c7ba" font-size="14" text-anchor="middle">🔔</text>
+      </g>
+    </g>
+  </g>
+  
+
+  <g transform="translate(16, 106)">
+    <text x="0" y="16" fill="#b42323" font-size="11" font-weight="800">🎵 SHARODIYA SOUNDSCAPE &amp; HERITAGE</text>
+    <text x="0" y="44" fill="#f8f3ec" font-size="22" font-weight="900">Festive Puja Music Traditions</text>
+    <text x="0" y="66" fill="#d4c7ba" font-size="11">Explore Bengal's rich Durga Puja music culture — traditional Dhak</text>
+    <text x="0" y="82" fill="#d4c7ba" font-size="11">beats, Agomoni hymns, and immortal immersion chants.</text>
+  </g>
+
+  <!-- Segmented Control: All Soundscapes / My Playlist -->
+  <g transform="translate(16, 204)">
+    <rect width="130" height="32" rx="16" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+    <text x="65" y="21" fill="#f8f3ec" font-size="11" font-weight="700" text-anchor="middle">All Soundscapes</text>
+    <g transform="translate(138, 0)">
+      <rect width="112" height="32" rx="16" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+      <text x="56" y="21" fill="#d4c7ba" font-size="11" font-weight="600" text-anchor="middle">🔖 My Playlist 0</text>
+    </g>
+  </g>
+
+  <!-- Mood Filter Box -->
+  <g transform="translate(16, 252)">
+    <rect width="380" height="136" rx="18" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+    <text x="16" y="26" fill="#f8f3ec" font-size="13" font-weight="800">✨ Choose Your Puja Mood</text>
+    
+    <g transform="translate(16, 40)">
+      <rect width="78" height="26" rx="13" fill="#b42323"/>
+      <text x="39" y="17" fill="#FFFFFF" font-size="10" font-weight="700" text-anchor="middle">All Moods</text>
+      <g transform="translate(86, 0)">
+        <rect width="112" height="26" rx="13" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+        <text x="56" y="17" fill="#d4c7ba" font-size="10" text-anchor="middle">Ritual &amp; Devotion</text>
+      </g>
+      <g transform="translate(206, 0)">
+        <rect width="136" height="26" rx="13" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+        <text x="68" y="17" fill="#d4c7ba" font-size="10" text-anchor="middle">Dhak &amp; Traditional Sounds</text>
+      </g>
+    </g>
+
+    <g transform="translate(16, 74)">
+      <rect width="104" height="26" rx="13" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+      <text x="52" y="17" fill="#d4c7ba" font-size="10" text-anchor="middle">Pandal Hopping</text>
+      <g transform="translate(112, 0)">
+        <rect width="130" height="26" rx="13" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+        <text x="65" y="17" fill="#d4c7ba" font-size="10" text-anchor="middle">Bengali Festive Music</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Track 1 -->
+  <g transform="translate(16, 404)">
+    <rect width="380" height="96" rx="16" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+    <circle cx="34" cy="48" r="18" fill="#341b18"/>
+    <text x="34" y="53" fill="#b42323" font-size="14" text-anchor="middle">▶</text>
+    <text x="68" y="38" fill="#f8f3ec" font-size="14" font-weight="800">Sharodiya Dhak Dhwoni &amp; Kashi Bol</text>
+    <text x="68" y="56" fill="#d4c7ba" font-size="11">Mamta Jagdish Dhody • Dhak &amp; Shankha</text>
+    <text x="330" y="38" fill="#b42323" font-size="11" font-weight="700">01:39</text>
+    <g transform="translate(68, 68)">
+      <text x="0" y="14" fill="#786e65" font-size="9">CC BY-SA 4.0</text>
+      <text x="140" y="14" fill="#0284c7" font-size="9" font-weight="600">Direct Audio ↗</text>
+    </g>
+  </g>
+
+  <!-- Track 2 -->
+  <g transform="translate(16, 510)">
+    <rect width="380" height="96" rx="16" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+    <circle cx="34" cy="48" r="18" fill="#341b18"/>
+    <text x="34" y="53" fill="#b42323" font-size="14" text-anchor="middle">▶</text>
+    <text x="68" y="38" fill="#f8f3ec" font-size="14" font-weight="800">Sacred Shankha Naad (Auspicious Conch)</text>
+    <text x="68" y="56" fill="#d4c7ba" font-size="11">David Bolton • Dhak &amp; Shankha</text>
+    <text x="330" y="38" fill="#b42323" font-size="11" font-weight="700">00:07</text>
+    <g transform="translate(68, 68)">
+      <text x="0" y="14" fill="#786e65" font-size="9">CC BY 2.5</text>
+      <text x="140" y="14" fill="#0284c7" font-size="9" font-weight="600">Direct Audio ↗</text>
+    </g>
+  </g>
+
+  <!-- Track 3 -->
+  <g transform="translate(16, 616)">
+    <rect width="380" height="96" rx="16" fill="#1e1915" stroke="#3d3227" stroke-width="1"/>
+    <circle cx="34" cy="48" r="18" fill="#341b18"/>
+    <text x="34" y="53" fill="#b42323" font-size="14" text-anchor="middle">▶</text>
+    <text x="68" y="38" fill="#f8f3ec" font-size="14" font-weight="800">Dhunuchi Naach Dhak Taali &amp; Kaashor</text>
+    <text x="68" y="56" fill="#d4c7ba" font-size="11">Traditional Bengali Dhaki Ensemble</text>
+    <text x="330" y="38" fill="#b42323" font-size="11" font-weight="700">04:00</text>
+    <g transform="translate(68, 68)">
+      <text x="0" y="14" fill="#786e65" font-size="9">Authorized Stream</text>
+      <text x="140" y="14" fill="#0284c7" font-size="9" font-weight="600">Direct Audio ↗</text>
+    </g>
+  </g>
+
+  <g transform="translate(0, 1262)">
+    
+  <!-- NATIVE 5-TAB BOTTOM NAVIGATION BAR (Y=0) -->
+  <g id="Native_Bottom_Nav" transform="translate(0, 0)">
+    <rect width="412" height="64" fill="#181411"/>
+    <line x1="0" y1="0" x2="412" y2="0" stroke="#2a241f" stroke-width="1"/>
+    
+      <!-- Tab: Home -->
+      <g transform="translate(0, 0)">
+        <rect width="82.4" height="64" fill="none"/>
+        <g transform="translate(41.2, 18)">
+          <path d="M3 10L12 3L21 10V20C21 20.6 20.6 21 20 21H4C3.4 21 3 20.6 3 20V10Z" fill="none" stroke="#a89e95" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" transform="translate(-12, -12)"/>
+        </g>
+        <text x="41.2" y="48" fill="#a89e95" font-size="11" font-weight="500" text-anchor="middle">Home</text>
+        
+      </g>
+    
+      <!-- Tab: Explore -->
+      <g transform="translate(82.4, 0)">
+        <rect width="82.4" height="64" fill="none"/>
+        <g transform="translate(41.2, 18)">
+          <path d="M12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2ZM16 8L13.5 13.5L8 16L10.5 10.5L16 8Z" fill="none" stroke="#a89e95" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" transform="translate(-12, -12)"/>
+        </g>
+        <text x="41.2" y="48" fill="#a89e95" font-size="11" font-weight="500" text-anchor="middle">Explore</text>
+        
+      </g>
+    
+      <!-- Tab: Map -->
+      <g transform="translate(164.8, 0)">
+        <rect width="82.4" height="64" fill="none"/>
+        <g transform="translate(41.2, 18)">
+          <path d="M12 2C8.1 2 5 5.1 5 9C5 14.2 12 22 12 22C12 22 19 14.2 19 9C19 5.1 15.9 2 12 2ZM12 11.5C10.6 11.5 9.5 10.4 9.5 9C9.5 7.6 10.6 6.5 12 6.5C13.4 6.5 14.5 7.6 14.5 9C14.5 10.4 13.4 11.5 12 11.5Z" fill="none" stroke="#a89e95" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" transform="translate(-12, -12)"/>
+        </g>
+        <text x="41.2" y="48" fill="#a89e95" font-size="11" font-weight="500" text-anchor="middle">Map</text>
+        
+      </g>
+    
+      <!-- Tab: Planner -->
+      <g transform="translate(247.20000000000002, 0)">
+        <rect width="82.4" height="64" fill="none"/>
+        <g transform="translate(41.2, 18)">
+          <path d="M4 19C4 17.3 5.3 16 7 16H17C18.7 16 20 17.3 20 19M12 4V12M8 8H16" fill="none" stroke="#a89e95" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" transform="translate(-12, -12)"/>
+        </g>
+        <text x="41.2" y="48" fill="#a89e95" font-size="11" font-weight="500" text-anchor="middle">Planner</text>
+        
+      </g>
+    
+      <!-- Tab: More -->
+      <g transform="translate(329.6, 0)">
+        <rect width="82.4" height="64" fill="none"/>
+        <g transform="translate(41.2, 18)">
+          <path d="M6 12C6 12.5 5.5 13 5 13C4.5 13 4 12.5 4 12C4 11.5 4.5 11 5 11C5.5 11 6 11.5 6 12ZM13 12C13 12.5 12.5 13 12 13C11.5 13 11 12.5 11 12C11 11.5 11.5 11 12 11C12.5 11 13 11.5 13 12ZM20 12C20 12.5 19.5 13 19 13C18.5 13 18 12.5 18 12C18 11.5 18.5 11 19 11C19.5 11 20 11.5 20 12Z" fill="#b42323" stroke="#b42323" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" transform="translate(-12, -12)"/>
+        </g>
+        <text x="41.2" y="48" fill="#b42323" font-size="11" font-weight="700" text-anchor="middle">More</text>
+        <circle cx="41.2" cy="56" r="2.5" fill="#b42323"/>
+      </g>
+    
+  </g>
+  
+    
+  <!-- ANDROID SYSTEM GESTURE NAVIGATION PILL (Y=64) -->
+  <g id="Native_Gesture_Pill" transform="translate(0, 64)">
+    <rect width="412" height="24" fill="none"/>
+    <rect x="170" y="10" width="72" height="4" rx="2" fill="#ffffff" fill-opacity="0.8"/>
+  </g>
+  
+  </g>
+</svg>

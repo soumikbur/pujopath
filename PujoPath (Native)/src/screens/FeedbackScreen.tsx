@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   StyleSheet,
   Linking,
 } from 'react-native';
@@ -11,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useResponsive } from '@/hooks/useResponsive';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 
 interface FeedbackScreenProps {
   navigation: any;
@@ -109,10 +109,11 @@ export const FeedbackScreen: React.FC<FeedbackScreenProps> = ({ navigation }) =>
             : 'Messages go directly to soumik.bur@gmail.com. We review all feedback, pandal updates, and community suggestions promptly.'}
         </Text>
 
-        <TouchableOpacity
+        <AnimatedPressable
+          preset="button"
+          scaleTo={0.95}
           style={styles.emailBtn}
           onPress={handleSendEmail}
-          activeOpacity={0.85}
           accessibilityRole="button"
           accessibilityLabel="Send Feedback Email"
         >
@@ -120,7 +121,7 @@ export const FeedbackScreen: React.FC<FeedbackScreenProps> = ({ navigation }) =>
           <Text style={styles.emailBtnText}>
             {isBn ? 'ইমেল পাঠান (Send Email)' : 'Send Feedback Email'}
           </Text>
-        </TouchableOpacity>
+        </AnimatedPressable>
       </View>
 
       {/* Topics Header */}
@@ -174,16 +175,17 @@ export const FeedbackScreen: React.FC<FeedbackScreenProps> = ({ navigation }) =>
           </Text>
         </View>
 
-        <TouchableOpacity
+        <AnimatedPressable
+          preset="button"
+          scaleTo={0.95}
           style={[styles.meetDevBtn, { borderColor: colors.primary }]}
           onPress={() => navigation.navigate('Developer')}
-          activeOpacity={0.8}
         >
           <Ionicons name="person-circle-outline" size={18} color={colors.primary} />
           <Text style={[styles.meetDevBtnText, { color: colors.primary }]}>
             {isBn ? 'ডেভেলপার পেজ দেখুন' : 'Meet Developers'}
           </Text>
-        </TouchableOpacity>
+        </AnimatedPressable>
       </View>
     </ScrollView>
   );

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Animated } from 'react-native';
+import { View, Text, Image, StyleSheet, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pandal } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
@@ -8,6 +8,8 @@ import { useRoute } from '@/context/RouteContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { getPandalImageSource } from '@/lib/utils/pandalImages';
 import { formatDistance, toBengaliDigits } from '@/lib/geo';
+import { motion } from '@/theme/motion';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 
 interface PandalCardProps {
   pandal: Pandal;
@@ -24,32 +26,47 @@ const PandalCardComponent: React.FC<PandalCardProps> = ({ pandal, onPress, style
 
   const favScale = useRef(new Animated.Value(1)).current;
   const routeScale = useRef(new Animated.Value(1)).current;
+  const imageOpacity = useRef(new Animated.Value(0)).current;
 
   const inPlan = isPandalInRoute(pandal.id);
   const favorited = isFavorite(pandal.id);
 
   const handleToggleFav = () => {
     if (!reduceMotion) {
-      favScale.setValue(0.72);
-      Animated.spring(favScale, {
-        toValue: 1,
-        friction: 4,
-        tension: 160,
-        useNativeDriver: true,
-      }).start();
+      Animated.sequence([
+        Animated.spring(favScale, {
+          toValue: 1.28,
+          tension: 320,
+          friction: 10,
+          useNativeDriver: true,
+        }),
+        Animated.spring(favScale, {
+          toValue: 1,
+          tension: 260,
+          friction: 18,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }
     toggleFavorite(pandal.id);
   };
 
   const handleToggleRoute = () => {
     if (!reduceMotion) {
-      routeScale.setValue(0.85);
-      Animated.spring(routeScale, {
-        toValue: 1,
-        friction: 5,
-        tension: 180,
-        useNativeDriver: true,
-      }).start();
+      Animated.sequence([
+        Animated.spring(routeScale, {
+          toValue: 0.88,
+          tension: 320,
+          friction: 12,
+          useNativeDriver: true,
+        }),
+        Animated.spring(routeScale, {
+          toValue: 1,
+          tension: 260,
+          friction: 20,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }
     if (inPlan) {
       removeStop(pandal.id);
@@ -77,8 +94,9 @@ const PandalCardComponent: React.FC<PandalCardProps> = ({ pandal, onPress, style
   const hasPhoto = Boolean(imageSource);
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.92}
+    <AnimatedPressable
+      preset="card"
+      scaleTo={0.975}
       onPress={onPress}
       style={[
         styles.card,
@@ -93,7 +111,22 @@ const PandalCardComponent: React.FC<PandalCardProps> = ({ pandal, onPress, style
       <View style={styles.heroContainer}>
         {hasPhoto ? (
           <>
-            <Image source={imageSource!} style={styles.heroImage} resizeMode="cover" />
+            <Animated.Image
+              source={imageSource!}
+              style={[styles.heroImage, { opacity: imageOpacity }]}
+              resizeMode="cover"
+              onLoad={() => {
+                if (reduceMotion) {
+                  imageOpacity.setValue(1);
+                } else {
+                  Animated.timing(imageOpacity, {
+                    toValue: 1,
+                    duration: motion.duration.quick,
+                    useNativeDriver: true,
+                  }).start();
+                }
+              }}
+            />
             <View style={styles.imageDarkOverlay} />
 
             {/* Verified 2025 Photo Badge on Bottom-Left of Photo */}
@@ -202,8 +235,9 @@ const PandalCardComponent: React.FC<PandalCardProps> = ({ pandal, onPress, style
         </View>
 
         {/* Top-Right Favorite Heart Button */}
-        <TouchableOpacity
-          activeOpacity={0.75}
+        <AnimatedPressable
+          preset="icon"
+          scaleTo={0.88}
           onPress={handleToggleFav}
           style={[
             styles.favButton,
@@ -225,7 +259,7 @@ const PandalCardComponent: React.FC<PandalCardProps> = ({ pandal, onPress, style
               color={favorited ? '#FFFFFF' : isDark ? '#EDE5DC' : '#625B55'}
             />
           </Animated.View>
-        </TouchableOpacity>
+        </AnimatedPressable>
       </View>
 
       {/* Info Content Section */}
@@ -329,14 +363,15 @@ const PandalCardComponent: React.FC<PandalCardProps> = ({ pandal, onPress, style
 
       {/* Card Action Footer */}
       <View style={[styles.cardFooter, { borderTopColor: isDark ? '#2F2720' : '#EEE8E1' }]}>
-        <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
+        <AnimatedPressable preset="button" scaleTo={0.96} onPress={onPress}>
           <Text style={[styles.viewDetailsText, { color: colors.primary }]}>
             {isBn ? 'বিস্তারিত দেখুন →' : 'View Details →'}
           </Text>
-        </TouchableOpacity>
+        </AnimatedPressable>
 
-        <TouchableOpacity
-          activeOpacity={0.8}
+        <AnimatedPressable
+          preset="button"
+          scaleTo={0.92}
           onPress={handleToggleRoute}
         >
           <Animated.View
@@ -374,9 +409,9 @@ const PandalCardComponent: React.FC<PandalCardProps> = ({ pandal, onPress, style
                 : 'Add Route'}
             </Text>
           </Animated.View>
-        </TouchableOpacity>
+        </AnimatedPressable>
       </View>
-    </TouchableOpacity>
+    </AnimatedPressable>
   );
 };
 

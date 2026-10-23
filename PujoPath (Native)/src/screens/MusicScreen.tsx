@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   TextInput,
   Image,
   StyleSheet,
@@ -14,6 +13,8 @@ import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAudio } from '@/context/AudioContext';
 import { useResponsive } from '@/hooks/useResponsive';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 import { MUSIC_TRACKS_DATA, PUJA_MOODS_LIST, MUSIC_CATEGORIES_META } from '@/data/music';
 import { MusicTrack } from '@/types';
 
@@ -41,6 +42,7 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
   const [selectedMood, setSelectedMood] = useState<string>('All');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [displayLimit, setDisplayLimit] = useState(10);
 
   const formatSeconds = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -73,6 +75,10 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
     }
     return list;
   }, [viewTab, userPlaylistTracks, selectedMood, selectedCategory, searchQuery]);
+
+  const visibleTracks = useMemo(() => {
+    return filteredTracks.slice(0, displayLimit);
+  }, [filteredTracks, displayLimit]);
 
   const handlePlayUserPlaylist = () => {
     if (userPlaylistTracks.length > 0) {
@@ -123,8 +129,8 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
               },
             ]}
           >
-            <TouchableOpacity
-              activeOpacity={0.8}
+            <AnimatedPressable
+              scaleTo={motion.scale.button}
               onPress={() => setViewTab('all')}
               style={[
                 styles.switcherTab,
@@ -133,6 +139,8 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                   { backgroundColor: isDark ? '#1A1613' : '#FFFFFF' },
                 ],
               ]}
+              accessibilityRole="button"
+              accessibilityLabel="View all soundscapes"
             >
               <Text
                 style={[
@@ -145,10 +153,10 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
               >
                 {isBn ? 'সব গান ও বোল' : 'All Soundscapes'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
 
-            <TouchableOpacity
-              activeOpacity={0.8}
+            <AnimatedPressable
+              scaleTo={motion.scale.button}
               onPress={() => setViewTab('playlist')}
               style={[
                 styles.switcherTab,
@@ -158,6 +166,8 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                   { backgroundColor: isDark ? '#1A1613' : '#FFFFFF' },
                 ],
               ]}
+              accessibilityRole="button"
+              accessibilityLabel="View my playlist"
             >
               <Ionicons
                 name="bookmark"
@@ -179,7 +189,7 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
               <View style={styles.playlistBadge}>
                 <Text style={styles.playlistBadgeText}>{userPlaylistIds.length}</Text>
               </View>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         </View>
 
@@ -201,17 +211,22 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
               </Text>
             </View>
             {selectedMood !== 'All' && (
-              <TouchableOpacity onPress={() => setSelectedMood('All')}>
+              <AnimatedPressable
+                scaleTo={motion.scale.chip}
+                onPress={() => setSelectedMood('All')}
+                accessibilityRole="button"
+                accessibilityLabel="Clear mood filter"
+              >
                 <Text style={styles.clearMoodText}>
                   {isBn ? 'সব মুড দেখুন' : 'Clear Mood Filter'}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             )}
           </View>
 
           <View style={styles.moodPillsRow}>
-            <TouchableOpacity
-              activeOpacity={0.7}
+            <AnimatedPressable
+              scaleTo={motion.scale.chip}
               onPress={() => setSelectedMood('All')}
               style={[
                 styles.moodChip,
@@ -220,6 +235,8 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                   borderColor: selectedMood === 'All' ? '#B42323' : (isDark ? '#2F2720' : '#EEE8E1'),
                 },
               ]}
+              accessibilityRole="button"
+              accessibilityLabel="Select all moods"
             >
               <Text
                 style={[
@@ -230,14 +247,14 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
               >
                 {isBn ? 'সকল মুড' : 'All Moods'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
 
             {PUJA_MOODS_LIST.map((m) => {
               const isSelected = selectedMood === m.id;
               return (
-                <TouchableOpacity
+                <AnimatedPressable
                   key={m.id}
-                  activeOpacity={0.7}
+                  scaleTo={motion.scale.chip}
                   onPress={() => setSelectedMood(m.id)}
                   style={[
                     styles.moodChip,
@@ -246,6 +263,8 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                       borderColor: isSelected ? '#B42323' : (isDark ? '#2F2720' : '#EEE8E1'),
                     },
                   ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Select mood ${m.label}`}
                 >
                   <Text
                     style={[
@@ -256,7 +275,7 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                   >
                     {isBn ? m.labelBn : m.label}
                   </Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
               );
             })}
           </View>
@@ -282,23 +301,29 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
               onChangeText={setSearchQuery}
             />
             {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <AnimatedPressable
+                scaleTo={motion.scale.icon}
+                onPress={() => setSearchQuery('')}
+                accessibilityLabel="Clear music search"
+              >
                 <Ionicons name="close-circle" size={16} color="#776D65" />
-              </TouchableOpacity>
+              </AnimatedPressable>
             )}
           </View>
 
           {viewTab === 'playlist' && userPlaylistTracks.length > 0 && (
-            <TouchableOpacity
-              activeOpacity={0.85}
+            <AnimatedPressable
+              scaleTo={motion.scale.button}
               onPress={handlePlayUserPlaylist}
               style={styles.playFullPlaylistBtn}
+              accessibilityRole="button"
+              accessibilityLabel="Play entire playlist"
             >
               <Ionicons name="play" size={14} color="#FFFFFF" style={{ marginRight: 6 }} />
               <Text style={styles.playFullPlaylistText}>
                 {isBn ? 'পুরো প্লেলিস্ট চালান' : 'Play Full Playlist'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           )}
 
           {/* Horizontal Category Filter Pills */}
@@ -307,8 +332,8 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.categoryScroll}
           >
-            <TouchableOpacity
-              activeOpacity={0.7}
+            <AnimatedPressable
+              scaleTo={motion.scale.chip}
               onPress={() => setSelectedCategory('All')}
               style={[
                 styles.categoryChip,
@@ -323,6 +348,8 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                       : (isDark ? '#2F2720' : '#EEE8E1'),
                 },
               ]}
+              accessibilityRole="button"
+              accessibilityLabel="Select all categories"
             >
               <Text
                 style={[
@@ -338,14 +365,14 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
               >
                 {isBn ? 'সকল ক্যাটেগরি' : 'All Categories'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
 
             {MUSIC_CATEGORIES_META.map((cat) => {
               const isSelected = selectedCategory === cat.id;
               return (
-                <TouchableOpacity
+                <AnimatedPressable
                   key={cat.id}
-                  activeOpacity={0.7}
+                  scaleTo={motion.scale.chip}
                   onPress={() => setSelectedCategory(cat.id)}
                   style={[
                     styles.categoryChip,
@@ -358,6 +385,8 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                         : (isDark ? '#2F2720' : '#EEE8E1'),
                     },
                   ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Select category ${cat.name}`}
                 >
                   <Text
                     style={[
@@ -372,7 +401,7 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                   >
                     {isBn ? cat.nameBn : cat.name}
                   </Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
               );
             })}
           </ScrollView>
@@ -415,7 +444,7 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
             </View>
           ) : (
             <View style={[styles.tracksGrid, isLandscape && { flexDirection: 'row', flexWrap: 'wrap', gap: 12 }]}>
-              {filteredTracks.map((track: MusicTrack) => {
+              {visibleTracks.map((track: MusicTrack) => {
                 const isSelected = currentTrack?.id === track.id;
                 const isThisPlaying = isSelected && isPlaying;
                 const inPlaylist = isInPlaylist(track.id);
@@ -424,9 +453,9 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                 const desc = isBn ? track.descriptionBn : track.description;
 
                 return (
-                  <TouchableOpacity
+                  <AnimatedPressable
                     key={track.id}
-                    activeOpacity={0.9}
+                    scaleTo={0.98}
                     onPress={() => {
                       if (isSelected) {
                         togglePlayPause();
@@ -450,6 +479,8 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                       },
                       isLandscape && { width: '48.8%' },
                     ]}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Track ${title} by ${artist}`}
                   >
                   <View style={styles.trackTopRow}>
                     {/* 48px Cover Image */}
@@ -462,10 +493,9 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                     </View>
 
                     {/* Play/Pause Button */}
-                    <TouchableOpacity
-                      activeOpacity={0.85}
-                      onPress={(e) => {
-                        e.stopPropagation();
+                    <AnimatedPressable
+                      scaleTo={motion.scale.button}
+                      onPress={() => {
                         if (isSelected) {
                           togglePlayPause();
                         } else {
@@ -479,6 +509,8 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                           borderColor: isThisPlaying ? '#D52F2F' : (isDark ? '#2F2720' : '#EEE8E1'),
                         },
                       ]}
+                      accessibilityRole="button"
+                      accessibilityLabel={isThisPlaying ? 'Pause track' : 'Play track'}
                     >
                       <Ionicons
                         name={isThisPlaying ? 'pause' : 'play'}
@@ -486,7 +518,7 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                         color={isThisPlaying ? '#FFFFFF' : '#D52F2F'}
                         style={{ marginLeft: isThisPlaying ? 0 : 2 }}
                       />
-                    </TouchableOpacity>
+                    </AnimatedPressable>
 
                     {/* Metadata */}
                     <View style={styles.trackInfo}>
@@ -506,20 +538,21 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                     {/* Right duration & playlist bookmark */}
                     <View style={styles.trackRightCol}>
                       <Text style={styles.durationText}>{formatSeconds(track.durationSeconds)}</Text>
-                      <TouchableOpacity
-                        activeOpacity={0.7}
-                        onPress={(e) => {
-                          e.stopPropagation();
+                      <AnimatedPressable
+                        scaleTo={motion.scale.icon}
+                        onPress={() => {
                           togglePlaylistTrack(track.id);
                         }}
                         style={styles.bookmarkBtn}
+                        accessibilityRole="button"
+                        accessibilityLabel={inPlaylist ? 'Remove from playlist' : 'Save to playlist'}
                       >
                         <Ionicons
                           name={inPlaylist ? 'bookmark' : 'bookmark-outline'}
                           size={18}
                           color={inPlaylist ? '#B42323' : '#776D65'}
                         />
-                      </TouchableOpacity>
+                      </AnimatedPressable>
                     </View>
                   </View>
 
@@ -562,8 +595,9 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                         </Text>
                       </View>
                       {track.sourceUrl && (
-                        <TouchableOpacity
-                          activeOpacity={0.7}
+                        <AnimatedPressable
+                          preset="chip"
+                          scaleTo={0.92}
                           onPress={() => Linking.openURL(track.sourceUrl).catch(() => {})}
                           style={styles.sourceLink}
                         >
@@ -571,13 +605,36 @@ export const MusicScreen: React.FC<MusicScreenProps> = ({ navigation }) => {
                             {isBn ? 'সোর্স' : 'Source'}
                           </Text>
                           <Ionicons name="open-outline" size={11} color={colors.textMuted} />
-                        </TouchableOpacity>
+                        </AnimatedPressable>
                       )}
                     </View>
                   </View>
-                </TouchableOpacity>
+                </AnimatedPressable>
               );
             })}
+
+            {filteredTracks.length > displayLimit && (
+              <AnimatedPressable
+                scaleTo={0.96}
+                onPress={() => setDisplayLimit((prev) => prev + 10)}
+                style={[
+                  styles.loadMoreBtn,
+                  {
+                    backgroundColor: isDark ? '#201C18' : '#F6F3EF',
+                    borderColor: isDark ? '#2F2720' : '#EEE8E1',
+                  },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel="Load more tracks"
+              >
+                <Ionicons name="chevron-down" size={16} color={colors.primary} />
+                <Text style={[styles.loadMoreText, { color: colors.primary }]}>
+                  {isBn
+                    ? `আরো গান দেখুন (+১০টি, বাকি ${filteredTracks.length - displayLimit}টি)`
+                    : `Show More Tracks (+10, ${filteredTracks.length - displayLimit} remaining)`}
+                </Text>
+              </AnimatedPressable>
+            )}
             </View>
           )}
         </View>
@@ -878,5 +935,20 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '600',
     textDecorationLine: 'underline',
+  },
+  loadMoreBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginTop: 8,
+    gap: 8,
+  },
+  loadMoreText: {
+    fontSize: 13,
+    fontWeight: '700',
   },
 });

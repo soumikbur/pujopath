@@ -13,7 +13,10 @@ import { PwaRegister } from '@/components/pwa/PwaRegister';
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 export const metadata: Metadata = {
-  title: 'PujoPath — Discover. Plan. Experience Pujo.',
+  title: {
+    default: 'PujoPath — Discover. Plan. Experience Pujo.',
+    template: '%s | PujoPath',
+  },
   description:
     'A minimal, clean, modern Durga Puja 2026 digital companion with pandal discovery, route planner, metro guide, sacred calendar, and Sharodiya music.',
   manifest: `${basePath}/manifest.json`,

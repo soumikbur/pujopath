@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   TextInput,
   Image,
   StyleSheet,
@@ -14,6 +13,8 @@ import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAudio } from '@/context/AudioContext';
 import { useResponsive } from '@/hooks/useResponsive';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 import { KALI_MUSIC_DATA, KALI_MUSIC_CATEGORIES } from '@/data/music/kaliMusic';
 import { MusicTrack } from '@/types';
 
@@ -35,6 +36,7 @@ export const KaliMusicScreen: React.FC<KaliMusicScreenProps> = ({ navigation }) 
 
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [displayLimit, setDisplayLimit] = useState(10);
 
   const formatSeconds = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -65,6 +67,10 @@ export const KaliMusicScreen: React.FC<KaliMusicScreenProps> = ({ navigation }) 
     }
     return list;
   }, [selectedCategory, searchQuery]);
+
+  const visibleTracks = useMemo(() => {
+    return filteredTracks.slice(0, displayLimit);
+  }, [filteredTracks, displayLimit]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -164,9 +170,13 @@ export const KaliMusicScreen: React.FC<KaliMusicScreenProps> = ({ navigation }) 
             onChangeText={setSearchQuery}
           />
           {searchQuery ? (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <AnimatedPressable
+              scaleTo={motion.scale.icon}
+              onPress={() => setSearchQuery('')}
+              accessibilityLabel="Clear search text"
+            >
               <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
-            </TouchableOpacity>
+            </AnimatedPressable>
           ) : null}
         </View>
 
@@ -182,10 +192,10 @@ export const KaliMusicScreen: React.FC<KaliMusicScreenProps> = ({ navigation }) 
           {KALI_MUSIC_CATEGORIES.map((cat) => {
             const isSelected = selectedCategory === cat.id;
             return (
-              <TouchableOpacity
+              <AnimatedPressable
                 key={cat.id}
+                scaleTo={motion.scale.chip}
                 onPress={() => setSelectedCategory(cat.id)}
-                activeOpacity={0.8}
                 style={[
                   styles.categoryPill,
                   {
@@ -199,6 +209,8 @@ export const KaliMusicScreen: React.FC<KaliMusicScreenProps> = ({ navigation }) 
                       : colors.border,
                   },
                 ]}
+                accessibilityRole="button"
+                accessibilityLabel={`Select category ${cat.name}`}
               >
                 <Text
                   style={[
@@ -215,7 +227,7 @@ export const KaliMusicScreen: React.FC<KaliMusicScreenProps> = ({ navigation }) 
                 >
                   {isBn ? cat.nameBn : cat.name}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             );
           })}
         </ScrollView>
@@ -230,7 +242,7 @@ export const KaliMusicScreen: React.FC<KaliMusicScreenProps> = ({ navigation }) 
               : `${filteredTracks.length} sacred tracks available`}
           </Text>
 
-          {filteredTracks.map((track) => {
+          {visibleTracks.map((track) => {
             const isThisPlaying = currentTrack?.id === track.id && isPlaying;
             const isThisSelected = currentTrack?.id === track.id;
 
@@ -248,7 +260,8 @@ export const KaliMusicScreen: React.FC<KaliMusicScreenProps> = ({ navigation }) 
                 ]}
               >
                 <View style={styles.trackCardTop}>
-                  <TouchableOpacity
+                  <AnimatedPressable
+                    scaleTo={motion.scale.button}
                     onPress={() => {
                       if (isThisSelected) {
                         togglePlayPause();
@@ -257,7 +270,7 @@ export const KaliMusicScreen: React.FC<KaliMusicScreenProps> = ({ navigation }) 
                       }
                     }}
                     style={styles.playIconBtn}
-                    activeOpacity={0.8}
+                    accessibilityRole="button"
                     accessibilityLabel={isThisPlaying ? 'Pause' : 'Play'}
                   >
                     <Ionicons
@@ -265,7 +278,7 @@ export const KaliMusicScreen: React.FC<KaliMusicScreenProps> = ({ navigation }) 
                       size={44}
                       color={colors.primary}
                     />
-                  </TouchableOpacity>
+                  </AnimatedPressable>
 
                   <View style={styles.trackInfo}>
                     <Text
@@ -307,6 +320,29 @@ export const KaliMusicScreen: React.FC<KaliMusicScreenProps> = ({ navigation }) 
               </View>
             );
           })}
+
+          {filteredTracks.length > displayLimit && (
+            <AnimatedPressable
+              scaleTo={0.96}
+              onPress={() => setDisplayLimit((prev) => prev + 10)}
+              style={[
+                styles.loadMoreBtn,
+                {
+                  backgroundColor: isDark ? colors.surface : '#FFFFFF',
+                  borderColor: colors.border,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel="Load more tracks"
+            >
+              <Ionicons name="chevron-down" size={16} color={colors.primary} />
+              <Text style={[styles.loadMoreText, { color: colors.primary }]}>
+                {isBn
+                  ? `আরো স্তোত্র ও ভক্তিগীতি দেখুন (+১০টি, বাকি ${filteredTracks.length - displayLimit}টি)`
+                  : `Show More Sacred Tracks (+10, ${filteredTracks.length - displayLimit} remaining)`}
+              </Text>
+            </AnimatedPressable>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -474,5 +510,20 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(0, 0, 0, 0.06)',
     paddingTop: 6,
+  },
+  loadMoreBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginTop: 8,
+    gap: 8,
+  },
+  loadMoreText: {
+    fontSize: 13,
+    fontWeight: '700',
   },
 });

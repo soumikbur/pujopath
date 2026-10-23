@@ -3,10 +3,11 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAudio } from '@/context/AudioContext';
@@ -58,7 +59,8 @@ export const MahalayaScreen: React.FC<MahalayaScreenProps> = ({ navigation }) =>
           </Text>
 
           {/* Audio Player Action Button */}
-          <TouchableOpacity
+          <AnimatedPressable
+            scaleTo={motion.scale.button}
             onPress={() => {
               if (currentTrack?.id === mahalayaTrack.id) {
                 togglePlayPause();
@@ -74,7 +76,7 @@ export const MahalayaScreen: React.FC<MahalayaScreenProps> = ({ navigation }) =>
                 ? (language === 'bn' ? 'স্থগিত রাখুন' : 'Pause Broadcast')
                 : (language === 'bn' ? 'মহিষাসুরমর্দিনী শ্রবণ করুন' : 'Listen to Recitation')}
             </Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
         </View>
 
         {/* Historic Heritage Story Card & Sacred Sanskrit Invocations */}

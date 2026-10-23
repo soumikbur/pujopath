@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   StyleSheet,
   Platform,
   Alert,
@@ -31,6 +30,9 @@ import { SelectedPandalsBar } from '@/components/SelectedPandalsBar';
 import { getPandalImageSource } from '@/lib/utils/pandalImages';
 import { Pandal, LocalityZone } from '@/types';
 import { useResponsive } from '@/hooks/useResponsive';
+import { motion } from '@/theme/motion';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { FadeInView } from '@/components/ui/FadeInView';
 
 interface MapScreenProps {
   navigation: any;
@@ -190,6 +192,20 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap'
     }).addTo(map);
+
+    window.addEventListener('resize', function() {
+      if (map) {
+        map.invalidateSize();
+      }
+    });
+
+    window.addEventListener('orientationchange', function() {
+      setTimeout(function() {
+        if (map) {
+          map.invalidateSize();
+        }
+      }, 80);
+    });
 
     tileLayer.on('tileerror', function() {
       if (window.ReactNativeWebView) {
@@ -578,9 +594,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
             {filterOptions.map((opt) => {
               const isSelected = selectedFilter === opt.value;
               return (
-                <TouchableOpacity
+                <AnimatedPressable
                   key={opt.value}
-                  activeOpacity={0.8}
+                  preset="chip"
+                  scaleTo={0.92}
                   onPress={() => setSelectedFilter(opt.value)}
                   style={[
                     styles.filterChip,
@@ -629,13 +646,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
                   >
                     {opt.label}
                   </Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
               );
             })}
 
             {/* Metro Lines Toggle Chip */}
-            <TouchableOpacity
-              activeOpacity={0.8}
+            <AnimatedPressable
+              preset="chip"
+              scaleTo={0.92}
               onPress={() => setShowMetro(!showMetro)}
               style={[
                 styles.metroToggleChip,
@@ -678,7 +696,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
               >
                 {isBn ? 'মেট্রো রুট' : 'Metro Lines'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </ScrollView>
         </View>
       )}
@@ -726,8 +744,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
             ]}
           >
             {/* Obvious Exit Fullscreen Button */}
-            <TouchableOpacity
-              activeOpacity={0.85}
+            <AnimatedPressable
+              preset="button"
+              scaleTo={0.94}
               onPress={() => setIsMapFullscreen(false)}
               style={[
                 styles.floatingExitBtn,
@@ -757,7 +776,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
               >
                 {isBn ? 'প্রস্থান' : 'Exit'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
 
             {/* Active Filter Badge */}
             <View
@@ -801,8 +820,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
           ]}
         >
           {/* Fullscreen Button: Outward arrows to expand, Inward arrows to collapse */}
-          <TouchableOpacity
-            activeOpacity={0.85}
+          <AnimatedPressable
+            preset="icon"
+            scaleTo={0.88}
             onPress={toggleMapFullscreen}
             style={[
               styles.floatingControlBtn,
@@ -862,11 +882,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
                   : colors.primary
               }
             />
-          </TouchableOpacity>
+          </AnimatedPressable>
 
           {/* Geolocation Button */}
-          <TouchableOpacity
-            activeOpacity={0.85}
+          <AnimatedPressable
+            preset="icon"
+            scaleTo={0.88}
             onPress={handleUserLocation}
             disabled={isLocating}
             style={[
@@ -883,11 +904,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
             ) : (
               <Ionicons name="locate" size={20} color={isKali ? '#a855f7' : colors.primary} />
             )}
-          </TouchableOpacity>
+          </AnimatedPressable>
 
           {/* Recenter Button */}
-          <TouchableOpacity
-            activeOpacity={0.85}
+          <AnimatedPressable
+            preset="icon"
+            scaleTo={0.88}
             onPress={() => webViewRef.current?.injectJavaScript('window.recenterDefault(); true;')}
             style={[
               styles.floatingControlBtn,
@@ -899,11 +921,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
             accessibilityLabel={isKali ? (isBn ? 'মানচিত্র কেন্দ্র করুন' : 'Recenter Map') : (isBn ? 'কলকাতা কেন্দ্র করুন' : 'Recenter Map')}
           >
             <Ionicons name="compass-outline" size={20} color={colors.textPrimary} />
-          </TouchableOpacity>
+          </AnimatedPressable>
 
           {/* Zoom In */}
-          <TouchableOpacity
-            activeOpacity={0.85}
+          <AnimatedPressable
+            preset="icon"
+            scaleTo={0.88}
             onPress={() => webViewRef.current?.injectJavaScript('window.zoomIn(); true;')}
             style={[
               styles.floatingControlBtn,
@@ -915,11 +938,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
             accessibilityLabel="Zoom In"
           >
             <Ionicons name="add" size={20} color={colors.textPrimary} />
-          </TouchableOpacity>
+          </AnimatedPressable>
 
           {/* Zoom Out */}
-          <TouchableOpacity
-            activeOpacity={0.85}
+          <AnimatedPressable
+            preset="icon"
+            scaleTo={0.88}
             onPress={() => webViewRef.current?.injectJavaScript('window.zoomOut(); true;')}
             style={[
               styles.floatingControlBtn,
@@ -931,12 +955,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
             accessibilityLabel="Zoom Out"
           >
             <Ionicons name="remove" size={20} color={colors.textPrimary} />
-          </TouchableOpacity>
+          </AnimatedPressable>
         </View>
 
         {/* 4. Mobile Floating Selected Pandal Card */}
         {selectedPandal && (
-          <View
+          <FadeInView
+            duration={motion.duration.standard}
+            slideOffset={32}
             style={[
               styles.floatingPandalCardContainer,
               isLandscape
@@ -964,13 +990,15 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
               ]}
             >
               {/* Close Button */}
-              <TouchableOpacity
+              <AnimatedPressable
+                preset="icon"
+                scaleTo={0.88}
                 onPress={() => setSelectedPandal(null)}
                 style={[styles.closeCardBtn, { backgroundColor: isDark ? '#27201a' : '#f5f1ec' }]}
                 accessibilityLabel="Close"
               >
                 <Ionicons name="close" size={16} color={colors.textSecondary} />
-              </TouchableOpacity>
+              </AnimatedPressable>
 
               <View style={styles.cardHeaderRow}>
                 {pImageSource ? (
@@ -1045,8 +1073,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
               {/* Action Buttons Row */}
               <View style={styles.cardActionsRow}>
                 {/* Add to Route Button */}
-                <TouchableOpacity
-                  activeOpacity={0.85}
+                <AnimatedPressable
+                  preset="button"
+                  scaleTo={0.94}
                   onPress={() => {
                     if (inPlan) removeStop(selectedPandal.id);
                     else addStop(selectedPandal);
@@ -1072,11 +1101,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
                   >
                     {inPlan ? (isBn ? 'রুটে যুক্ত' : 'Added') : (isBn ? 'রুটে যোগ' : 'Add to Route')}
                   </Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
 
                 {/* External Navigation Button */}
-                <TouchableOpacity
-                  activeOpacity={0.85}
+                <AnimatedPressable
+                  preset="button"
+                  scaleTo={0.94}
                   onPress={() => handleLaunchExternalNavigation(selectedPandal)}
                   style={[
                     styles.cardActionBtn,
@@ -1090,11 +1120,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
                   <Text style={[styles.cardActionBtnText, { color: colors.textPrimary }]}>
                     {isBn ? 'দিকনির্দেশ' : 'Directions'}
                   </Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
 
                 {/* View Details Profile Button */}
-                <TouchableOpacity
-                  activeOpacity={0.85}
+                <AnimatedPressable
+                  preset="button"
+                  scaleTo={0.94}
                   onPress={() => navigation.navigate('PandalDetail', { pandalId: selectedPandal.id })}
                   style={[
                     styles.cardActionBtn,
@@ -1107,10 +1138,10 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
                   <Text style={[styles.cardActionBtnText, { color: colors.textPrimary }]}>
                     {isBn ? 'বিস্তারিত →' : 'Details →'}
                   </Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
               </View>
             </View>
-          </View>
+          </FadeInView>
         )}
 
         {/* 5. Bottom Selected Pandals Bar (planner bar when no pandal open) */}

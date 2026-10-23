@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform, StatusBar, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, Platform, StatusBar, Animated, Easing } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -9,6 +9,8 @@ import { useRoute } from '@/context/RouteContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useNotifications } from '@/context/NotificationContext';
 import { useFestival } from '@/context/FestivalContext';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 
 import { useResponsive } from '@/hooks/useResponsive';
 
@@ -28,7 +30,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
   const { favorites } = useRoute();
   const { activeScheduledCount } = useNotifications();
   const reduceMotion = useReducedMotion();
-  const { isLandscape, screenPaddingLeft, screenPaddingRight, headerHeight } = useResponsive();
+  const { isLandscape, screenPaddingLeft, screenPaddingRight, headerHeight, width } = useResponsive();
 
   const themeAnim = useRef(new Animated.Value(0)).current;
   const heartAnim = useRef(new Animated.Value(1)).current;
@@ -105,13 +107,13 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
         {/* Left Section: Only left-pointing back arrow icon (no PujoPath text, no 'Back' text) */}
         <View style={styles.leftGroup}>
           {showBack && onBack ? (
-            <TouchableOpacity
+            <AnimatedPressable
               onPress={onBack}
+              scaleTo={motion.scale.icon}
               style={styles.backButton}
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               accessibilityLabel={isBn ? 'পূর্ববর্তী পৃষ্ঠায় ফিরে যান' : 'Go back'}
               accessibilityRole="button"
-              activeOpacity={0.75}
             >
               <View
                 style={[
@@ -142,16 +144,16 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
                   {title}
                 </Text>
               ) : null}
-            </TouchableOpacity>
+            </AnimatedPressable>
           ) : (
             <View style={styles.rootBackRow}>
-              <TouchableOpacity
+              <AnimatedPressable
                 onPress={resetFestival}
+                scaleTo={motion.scale.icon}
                 style={styles.backButton}
                 hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                 accessibilityLabel={isBn ? 'উৎসব নির্বাচনে ফিরে যান' : 'Back to festival selection'}
                 accessibilityRole="button"
-                activeOpacity={0.75}
               >
                 <View
                   style={[
@@ -168,11 +170,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
                     color={colors.primary}
                   />
                 </View>
-              </TouchableOpacity>
+              </AnimatedPressable>
 
               {activeFestival && (
-                <TouchableOpacity
-                  activeOpacity={0.75}
+                <AnimatedPressable
+                  scaleTo={motion.scale.chip}
                   onPress={resetFestival}
                   style={[
                     styles.festivalBadgePill,
@@ -198,7 +200,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
                       ? '🌸 দুর্গাপূজা ▾'
                       : '🌸 Durga Puja ▾'}
                   </Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
               )}
             </View>
           )}
@@ -207,9 +209,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
         {/* Right Section: Theme Toggle + Language Toggle + Saved Heart */}
         <View style={styles.actionsRow}>
           {/* Theme Switcher Toggle (Sun / Moon) with smooth rotation */}
-          <TouchableOpacity
+          <AnimatedPressable
             onPress={handleToggleTheme}
-            activeOpacity={0.75}
+            scaleTo={motion.scale.icon}
             style={[
               styles.iconButton,
               {
@@ -233,62 +235,81 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
                 color={isDark ? '#FBBF24' : '#625B55'}
               />
             </Animated.View>
-          </TouchableOpacity>
+          </AnimatedPressable>
 
-          {/* Language Switcher Pill [ EN | বাংলা ] */}
-          <View
-            style={[
-              styles.langPillContainer,
-              {
-                borderColor: colors.border,
-                backgroundColor: isDark ? colors.surface : 'transparent',
-              },
-            ]}
-          >
-            <TouchableOpacity
-              activeOpacity={0.75}
-              onPress={() => setLanguage('en')}
+          {/* Language Switcher: Compact Single-Toggle on width < 360, dual-pill on >= 360 */}
+          {width < 360 ? (
+            <AnimatedPressable
+              scaleTo={motion.scale.icon}
+              onPress={() => setLanguage(language === 'en' ? 'bn' : 'en')}
               style={[
-                styles.langOption,
-                language === 'en' && [styles.langOptionActive, { backgroundColor: colors.primary }],
+                styles.iconButton,
+                {
+                  borderColor: colors.border,
+                  backgroundColor: isDark ? colors.surface : 'transparent',
+                },
               ]}
-              accessibilityLabel="English"
+              accessibilityLabel={isBn ? 'Switch to English' : 'বাংলায় পরিবর্তন করুন'}
             >
-              <Text
-                style={[
-                  styles.langText,
-                  { color: language === 'en' ? '#FFFFFF' : colors.textSecondary },
-                  language === 'en' && styles.langTextActive,
-                ]}
-              >
-                EN
+              <Text style={[styles.compactLangText, { color: colors.textPrimary }]}>
+                {language === 'en' ? 'বাং' : 'EN'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
+          ) : (
+            <View
+              style={[
+                styles.langPillContainer,
+                {
+                  borderColor: colors.border,
+                  backgroundColor: isDark ? colors.surface : 'transparent',
+                },
+              ]}
+            >
+              <AnimatedPressable
+                scaleTo={motion.scale.chip}
+                onPress={() => setLanguage('en')}
+                style={[
+                  styles.langOption,
+                  language === 'en' && [styles.langOptionActive, { backgroundColor: colors.primary }],
+                ]}
+                accessibilityLabel="English"
+              >
+                <Text
+                  style={[
+                    styles.langText,
+                    { color: language === 'en' ? '#FFFFFF' : colors.textSecondary },
+                    language === 'en' && styles.langTextActive,
+                  ]}
+                >
+                  EN
+                </Text>
+              </AnimatedPressable>
 
-            <TouchableOpacity
-              activeOpacity={0.75}
-              onPress={() => setLanguage('bn')}
-              style={[
-                styles.langOption,
-                language === 'bn' && [styles.langOptionActive, { backgroundColor: colors.primary }],
-              ]}
-              accessibilityLabel="Bengali"
-            >
-              <Text
+              <AnimatedPressable
+                scaleTo={motion.scale.chip}
+                onPress={() => setLanguage('bn')}
                 style={[
-                  styles.langText,
-                  { color: language === 'bn' ? '#FFFFFF' : colors.textSecondary },
-                  language === 'bn' && styles.langTextActive,
+                  styles.langOption,
+                  language === 'bn' && [styles.langOptionActive, { backgroundColor: colors.primary }],
                 ]}
+                accessibilityLabel="Bengali"
               >
-                বাংলা
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <Text
+                  style={[
+                    styles.langText,
+                    { color: language === 'bn' ? '#FFFFFF' : colors.textSecondary },
+                    language === 'bn' && styles.langTextActive,
+                  ]}
+                >
+                  বাংলা
+                </Text>
+              </AnimatedPressable>
+            </View>
+          )}
 
           {/* Saved Pandals Heart with Dynamic Counter Badge & Micro-Bounce */}
-          <TouchableOpacity
-            activeOpacity={0.75}
+          <AnimatedPressable
+            scaleTo={motion.scale.icon}
             onPress={() => {
               const rootNav = navigation?.getParent?.() || navigation;
               rootNav?.navigate('Saved');
@@ -322,37 +343,39 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title, showBack, onBack })
                 </View>
               )}
             </Animated.View>
-          </TouchableOpacity>
+          </AnimatedPressable>
 
-          {/* Notifications & Reminders Bell */}
-          <TouchableOpacity
-            activeOpacity={0.75}
-            onPress={() => {
-              const rootNav = navigation?.getParent?.() || navigation;
-              rootNav?.navigate('Notifications');
-            }}
-            style={[
-              styles.iconButton,
-              {
-                borderColor: colors.border,
-                backgroundColor: isDark ? colors.surface : 'transparent',
-              },
-            ]}
-            accessibilityLabel="Notifications and reminders"
-          >
-            <Ionicons
-              name="notifications-outline"
-              size={17}
-              color={activeScheduledCount > 0 ? colors.primary : (isDark ? '#B4A99E' : '#625B55')}
-            />
-            {activeScheduledCount > 0 && (
-              <View style={[styles.badge, { backgroundColor: colors.primary }]}>
-                <Text style={styles.badgeText}>
-                  {activeScheduledCount > 9 ? '9+' : activeScheduledCount}
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
+          {/* Notifications & Reminders Bell (available in More drawer on ultra-compact < 340 screens) */}
+          {width >= 340 && (
+            <AnimatedPressable
+              scaleTo={motion.scale.icon}
+              onPress={() => {
+                const rootNav = navigation?.getParent?.() || navigation;
+                rootNav?.navigate('Notifications');
+              }}
+              style={[
+                styles.iconButton,
+                {
+                  borderColor: colors.border,
+                  backgroundColor: isDark ? colors.surface : 'transparent',
+                },
+              ]}
+              accessibilityLabel="Notifications and reminders"
+            >
+              <Ionicons
+                name="notifications-outline"
+                size={17}
+                color={activeScheduledCount > 0 ? colors.primary : (isDark ? '#B4A99E' : '#625B55')}
+              />
+              {activeScheduledCount > 0 && (
+                <View style={[styles.badge, { backgroundColor: colors.primary }]}>
+                  <Text style={styles.badgeText}>
+                    {activeScheduledCount > 9 ? '9+' : activeScheduledCount}
+                  </Text>
+                </View>
+              )}
+            </AnimatedPressable>
+          )}
         </View>
       </View>
     </View>
@@ -374,7 +397,7 @@ const styles = StyleSheet.create({
   leftGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexShrink: 1,
+    flexShrink: 0,
     marginRight: 8,
   },
   rootBackRow: {
@@ -469,5 +492,9 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '800',
     color: '#FFFFFF',
+  },
+  compactLangText: {
+    fontSize: 11,
+    fontWeight: '800',
   },
 });

@@ -34,14 +34,14 @@ export default function CalendarPage() {
   const kaliSchedule = getKaliPujaSchedule(selectedKaliYear);
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-12">
+    <div className="space-y-6 w-full max-w-4xl mx-auto pb-12 min-w-0">
       {/* Festival Switcher Bar */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-[#f4ede4] dark:bg-[#201c18] border border-[#eee8e1] dark:border-[#2f2720] w-fit">
+      <div className="flex items-center gap-1.5 sm:gap-2 p-1 sm:p-1.5 rounded-2xl bg-[#f4ede4] dark:bg-[#201c18] border border-[#eee8e1] dark:border-[#2f2720] max-w-full overflow-x-auto no-scrollbar">
         <button
           type="button"
           onClick={() => selectFestival('durga')}
           className={cn(
-            'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer',
+            'px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 shrink-0 transition-all cursor-pointer whitespace-nowrap',
             !isKali
               ? 'bg-[#b42323] text-white shadow-xs'
               : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white'
@@ -54,7 +54,7 @@ export default function CalendarPage() {
           type="button"
           onClick={() => selectFestival('kali')}
           className={cn(
-            'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer',
+            'px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 shrink-0 transition-all cursor-pointer whitespace-nowrap',
             isKali
               ? 'bg-purple-700 text-white shadow-xs'
               : 'text-[#665a54] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white'

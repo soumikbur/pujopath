@@ -3,13 +3,14 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   TextInput,
   Image,
   StyleSheet,
   StatusBar,
 } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -112,9 +113,12 @@ export const KaliExploreScreen: React.FC<KaliExploreScreenProps> = ({ navigation
             onChangeText={setSearchQuery}
           />
           {searchQuery ? (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <AnimatedPressable
+              scaleTo={motion.scale.iconButton}
+              onPress={() => setSearchQuery('')}
+            >
               <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
-            </TouchableOpacity>
+            </AnimatedPressable>
           ) : null}
         </View>
 
@@ -128,10 +132,10 @@ export const KaliExploreScreen: React.FC<KaliExploreScreenProps> = ({ navigation
           {filterOptions.map((opt) => {
             const isSelected = selectedFilter === opt.id;
             return (
-              <TouchableOpacity
+              <AnimatedPressable
                 key={opt.id}
+                scaleTo={motion.scale.chip}
                 onPress={() => setSelectedFilter(opt.id)}
-                activeOpacity={0.8}
                 style={[
                   styles.filterPill,
                   {
@@ -161,7 +165,7 @@ export const KaliExploreScreen: React.FC<KaliExploreScreenProps> = ({ navigation
                 >
                   {opt.label}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             );
           })}
         </ScrollView>

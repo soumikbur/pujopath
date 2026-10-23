@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Platform, Animated, Easing } from 'react-native';
+import { View, Text, Image, StyleSheet, Platform, Animated, Easing } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,6 +9,8 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useFestival } from '@/context/FestivalContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useResponsive } from '@/hooks/useResponsive';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 
 export const MiniPlayer: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -72,7 +74,7 @@ export const MiniPlayer: React.FC = () => {
     }
   };
 
-  const floatingBottom = (isLandscape ? 40 : 56) + Math.max(safeBottom, 4) + 6;
+  const floatingBottom = (isLandscape ? 48 : 56) + Math.max(safeBottom, 4) + (isLandscape ? 4 : 6);
 
   const translateY = entranceAnim.interpolate({
     inputRange: [0, 1],
@@ -101,8 +103,8 @@ export const MiniPlayer: React.FC = () => {
         styles.floatingWrapper,
         {
           bottom: floatingBottom,
-          left: 16 + safeLeft,
-          right: 16 + safeRight,
+          left: Math.max(safeLeft, 16),
+          right: Math.max(safeRight, 16),
         },
         isLandscape && { alignItems: 'center' },
       ]}
@@ -117,7 +119,7 @@ export const MiniPlayer: React.FC = () => {
             opacity: opacity,
             transform: [{ translateY: translateY }],
           },
-          isLandscape && { maxWidth: 580, width: '100%' },
+          isLandscape && { maxWidth: 540, width: '100%', height: 56, borderRadius: 16 },
         ]}
       >
         {/* Top-edge integrated progress bar */}
@@ -126,14 +128,17 @@ export const MiniPlayer: React.FC = () => {
         </View>
 
         <View style={styles.innerRow}>
-          {/* 1. Album Artwork 44x44 */}
-          <TouchableOpacity
-            activeOpacity={0.85}
+          {/* 1. Album Artwork */}
+          <AnimatedPressable
+            scaleTo={0.96}
             onPress={() => navigation?.navigate(musicDest)}
             style={[
               styles.artworkContainer,
               { borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.45)' },
+              isLandscape && { width: 36, height: 36, borderRadius: 10 },
             ]}
+            accessibilityRole="button"
+            accessibilityLabel="View now playing track in music screen"
           >
             <Image
               source={
@@ -144,13 +149,15 @@ export const MiniPlayer: React.FC = () => {
               style={styles.artworkImage}
               resizeMode="cover"
             />
-          </TouchableOpacity>
+          </AnimatedPressable>
 
           {/* 2. Track Title, Artist & Time */}
-          <TouchableOpacity
-            activeOpacity={0.85}
+          <AnimatedPressable
+            scaleTo={0.98}
             onPress={() => navigation?.navigate(musicDest)}
             style={styles.infoContainer}
+            accessibilityRole="button"
+            accessibilityLabel="Open music player"
           >
             <Text
               style={[styles.title, { color: isDark ? '#EDE5DC' : '#292525' }]}
@@ -169,14 +176,15 @@ export const MiniPlayer: React.FC = () => {
             >
               {formatSeconds(positionMs)} / {formatSeconds(durationMs || 100000)}
             </Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
 
           {/* 3. Action Controls */}
           <View style={styles.controlsRow}>
             {/* Red Circular Play / Pause Button with tactile spring bounce */}
-            <TouchableOpacity
+            <AnimatedPressable
+              scaleTo={motion.scale.button}
               onPress={handleTogglePlay}
-              activeOpacity={0.8}
+              accessibilityRole="button"
               accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
             >
               <Animated.View
@@ -193,13 +201,14 @@ export const MiniPlayer: React.FC = () => {
                   style={{ marginLeft: isPlaying ? 0 : 2 }}
                 />
               </Animated.View>
-            </TouchableOpacity>
+            </AnimatedPressable>
 
             {/* Playlist navigation icon */}
-            <TouchableOpacity
+            <AnimatedPressable
+              scaleTo={motion.scale.icon}
               onPress={() => navigation?.navigate(musicDest)}
-              activeOpacity={0.7}
               style={styles.actionIconBtn}
+              accessibilityRole="button"
               accessibilityLabel="View music library"
             >
               <Ionicons
@@ -207,13 +216,14 @@ export const MiniPlayer: React.FC = () => {
                 size={16}
                 color={isDark ? '#EDE5DC' : 'rgba(41,37,37,0.60)'}
               />
-            </TouchableOpacity>
+            </AnimatedPressable>
 
             {/* Close button with slide out */}
-            <TouchableOpacity
+            <AnimatedPressable
+              scaleTo={motion.scale.icon}
               onPress={handleStop}
-              activeOpacity={0.7}
               style={styles.actionIconBtn}
+              accessibilityRole="button"
               accessibilityLabel="Close media player"
             >
               <Ionicons
@@ -221,7 +231,7 @@ export const MiniPlayer: React.FC = () => {
                 size={16}
                 color={isDark ? '#EDE5DC' : 'rgba(41,37,37,0.60)'}
               />
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         </View>
       </Animated.View>

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   StyleSheet,
   Alert,
 } from 'react-native';
@@ -12,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useResponsive } from '@/hooks/useResponsive';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 
 interface HelplineScreenProps {
   navigation: any;
@@ -148,9 +148,10 @@ export const HelplineScreen: React.FC<HelplineScreenProps> = ({ navigation }) =>
             const desc = language === 'bn' ? item.descBn : item.desc;
 
             return (
-              <TouchableOpacity
+              <AnimatedPressable
                 key={idx}
-                activeOpacity={0.85}
+                preset="card"
+                scaleTo={0.98}
                 onPress={() => handleCall(item.phone, name)}
                 style={[
                   styles.itemCard,
@@ -171,7 +172,7 @@ export const HelplineScreen: React.FC<HelplineScreenProps> = ({ navigation }) =>
                   <Ionicons name="call" size={16} color="#FFFFFF" />
                   <Text style={styles.callNumberText}>{item.phone}</Text>
                 </View>
-              </TouchableOpacity>
+              </AnimatedPressable>
             );
           })}
         </View>
@@ -213,10 +214,11 @@ export const HelplineScreen: React.FC<HelplineScreenProps> = ({ navigation }) =>
                 : 'Have suggestions, corrections, or new features to suggest? Send your feedback directly via LinkedIn messaging.'}
             </Text>
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 4 }}>
-              <TouchableOpacity
+              <AnimatedPressable
+                preset="button"
+                scaleTo={0.94}
                 style={[styles.callBtn, { backgroundColor: '#0A66C2', alignSelf: 'flex-start', paddingHorizontal: 16 }]}
                 onPress={() => navigation?.navigate?.('Feedback')}
-                activeOpacity={0.8}
                 accessibilityRole="button"
                 accessibilityLabel={language === 'bn' ? 'মতামত জানান' : 'Send feedback'}
               >
@@ -224,18 +226,19 @@ export const HelplineScreen: React.FC<HelplineScreenProps> = ({ navigation }) =>
                 <Text style={styles.callNumberText}>
                   {language === 'bn' ? 'মতামত দিন (Feedback)' : 'Feedback'}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
 
-              <TouchableOpacity
+              <AnimatedPressable
+                preset="button"
+                scaleTo={0.94}
                 style={[styles.callBtn, { backgroundColor: '#004182', alignSelf: 'flex-start', paddingHorizontal: 16 }]}
                 onPress={() => Linking.openURL('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/')}
-                activeOpacity={0.8}
                 accessibilityRole="button"
                 accessibilityLabel={language === 'bn' ? 'লিঙ্কডইনে বার্তা পাঠান' : 'Message on LinkedIn'}
               >
                 <Ionicons name="logo-linkedin" size={16} color="#FFFFFF" />
                 <Text style={styles.callNumberText}>LinkedIn</Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             </View>
           </View>
         </View>

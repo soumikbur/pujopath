@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   Image,
   StyleSheet,
   Platform,
@@ -13,6 +12,8 @@ import {
 } from 'react-native';
 import * as Linking from 'expo-linking';
 import { Ionicons } from '@expo/vector-icons';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTheme } from '@/context/ThemeContext';
@@ -379,47 +380,45 @@ export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, n
 
           {/* Action Row */}
           <View style={[styles.actionRow, { borderTopColor: isDark ? '#2F2720' : '#EEE8E1' }]}>
-            <Animated.View style={{ transform: [{ scale: routeScale }] }}>
-              <TouchableOpacity
-                activeOpacity={0.85}
-                onPress={handleToggleRoute}
+            <AnimatedPressable
+              scaleTo={motion.scale.button}
+              onPress={handleToggleRoute}
+              style={[
+                styles.primaryActionBtn,
+                inPlan
+                  ? {
+                      backgroundColor: colors.primarySoft,
+                      borderColor: colors.primary,
+                    }
+                  : {
+                      backgroundColor: colors.primary,
+                      borderColor: colors.primary,
+                    },
+              ]}
+            >
+              <Ionicons
+                name={inPlan ? 'checkmark-circle' : 'add-circle'}
+                size={16}
+                color={inPlan ? colors.primary : '#FFFFFF'}
+              />
+              <Text
                 style={[
-                  styles.primaryActionBtn,
-                  inPlan
-                    ? {
-                        backgroundColor: colors.primarySoft,
-                        borderColor: colors.primary,
-                      }
-                    : {
-                        backgroundColor: colors.primary,
-                        borderColor: colors.primary,
-                      },
+                  styles.primaryActionText,
+                  { color: inPlan ? colors.primary : '#FFFFFF' },
                 ]}
               >
-                <Ionicons
-                  name={inPlan ? 'checkmark-circle' : 'add-circle'}
-                  size={16}
-                  color={inPlan ? colors.primary : '#FFFFFF'}
-                />
-                <Text
-                  style={[
-                    styles.primaryActionText,
-                    { color: inPlan ? colors.primary : '#FFFFFF' },
-                  ]}
-                >
-                  {inPlan
-                    ? isBn
-                      ? 'রুটে সংরক্ষিত'
-                      : 'In Route'
-                    : isBn
-                    ? '+ রুটে যোগ করুন'
-                    : '+ Add to Route'}
-                </Text>
-              </TouchableOpacity>
-            </Animated.View>
+                {inPlan
+                  ? isBn
+                    ? 'রুটে সংরক্ষিত'
+                    : 'In Route'
+                  : isBn
+                  ? '+ রুটে যোগ করুন'
+                  : '+ Add to Route'}
+              </Text>
+            </AnimatedPressable>
 
-            <TouchableOpacity
-              activeOpacity={0.85}
+            <AnimatedPressable
+              scaleTo={motion.scale.button}
               onPress={handleOpenMaps}
               style={[
                 styles.secondaryActionBtn,
@@ -433,35 +432,33 @@ export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, n
               <Text style={[styles.secondaryActionText, { color: colors.textPrimary }]}>
                 {isBn ? 'ম্যাপে দেখুন' : 'Directions'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
 
-            <Animated.View style={{ transform: [{ scale: favScale }] }}>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={handleToggleFav}
-                style={[
-                  styles.iconActionBtn,
-                  {
-                    backgroundColor: favorited
-                      ? colors.primary
-                      : isDark
-                      ? '#201C18'
-                      : '#F5F1EB',
-                    borderColor: favorited ? colors.primary : isDark ? '#3D332A' : '#DED6CE',
-                  },
-                ]}
-                accessibilityLabel="Save pandal"
-              >
-                <Ionicons
-                  name={favorited ? 'heart' : 'heart-outline'}
-                  size={18}
-                  color={favorited ? '#FFFFFF' : isDark ? '#EDE5DC' : '#625B55'}
-                />
-              </TouchableOpacity>
-            </Animated.View>
+            <AnimatedPressable
+              scaleTo={motion.scale.iconButton}
+              onPress={handleToggleFav}
+              style={[
+                styles.iconActionBtn,
+                {
+                  backgroundColor: favorited
+                    ? colors.primary
+                    : isDark
+                    ? '#201C18'
+                    : '#F5F1EB',
+                  borderColor: favorited ? colors.primary : isDark ? '#3D332A' : '#DED6CE',
+                },
+              ]}
+              accessibilityLabel="Save pandal"
+            >
+              <Ionicons
+                name={favorited ? 'heart' : 'heart-outline'}
+                size={18}
+                color={favorited ? '#FFFFFF' : isDark ? '#EDE5DC' : '#625B55'}
+              />
+            </AnimatedPressable>
 
-            <TouchableOpacity
-              activeOpacity={0.8}
+            <AnimatedPressable
+              scaleTo={motion.scale.iconButton}
               onPress={handleShare}
               style={[
                 styles.iconActionBtn,
@@ -473,13 +470,13 @@ export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, n
               accessibilityLabel="Share pandal"
             >
               <Ionicons name="share-social-outline" size={18} color={colors.textSecondary} />
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         </View>
 
         {/* Visit Reminder Card */}
-        <TouchableOpacity
-          activeOpacity={0.85}
+        <AnimatedPressable
+          scaleTo={motion.scale.card}
           onPress={handleToggleReminder}
           style={[
             styles.reminderCard,
@@ -561,7 +558,7 @@ export const PandalDetailScreen: React.FC<PandalDetailScreenProps> = ({ route, n
             size={18}
             color={hasReminder ? '#D9531E' : colors.textMuted}
           />
-        </TouchableOpacity>
+        </AnimatedPressable>
 
         {/* Theme Section */}
         {theme && (

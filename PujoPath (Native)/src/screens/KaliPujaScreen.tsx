@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   StyleSheet,
   StatusBar,
 } from 'react-native';
@@ -11,6 +10,8 @@ import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useResponsive } from '@/hooks/useResponsive';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 import {
   AVAILABLE_KALI_PUJA_YEARS,
   getKaliPujaSchedule,
@@ -159,8 +160,9 @@ export const KaliPujaScreen: React.FC<KaliPujaScreenProps> = ({ navigation }) =>
             {AVAILABLE_KALI_PUJA_YEARS.map((yr) => {
               const isSelected = yr === selectedYear;
               return (
-                <TouchableOpacity
+                <AnimatedPressable
                   key={yr}
+                  scaleTo={motion.scale.chip}
                   style={[
                     styles.yearChip,
                     {
@@ -173,7 +175,6 @@ export const KaliPujaScreen: React.FC<KaliPujaScreenProps> = ({ navigation }) =>
                     },
                   ]}
                   onPress={() => setSelectedYear(yr)}
-                  activeOpacity={0.8}
                   accessibilityLabel={`Select year ${yr}`}
                 >
                   <Text
@@ -192,7 +193,7 @@ export const KaliPujaScreen: React.FC<KaliPujaScreenProps> = ({ navigation }) =>
                       ]}
                     />
                   )}
-                </TouchableOpacity>
+                </AnimatedPressable>
               );
             })}
           </View>

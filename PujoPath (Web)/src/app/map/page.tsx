@@ -214,13 +214,18 @@ export default function MapPage() {
         'flex flex-col',
         isFullscreen
           ? 'fixed inset-0 z-[9999] w-screen h-screen bg-[#faf7f2] dark:bg-[#14110e] p-2 sm:p-4'
-          : 'space-y-3 sm:space-y-4 max-w-7xl mx-auto h-[calc(100dvh-13.5rem)] sm:h-[calc(100vh-12rem)] min-h-[380px] pb-2 sm:pb-4'
+          : 'space-y-3 sm:space-y-4 w-full max-w-7xl mx-auto h-[calc(100dvh-13.5rem)] sm:h-[calc(100vh-12rem)] min-h-[380px] pb-2 sm:pb-4 min-w-0'
       )}
     >
+      {/* Semantic h1 heading for accessibility & screen readers */}
+      <h1 className="sr-only">
+        {isBn ? 'ইন্টারেক্টিভ পুজো ম্যাপ ও পরিক্রমা রুট' : 'Interactive Durga Puja & Kali Puja Map'}
+      </h1>
+
       {/* Festival Switcher Bar (Hidden in Fullscreen to maximize view area) */}
       {!isFullscreen && (
-        <div className="flex items-center justify-between gap-3 shrink-0 flex-wrap">
-          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#f4ede4] dark:bg-[#201c18] border border-[#eee8e1] dark:border-[#2f2720]">
+        <div className="flex items-center justify-between gap-2 sm:gap-3 shrink-0 flex-wrap w-full max-w-full">
+          <div className="flex items-center gap-1 sm:gap-1.5 p-1 rounded-2xl bg-[#f4ede4] dark:bg-[#201c18] border border-[#eee8e1] dark:border-[#2f2720] max-w-full overflow-x-auto no-scrollbar">
             <button
               type="button"
               onClick={() => {
@@ -230,7 +235,7 @@ export default function MapPage() {
                 setSelectedFilter('All');
               }}
               className={cn(
-                'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all cursor-pointer',
+                'px-3 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer whitespace-nowrap',
                 !isKali
                   ? 'bg-[#b42323] text-white shadow-xs'
                   : 'text-[#625b55] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white'
@@ -248,7 +253,7 @@ export default function MapPage() {
                 setSelectedFilter('Barasat' as any);
               }}
               className={cn(
-                'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all cursor-pointer',
+                'px-3 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer whitespace-nowrap',
                 isKali
                   ? 'bg-purple-700 text-white shadow-xs'
                   : 'text-[#625b55] dark:text-[#a89e95] hover:text-[#242424] dark:hover:text-white'

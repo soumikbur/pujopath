@@ -3,12 +3,13 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   Image,
   StyleSheet,
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { motion } from '@/theme/motion';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { PujoBackground } from '@/components/PujoBackground';
@@ -156,15 +157,20 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     [isBn, isDark, toggleTheme, toggleLanguageCallback, navigateSavedCallback]
   );
 
-  const availableContentWidth = width - screenPaddingLeft - screenPaddingRight;
+  const availableContentWidth = isLandscape
+    ? Math.min(width - screenPaddingLeft - screenPaddingRight, 920)
+    : width - screenPaddingLeft - screenPaddingRight;
+
   const portraitTwoColWidth = Math.floor((availableContentWidth - 12) / 2);
+  const landscapeThreeColWidth = Math.floor((availableContentWidth - 24) / 3);
+  const landscapeSixColWidth = Math.floor((availableContentWidth - 60) / 6);
 
   const quickCardWidth = isLandscape
-    ? (width >= 960 ? '15.4%' : '31.8%')
+    ? (width >= 960 ? landscapeSixColWidth : landscapeThreeColWidth)
     : portraitTwoColWidth;
 
   const pillCardWidth = isLandscape
-    ? (width >= 960 ? '15.5%' : '31.8%')
+    ? (width >= 960 ? landscapeSixColWidth : landscapeThreeColWidth)
     : portraitTwoColWidth;
 
   return (
@@ -248,8 +254,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
           {/* CTA Buttons */}
           <View style={[styles.heroButtonRow, isLandscape && styles.heroButtonRowLandscape]}>
-            <TouchableOpacity
-              activeOpacity={0.88}
+            <AnimatedPressable
+              scaleTo={motion.scale.button}
               onPress={() => navigation.navigate('Explore')}
               style={[styles.heroPrimaryBtn, isLandscape && styles.heroBtnLandscape]}
             >
@@ -258,10 +264,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 {isBn ? 'প্যান্ডেল খুঁজুন' : 'Find pandals'}
               </Text>
               <Ionicons name="arrow-forward" size={13} color="#FFFFFF" />
-            </TouchableOpacity>
+            </AnimatedPressable>
 
-            <TouchableOpacity
-              activeOpacity={0.85}
+            <AnimatedPressable
+              scaleTo={motion.scale.button}
               onPress={() => navigation.navigate('Planner')}
               style={[
                 styles.heroSecondaryBtn,
@@ -276,7 +282,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               <Text style={[styles.heroSecondaryBtnText, { color: isDark ? '#FAF6F0' : '#1C1917' }]}>
                 {isBn ? 'রুট তৈরি করুন' : 'Build a route'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         </View>
 
@@ -290,9 +296,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
           <View style={styles.quickAccessGrid}>
             {quickAccessItems.map((item) => (
-              <TouchableOpacity
+              <AnimatedPressable
                 key={item.screen}
-                activeOpacity={0.82}
+                scaleTo={motion.scale.card}
                 onPress={() => navigation.navigate(item.screen)}
                 style={[
                   styles.quickCard,
@@ -336,7 +342,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     {item.desc}
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </AnimatedPressable>
             ))}
           </View>
         </View>
@@ -344,8 +350,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         {/* ========================================================= */}
         {/* 2.5 KALI PUJA SPECIAL FESTIVAL CARD                       */}
         {/* ========================================================= */}
-        <TouchableOpacity
-          activeOpacity={0.88}
+        <AnimatedPressable
+          scaleTo={motion.scale.card}
           onPress={() => navigation.navigate('KaliPuja')}
           style={[
             styles.kaliPujaCard,
@@ -428,7 +434,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               </View>
             </>
           )}
-        </TouchableOpacity>
+        </AnimatedPressable>
 
         {/* ========================================================= */}
         {/* 3. PUJA HIGHLIGHTS (3 COLUMNS IN LANDSCAPE)               */}
@@ -447,21 +453,21 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               </Text>
             </View>
 
-            <TouchableOpacity
-              activeOpacity={0.8}
+            <AnimatedPressable
+              scaleTo={motion.scale.button}
               onPress={() => navigation.navigate('Explore')}
               style={styles.viewAllBtn}
             >
               <Text style={styles.viewAllText}>{isBn ? 'সব দেখুন' : 'View all'}</Text>
               <Ionicons name="arrow-forward" size={13} color="#B42323" />
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
 
           <View style={[styles.highlightsList, isLandscape && styles.highlightsListLandscape]}>
             {highlights.map((item, idx) => (
-              <TouchableOpacity
+              <AnimatedPressable
                 key={idx}
-                activeOpacity={0.85}
+                scaleTo={motion.scale.card}
                 onPress={() => navigation.navigate(item.screen)}
                 style={[
                   styles.highlightCard,
@@ -503,7 +509,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     {item.desc}
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </AnimatedPressable>
             ))}
           </View>
         </View>
@@ -515,9 +521,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           {featurePills.map((pill, idx) => {
             const isClickable = Boolean(pill.onPress);
             return (
-              <TouchableOpacity
+              <AnimatedPressable
                 key={idx}
-                activeOpacity={isClickable ? 0.8 : 1}
+                scaleTo={isClickable ? motion.scale.card : 1}
                 onPress={pill.onPress}
                 disabled={!isClickable}
                 style={[
@@ -540,7 +546,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     {pill.desc}
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </AnimatedPressable>
             );
           })}
         </View>
@@ -548,8 +554,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         {/* ========================================================= */}
         {/* 5. FOOTER CREDIT LINE                                     */}
         {/* ========================================================= */}
-        <TouchableOpacity
-          activeOpacity={0.8}
+        <AnimatedPressable
+          scaleTo={motion.scale.button}
           onPress={() => navigation.navigate('Developer')}
           style={styles.footerContainer}
         >
@@ -557,7 +563,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             {isBn ? 'নির্মাণে সৌমিক ও মৌমিতা with ' : 'Made by Soumik & Moumita with '}
             <Text style={{ color: '#E02424' }}>❤️</Text>
           </Text>
-        </TouchableOpacity>
+        </AnimatedPressable>
       </ScrollView>
     </View>
   );

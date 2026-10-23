@@ -37,7 +37,7 @@ export default function FeedbackPage() {
   ];
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto pb-14 px-1">
+    <div className="space-y-8 w-full max-w-4xl mx-auto pb-14 px-1 min-w-0">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 text-[#0a66c2] dark:text-[#70b5f9] text-xs sm:text-sm font-bold uppercase tracking-wider">

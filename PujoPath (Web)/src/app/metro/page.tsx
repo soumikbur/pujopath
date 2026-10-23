@@ -40,7 +40,7 @@ export default function MetroPage() {
       : METRO_STATIONS_DATA.filter((s) => s.line === selectedStationLine);
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-12">
+    <div className="space-y-6 w-full max-w-5xl mx-auto pb-12 min-w-0">
       <div>
         <div className="flex items-center gap-2 text-[#b42323] text-xs sm:text-sm font-bold uppercase tracking-wider">
           <Train className="w-4 h-4" />
@@ -57,7 +57,7 @@ export default function MetroPage() {
       </div>
 
       {/* Segmented Control Navigation */}
-      <div className="pt-1">
+      <div className="pt-1 max-w-full overflow-x-auto no-scrollbar">
         <AnimatedSegmentedControl<MetroViewTab>
           options={[
             {

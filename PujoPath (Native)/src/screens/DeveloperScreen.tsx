@@ -4,7 +4,6 @@ import {
   Text,
   ScrollView,
   Image,
-  TouchableOpacity,
   StyleSheet,
   Linking,
 } from 'react-native';
@@ -12,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useResponsive } from '@/hooks/useResponsive';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 
 interface DeveloperScreenProps {
   navigation: any;
@@ -158,17 +158,18 @@ export const DeveloperScreen: React.FC<DeveloperScreenProps> = ({ navigation }) 
           <Text style={[styles.profileLabel, { color: colors.textMuted }]}>
             {isBn ? 'পেশাদার প্রোফাইল' : 'Professional Profile'}
           </Text>
-          <TouchableOpacity
+          <AnimatedPressable
+            preset="button"
+            scaleTo={0.94}
             style={styles.linkedInBtn}
             onPress={() => Linking.openURL('https://www.linkedin.com/in/moumita-shee-798505226/')}
-            activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel="Moumita LinkedIn Profile"
           >
             <Ionicons name="logo-linkedin" size={15} color="#FFFFFF" />
             <Text style={styles.linkedInText}>{isBn ? 'লিঙ্কডইন' : 'LinkedIn'}</Text>
             <Ionicons name="open-outline" size={13} color="#FFFFFF" />
-          </TouchableOpacity>
+          </AnimatedPressable>
         </View>
       </View>
 
@@ -231,17 +232,18 @@ export const DeveloperScreen: React.FC<DeveloperScreenProps> = ({ navigation }) 
           <Text style={[styles.profileLabel, { color: colors.textMuted }]}>
             {isBn ? 'পেশাদার প্রোফাইল' : 'Professional Profile'}
           </Text>
-          <TouchableOpacity
+          <AnimatedPressable
+            preset="button"
+            scaleTo={0.94}
             style={styles.linkedInBtn}
             onPress={() => Linking.openURL('https://www.linkedin.com/in/soumik-ghosh-883a1a22b/')}
-            activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel="Soumik LinkedIn Profile"
           >
             <Ionicons name="logo-linkedin" size={15} color="#FFFFFF" />
             <Text style={styles.linkedInText}>{isBn ? 'লিঙ্কডইন' : 'LinkedIn'}</Text>
             <Ionicons name="open-outline" size={13} color="#FFFFFF" />
-          </TouchableOpacity>
+          </AnimatedPressable>
         </View>
       </View>
       </View>
@@ -273,16 +275,17 @@ export const DeveloperScreen: React.FC<DeveloperScreenProps> = ({ navigation }) 
           </Text>
         </View>
 
-        <TouchableOpacity
+        <AnimatedPressable
+          preset="button"
+          scaleTo={0.95}
           style={styles.shareFeedbackBtn}
           onPress={() => navigation.navigate('Feedback')}
-          activeOpacity={0.85}
         >
           <Ionicons name="mail" size={16} color="#FFFFFF" />
           <Text style={styles.shareFeedbackText}>
             {isBn ? 'মতামত দিন' : 'Share Feedback'}
           </Text>
-        </TouchableOpacity>
+        </AnimatedPressable>
       </View>
     </ScrollView>
   );

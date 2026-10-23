@@ -75,7 +75,7 @@ export default function KaliPujaPage() {
   }, []);
 
   return (
-    <div className="space-y-10 max-w-5xl mx-auto pb-16 px-1">
+    <div className="space-y-8 sm:space-y-10 w-full max-w-5xl mx-auto pb-16 px-1.5 sm:px-4 min-w-0 overflow-hidden">
       {/* 1. HERO BANNER */}
       <div className="relative overflow-hidden rounded-3xl p-7 sm:p-10 bg-gradient-to-br from-[#1b0a2a] via-[#2d1245] to-[#12071d] text-white border border-[#4c1d7a]/50 shadow-2xl">
         <div className="relative z-10 space-y-4">
@@ -193,7 +193,7 @@ export default function KaliPujaPage() {
               <span className="text-xs font-bold uppercase tracking-wider text-[#92400e] dark:text-amber-400">
                 {isBn ? 'পূজার পুণ্য সময়সীমা (কলকাতা):' : 'Auspicious Midnight Window (Kolkata):'}
               </span>
-              <div className="text-2xl sm:text-3xl font-black text-[#78350f] dark:text-amber-300 mt-0.5">
+              <div className="text-lg sm:text-2xl md:text-3xl font-black text-[#78350f] dark:text-amber-300 mt-0.5 break-words">
                 {isBn ? schedule.nishitaKaalPuja.windowStringBn : schedule.nishitaKaalPuja.windowString}
               </div>
             </div>
