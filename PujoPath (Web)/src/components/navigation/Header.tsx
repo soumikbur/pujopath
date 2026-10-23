@@ -35,7 +35,7 @@ export function Header() {
   const { theme, toggleTheme } = useTheme();
   const { savedPandalIds } = useFavorites();
   const { unreadCount } = useNotifications();
-  const { activeFestival, isKali } = useFestival();
+  const { activeFestival, isKali, isDurga } = useFestival();
   const [moreOpen, setMoreOpen] = useState(false);
   const [installModalOpen, setInstallModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -96,7 +96,7 @@ export function Header() {
         {/* Brand Logo & Active Festival Pill */}
         <div className="flex items-center gap-1 sm:gap-2.5 shrink-0 min-w-0">
           <Link
-            href="/"
+            href={activeFestival ? `/?festival=${activeFestival}` : '/'}
             className="flex items-center text-base sm:text-xl font-extrabold tracking-tight text-[#b42323] transition-transform active:scale-95 shrink-0"
             aria-label="PujoPath home"
           >
@@ -110,12 +110,26 @@ export function Header() {
               'flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold border transition-all active:scale-95 shadow-xs shrink-0',
               isKali
                 ? 'bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-800 hover:border-purple-400'
-                : 'bg-[#fdeeee] dark:bg-[#341b18] text-[#b42323] dark:text-[#ff8787] border-[#f6ceca] dark:border-[#532822] hover:border-pujo-red/50'
+                : isDurga
+                ? 'bg-[#fdeeee] dark:bg-[#341b18] text-[#b42323] dark:text-[#ff8787] border-[#f6ceca] dark:border-[#532822] hover:border-pujo-red/50'
+                : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-stone-400'
             )}
             title={isBn ? 'উৎসব নির্বাচন ও পরিবর্তন করুন' : 'Change festival experience'}
           >
-            <span className="hidden min-[480px]:inline">{isKali ? (isBn ? '🪔 শ্যামাপূজা ▾' : '🪔 Kali Puja ▾') : (isBn ? '🌸 দুর্গাপূজা ▾' : '🌸 Durga Puja ▾')}</span>
-            <span className="min-[480px]:hidden">{isKali ? '🪔' : '🌸'}</span>
+            <span className="hidden min-[480px]:inline">
+              {isKali
+                ? isBn
+                  ? '🪔 শ্যামাপূজা ▾'
+                  : '🪔 Kali Puja ▾'
+                : isDurga
+                ? isBn
+                  ? '🌸 দুর্গাপূজা ▾'
+                  : '🌸 Durga Puja ▾'
+                : isBn
+                ? '✨ উৎসব নির্বাচন ▾'
+                : '✨ Choose Festival ▾'}
+            </span>
+            <span className="min-[480px]:hidden">{isKali ? '🪔' : isDurga ? '🌸' : '✨'}</span>
           </Link>
         </div>
 

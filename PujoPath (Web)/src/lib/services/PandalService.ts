@@ -7,7 +7,7 @@ export class PandalService {
     userLat?: number,
     userLng?: number,
     extraPandals?: Pandal[],
-    festival: 'durga' | 'kali' | 'all' = 'all'
+    festival: 'durga' | 'kali' | 'all' | null = 'all'
   ): Pandal[] {
     const dataSource =
       festival === 'durga'
@@ -61,7 +61,7 @@ export class PandalService {
     userLat?: number,
     userLng?: number,
     extraPandals?: Pandal[],
-    festival: 'durga' | 'kali' | 'all' = 'all'
+    festival: 'durga' | 'kali' | 'all' | null = 'all'
   ): Pandal[] {
     let list = this.getAllPandals(userLat, userLng, extraPandals, festival);
 

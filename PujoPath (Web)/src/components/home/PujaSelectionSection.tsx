@@ -2,15 +2,22 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Sparkles, Flame, Check, ArrowRight, Compass } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nContext';
-import { useFestival } from '@/lib/context/FestivalContext';
+import { useFestival, FestivalType } from '@/lib/context/FestivalContext';
 import { cn } from '@/lib/utils/cn';
 
 export function PujaSelectionSection() {
+  const router = useRouter();
   const { locale } = useI18n();
   const isBn = locale === 'bn';
   const { activeFestival, selectFestival } = useFestival();
+
+  const handleSwitch = (festival: FestivalType) => {
+    selectFestival(festival);
+    router.push(`/?festival=${festival}`);
+  };
 
   return (
     <section
@@ -46,7 +53,7 @@ export function PujaSelectionSection() {
         {/* 1. Durga Puja Option */}
         <button
           type="button"
-          onClick={() => selectFestival('durga')}
+          onClick={() => handleSwitch('durga')}
           className={cn(
             'flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border text-left transition-all duration-200 active:scale-[0.98]',
             activeFestival === 'durga'
@@ -99,7 +106,7 @@ export function PujaSelectionSection() {
         {/* 2. Kali Puja Option */}
         <button
           type="button"
-          onClick={() => selectFestival('kali')}
+          onClick={() => handleSwitch('kali')}
           className={cn(
             'flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border text-left transition-all duration-200 active:scale-[0.98]',
             activeFestival === 'kali'

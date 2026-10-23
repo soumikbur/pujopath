@@ -50,31 +50,32 @@ export const FESTIVAL_THEMES: Record<FestivalType, FestivalThemeTokens> = {
 const FESTIVAL_STORAGE_KEY = '@pujopath_active_festival';
 
 interface FestivalContextType {
-  activeFestival: FestivalType;
+  activeFestival: FestivalType | null;
   selectFestival: (festival: FestivalType) => void;
   resetFestival: () => void;
   toggleFestival: () => void;
   festivalTheme: FestivalThemeTokens;
   isKali: boolean;
   isDurga: boolean;
+  hasSelectedFestival: boolean;
 }
 
 const FestivalContext = createContext<FestivalContextType>({
-  activeFestival: 'durga',
+  activeFestival: null,
   selectFestival: () => {},
   resetFestival: () => {},
   toggleFestival: () => {},
   festivalTheme: FESTIVAL_THEMES.durga,
   isKali: false,
-  isDurga: true,
+  isDurga: false,
+  hasSelectedFestival: false,
 });
 
 export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [activeFestival, setActiveFestival] = useState<FestivalType>('durga');
+  const [activeFestival, setActiveFestival] = useState<FestivalType | null>(null);
 
   useEffect(() => {
     try {
-      // 1. Check URL search param if present (e.g. ?festival=kali)
       if (typeof window !== 'undefined') {
         const urlParams = new URLSearchParams(window.location.search);
         const festParam = urlParams.get('festival');
@@ -84,7 +85,16 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           return;
         }
 
-        // 2. Check saved storage preference
+        // Root URL '/' without ?festival parameter MUST NOT auto-select Durga Puja.
+        // Even if previously stored in localStorage, initial landing on '/' displays the Puja Selection page.
+        const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
+        if (pathname === '/') {
+          setActiveFestival(null);
+          return;
+        }
+
+        // For direct navigation to deep category-specific routes (e.g. /explore, /map),
+        // check saved preference.
         const saved = localStorage.getItem(FESTIVAL_STORAGE_KEY);
         if (saved === 'kali' || saved === 'durga') {
           setActiveFestival(saved);
@@ -101,14 +111,17 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const resetFestival = () => {
-    selectFestival('durga');
+    setActiveFestival(null);
+    try {
+      localStorage.removeItem(FESTIVAL_STORAGE_KEY);
+    } catch {}
   };
 
   const toggleFestival = () => {
-    selectFestival(activeFestival === 'durga' ? 'kali' : 'durga');
+    selectFestival(activeFestival === 'kali' ? 'durga' : 'kali');
   };
 
-  const festivalTheme = FESTIVAL_THEMES[activeFestival] || FESTIVAL_THEMES.durga;
+  const festivalTheme = (activeFestival && FESTIVAL_THEMES[activeFestival]) || FESTIVAL_THEMES.durga;
 
   return (
     <FestivalContext.Provider
@@ -120,6 +133,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         festivalTheme,
         isKali: activeFestival === 'kali',
         isDurga: activeFestival === 'durga',
+        hasSelectedFestival: activeFestival !== null,
       }}
     >
       {children}

@@ -25,11 +25,13 @@ import {
 } from 'lucide-react';
 import { NATIVE_APK_DOWNLOAD_URL } from '@/lib/config';
 import { useI18n } from '@/lib/i18n/I18nContext';
+import { useFestival } from '@/lib/context/FestivalContext';
 import { cn } from '@/lib/utils/cn';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
   const { locale } = useI18n();
+  const { activeFestival } = useFestival();
   const isBn = locale === 'bn';
   const [moreOpen, setMoreOpen] = useState(false);
 
@@ -49,7 +51,7 @@ export function MobileBottomNav() {
   }, []);
 
   const mainItems = [
-    { href: '/', label: isBn ? 'হোম' : 'Home', icon: Home },
+    { href: activeFestival ? `/?festival=${activeFestival}` : '/', label: isBn ? 'হোম' : 'Home', icon: Home },
     { href: '/explore', label: isBn ? 'অন্বেষণ' : 'Explore', icon: Compass },
     { href: '/map', label: isBn ? 'মানচিত্র' : 'Map', icon: MapPin },
     { href: '/planner', label: isBn ? 'পরিকল্পনা' : 'Planner', icon: Route },
